@@ -1,4 +1,23 @@
+# Project information
 site_name: ISCC - Content Identifiers
+site_description: International Standard Content Code
+site_author: Titusz Pan
+site_url: http://iscc.codes
+
+# Repository
+repo_name: GitHub
+repo_url: https://github.com/coblo/iscc-specs
+edit_uri: edit/master/docs/
+
+# Copyright
+copyright: 'Copyright (CC BY-NC-SA 4.0) 2017, Content Blockchain Project'
+
+# Documentation and Ttheme
 theme: 'material'
+
+# Options
+extra:
+    version: '0.0.1'
+
 markdown_extensions:
   - admonition
