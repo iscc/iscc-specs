@@ -1,23 +1,47 @@
 # Project information
-site_name: ISCC - Content Identifiers
-site_description: International Standard Content Code
-site_author: Titusz Pan
-site_url: http://iscc.codes
+site_name: 'ISCC - Content Identifiers'
+site_description: 'International Standard Content Code - Specification'
+site_author: 'Titusz Pan'
+site_url: 'http://iscc.codes'
+site_favicon: 'images/favicon.png'
 
 # Repository
-repo_name: GitHub
-repo_url: https://github.com/coblo/iscc-specs
-edit_uri: edit/master/docs/
+repo_name: 'coblo/iscc-specs'
+repo_url: 'https://github.com/coblo/iscc-specs'
+edit_uri: 'edit/master/docs/'
 
 # Copyright
-copyright: 'Copyright (CC BY-NC-SA 4.0) 2017, Content Blockchain Project'
+copyright: 'Copyright © 2016-2017, Content Blockchain Project'
 
 # Documentation and Ttheme
 theme: 'material'
 
+pages:
+    - ISCC - Introduction: 'index.md'
+    - ISCC - Concept: 'concept.md'
+    - ISCC - Specification (Draft): 'specification.md'
+    - Contributing: 'contributing.md'
+    - License: 'license.md'
+
 # Options
 extra:
-    version: '0.0.1'
+    logo: 'images/logo-white.svg'
+    palette:
+        primary: 'blue'
+        accent: 'red'
+    social:
+    -
+        type: 'github'
+        link: 'https://github.com/coblo'
+    -
+        type: 'home'
+        link: 'https://content-blockchain.org'
+    feature:
+        tabs: false
 
 markdown_extensions:
-  - admonition
+    - abbr
+    - admonition
+    - codehilite(guess_lang=false)
+    - toc(permalink=true)
+    - def_list
