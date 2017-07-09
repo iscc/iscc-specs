@@ -8,7 +8,7 @@
 The latest version of this document can be found at [iscc.codes](http://iscc.codes)
 
 ## Abstract
-ISCC is a Identifier for digital content, that can be created by anybody from minimal metadata and the content itself. The ISCC specification defines and describes the technical procedures needed to create ISCC identifiers.
+ISCC is an identifier for digital content, that can be created by anybody from minimal metadata and the content itself. The ISCC specification defines and describes the technical procedures needed to create ISCC identifiers.
 
 ## Status of this Document
 
