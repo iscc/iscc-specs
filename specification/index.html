@@ -10,28 +10,28 @@
         <meta name="description" content="International Standard Content Code - Specification">
       
       
-        <link rel="canonical" href="http://iscc.codes/">
+        <link rel="canonical" href="http://iscc.codes/specification/">
       
       
         <meta name="author" content="Titusz Pan">
       
       
-        <link rel="shortcut icon" href="./images/favicon.png">
+        <link rel="shortcut icon" href="../images/favicon.png">
       
       <meta name="generator" content="mkdocs-0.16.3, mkdocs-material-1.7.4">
     
     
       
-        <title>ISCC - Content Identifiers</title>
+        <title>ISCC - Specification (Draft) - ISCC - Content Identifiers</title>
       
     
     
-      <script src="./assets/javascripts/modernizr-1df76c4e58.js"></script>
+      <script src="../assets/javascripts/modernizr-1df76c4e58.js"></script>
     
     
-      <link rel="stylesheet" href="./assets/stylesheets/application-769c285a91.css">
+      <link rel="stylesheet" href="../assets/stylesheets/application-769c285a91.css">
       
-        <link rel="stylesheet" href="./assets/stylesheets/application-02c2a4388f.palette.css">
+        <link rel="stylesheet" href="../assets/stylesheets/application-02c2a4388f.palette.css">
       
     
     
@@ -71,7 +71,7 @@
       <div class="md-flex__cell md-flex__cell--shrink">
         
           <a href="http://iscc.codes" title="ISCC - Content Identifiers" class="md-logo md-header-nav__button">
-            <img src="./images/logo-white.svg" width="24" height="24">
+            <img src="../images/logo-white.svg" width="24" height="24">
           </a>
         
       </div>
@@ -84,7 +84,7 @@
             
               
             
-            ISCC - Introduction
+            ISCC - Specification (Draft)
           
         </span>
       </div>
@@ -157,7 +157,7 @@
   <label class="md-nav__title md-nav__title--site" for="drawer">
     
       <i class="md-logo md-nav__button">
-        <img src="./images/logo-white.svg">
+        <img src="../images/logo-white.svg">
       </i>
     
     ISCC - Content Identifiers
@@ -191,6 +191,30 @@
       
       
 
+
+  <li class="md-nav__item">
+    <a href=".." title="ISCC - Introduction" class="md-nav__link">
+      ISCC - Introduction
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../concept/" title="ISCC - Concept" class="md-nav__link">
+      ISCC - Concept
+    </a>
+  </li>
+
+    
+      
+      
+      
+
   
 
 
@@ -202,11 +226,11 @@
     
     
       <label class="md-nav__link md-nav__link--active" for="toc">
-        ISCC - Introduction
+        ISCC - Specification (Draft)
       </label>
     
-    <a href="." title="ISCC - Introduction" class="md-nav__link md-nav__link--active">
-      ISCC - Introduction
+    <a href="./" title="ISCC - Specification (Draft)" class="md-nav__link md-nav__link--active">
+      ISCC - Specification (Draft)
     </a>
     
       
@@ -220,15 +244,22 @@
     <ul class="md-nav__list" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#better-content-identifiers" title="Better Content Identifiers" class="md-nav__link">
-    Better Content Identifiers
+  <a href="#abstract" title="Abstract" class="md-nav__link">
+    Abstract
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#how-it-works" title="How it works" class="md-nav__link">
-    How it works
+  <a href="#status-of-this-document" title="Status of this Document" class="md-nav__link">
+    Status of this Document
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#identifier-format" title="Identifier Format" class="md-nav__link">
+    Identifier Format
   </a>
   
 </li>
@@ -248,31 +279,7 @@
 
 
   <li class="md-nav__item">
-    <a href="concept/" title="ISCC - Concept" class="md-nav__link">
-      ISCC - Concept
-    </a>
-  </li>
-
-    
-      
-      
-      
-
-
-  <li class="md-nav__item">
-    <a href="specification/" title="ISCC - Specification (Draft)" class="md-nav__link">
-      ISCC - Specification (Draft)
-    </a>
-  </li>
-
-    
-      
-      
-      
-
-
-  <li class="md-nav__item">
-    <a href="contributing/" title="Contributing" class="md-nav__link">
+    <a href="../contributing/" title="Contributing" class="md-nav__link">
       Contributing
     </a>
   </li>
@@ -284,7 +291,7 @@
 
 
   <li class="md-nav__item">
-    <a href="license/" title="License" class="md-nav__link">
+    <a href="../license/" title="License" class="md-nav__link">
       License
     </a>
   </li>
@@ -311,15 +318,22 @@
     <ul class="md-nav__list" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#better-content-identifiers" title="Better Content Identifiers" class="md-nav__link">
-    Better Content Identifiers
+  <a href="#abstract" title="Abstract" class="md-nav__link">
+    Abstract
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#how-it-works" title="How it works" class="md-nav__link">
-    How it works
+  <a href="#status-of-this-document" title="Status of this Document" class="md-nav__link">
+    Status of this Document
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#identifier-format" title="Identifier Format" class="md-nav__link">
+    Identifier Format
   </a>
   
 </li>
@@ -338,23 +352,63 @@
             <article class="md-content__inner md-typeset">
               
                 
-                  <a href="https://github.com/coblo/iscc-specs/edit/master/docs/index.md" title="Edit this page" class="md-icon md-content__icon">edit</a>
+                  <a href="https://github.com/coblo/iscc-specs/edit/master/docs/specification.md" title="Edit this page" class="md-icon md-content__icon">edit</a>
                 
                 
-                <h1 id="iscc-international-standard-content-code">ISCC - International Standard Content Code<a class="headerlink" href="#iscc-international-standard-content-code" title="Permanent link">&para;</a></h1>
+                <h1 id="iscc-specification-draft"><abbr title="International Standard Content Code">ISCC</abbr> - Specification (Draft)<a class="headerlink" href="#iscc-specification-draft" title="Permanent link">&para;</a></h1>
+<p><strong>International Standard Content Code</strong></p>
 <div class="admonition attention">
 <p class="admonition-title">Attention</p>
-<p>This site is work in progress!</p>
+<p>This document is work in progress!</p>
 </div>
-<p>The latest version of these pages can be found at <a href="http://iscc.codes">iscc.codes</a></p>
-<h2 id="better-content-identifiers">Better Content Identifiers<a class="headerlink" href="#better-content-identifiers" title="Permanent link">&para;</a></h2>
-<p>Currently, the media industry is still relying on identifiers that were designed for physical products such as printed books and magazines. However, traditional identifiers (like ISBN, ISSN or ISRC) fall short of the requirements for digital trade.</p>
-<p>Freely accessible standard <strong>identifiers</strong>, which are specifically <strong>designed for digital content</strong>, are a fundamental prerequisite for transactions and sales activities in a digital and increasingly heterogeneous media environment.</p>
-<p>With better identifiers for digital content, the entire ecosystem becomes more efficient.</p>
-<p><img alt="iscc-sample" src="./images/iscc-sample.svg" /></p>
-<h2 id="how-it-works">How it works<a class="headerlink" href="#how-it-works" title="Permanent link">&para;</a></h2>
-<p>The major innovation of the ISCC: identifiers will be generated algorithmically and in a decentralized way from a basic set of metadata and the content itself. This inseparably links any specific content manifestation to a specific ID.</p>
-<p>The ISCC is a unique, hierarchically structured composite identifier. It is built from a generic and balanced mix of content-derived, locality-sensitive and similarity-preserving hashes generated from metadata and content.</p>
+<p>The latest version of this document can be found at <a href="http://iscc.codes">iscc.codes</a></p>
+<h2 id="abstract">Abstract<a class="headerlink" href="#abstract" title="Permanent link">&para;</a></h2>
+<p><abbr title="International Standard Content Code">ISCC</abbr> is a Identifier for digital content, that can be created by anybody from minimal metadata and the content itself. The <abbr title="International Standard Content Code">ISCC</abbr> specification defines and describes the technical procedures needed to create <abbr title="International Standard Content Code">ISCC</abbr> identifiers.</p>
+<h2 id="status-of-this-document">Status of this Document<a class="headerlink" href="#status-of-this-document" title="Permanent link">&para;</a></h2>
+<p>This document is the <strong>first draft</strong> of the open and vendor neutral <abbr title="International Standard Content Code">ISCC</abbr> 1.0 specification. The content of this document is determined by its authors in an open consensus process. All participants of the wider content ecosystem are invited to contribute.</p>
+<h2 id="identifier-format">Identifier Format<a class="headerlink" href="#identifier-format" title="Permanent link">&para;</a></h2>
+<p>The <abbr title="International Standard Content Code">ISCC</abbr> identifier is build from multiple 64-bit components:</p>
+<table>
+<thead>
+<tr>
+<th>Components:</th>
+<th>Meta-ID</th>
+<th>Content-ID</th>
+<th>Data-ID</th>
+<th>Instance-ID</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Identifies:</strong></td>
+<td>Intangible creation</td>
+<td>Content similarity</td>
+<td>Data similarity</td>
+<td>Data integirty</td>
+</tr>
+<tr>
+<td><strong>Required:</strong></td>
+<td>Yes</td>
+<td>No</td>
+<td>Yes</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td><strong>Input:</strong></td>
+<td>Metadata</td>
+<td>Extracted  content</td>
+<td>Raw data</td>
+<td>Raw data</td>
+</tr>
+<tr>
+<td><strong>Size:</strong></td>
+<td>64 Bits</td>
+<td>64 Bits</td>
+<td>64 Bits</td>
+<td>64 Bits</td>
+</tr>
+</tbody>
+</table>
                 
                   
                 
@@ -373,14 +427,28 @@
     <div class="md-footer-nav">
       <nav class="md-footer-nav__inner md-grid">
         
+          <a href="../concept/" title="ISCC - Concept" class="md-flex md-footer-nav__link md-footer-nav__link--prev" rel="prev">
+            <div class="md-flex__cell md-flex__cell--shrink">
+              <i class="md-icon md-icon--arrow-back md-footer-nav__button"></i>
+            </div>
+            <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
+              <span class="md-flex__ellipsis">
+                <span class="md-footer-nav__direction">
+                  Previous
+                </span>
+                ISCC - Concept
+              </span>
+            </div>
+          </a>
         
-          <a href="concept/" title="ISCC - Concept" class="md-flex md-footer-nav__link md-footer-nav__link--next" rel="next">
+        
+          <a href="../contributing/" title="Contributing" class="md-flex md-footer-nav__link md-footer-nav__link--next" rel="next">
             <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
               <span class="md-flex__ellipsis">
                 <span class="md-footer-nav__direction">
                   Next
                 </span>
-                ISCC - Concept
+                Contributing
               </span>
             </div>
             <div class="md-flex__cell md-flex__cell--shrink">
@@ -424,10 +492,10 @@
       
     </div>
     
-      <script src="./assets/javascripts/application-c35428f87f.js"></script>
+      <script src="../assets/javascripts/application-c35428f87f.js"></script>
       
       
-      <script>app.initialize({url:{base:"."}})</script>
+      <script>app.initialize({url:{base:".."}})</script>
       
     
     

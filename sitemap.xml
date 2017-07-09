@@ -3,7 +3,39 @@
 
     
     <url>
-     <loc>/</loc>
+     <loc>http://iscc.codes/</loc>
+     <lastmod>2017-07-09</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+    
+
+    
+    <url>
+     <loc>http://iscc.codes/concept/</loc>
+     <lastmod>2017-07-09</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+    
+
+    
+    <url>
+     <loc>http://iscc.codes/specification/</loc>
+     <lastmod>2017-07-09</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+    
+
+    
+    <url>
+     <loc>http://iscc.codes/contributing/</loc>
+     <lastmod>2017-07-09</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+    
+
+    
+    <url>
+     <loc>http://iscc.codes/license/</loc>
      <lastmod>2017-07-09</lastmod>
      <changefreq>daily</changefreq>
     </url>
