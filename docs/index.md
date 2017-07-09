@@ -17,7 +17,7 @@ With better identifiers for digital content, the entire ecosystem becomes more e
 
 ## How it works
 
-The major innovation of the ISCC: identifiers will be generated algorithmically and in a decentralized way from a basic set of metadata and the content itself. This inseparably links any specific content manifestation to a specific ID.
+The major innovation of the ISCC: identifiers are generated algorithmically and in a decentralized way from a basic set of metadata and the content itself. This inseparably links any specific content to a specific ID.
 
 The ISCC is a unique, hierarchically structured composite identifier. It is built from a generic and balanced mix of content-derived, locality-sensitive and similarity-preserving hashes generated from metadata and content.
 
