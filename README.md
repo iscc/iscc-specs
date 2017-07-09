@@ -1,6 +1,6 @@
 # ISCC Specification
 
-The **International Standard Content Code** is an open standard for decentralized content identifiers. This repository contains the specification of the **ISCC Standard**. The latest published version can be found at [iscc.codes](http://iscc.codes)
+The **International Standard Content Code** is an [open standard](https://en.wikipedia.org/wiki/Open_standard) for decentralized content identifiers. This repository contains the specification of the **ISCC Standard**. The latest published version can be found at [iscc.codes](http://iscc.codes)
 
 ## Install
 
