@@ -1,2 +1,4 @@
 site_name: ISCC - Content Identifiers
 theme: 'material'
+markdown_extensions:
+  - admonition
