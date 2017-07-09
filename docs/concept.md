@@ -81,7 +81,7 @@ While many details about the ISCC are still up for discussion we are quite confi
 
 Before we settle on the details of the proposed ISCC identifier, we want to build a simple and reduced proof-of-concept implementation of our ideas. It will enable us and other developers to test with real world data and systems and find out early what works and what doesn't.
 
-![img](https://content-blockchain.org/media/iscc-web-demo.svg)
+![img](images/iscc-web-demo.svg)
 
 The minimal viable, first iteration ISCC will be a byte structure built from the following components:
 
