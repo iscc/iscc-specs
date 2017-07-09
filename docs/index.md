@@ -5,5 +5,4 @@ International Standard Content Code
 !!! attention
     This document is work in progress!
 
-The latest version of this document can be located at ...
-
+The latest version of this document can be found at [iscc.codes](http://iscc.codes)
