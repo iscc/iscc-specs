@@ -4,7 +4,7 @@ The **International Standard Content Code** is an [open standard](https://en.wik
 
 ## Install
 
-The entire **ISCC Specification** is written in plain text [Markdown](https://en.wikipedia.org/wiki/Markdown). The markdown content is than built and published with the excellent [mkdoks](http://www.mkdocs.org/) documetation tool. If you have some basic command line skills you can build and run the specification site on your own computer. Make sure you have the [Git](https://git-scm.com/) and [Python](https://www.python.org/) installed on your system and follow these steps on the command line:
+The entire **ISCC Specification** is written in plain text [Markdown](https://en.wikipedia.org/wiki/Markdown). The markdown content is than built and published with the excellent [mkdocs](http://www.mkdocs.org/) documetation tool. If you have some basic command line skills you can build and run the specification site on your own computer. Make sure you have the [Git](https://git-scm.com/) and [Python](https://www.python.org/) installed on your system and follow these steps on the command line:
 
 ```shell
 git clone https://github.com/coblo/iscc-specs.git
