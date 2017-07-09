@@ -132,7 +132,7 @@
         }, 
         {
             "location": "/specification/", 
-            "text": "ISCC\n - Specification (Draft)\n\n\nInternational Standard Content Code\n\n\n\n\nAttention\n\n\nThis document is work in progress!\n\n\n\n\nThe latest version of this document can be found at \niscc.codes\n\n\nAbstract\n\n\nISCC\n is a Identifier for digital content, that can be created by anybody from minimal metadata and the content itself. The \nISCC\n specification defines and describes the technical procedures needed to create \nISCC\n identifiers.\n\n\nStatus of this Document\n\n\nThis document is the \nfirst draft\n of the open and vendor neutral \nISCC\n 1.0 specification. The content of this document is determined by its authors in an open consensus process. All participants of the wider content ecosystem are invited to contribute.\n\n\nIdentifier Format\n\n\nThe \nISCC\n identifier is build from multiple 64-bit components:\n\n\n\n\n\n\n\n\nComponents:\n\n\nMeta-ID\n\n\nContent-ID\n\n\nData-ID\n\n\nInstance-ID\n\n\n\n\n\n\n\n\n\n\nIdentifies:\n\n\nIntangible creation\n\n\nContent similarity\n\n\nData similarity\n\n\nData integirty\n\n\n\n\n\n\nRequired:\n\n\nYes\n\n\nNo\n\n\nYes\n\n\nYes\n\n\n\n\n\n\nInput:\n\n\nMetadata\n\n\nExtracted  content\n\n\nRaw data\n\n\nRaw data\n\n\n\n\n\n\nSize:\n\n\n64 Bits\n\n\n64 Bits\n\n\n64 Bits\n\n\n64 Bits", 
+            "text": "ISCC\n - Specification (Draft)\n\n\nInternational Standard Content Code\n\n\n\n\nAttention\n\n\nThis document is work in progress!\n\n\n\n\nThe latest version of this document can be found at \niscc.codes\n\n\nAbstract\n\n\nISCC\n is an identifier for digital content, that can be created by anybody from minimal metadata and the content itself. The \nISCC\n specification defines and describes the technical procedures needed to create \nISCC\n identifiers.\n\n\nStatus of this Document\n\n\nThis document is the \nfirst draft\n of the open and vendor neutral \nISCC\n 1.0 specification. The content of this document is determined by its authors in an open consensus process. All participants of the wider content ecosystem are invited to contribute.\n\n\nIdentifier Format\n\n\nThe \nISCC\n identifier is build from multiple 64-bit components:\n\n\n\n\n\n\n\n\nComponents:\n\n\nMeta-ID\n\n\nContent-ID\n\n\nData-ID\n\n\nInstance-ID\n\n\n\n\n\n\n\n\n\n\nIdentifies:\n\n\nIntangible creation\n\n\nContent similarity\n\n\nData similarity\n\n\nData integirty\n\n\n\n\n\n\nRequired:\n\n\nYes\n\n\nNo\n\n\nYes\n\n\nYes\n\n\n\n\n\n\nInput:\n\n\nMetadata\n\n\nExtracted  content\n\n\nRaw data\n\n\nRaw data\n\n\n\n\n\n\nSize:\n\n\n64 Bits\n\n\n64 Bits\n\n\n64 Bits\n\n\n64 Bits", 
             "title": "ISCC - Specification (Draft)"
         }, 
         {
@@ -142,7 +142,7 @@
         }, 
         {
             "location": "/specification/#abstract", 
-            "text": "ISCC  is a Identifier for digital content, that can be created by anybody from minimal metadata and the content itself. The  ISCC  specification defines and describes the technical procedures needed to create  ISCC  identifiers.", 
+            "text": "ISCC  is an identifier for digital content, that can be created by anybody from minimal metadata and the content itself. The  ISCC  specification defines and describes the technical procedures needed to create  ISCC  identifiers.", 
             "title": "Abstract"
         }, 
         {
