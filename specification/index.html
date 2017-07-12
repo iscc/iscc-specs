@@ -244,22 +244,42 @@
     <ul class="md-nav__list" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#abstract" title="Abstract" class="md-nav__link">
-    Abstract
+  <a href="#about-this-document" title="About this Document" class="md-nav__link">
+    About this Document
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#status-of-this-document" title="Status of this Document" class="md-nav__link">
-    Status of this Document
+  <a href="#basic-structure-of-an-iscc" title="Basic structure of an ISCC" class="md-nav__link">
+    Basic structure of an ISCC
   </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#components-overview" title="Components overview" class="md-nav__link">
+    Components overview
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#component-types" title="Component types" class="md-nav__link">
+    Component types
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#identifier-format" title="Identifier Format" class="md-nav__link">
-    Identifier Format
+  <a href="#meta-id-component" title="Meta-ID component" class="md-nav__link">
+    Meta-ID component
   </a>
   
 </li>
@@ -318,22 +338,42 @@
     <ul class="md-nav__list" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#abstract" title="Abstract" class="md-nav__link">
-    Abstract
+  <a href="#about-this-document" title="About this Document" class="md-nav__link">
+    About this Document
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#status-of-this-document" title="Status of this Document" class="md-nav__link">
-    Status of this Document
+  <a href="#basic-structure-of-an-iscc" title="Basic structure of an ISCC" class="md-nav__link">
+    Basic structure of an ISCC
   </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#components-overview" title="Components overview" class="md-nav__link">
+    Components overview
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#component-types" title="Component types" class="md-nav__link">
+    Component types
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#identifier-format" title="Identifier Format" class="md-nav__link">
-    Identifier Format
+  <a href="#meta-id-component" title="Meta-ID component" class="md-nav__link">
+    Meta-ID component
   </a>
   
 </li>
@@ -362,12 +402,11 @@
 <p>This document is work in progress!</p>
 </div>
 <p>The latest version of this document can be found at <a href="http://iscc.codes">iscc.codes</a></p>
-<h2 id="abstract">Abstract<a class="headerlink" href="#abstract" title="Permanent link">&para;</a></h2>
-<p><abbr title="International Standard Content Code">ISCC</abbr> is an identifier for digital content, that can be created by anybody from minimal metadata and the content itself. The <abbr title="International Standard Content Code">ISCC</abbr> specification defines and describes the technical procedures needed to create <abbr title="International Standard Content Code">ISCC</abbr> identifiers.</p>
-<h2 id="status-of-this-document">Status of this Document<a class="headerlink" href="#status-of-this-document" title="Permanent link">&para;</a></h2>
-<p>This document is the <strong>first draft</strong> of the open and vendor neutral <abbr title="International Standard Content Code">ISCC</abbr> 1.0 specification. The content of this document is determined by its authors in an open consensus process. All participants of the wider content ecosystem are invited to contribute.</p>
-<h2 id="identifier-format">Identifier Format<a class="headerlink" href="#identifier-format" title="Permanent link">&para;</a></h2>
-<p>The <abbr title="International Standard Content Code">ISCC</abbr> identifier is build from multiple 64-bit components:</p>
+<h2 id="about-this-document">About this Document<a class="headerlink" href="#about-this-document" title="Permanent link">&para;</a></h2>
+<p>This document is the <strong>first draft</strong> of the open and vendor neutral <abbr title="International Standard Content Code">ISCC</abbr> 1.0 specification and describes the technical procedures to create and manage <abbr title="International Standard Content Code">ISCC</abbr> identifiers. It is produced by the <a href="https://content-blockchain.org">Content Blockchain Project</a> and it should be regarded as the definitive guide to the <abbr title="International Standard Content Code">ISCC</abbr> standard. The content is determined by its authors in an open consensus process. All participants of the wider content ecosystem are invited to contribute.</p>
+<h2 id="basic-structure-of-an-iscc">Basic structure of an <abbr title="International Standard Content Code">ISCC</abbr><a class="headerlink" href="#basic-structure-of-an-iscc" title="Permanent link">&para;</a></h2>
+<h3 id="components-overview">Components overview<a class="headerlink" href="#components-overview" title="Permanent link">&para;</a></h3>
+<p>The <abbr title="International Standard Content Code">ISCC</abbr> identifier is a fixed size sequence of 32 bytes (256 bits) build from multiple self describing 64 bit components: </p>
 <table>
 <thead>
 <tr>
@@ -384,14 +423,7 @@
 <td>Intangible creation</td>
 <td>Content similarity</td>
 <td>Data similarity</td>
-<td>Data integirty</td>
-</tr>
-<tr>
-<td><strong>Required:</strong></td>
-<td>Yes</td>
-<td>No</td>
-<td>Yes</td>
-<td>Yes</td>
+<td>Data checksum</td>
 </tr>
 <tr>
 <td><strong>Input:</strong></td>
@@ -401,11 +433,84 @@
 <td>Raw data</td>
 </tr>
 <tr>
+<td><strong>Algorithms:</strong></td>
+<td>Simhash</td>
+<td>Type specific</td>
+<td>CDC, Minhash</td>
+<td>CDC, Merkle tree</td>
+</tr>
+<tr>
 <td><strong>Size:</strong></td>
-<td>64 Bits</td>
-<td>64 Bits</td>
-<td>64 Bits</td>
-<td>64 Bits</td>
+<td>64 bits</td>
+<td>64 bits</td>
+<td>64 bits</td>
+<td>64 bits</td>
+</tr>
+</tbody>
+</table>
+<p>Each component is guaranteed to fit into a 64-bit unsigned integer value. The printable and human readable representation of each component is is a 13 character <a href="https://tools.ietf.org/html/rfc4648#section-7">RFC 4648</a> base32hex coded string without padding. The components may be used independently by applications for various purposes but must be combined to a 52 character string for a fully qualified <abbr title="International Standard Content Code">ISCC</abbr> code. The components must be combined in the fixed order of Meta-ID, Content-ID, Data-ID, Instance-ID and may be seperated by hyphens. </p>
+<h3 id="component-types">Component types<a class="headerlink" href="#component-types" title="Permanent link">&para;</a></h3>
+<p>Each component has the same basic structure of a 1 byte header and a 7 byte main section. Each component can thus be fit into a 64-bit integer value. The header-byte of each component is subdivided into 2 nibbles (4 Bits). The first nibble specifies the component type while the second nibble is component specific.</p>
+<table>
+<thead>
+<tr>
+<th>Component</th>
+<th>Nibble-1</th>
+<th>Nibble-2</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><em>Meta-ID</em></td>
+<td>0000</td>
+<td><abbr title="International Standard Content Code">ISCC</abbr> version</td>
+</tr>
+<tr>
+<td><em>Content-ID</em></td>
+<td>0001</td>
+<td>Content type</td>
+</tr>
+<tr>
+<td><em>Data-ID</em></td>
+<td>0010</td>
+<td>Reserved</td>
+</tr>
+<tr>
+<td><em>Instance-ID</em></td>
+<td>0011</td>
+<td>Reserved</td>
+</tr>
+</tbody>
+</table>
+<h2 id="meta-id-component">Meta-ID component<a class="headerlink" href="#meta-id-component" title="Permanent link">&para;</a></h2>
+<p>The Meta-ID is built from minimal and generic metadata of the content to be identified. An <abbr title="International Standard Content Code">ISCC</abbr> generating application must accept the following 3 input fields as UTF-8 encoded bytestring:</p>
+<table>
+<thead>
+<tr>
+<th>Inputfield</th>
+<th>Required</th>
+<th>Max chars</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><em>title</em></td>
+<td>Yes</td>
+<td>70</td>
+<td>The title of an intangible creation.</td>
+</tr>
+<tr>
+<td><em>creators</em></td>
+<td>No</td>
+<td>70</td>
+<td>One or more semicolon separated names of the original creators of the content.</td>
+</tr>
+<tr>
+<td><em>extra</em></td>
+<td>No</td>
+<td>70</td>
+<td>A short statement that distinguishes this intangible creation from another one.</td>
 </tr>
 </tbody>
 </table>
