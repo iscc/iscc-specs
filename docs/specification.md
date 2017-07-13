@@ -9,7 +9,7 @@ The latest version of this document can be found at [iscc.codes](http://iscc.cod
 
 ## About this Document
 
-This document is the **first draft** of the open and vendor neutral ISCC 1.0 specification and describes the technical procedures to create and manage ISCC identifiers. It is produced by the [Content Blockchain Project](https://content-blockchain.org) and it should be regarded as the definitive guide to the ISCC standard. The content is determined by its authors in an open consensus process. All participants of the wider media ecosystem are invited to contribute.
+This document is the **first draft** of the open and vendor neutral ISCC 1.0 specification and describes the technical procedures to create and manage ISCC identifiers. It is produced by the [Content Blockchain Project](https://content-blockchain.org) and it should be regarded as the definitive guide to the ISCC standard for technical implementors. The content is determined by its authors in an open consensus process. All participants of the wider media ecosystem are invited to contribute.
 
 ## Basic structure of an ISCC
 
@@ -44,35 +44,59 @@ Each component has the same basic structure of a 1 byte header and a 7 byte main
 
 ## Meta-ID component
 
-The Meta-ID is built from minimal and generic metadata of the content to be identified. An ISCC generating application must accept the following 3 text input fields:
+The Meta-ID is built from minimal and generic metadata of the content to be identified. An ISCC generating application must provide a `generate_meta_id` function thats accepts the following input fields:
 
-| Input field | Required | Max chars | Description                              |
-| ----------- | -------- | --------- | ---------------------------------------- |
-| *title*     | Yes      | 128       | The title of an intangible creation.     |
-| *creators*  | No       | 128       | One or more semicolon separated names of the original creators of the content. |
-| *extra*     | No       | 128       | A short statement that distinguishes this intangible creation from another one. |
+| Name       | Type         | Required | Description                              |
+| ---------- | ------------ | -------- | ---------------------------------------- |
+| *title*    | unicode text | Yes      | The title of an intangible creation.     |
+| *creators* | unicode text | No       | One or more semicolon separated names of the original creators of the content. |
+| *extra*    | unicode text | No       | A short statement that distinguishes this intangible creation from another one. |
+| version    | integer      | No       | ISCC version number. Currently defaults to the only valid value of `1`. May change in the future. |
 
-### Producing a Meta-ID from text input
+The `generate_meta_id` function must return a valid base32hex encoded Meta-ID code.
+
+### Generate Meta-ID
 
 An ISCC generating application must follow these steps in given order to produce a stable Meta-ID:
 
-1. Normalize all text input according to the Unicode standard [Normalization Form KC (NFKC)](http://www.unicode.org/reports/tr15/#Norm_Forms).
-2. Trim each normalized inputfield to the first 128 characters.
-3. ...
+1. Apply Unicode standard [Normalization Form KC (NFKC)](http://www.unicode.org/reports/tr15/#Norm_Forms) separatly to all text input values.
+2. Trim each normalized input value to its first 128 characters.
+3. Apply [`normalize_text`](#normalize-text) to the trimmed `title` input value.
+4. Apply [`normalize_creators`](#normalize-creators) to the trimmed `creators` input value.
+5. Apply [`normalize_text`](#normalize-text) to the trimmed `extra` input value.
+6. Concatenate the results of step 3, 4 and 5 in ascending order.
+7. Create a list of 4 character [n-grams](https://en.wikipedia.org/wiki/N-gram) by sliding character-wise through the result of step 6.
+8. Encode each n-gram from step 7 to an utf-8 bytestring and calculate its sha256 digest.
+9. Apply `simhash` to the list sha256 digests from step 8.
+10. Trim the resulting byte sequence to the first 7 bytes.
+11. Prepend the 1 byte component header according to component type and ISCC version (e.g. `0x00`).
+12. Encode the resulting 8 byte sequence with base32hex and return the result.
 
 ## Procedures & Algorithms
 
-### Text normalization
+### Normalize Text
 
-We define a specific text normalization function that takes unicode text as an input and returns *normalized* unicode text for futher algorithmic processing.  We reference this function by the name `normalize_text` . The  `normalize_text` function performs the following operations in the given order while each step works with the results of the previous operation:
+We define a text normalization function that is specific to our application. It takes unicode text as an input and returns *normalized* unicode text for futher algorithmic processing.  We reference this function by the name `normalize_text` . The  `normalize_text` function performs the following operations in the given order while each step works with the results of the previous operation:
 
 1. Decompose the input text by applying [Unicode Normalization Form D (NFD)](http://www.unicode.org/reports/tr15/#Norm_Forms).
 2. Replace each group of one or more consecutive `Separator` characters ([Unicode categories](https://en.wikipedia.org/wiki/Unicode_character_property) Zs, Zl and Zp) with exactly one Unicode `SPACE` character (`U+0020`) .
-3. Remove each character that is not in one of the Unicode categories `Seperator` , `Letter`, `Number` or `Symbol`.
-4. Remove any leading or trailing `Seperator` characters.
-5. Re-Compose the text by applying `Unicode Normalization Form C (NFC)`.
-6. Return the resulting text
+3. Remove any leading or trailing `Seperator` characters.
+4. Remove each character that is not in one of the Unicode categories `Seperator` , `Letter`, `Number` or `Symbol`.
+5. Convert all characters to their lower case
+6. Re-Compose the text by applying `Unicode Normalization Form C (NFC)`.
+7. Return the resulting text
 
+### Normalize Creators
+
+!!! todo
+
+    Specify `normalize_creator` function
+
+### Tokenize Text
+
+!!! todo
+
+    Specify `tokenize_text` function
 
 
 *[ISCC]: International Standard Content Code
