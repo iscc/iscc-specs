@@ -286,8 +286,8 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#producing-a-meta-id-from-text-input" title="Producing a Meta-ID from text input" class="md-nav__link">
-    Producing a Meta-ID from text input
+  <a href="#generate-meta-id" title="Generate Meta-ID" class="md-nav__link">
+    Generate Meta-ID
   </a>
   
 </li>
@@ -306,8 +306,22 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#text-normalization" title="Text normalization" class="md-nav__link">
-    Text normalization
+  <a href="#normalize-text" title="Normalize Text" class="md-nav__link">
+    Normalize Text
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#normalize-creators" title="Normalize Creators" class="md-nav__link">
+    Normalize Creators
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tokenize-text" title="Tokenize Text" class="md-nav__link">
+    Tokenize Text
   </a>
   
 </li>
@@ -413,8 +427,8 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#producing-a-meta-id-from-text-input" title="Producing a Meta-ID from text input" class="md-nav__link">
-    Producing a Meta-ID from text input
+  <a href="#generate-meta-id" title="Generate Meta-ID" class="md-nav__link">
+    Generate Meta-ID
   </a>
   
 </li>
@@ -433,8 +447,22 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#text-normalization" title="Text normalization" class="md-nav__link">
-    Text normalization
+  <a href="#normalize-text" title="Normalize Text" class="md-nav__link">
+    Normalize Text
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#normalize-creators" title="Normalize Creators" class="md-nav__link">
+    Normalize Creators
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tokenize-text" title="Tokenize Text" class="md-nav__link">
+    Tokenize Text
   </a>
   
 </li>
@@ -469,7 +497,7 @@
 </div>
 <p>The latest version of this document can be found at <a href="http://iscc.codes">iscc.codes</a></p>
 <h2 id="about-this-document">About this Document<a class="headerlink" href="#about-this-document" title="Permanent link">&para;</a></h2>
-<p>This document is the <strong>first draft</strong> of the open and vendor neutral <abbr title="International Standard Content Code">ISCC</abbr> 1.0 specification and describes the technical procedures to create and manage <abbr title="International Standard Content Code">ISCC</abbr> identifiers. It is produced by the <a href="https://content-blockchain.org">Content Blockchain Project</a> and it should be regarded as the definitive guide to the <abbr title="International Standard Content Code">ISCC</abbr> standard. The content is determined by its authors in an open consensus process. All participants of the wider media ecosystem are invited to contribute.</p>
+<p>This document is the <strong>first draft</strong> of the open and vendor neutral <abbr title="International Standard Content Code">ISCC</abbr> 1.0 specification and describes the technical procedures to create and manage <abbr title="International Standard Content Code">ISCC</abbr> identifiers. It is produced by the <a href="https://content-blockchain.org">Content Blockchain Project</a> and it should be regarded as the definitive guide to the <abbr title="International Standard Content Code">ISCC</abbr> standard for technical implementors. The content is determined by its authors in an open consensus process. All participants of the wider media ecosystem are invited to contribute.</p>
 <h2 id="basic-structure-of-an-iscc">Basic structure of an <abbr title="International Standard Content Code">ISCC</abbr><a class="headerlink" href="#basic-structure-of-an-iscc" title="Permanent link">&para;</a></h2>
 <h3 id="components-overview">Components overview<a class="headerlink" href="#components-overview" title="Permanent link">&para;</a></h3>
 <p>The <abbr title="International Standard Content Code">ISCC</abbr> identifier is a fixed size sequence of 32 bytes (256 bits) build from multiple self describing 64 bit components: </p>
@@ -553,55 +581,82 @@
 </tbody>
 </table>
 <h2 id="meta-id-component">Meta-ID component<a class="headerlink" href="#meta-id-component" title="Permanent link">&para;</a></h2>
-<p>The Meta-ID is built from minimal and generic metadata of the content to be identified. An <abbr title="International Standard Content Code">ISCC</abbr> generating application must accept the following 3 text input fields:</p>
+<p>The Meta-ID is built from minimal and generic metadata of the content to be identified. An <abbr title="International Standard Content Code">ISCC</abbr> generating application must provide a <code>generate_meta_id</code> function thats accepts the following input fields:</p>
 <table>
 <thead>
 <tr>
-<th>Input field</th>
+<th>Name</th>
+<th>Type</th>
 <th>Required</th>
-<th>Max chars</th>
 <th>Description</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td><em>title</em></td>
+<td>unicode text</td>
 <td>Yes</td>
-<td>128</td>
 <td>The title of an intangible creation.</td>
 </tr>
 <tr>
 <td><em>creators</em></td>
+<td>unicode text</td>
 <td>No</td>
-<td>128</td>
 <td>One or more semicolon separated names of the original creators of the content.</td>
 </tr>
 <tr>
 <td><em>extra</em></td>
+<td>unicode text</td>
 <td>No</td>
-<td>128</td>
 <td>A short statement that distinguishes this intangible creation from another one.</td>
+</tr>
+<tr>
+<td>version</td>
+<td>integer</td>
+<td>No</td>
+<td><abbr title="International Standard Content Code">ISCC</abbr> version number. Currently defaults to the only valid value of <code>1</code>. May change in the future.</td>
 </tr>
 </tbody>
 </table>
-<h3 id="producing-a-meta-id-from-text-input">Producing a Meta-ID from text input<a class="headerlink" href="#producing-a-meta-id-from-text-input" title="Permanent link">&para;</a></h3>
+<p>The <code>generate_meta_id</code> function must return a valid base32hex encoded Meta-ID code.</p>
+<h3 id="generate-meta-id">Generate Meta-ID<a class="headerlink" href="#generate-meta-id" title="Permanent link">&para;</a></h3>
 <p>An <abbr title="International Standard Content Code">ISCC</abbr> generating application must follow these steps in given order to produce a stable Meta-ID:</p>
 <ol>
-<li>Normalize all text input according to the Unicode standard <a href="http://www.unicode.org/reports/tr15/#Norm_Forms">Normalization Form KC (NFKC)</a>.</li>
-<li>Trim each normalized inputfield to the first 128 characters.</li>
-<li>...</li>
+<li>Apply Unicode standard <a href="http://www.unicode.org/reports/tr15/#Norm_Forms">Normalization Form KC (NFKC)</a> separatly to all text input values.</li>
+<li>Trim each normalized input value to its first 128 characters.</li>
+<li>Apply <a href="#normalize-text"><code>normalize_text</code></a> to the trimmed <code>title</code> input value.</li>
+<li>Apply <a href="#normalize-creators"><code>normalize_creators</code></a> to the trimmed <code>creators</code> input value.</li>
+<li>Apply <a href="#normalize-text"><code>normalize_text</code></a> to the trimmed <code>extra</code> input value.</li>
+<li>Concatenate the results of step 3, 4 and 5 in ascending order.</li>
+<li>Create a list of 4 <abbr title="A character is defined as one Unicode code point">character</abbr> <a href="https://en.wikipedia.org/wiki/N-gram">n-grams</a> by sliding <abbr title="A character is defined as one Unicode code point">character</abbr>-wise through the result of step 6.</li>
+<li>Encode each n-gram from step 7 to an utf-8 bytestring and calculate its sha256 digest.</li>
+<li>Apply <code>simhash</code> to the list sha256 digests from step 8.</li>
+<li>Trim the resulting byte sequence to the first 7 bytes.</li>
+<li>Prepend the 1 byte component header according to component type and <abbr title="International Standard Content Code">ISCC</abbr> version (e.g. <code>0x00</code>).</li>
+<li>Encode the resulting 8 byte sequence with base32hex and return the result.</li>
 </ol>
 <h2 id="procedures-algorithms">Procedures &amp; Algorithms<a class="headerlink" href="#procedures-algorithms" title="Permanent link">&para;</a></h2>
-<h3 id="text-normalization">Text normalization<a class="headerlink" href="#text-normalization" title="Permanent link">&para;</a></h3>
-<p>We define a specific text normalization function that takes unicode text as an input and returns <em>normalized</em> unicode text for futher algorithmic processing.  We reference this function by the name <code>normalize_text</code> . The  <code>normalize_text</code> function performs the following operations in the given order while each step works with the results of the previous operation:</p>
+<h3 id="normalize-text">Normalize Text<a class="headerlink" href="#normalize-text" title="Permanent link">&para;</a></h3>
+<p>We define a text normalization function that is specific to our application. It takes unicode text as an input and returns <em>normalized</em> unicode text for futher algorithmic processing.  We reference this function by the name <code>normalize_text</code> . The  <code>normalize_text</code> function performs the following operations in the given order while each step works with the results of the previous operation:</p>
 <ol>
 <li>Decompose the input text by applying <a href="http://www.unicode.org/reports/tr15/#Norm_Forms">Unicode Normalization Form D (NFD)</a>.</li>
 <li>Replace each group of one or more consecutive <code>Separator</code> characters (<a href="https://en.wikipedia.org/wiki/Unicode_character_property">Unicode categories</a> Zs, Zl and Zp) with exactly one Unicode <code>SPACE</code> <abbr title="A character is defined as one Unicode code point">character</abbr> (<code>U+0020</code>) .</li>
-<li>Remove each <abbr title="A character is defined as one Unicode code point">character</abbr> that is not in one of the Unicode categories <code>Seperator</code> , <code>Letter</code>, <code>Number</code> or <code>Symbol</code>.</li>
 <li>Remove any leading or trailing <code>Seperator</code> characters.</li>
+<li>Remove each <abbr title="A character is defined as one Unicode code point">character</abbr> that is not in one of the Unicode categories <code>Seperator</code> , <code>Letter</code>, <code>Number</code> or <code>Symbol</code>.</li>
+<li>Convert all characters to their lower case</li>
 <li>Re-Compose the text by applying <code>Unicode Normalization Form C (NFC)</code>.</li>
 <li>Return the resulting text</li>
 </ol>
+<h3 id="normalize-creators">Normalize Creators<a class="headerlink" href="#normalize-creators" title="Permanent link">&para;</a></h3>
+<div class="admonition todo">
+<p class="admonition-title">Todo</p>
+<p>Specify <code>normalize_creator</code> function</p>
+</div>
+<h3 id="tokenize-text">Tokenize Text<a class="headerlink" href="#tokenize-text" title="Permanent link">&para;</a></h3>
+<div class="admonition todo">
+<p class="admonition-title">Todo</p>
+<p>Specify <code>tokenize_text</code> function</p>
+</div>
                 
                   
                 
