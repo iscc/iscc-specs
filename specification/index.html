@@ -282,6 +282,39 @@
     Meta-ID component
   </a>
   
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#producing-a-meta-id-from-text-input" title="Producing a Meta-ID from text input" class="md-nav__link">
+    Producing a Meta-ID from text input
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#procedures-algorithms" title="Procedures &amp; Algorithms" class="md-nav__link">
+    Procedures &amp; Algorithms
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#text-normalization" title="Text normalization" class="md-nav__link">
+    Text normalization
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
       
@@ -376,6 +409,39 @@
     Meta-ID component
   </a>
   
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#producing-a-meta-id-from-text-input" title="Producing a Meta-ID from text input" class="md-nav__link">
+    Producing a Meta-ID from text input
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#procedures-algorithms" title="Procedures &amp; Algorithms" class="md-nav__link">
+    Procedures &amp; Algorithms
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#text-normalization" title="Text normalization" class="md-nav__link">
+    Text normalization
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
       
@@ -403,7 +469,7 @@
 </div>
 <p>The latest version of this document can be found at <a href="http://iscc.codes">iscc.codes</a></p>
 <h2 id="about-this-document">About this Document<a class="headerlink" href="#about-this-document" title="Permanent link">&para;</a></h2>
-<p>This document is the <strong>first draft</strong> of the open and vendor neutral <abbr title="International Standard Content Code">ISCC</abbr> 1.0 specification and describes the technical procedures to create and manage <abbr title="International Standard Content Code">ISCC</abbr> identifiers. It is produced by the <a href="https://content-blockchain.org">Content Blockchain Project</a> and it should be regarded as the definitive guide to the <abbr title="International Standard Content Code">ISCC</abbr> standard. The content is determined by its authors in an open consensus process. All participants of the wider content ecosystem are invited to contribute.</p>
+<p>This document is the <strong>first draft</strong> of the open and vendor neutral <abbr title="International Standard Content Code">ISCC</abbr> 1.0 specification and describes the technical procedures to create and manage <abbr title="International Standard Content Code">ISCC</abbr> identifiers. It is produced by the <a href="https://content-blockchain.org">Content Blockchain Project</a> and it should be regarded as the definitive guide to the <abbr title="International Standard Content Code">ISCC</abbr> standard. The content is determined by its authors in an open consensus process. All participants of the wider media ecosystem are invited to contribute.</p>
 <h2 id="basic-structure-of-an-iscc">Basic structure of an <abbr title="International Standard Content Code">ISCC</abbr><a class="headerlink" href="#basic-structure-of-an-iscc" title="Permanent link">&para;</a></h2>
 <h3 id="components-overview">Components overview<a class="headerlink" href="#components-overview" title="Permanent link">&para;</a></h3>
 <p>The <abbr title="International Standard Content Code">ISCC</abbr> identifier is a fixed size sequence of 32 bytes (256 bits) build from multiple self describing 64 bit components: </p>
@@ -448,9 +514,13 @@
 </tr>
 </tbody>
 </table>
-<p>Each component is guaranteed to fit into a 64-bit unsigned integer value. The printable and human readable representation of each component is is a 13 character <a href="https://tools.ietf.org/html/rfc4648#section-7">RFC 4648</a> base32hex coded string without padding. The components may be used independently by applications for various purposes but must be combined to a 52 character string for a fully qualified <abbr title="International Standard Content Code">ISCC</abbr> code. The components must be combined in the fixed order of Meta-ID, Content-ID, Data-ID, Instance-ID and may be seperated by hyphens. </p>
+<p>Each component is guaranteed to fit into a 64 bit unsigned integer value. The printable and human readable representation of each component is is a 13 <abbr title="A character is defined as one Unicode code point">character</abbr> <a href="https://tools.ietf.org/html/rfc4648#section-7">RFC 4648</a> base32hex coded string without padding. The components may be used independently by applications for various purposes but must be combined to a 52 <abbr title="A character is defined as one Unicode code point">character</abbr> string (55 with hyphens) for a fully qualified <abbr title="International Standard Content Code">ISCC</abbr> code. The components must be combined in the fixed order of Meta-ID, Content-ID, Data-ID, Instance-ID and may be seperated by hyphens.</p>
+<div class="admonition todo">
+<p class="admonition-title">Todo</p>
+<p>Describe coded format with prefix, colon, components +- hyphens </p>
+</div>
 <h3 id="component-types">Component types<a class="headerlink" href="#component-types" title="Permanent link">&para;</a></h3>
-<p>Each component has the same basic structure of a 1 byte header and a 7 byte main section. Each component can thus be fit into a 64-bit integer value. The header-byte of each component is subdivided into 2 nibbles (4 Bits). The first nibble specifies the component type while the second nibble is component specific.</p>
+<p>Each component has the same basic structure of a 1 byte header and a 7 byte main section. Each component can thus be fit into a 64-bit integer value. The header-byte of each component is subdivided into 2 nibbles (4 bits). The first nibble specifies the component type while the second nibble is component specific.</p>
 <table>
 <thead>
 <tr>
@@ -483,11 +553,11 @@
 </tbody>
 </table>
 <h2 id="meta-id-component">Meta-ID component<a class="headerlink" href="#meta-id-component" title="Permanent link">&para;</a></h2>
-<p>The Meta-ID is built from minimal and generic metadata of the content to be identified. An <abbr title="International Standard Content Code">ISCC</abbr> generating application must accept the following 3 input fields as UTF-8 encoded bytestring:</p>
+<p>The Meta-ID is built from minimal and generic metadata of the content to be identified. An <abbr title="International Standard Content Code">ISCC</abbr> generating application must accept the following 3 text input fields:</p>
 <table>
 <thead>
 <tr>
-<th>Inputfield</th>
+<th>Input field</th>
 <th>Required</th>
 <th>Max chars</th>
 <th>Description</th>
@@ -497,23 +567,41 @@
 <tr>
 <td><em>title</em></td>
 <td>Yes</td>
-<td>70</td>
+<td>128</td>
 <td>The title of an intangible creation.</td>
 </tr>
 <tr>
 <td><em>creators</em></td>
 <td>No</td>
-<td>70</td>
+<td>128</td>
 <td>One or more semicolon separated names of the original creators of the content.</td>
 </tr>
 <tr>
 <td><em>extra</em></td>
 <td>No</td>
-<td>70</td>
+<td>128</td>
 <td>A short statement that distinguishes this intangible creation from another one.</td>
 </tr>
 </tbody>
 </table>
+<h3 id="producing-a-meta-id-from-text-input">Producing a Meta-ID from text input<a class="headerlink" href="#producing-a-meta-id-from-text-input" title="Permanent link">&para;</a></h3>
+<p>An <abbr title="International Standard Content Code">ISCC</abbr> generating application must follow these steps in given order to produce a stable Meta-ID:</p>
+<ol>
+<li>Normalize all text input according to the Unicode standard <a href="http://www.unicode.org/reports/tr15/#Norm_Forms">Normalization Form KC (NFKC)</a>.</li>
+<li>Trim each normalized inputfield to the first 128 characters.</li>
+<li>...</li>
+</ol>
+<h2 id="procedures-algorithms">Procedures &amp; Algorithms<a class="headerlink" href="#procedures-algorithms" title="Permanent link">&para;</a></h2>
+<h3 id="text-normalization">Text normalization<a class="headerlink" href="#text-normalization" title="Permanent link">&para;</a></h3>
+<p>We define a specific text normalization function that takes unicode text as an input and returns <em>normalized</em> unicode text for futher algorithmic processing.  We reference this function by the name <code>normalize_text</code> . The  <code>normalize_text</code> function performs the following operations in the given order while each step works with the results of the previous operation:</p>
+<ol>
+<li>Decompose the input text by applying <a href="http://www.unicode.org/reports/tr15/#Norm_Forms">Unicode Normalization Form D (NFD)</a>.</li>
+<li>Replace each group of one or more consecutive <code>Separator</code> characters (<a href="https://en.wikipedia.org/wiki/Unicode_character_property">Unicode categories</a> Zs, Zl and Zp) with exactly one Unicode <code>SPACE</code> <abbr title="A character is defined as one Unicode code point">character</abbr> (<code>U+0020</code>) .</li>
+<li>Remove each <abbr title="A character is defined as one Unicode code point">character</abbr> that is not in one of the Unicode categories <code>Seperator</code> , <code>Letter</code>, <code>Number</code> or <code>Symbol</code>.</li>
+<li>Remove any leading or trailing <code>Seperator</code> characters.</li>
+<li>Re-Compose the text by applying <code>Unicode Normalization Form C (NFC)</code>.</li>
+<li>Return the resulting text</li>
+</ol>
                 
                   
                 
