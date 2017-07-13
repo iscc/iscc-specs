@@ -46,12 +46,12 @@ Each component has the same basic structure of a 1 byte header and a 7 byte main
 
 The Meta-ID is built from minimal and generic metadata of the content to be identified. An ISCC generating application must provide a `generate_meta_id` function thats accepts the following input fields:
 
-| Name       | Type         | Required | Description                              |
-| ---------- | ------------ | -------- | ---------------------------------------- |
-| *title*    | unicode text | Yes      | The title of an intangible creation.     |
-| *creators* | unicode text | No       | One or more semicolon separated names of the original creators of the content. |
-| *extra*    | unicode text | No       | A short statement that distinguishes this intangible creation from another one. |
-| version    | integer      | No       | ISCC version number. Currently defaults to the only valid value of `1`. May change in the future. |
+| Name       | Type    | Required | Description                              |
+| ---------- | ------- | -------- | ---------------------------------------- |
+| *title*    | unicode | Yes      | The title of an intangible creation.     |
+| *creators* | unicode | No       | One or more semicolon separated names of the original creators of the content. |
+| *extra*    | unicode | No       | A short statement that distinguishes this intangible creation from another one. |
+| version    | integer | No       | ISCC version number. Currently defaults to the only valid value of `1`. May change in the future. |
 
 The `generate_meta_id` function must return a valid base32hex encoded Meta-ID code.
 
