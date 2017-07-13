@@ -25,11 +25,11 @@ The ISCC identifier is a fixed size sequence of 32 bytes (256 bits) build from m
 | **Algorithms:** | Simhash             | Type specific      | CDC, Minhash    | CDC, Merkle tree |
 | **Size:**       | 64 bits             | 64 bits            | 64 bits         | 64 bits          |
 
-Each component is guaranteed to fit into a 64-bit unsigned integer value. The printable and human readable representation of each component is is a 13 character [RFC 4648](https://tools.ietf.org/html/rfc4648#section-7) base32hex coded string without padding. The components may be used independently by applications for various purposes but must be combined to a 52 character string for a fully qualified ISCC code. The components must be combined in the fixed order of Meta-ID, Content-ID, Data-ID, Instance-ID and may be seperated by hyphens. 
+Each component is guaranteed to fit into a 64 bit unsigned integer value. The printable and human readable representation of each component is is a 13 character [RFC 4648](https://tools.ietf.org/html/rfc4648#section-7) base32hex coded string without padding. The components may be used independently by applications for various purposes but must be combined to a 52 character string for a fully qualified ISCC code. The components must be combined in the fixed order of Meta-ID, Content-ID, Data-ID, Instance-ID and may be seperated by hyphens. 
 
 ### Component types
 
-Each component has the same basic structure of a 1 byte header and a 7 byte main section. Each component can thus be fit into a 64-bit integer value. The header-byte of each component is subdivided into 2 nibbles (4 Bits). The first nibble specifies the component type while the second nibble is component specific.
+Each component has the same basic structure of a 1 byte header and a 7 byte main section. Each component can thus be fit into a 64-bit integer value. The header-byte of each component is subdivided into 2 nibbles (4 bits). The first nibble specifies the component type while the second nibble is component specific.
 
 | Component     | Nibble-1 | Nibble-2     |
 | ------------- | -------- | ------------ |
