@@ -1,4 +1,4 @@
-# sISCC - Specification (Draft)
+# ISCC - Specification (Draft)
 
 **International Standard Content Code**
 
