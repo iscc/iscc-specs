@@ -298,6 +298,40 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#content-id-component" title="Content-ID component" class="md-nav__link">
+    Content-ID component
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#content-id-text" title="Content-ID-Text" class="md-nav__link">
+    Content-ID-Text
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#data-id-component" title="Data-ID component" class="md-nav__link">
+    Data-ID component
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#instance-id-component" title="Instance-ID component" class="md-nav__link">
+    Instance-ID component
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#procedures-algorithms" title="Procedures &amp; Algorithms" class="md-nav__link">
     Procedures &amp; Algorithms
   </a>
@@ -439,6 +473,40 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#content-id-component" title="Content-ID component" class="md-nav__link">
+    Content-ID component
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#content-id-text" title="Content-ID-Text" class="md-nav__link">
+    Content-ID-Text
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#data-id-component" title="Data-ID component" class="md-nav__link">
+    Data-ID component
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#instance-id-component" title="Instance-ID component" class="md-nav__link">
+    Instance-ID component
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#procedures-algorithms" title="Procedures &amp; Algorithms" class="md-nav__link">
     Procedures &amp; Algorithms
   </a>
@@ -489,7 +557,7 @@
                   <a href="https://github.com/coblo/iscc-specs/edit/master/docs/specification.md" title="Edit this page" class="md-icon md-content__icon">edit</a>
                 
                 
-                <h1 id="iscc-specification-draft"><abbr title="International Standard Content Code">ISCC</abbr> - Specification (Draft)<a class="headerlink" href="#iscc-specification-draft" title="Permanent link">&para;</a></h1>
+                <h1 id="siscc-specification-draft">sISCC - Specification (Draft)<a class="headerlink" href="#siscc-specification-draft" title="Permanent link">&para;</a></h1>
 <p><strong>International Standard Content Code</strong></p>
 <div class="admonition attention">
 <p class="admonition-title">Attention</p>
@@ -555,31 +623,37 @@
 <th>Component</th>
 <th>Nibble-1</th>
 <th>Nibble-2</th>
+<th>Byte</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td><em>Meta-ID</em></td>
 <td>0000</td>
-<td><abbr title="International Standard Content Code">ISCC</abbr> version</td>
+<td>0000 - <abbr title="International Standard Content Code">ISCC</abbr> version (0)</td>
+<td>0x00</td>
 </tr>
 <tr>
 <td><em>Content-ID</em></td>
 <td>0001</td>
-<td>Content type</td>
+<td>0000 - ContentType Text (0)</td>
+<td>0x10</td>
 </tr>
 <tr>
 <td><em>Data-ID</em></td>
 <td>0010</td>
-<td>Reserved</td>
+<td>0000 - Reserved</td>
+<td>0x20</td>
 </tr>
 <tr>
 <td><em>Instance-ID</em></td>
 <td>0011</td>
-<td>Reserved</td>
+<td>0000 - Reserved</td>
+<td>0x30</td>
 </tr>
 </tbody>
 </table>
+<p>Content types</p>
 <h2 id="meta-id-component">Meta-ID component<a class="headerlink" href="#meta-id-component" title="Permanent link">&para;</a></h2>
 <p>The Meta-ID is built from minimal and generic metadata of the content to be identified. An <abbr title="International Standard Content Code">ISCC</abbr> generating application must provide a <code>generate_meta_id</code> function thats accepts the following input fields:</p>
 <table>
@@ -633,7 +707,54 @@
 <li>Apply <code>simhash</code> to the list sha256 digests from step 8.</li>
 <li>Trim the resulting byte sequence to the first 7 bytes.</li>
 <li>Prepend the 1 byte component header according to component type and <abbr title="International Standard Content Code">ISCC</abbr> version (e.g. <code>0x00</code>).</li>
-<li>Encode the resulting 8 byte sequence with base32hex and return the result.</li>
+<li>Encode the resulting 8 byte sequence with base32 (no-padding) and return the result.</li>
+</ol>
+<h2 id="content-id-component">Content-ID component<a class="headerlink" href="#content-id-component" title="Permanent link">&para;</a></h2>
+<p>The Content-ID has multiple subtypes, one for each <abbr title="Generic Media Type">GMT</abbr>. The subtype is specified by the first 3 bits of the second nibble of the first byte. The last bit of the first byte is a flag that signifies if the <abbr title="Content-ID Component">C-ID</abbr> applies to all GM-Type specific content or just to some part of it.</p>
+<table>
+<thead>
+<tr>
+<th>Generic Media Type</th>
+<th>Nibble-2 Bits 0-3</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Text</td>
+<td>000</td>
+</tr>
+<tr>
+<td>Image</td>
+<td>001</td>
+</tr>
+<tr>
+<td>Audio</td>
+<td>010</td>
+</tr>
+</tbody>
+</table>
+<h3 id="content-id-text">Content-ID-Text<a class="headerlink" href="#content-id-text" title="Permanent link">&para;</a></h3>
+<p>The Content-ID-Text is build from the extracted plaintext content of an encoded media object. To build a stable <abbr title="Content-ID Component">C-ID</abbr>-Text the plain text content must be extracted in a reproducable manner. To make this possible the plaintext content must be extracted with <a href="https://tika.apache.org/">Apache Tika v1.16</a>.</p>
+<h2 id="data-id-component">Data-ID component<a class="headerlink" href="#data-id-component" title="Permanent link">&para;</a></h2>
+<p>The Data-ID is build from the raw encoded data of the content to be identified. An <abbr title="International Standard Content Code">ISCC</abbr> generating application must provide a <code>generate_data_id</code> function that accepts the raw encoded data as input. Generate a Data-ID by this procedure:</p>
+<ol>
+<li>Apply <code>chunk_data</code> to the raw encoded content data</li>
+<li>For each chunk calculate the sha256 digest</li>
+<li>Apply <code>minhash</code> with 256 permutations to the resulting list of digests</li>
+<li>Take the lowest bit from each minhash value and concatenate them to a 256 string</li>
+<li>Trim the resulting byte sequence to the first 7 bytes.</li>
+<li>Prepend the 1 byte component header (e.g. 0x20). </li>
+<li>Encode the resulting 8 byte sequence with base32 (no-padding and return the result</li>
+</ol>
+<h2 id="instance-id-component">Instance-ID component<a class="headerlink" href="#instance-id-component" title="Permanent link">&para;</a></h2>
+<p>The Instance-ID is built from the raw data file of the content to be identified. An <abbr title="International Standard Content Code">ISCC</abbr> generating application must provide a <code>generate_instance_id</code> function thats accepts the raw data file as input. Generate an Instance-ID by this procedure:</p>
+<ol>
+<li>Apply <code>chunk_data</code> to the raw encoded content data</li>
+<li>For each chunk calculate its sha256 digest</li>
+<li>Calculate the merkle root from the list sha256 digests (in order of chunks)</li>
+<li>Trim the resulting byte sequence to the first 7 bytes.</li>
+<li>Prepend the 1 byte component header (e.g. 0x30).</li>
+<li>Encode the resulting 8 byte sequence with base32 (no-padding) and return the result.</li>
 </ol>
 <h2 id="procedures-algorithms">Procedures &amp; Algorithms<a class="headerlink" href="#procedures-algorithms" title="Permanent link">&para;</a></h2>
 <h3 id="normalize-text">Normalize Text<a class="headerlink" href="#normalize-text" title="Permanent link">&para;</a></h3>
