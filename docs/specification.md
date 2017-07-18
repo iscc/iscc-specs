@@ -1,4 +1,4 @@
-# ISCC - Specification (Draft)
+# sISCC - Specification (Draft)
 
 **International Standard Content Code**
 
@@ -35,12 +35,16 @@ Each component is guaranteed to fit into a 64 bit unsigned integer value. The pr
 
 Each component has the same basic structure of a 1 byte header and a 7 byte main section. Each component can thus be fit into a 64-bit integer value. The header-byte of each component is subdivided into 2 nibbles (4 bits). The first nibble specifies the component type while the second nibble is component specific.
 
-| Component     | Nibble-1 | Nibble-2     |
-| ------------- | -------- | ------------ |
-| *Meta-ID*     | 0000     | ISCC version |
-| *Content-ID*  | 0001     | Content type |
-| *Data-ID*     | 0010     | Reserved     |
-| *Instance-ID* | 0011     | Reserved     |
+| Component     | Nibble-1 | Nibble-2                    | Byte |
+| ------------- | -------- | --------------------------- | ---- |
+| *Meta-ID*     | 0000     | 0000 - ISCC version (0)     | 0x00 |
+| *Content-ID*  | 0001     | 0000 - ContentType Text (0) | 0x10 |
+| *Data-ID*     | 0010     | 0000 - Reserved             | 0x20 |
+| *Instance-ID* | 0011     | 0000 - Reserved             | 0x30 |
+
+Content types
+
+
 
 ## Meta-ID component
 
@@ -70,7 +74,46 @@ An ISCC generating application must follow these steps in given order to produce
 9. Apply `simhash` to the list sha256 digests from step 8.
 10. Trim the resulting byte sequence to the first 7 bytes.
 11. Prepend the 1 byte component header according to component type and ISCC version (e.g. `0x00`).
-12. Encode the resulting 8 byte sequence with base32hex and return the result.
+12. Encode the resulting 8 byte sequence with base32 (no-padding) and return the result.
+
+
+## Content-ID component
+
+The Content-ID has multiple subtypes, one for each GMT. The subtype is specified by the first 3 bits of the second nibble of the first byte. The last bit of the first byte is a flag that signifies if the C-ID applies to all GM-Type specific content or just to some part of it.
+
+| Generic Media Type | Nibble-2 Bits 0-3 |
+| ------------------ | ----------------- |
+| Text               | 000               |
+| Image              | 001               |
+| Audio              | 010               |
+
+### Content-ID-Text
+
+The Content-ID-Text is build from the extracted plaintext content of an encoded media object. To build a stable C-ID-Text the plain text content must be extracted in a reproducable manner. To make this possible the plaintext content must be extracted with [Apache Tika v1.16](https://tika.apache.org/).
+
+## Data-ID component
+
+The Data-ID is build from the raw encoded data of the content to be identified. An ISCC generating application must provide a `generate_data_id` function that accepts the raw encoded data as input. Generate a Data-ID by this procedure:
+
+1. Apply `chunk_data` to the raw encoded content data
+2. For each chunk calculate the sha256 digest
+3. Apply `minhash` with 256 permutations to the resulting list of digests
+4. Take the lowest bit from each minhash value and concatenate them to a 256 string
+5. Trim the resulting byte sequence to the first 7 bytes.
+6. Prepend the 1 byte component header (e.g. 0x20). 
+7. Encode the resulting 8 byte sequence with base32 (no-padding and return the result
+
+## Instance-ID component
+
+The Instance-ID is built from the raw data file of the content to be identified. An ISCC generating application must provide a `generate_instance_id` function thats accepts the raw data file as input. Generate an Instance-ID by this procedure:
+
+1. Apply `chunk_data` to the raw encoded content data
+2. For each chunk calculate its sha256 digest
+3. Calculate the merkle root from the list sha256 digests (in order of chunks)
+4. Trim the resulting byte sequence to the first 7 bytes.
+5. Prepend the 1 byte component header (e.g. 0x30).
+6. Encode the resulting 8 byte sequence with base32 (no-padding) and return the result.
+
 
 ## Procedures & Algorithms
 
@@ -100,6 +143,16 @@ We define a text normalization function that is specific to our application. It 
 
 
 *[ISCC]: International Standard Content Code
+
+*[M-ID]: Meta-ID Component
+
+*[C-ID]: Content-ID Component
+
+*[D-ID]: Data-ID Component
+
+*[I-ID]: Instance-ID Component
+
+*[GMT]: Generic Media Type
 
 *[character]: A character is defined as one Unicode code point
 
