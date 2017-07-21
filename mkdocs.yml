@@ -40,6 +40,8 @@ extra:
         tabs: false
 
 markdown_extensions:
+    - meta
+    - footnotes
     - abbr
     - admonition
     - codehilite(guess_lang=false)
