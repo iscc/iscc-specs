@@ -20,6 +20,9 @@ contribute.
 
 ## Definitions and Terminology
 
+GMT
+:	Generic Media Type: A basic digital content type such as plain text or raw pixel data.
+
 ISCC
 :	International Standard Content Code
 
@@ -34,9 +37,10 @@ ISCC ID
 
 ## Basic structure of an ISCC
 
-An `ISCC Digest` is a fixed size sequence of 32 bytes (256 bits) used to permanently identify a given digital media file. It is generated from basic metadata and the contents of the digital media file which it identifies. An `ISCC Code` is the canonical and printable representation of an [RFC 4648](https://tools.ietf.org/html/rfc4648#section-6) base32[^base32] encoded (without padding) string representation of an ISCC Digest.
+An ISCC Digest is a fixed size sequence of 32 bytes (256 bits) used to permanently identify a given digital media file. It is generated from basic metadata and the contents of the digital media file which it identifies. An ISCC Code is an [RFC 4648](https://tools.ietf.org/html/rfc4648#section-6) base32[^base32] encoded printable string representation of an ISCC.
 
 ### ISCC Code Example:
+
 ```
 ISCC:VWP2EL217KLUD-WGWYFRNMY8CLI-47TNX8LTIPKU-51Y34YDBBLOK9
 ```
@@ -102,13 +106,18 @@ An ISCC generating application must follow these steps in given order to produce
 
 ## Content-ID component
 
-The Content-ID has multiple subtypes, one for each GMT. The subtype is specified by the first 3 bits of the second nibble of the first byte. The last bit of the first byte is a flag that signifies if the C-ID applies to all GM-Type specific content or just to some part of it.
+The Content-ID component has multiple subtypes. The subtypes are called **Generic Media Types**. A fully qaulified ISCC can only have a Content-ID of one specific GMT but there might be multiple ISCCs per digital content file - one per GMT. A Content-ID is generated in two broad steps. In the first step we extract and convert content from a rich media type to a normalized generic media type. In the second step we run a GMT-specific process to generate the Content-ID part of an ISCC. A Content-ID is always exactly one of multiple subtypes (GMTs). The subtype is designated by the first 3 bits of the second nibble of the first byte of the Content-ID. 
 
 | Generic Media Type | Nibble-2 Bits 0-3 |
 | :----------------- | :---------------- |
 | Text               | 000               |
 | Image              | 001               |
 | Audio              | 010               |
+| Video              | 011               |
+| Mixed              | 100               |
+| Reserved           | 101, 110, 111     |
+
+The last bit of the first byte is the "Partial Content Flag". It designates if the Content-ID applies to the full content or just some part of it. The PCF must be set as a `0`-bit (full GMT-specific content) by default. Setting the PCF to `1` enables applications to create multiple ISCCs for content parts of one and the same digital file. For example one might create separate ISCC for multiple articles of a magazine issue. In such a case the different Content-ID components would automatically be "bound" together by identical Meta, Data and Instance components.
 
 ### Content-ID-Text
 
@@ -179,6 +188,8 @@ We define a text normalization function that is specific to our application. It 
 *[I-ID]: Instance-ID Component
 
 *[GMT]: Generic Media Type
+
+*[PCF]: Partial Content Flag
 
 *[character]: A character is defined as one Unicode code point
 
