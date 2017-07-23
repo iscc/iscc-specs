@@ -612,6 +612,8 @@ identifiers. It is produced by the <a href="https://content-blockchain.org">Cont
 contribute.</p>
 <h2 id="definitions-and-terminology">Definitions and Terminology<a class="headerlink" href="#definitions-and-terminology" title="Permanent link">&para;</a></h2>
 <dl>
+<dt><abbr title="Generic Media Type">GMT</abbr></dt>
+<dd>Generic Media Type: A basic digital content type such as plain text or raw pixel data.</dd>
 <dt>ISCC</dt>
 <dd>International Standard Content Code</dd>
 <dt><abbr title="Base32 encoded representation of an ISCC">ISCC Code</abbr></dt>
@@ -622,7 +624,7 @@ contribute.</p>
 <dd>The integer representation of an ISCC</dd>
 </dl>
 <h2 id="basic-structure-of-an-iscc">Basic structure of an ISCC<a class="headerlink" href="#basic-structure-of-an-iscc" title="Permanent link">&para;</a></h2>
-<p>An <code>ISCC Digest</code> is a fixed size sequence of 32 bytes (256 bits) used to permanently identify a given digital media file. It is generated from basic metadata and the contents of the digital media file which it identifies. An <code>ISCC Code</code> is the canonical and printable representation of an <a href="https://tools.ietf.org/html/rfc4648#section-6">RFC 4648</a> base32<sup id="fnref:base32"><a class="footnote-ref" href="#fn:base32" rel="footnote">1</a></sup> encoded (without padding) string representation of an <abbr title="Raw binary data of an ISCC">ISCC Digest</abbr>.</p>
+<p>An <abbr title="Raw binary data of an ISCC">ISCC Digest</abbr> is a fixed size sequence of 32 bytes (256 bits) used to permanently identify a given digital media file. It is generated from basic metadata and the contents of the digital media file which it identifies. An <abbr title="Base32 encoded representation of an ISCC">ISCC Code</abbr> is an <a href="https://tools.ietf.org/html/rfc4648#section-6">RFC 4648</a> base32<sup id="fnref:base32"><a class="footnote-ref" href="#fn:base32" rel="footnote">1</a></sup> encoded printable string representation of an ISCC.</p>
 <h3 id="iscc-code-example"><abbr title="Base32 encoded representation of an ISCC">ISCC Code</abbr> Example:<a class="headerlink" href="#iscc-code-example" title="Permanent link">&para;</a></h3>
 <div class="codehilite"><pre><span></span>ISCC:VWP2EL217KLUD-WGWYFRNMY8CLI-47TNX8LTIPKU-51Y34YDBBLOK9
 </pre></div>
@@ -770,7 +772,7 @@ contribute.</p>
 <li>Encode the resulting 8 byte sequence with base32 (no-padding) and return the result.</li>
 </ol>
 <h2 id="content-id-component">Content-ID component<a class="headerlink" href="#content-id-component" title="Permanent link">&para;</a></h2>
-<p>The Content-ID has multiple subtypes, one for each <abbr title="Generic Media Type">GMT</abbr>. The subtype is specified by the first 3 bits of the second nibble of the first byte. The last bit of the first byte is a flag that signifies if the <abbr title="Content-ID Component">C-ID</abbr> applies to all GM-Type specific content or just to some part of it.</p>
+<p>The Content-ID component has multiple subtypes. The subtypes are called <strong>Generic Media Types</strong>. A fully qaulified ISCC can only have a Content-ID of one specific <abbr title="Generic Media Type">GMT</abbr> but there might be multiple ISCCs per digital content file - one per <abbr title="Generic Media Type">GMT</abbr>. A Content-ID is generated in two broad steps. In the first step we extract and convert content from a rich media type to a normalized generic media type. In the second step we run a <abbr title="Generic Media Type">GMT</abbr>-specific process to generate the Content-ID part of an ISCC. A Content-ID is always exactly one of multiple subtypes (GMTs). The subtype is designated by the first 3 bits of the second nibble of the first byte of the Content-ID. </p>
 <table>
 <thead>
 <tr>
@@ -791,8 +793,21 @@ contribute.</p>
 <td align="left">Audio</td>
 <td align="left">010</td>
 </tr>
+<tr>
+<td align="left">Video</td>
+<td align="left">011</td>
+</tr>
+<tr>
+<td align="left">Mixed</td>
+<td align="left">100</td>
+</tr>
+<tr>
+<td align="left">Reserved</td>
+<td align="left">101, 110, 111</td>
+</tr>
 </tbody>
 </table>
+<p>The last bit of the first byte is the "Partial Content Flag". It designates if the Content-ID applies to the full content or just some part of it. The <abbr title="Partial Content Flag">PCF</abbr> must be set as a <code>0</code>-bit (full <abbr title="Generic Media Type">GMT</abbr>-specific content) by default. Setting the <abbr title="Partial Content Flag">PCF</abbr> to <code>1</code> enables applications to create multiple ISCCs for content parts of one and the same digital file. For example one might create separate ISCC for multiple articles of a magazine issue. In such a case the different Content-ID components would automatically be "bound" together by identical Meta, Data and Instance components.</p>
 <h3 id="content-id-text">Content-ID-Text<a class="headerlink" href="#content-id-text" title="Permanent link">&para;</a></h3>
 <p>The Content-ID-Text is build from the extracted plaintext content of an encoded media object. To build a stable <abbr title="Content-ID Component">C-ID</abbr>-Text the plain text content must be extracted in a reproducable manner. To make this possible the plaintext content must be extracted with <a href="https://tika.apache.org/">Apache Tika v1.16</a>.</p>
 <h2 id="data-id-component">Data-ID component<a class="headerlink" href="#data-id-component" title="Permanent link">&para;</a></h2>
