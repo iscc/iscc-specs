@@ -37,7 +37,7 @@ ISCC ID
 
 The ISCC is used to permanently identify a given digital media object. It is algorithmically generated from basic metadata and the contents of the digital media object which it identifies. The ISCC Digest is a fixed size sequence of 32 bytes (256 bits) assembled from multiple sub-components. The printable ISCC Code is an [RFC 4648](https://tools.ietf.org/html/rfc4648#section-6) base32[^base32] encoded string representation of an ISCC Digest. This is a high-level overview of the ISCC creation process:
 
-![îscc-creation-process](images/îscc-creation-process.svg)
+![iscc-creation-process](images/iscc-creation-process.svg)
 
 ## ISCC Components
 
