@@ -55,10 +55,10 @@ Each component is guaranteed to fit into a 64-bit unsigned integer value. The co
 
 !!! todo
 
-    Describe coded format with prefix, colon, components +- hyphens 
+    Describe coded format with prefix, colon, components +- hyphens
 ### Component types
 
-Each component has the same basic structure of a 1-byte header and a 7-byte main section. Each component can thus be fit into a 64-bit integer value. The header-byte of each component is subdivided into 2 nibbles (4 bits). The first nibble specifies the component type while the second nibble is component specific.
+Each component has the same basic structure of a 1-byte header and a 7-byte main section[^component-length]. Each component can thus be fit into a 64-bit integer value. The header-byte of each component is subdivided into 2 nibbles (4 bits). The first nibble specifies the component type while the second nibble is component specific.
 
 | Component     | Nibble-1 | Nibble-2                    | Byte |
 | :------------ | :------- | :-------------------------- | :--- |
@@ -100,22 +100,31 @@ An ISCC generating application must follow these steps in the given order to pro
 
 ### Content-ID
 
-The Content-ID component has multiple subtypes. The subtypes are called **Generic Media Types**. A fully qualified ISCC can only have a Content-ID of one specific GMT. There can be multiple ISCCs per digital content file - one per GMT. A Content-ID is generated in two broad steps. In the first step, we extract and convert content from a rich media type to a normalized generic media type. In the second step, we run a GMT-specific process to generate the Content-ID part of an ISCC. The subtype is signaled by the first 3 bits of the second nibble of the first byte of the Content-ID. 
+The Content-ID component has multiple subtypes. Except for the *mixed type* all subtypes correspond with the **Generic Media Types**. A fully qualified ISCC can only have a Content-ID component of one specific type, but there can be multiple ISCCs with different Content-ID types per digital media object.
 
-| Generic Media Type | Nibble-2 Bits 0-3 |
+A Content-ID is generated in two broad steps. In the first step, we extract and convert content from a rich media type to a normalized GMT. In the second step, we use a GMT-specific process to generate the Content-ID component of an ISCC. 
+
+#### Content-ID Types
+
+The  Content-ID type is signaled by the first 3 bits of the second nibble of the first byte of the Content-ID:
+
+| Conent-ID Type | Nibble-2 Bits 0-3 |
 | :----------------- | :---------------- |
-| Text               | 000               |
-| Image              | 001               |
-| Audio              | 010               |
-| Video              | 011               |
-| Mixed              | 100               |
+| text               | 000               |
+| image              | 001               |
+| audio              | 010               |
+| video              | 011               |
+| mixed              | 100               |
 | Reserved           | 101, 110, 111     |
 
-The last bit of the first byte is the "Partial Content Flag". It designates if the Content-ID applies to the full content or just some part of it. The PCF must be set as a `0`-bit (full GMT-specific content) by default. Setting the PCF to `1` enables applications to create multiple ISCCs for content parts of one and the same digital file. For example, one might create separate ISCC for multiple articles of a magazine issue. In such a case the different Content-ID components would automatically be "bound" together by the remaining components.
+#### Partial Content Flag (PCF)
+
+The last bit of the header byte is the "Partial Content Flag". It designates if the Content-ID applies to the full content or just some part of it. The PCF must be set as a `0`-bit (full GMT-specific content) by default. Setting the PCF to `1` enables applications to create multiple ISCCs for partial extracts of one and the same digital file. The exact semantics of *partial content* are outside of the scope of this specification. Applications that plan to support partial Content-IDs should clearly define their semantics. For example, an application might create separate ISCC for the text contents of multiple articles of a magazine issue. In such a scenario
+the Meta-, Data-, and Instance-IDs are the compound key for the magazine issue, while the Content-ID-Text component distinguishes the different articles of the issue. The different Content-ID-Text components would automatically be "bound" together by the other 3 components.
 
 #### Content-ID-Text
 
-The Content-ID-Text is built from the extracted plain-text content of an encoded media object. To build a stable C-ID-Text the plain text content must be extracted in a way that is reproducible. To make this possible we specify that the plain-text content must be extracted with [Apache Tika v1.16](https://tika.apache.org/).
+The Content-ID-Text is built from the extracted plain-text content of an encoded media object. To build a stable Content-ID-Text the plain text content must be extracted in a way that is reproducible. To make this possible we specify that the plain-text content must be extracted with [Apache Tika v1.16](https://tika.apache.org/).
 
 ### Data-ID
 
@@ -131,7 +140,7 @@ The Data-ID is built from the raw encoded data of the content to be identified. 
 
 ### Instance-ID
 
-The Instance-ID is built from the raw data file of the content to be identified. An ISCC generating application must provide a `generate_instance_id` function that accepts the raw data file as input. Generate an Instance-ID by this procedure:
+The Instance-ID is built from the raw data file of the content to be identified. It is serves as basic checksum of the media object. Applications may carry or store the full merkle root for an advanced data integrity verification. An ISCC generating application must provide a `generate_instance_id` function that accepts the raw data file as input. Generate an Instance-ID by this procedure:
 
 1. Apply `chunk_data` to the raw encoded content data.
 2. For each chunk calculate its sha256 digest.
@@ -189,4 +198,9 @@ We define a text normalization function that is specific to our application. It 
 
 ## Footnotes
 
-[^base32]: The final base encoding of this specification might change before version 1. Base32 was chosen because it is a widely accepted standard and has implementations in most popular programming languages. It is url save, case sensitive and encodes the ISCC octets to a fixed size alphanumeric string. The predictable size of the encoding is a property that we need for composition and decomposition of components without having to rely on a delimiter (hyphen) in the ISCC code representation. We might change to a non standard base62, mixed case encoding to create shorter ISCC codes before the final version 1 specification. 
+[^base32]: The final base encoding of this specification might change before version 1. Base32 was chosen because it is a widely accepted standard and has implementations in most popular programming languages. It is url save, case sensitive and encodes the ISCC octets to a fixed size alphanumeric string. The predictable size of the encoding is a property that we need for composition and decomposition of components without having to rely on a delimiter (hyphen) in the ISCC code representation. We might change to a non standard base62, mixed case encoding to create shorter ISCC codes before the final version 1 specification.
+
+[^component-length]: We might switch to a different base structure for components. For example we might use a variable length header and a bigger 8-byte body. The header would only be carried in the encoded representation and applications could use full 64-bit space per component. Similarity searches make no sense accross different components the type information of the header can be ignored after an ISCC has been decomposed by an application.
+
+.
+
