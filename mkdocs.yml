@@ -17,9 +17,9 @@ copyright: 'Copyright © 2016-2017, Content Blockchain Project'
 theme: 'material'
 
 pages:
-    - ISCC - Introduction: 'index.md'
-    - ISCC - Concept: 'concept.md'
-    - ISCC - Specification (Draft): 'specification.md'
+    - Introduction: 'index.md'
+    - Concept: 'concept.md'
+    - Specification (Draft): 'specification.md'
     - Contributing: 'contributing.md'
     - License: 'license.md'
 
@@ -29,13 +29,14 @@ extra:
     palette:
         primary: 'blue'
         accent: 'red'
+    font:
+        text: 'Open Sans'
+        code: 'Ubuntu Mono'
     social:
-    -
-        type: 'github'
-        link: 'https://github.com/coblo'
-    -
-        type: 'home'
-        link: 'https://content-blockchain.org'
+    - type: 'github'
+      link: 'https://github.com/coblo'
+    - type: 'home'
+      link: 'https://content-blockchain.org'
     feature:
         tabs: false
 
