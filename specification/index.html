@@ -39,8 +39,8 @@
         
         
         
-        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,400i,700|Roboto+Mono">
-        <style>body,input{font-family:"Roboto","Helvetica Neue",Helvetica,Arial,sans-serif}code,kbd,pre{font-family:"Roboto Mono","Courier New",Courier,monospace}</style>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open Sans:300,400,400i,700|Ubuntu+Mono">
+        <style>body,input{font-family:"Open Sans","Helvetica Neue",Helvetica,Arial,sans-serif}code,kbd,pre{font-family:"Ubuntu Mono","Courier New",Courier,monospace}</style>
       
       <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
     
@@ -84,7 +84,7 @@
             
               
             
-            ISCC - Specification (Draft)
+            Specification (Draft)
           
         </span>
       </div>
@@ -193,8 +193,8 @@
 
 
   <li class="md-nav__item">
-    <a href=".." title="ISCC - Introduction" class="md-nav__link">
-      ISCC - Introduction
+    <a href=".." title="Introduction" class="md-nav__link">
+      Introduction
     </a>
   </li>
 
@@ -205,8 +205,8 @@
 
 
   <li class="md-nav__item">
-    <a href="../concept/" title="ISCC - Concept" class="md-nav__link">
-      ISCC - Concept
+    <a href="../concept/" title="Concept" class="md-nav__link">
+      Concept
     </a>
   </li>
 
@@ -226,11 +226,11 @@
     
     
       <label class="md-nav__link md-nav__link--active" for="toc">
-        ISCC - Specification (Draft)
+        Specification (Draft)
       </label>
     
-    <a href="./" title="ISCC - Specification (Draft)" class="md-nav__link md-nav__link--active">
-      ISCC - Specification (Draft)
+    <a href="./" title="Specification (Draft)" class="md-nav__link md-nav__link--active">
+      Specification (Draft)
     </a>
     
       
@@ -306,6 +306,20 @@
   
     <nav class="md-nav">
       <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#content-id-types" title="Content-ID Types" class="md-nav__link">
+    Content-ID Types
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#partial-content-flag-pcf" title="Partial Content Flag (PCF)" class="md-nav__link">
+    Partial Content Flag (PCF)
+  </a>
+  
+</li>
         
           <li class="md-nav__item">
   <a href="#content-id-text" title="Content-ID-Text" class="md-nav__link">
@@ -497,6 +511,20 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#content-id-types" title="Content-ID Types" class="md-nav__link">
+    Content-ID Types
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#partial-content-flag-pcf" title="Partial Content Flag (PCF)" class="md-nav__link">
+    Partial Content Flag (PCF)
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#content-id-text" title="Content-ID-Text" class="md-nav__link">
     Content-ID-Text
   </a>
@@ -656,10 +684,10 @@
 <p>Each component is guaranteed to fit into a 64-bit unsigned integer value. The components may be used independently by applications for various purposes but must be combined into a 52 <abbr title="A character is defined as one Unicode code point">character</abbr> string (55 with hyphens) for a fully qualified ISCC code. The components must be combined in the fixed order of Meta-ID, Content-ID, Data-ID, Instance-ID and may be separated by hyphens.</p>
 <div class="admonition todo">
 <p class="admonition-title">Todo</p>
-<p>Describe coded format with prefix, colon, components +- hyphens </p>
+<p>Describe coded format with prefix, colon, components +- hyphens</p>
 </div>
 <h3 id="component-types">Component types<a class="headerlink" href="#component-types" title="Permanent link">&para;</a></h3>
-<p>Each component has the same basic structure of a 1-byte header and a 7-byte main section. Each component can thus be fit into a 64-bit integer value. The header-byte of each component is subdivided into 2 nibbles (4 bits). The first nibble specifies the component type while the second nibble is component specific.</p>
+<p>Each component has the same basic structure of a 1-byte header and a 7-byte main section<sup id="fnref:component-length"><a class="footnote-ref" href="#fn:component-length" rel="footnote">2</a></sup>. Each component can thus be fit into a 64-bit integer value. The header-byte of each component is subdivided into 2 nibbles (4 bits). The first nibble specifies the component type while the second nibble is component specific.</p>
 <table>
 <thead>
 <tr>
@@ -752,33 +780,36 @@
 <li>Encode the resulting 8 byte sequence with base32 (no-padding) and return the result.</li>
 </ol>
 <h3 id="content-id">Content-ID<a class="headerlink" href="#content-id" title="Permanent link">&para;</a></h3>
-<p>The Content-ID component has multiple subtypes. The subtypes are called <strong>Generic Media Types</strong>. A fully qualified ISCC can only have a Content-ID of one specific <abbr title="Generic Media Type">GMT</abbr>. There can be multiple ISCCs per digital content file - one per <abbr title="Generic Media Type">GMT</abbr>. A Content-ID is generated in two broad steps. In the first step, we extract and convert content from a rich media type to a normalized generic media type. In the second step, we run a <abbr title="Generic Media Type">GMT</abbr>-specific process to generate the Content-ID part of an ISCC. The subtype is signaled by the first 3 bits of the second nibble of the first byte of the Content-ID. </p>
+<p>The Content-ID component has multiple subtypes. Except for the <em>mixed type</em> all subtypes correspond with the <strong>Generic Media Types</strong>. A fully qualified ISCC can only have a Content-ID component of one specific type, but there can be multiple ISCCs with different Content-ID types per digital media object.</p>
+<p>A Content-ID is generated in two broad steps. In the first step, we extract and convert content from a rich media type to a normalized <abbr title="Generic Media Type">GMT</abbr>. In the second step, we use a <abbr title="Generic Media Type">GMT</abbr>-specific process to generate the Content-ID component of an ISCC. </p>
+<h4 id="content-id-types">Content-ID Types<a class="headerlink" href="#content-id-types" title="Permanent link">&para;</a></h4>
+<p>The  Content-ID type is signaled by the first 3 bits of the second nibble of the first byte of the Content-ID:</p>
 <table>
 <thead>
 <tr>
-<th align="left">Generic Media Type</th>
+<th align="left">Conent-ID Type</th>
 <th align="left">Nibble-2 Bits 0-3</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td align="left">Text</td>
+<td align="left">text</td>
 <td align="left">000</td>
 </tr>
 <tr>
-<td align="left">Image</td>
+<td align="left">image</td>
 <td align="left">001</td>
 </tr>
 <tr>
-<td align="left">Audio</td>
+<td align="left">audio</td>
 <td align="left">010</td>
 </tr>
 <tr>
-<td align="left">Video</td>
+<td align="left">video</td>
 <td align="left">011</td>
 </tr>
 <tr>
-<td align="left">Mixed</td>
+<td align="left">mixed</td>
 <td align="left">100</td>
 </tr>
 <tr>
@@ -787,9 +818,11 @@
 </tr>
 </tbody>
 </table>
-<p>The last bit of the first byte is the "Partial Content Flag". It designates if the Content-ID applies to the full content or just some part of it. The <abbr title="Partial Content Flag">PCF</abbr> must be set as a <code>0</code>-bit (full <abbr title="Generic Media Type">GMT</abbr>-specific content) by default. Setting the <abbr title="Partial Content Flag">PCF</abbr> to <code>1</code> enables applications to create multiple ISCCs for content parts of one and the same digital file. For example, one might create separate ISCC for multiple articles of a magazine issue. In such a case the different Content-ID components would automatically be "bound" together by the remaining components.</p>
+<h4 id="partial-content-flag-pcf">Partial Content Flag (<abbr title="Partial Content Flag">PCF</abbr>)<a class="headerlink" href="#partial-content-flag-pcf" title="Permanent link">&para;</a></h4>
+<p>The last bit of the header byte is the "Partial Content Flag". It designates if the Content-ID applies to the full content or just some part of it. The <abbr title="Partial Content Flag">PCF</abbr> must be set as a <code>0</code>-bit (full <abbr title="Generic Media Type">GMT</abbr>-specific content) by default. Setting the <abbr title="Partial Content Flag">PCF</abbr> to <code>1</code> enables applications to create multiple ISCCs for partial extracts of one and the same digital file. The exact semantics of <em>partial content</em> are outside of the scope of this specification. Applications that plan to support partial Content-IDs should clearly define their semantics. For example, an application might create separate ISCC for the text contents of multiple articles of a magazine issue. In such a scenario
+the Meta-, Data-, and Instance-IDs are the compound key for the magazine issue, while the Content-ID-Text component distinguishes the different articles of the issue. The different Content-ID-Text components would automatically be "bound" together by the other 3 components.</p>
 <h4 id="content-id-text">Content-ID-Text<a class="headerlink" href="#content-id-text" title="Permanent link">&para;</a></h4>
-<p>The Content-ID-Text is built from the extracted plain-text content of an encoded media object. To build a stable <abbr title="Content-ID Component">C-ID</abbr>-Text the plain text content must be extracted in a way that is reproducible. To make this possible we specify that the plain-text content must be extracted with <a href="https://tika.apache.org/">Apache Tika v1.16</a>.</p>
+<p>The Content-ID-Text is built from the extracted plain-text content of an encoded media object. To build a stable Content-ID-Text the plain text content must be extracted in a way that is reproducible. To make this possible we specify that the plain-text content must be extracted with <a href="https://tika.apache.org/">Apache Tika v1.16</a>.</p>
 <h3 id="data-id">Data-ID<a class="headerlink" href="#data-id" title="Permanent link">&para;</a></h3>
 <p>The Data-ID is built from the raw encoded data of the content to be identified. An ISCC generating application must provide a <code>generate_data_id</code> function that accepts the raw encoded data as input. Generate a Data-ID by this procedure:</p>
 <ol>
@@ -802,7 +835,7 @@
 <li>Encode the resulting 8-byte sequence with base32 (no-padding) and return the result</li>
 </ol>
 <h3 id="instance-id">Instance-ID<a class="headerlink" href="#instance-id" title="Permanent link">&para;</a></h3>
-<p>The Instance-ID is built from the raw data file of the content to be identified. An ISCC generating application must provide a <code>generate_instance_id</code> function that accepts the raw data file as input. Generate an Instance-ID by this procedure:</p>
+<p>The Instance-ID is built from the raw data file of the content to be identified. It is serves as basic checksum of the media object. Applications may carry or store the full merkle root for an advanced data integrity verification. An ISCC generating application must provide a <code>generate_instance_id</code> function that accepts the raw data file as input. Generate an Instance-ID by this procedure:</p>
 <ol>
 <li>Apply <code>chunk_data</code> to the raw encoded content data.</li>
 <li>For each chunk calculate its sha256 digest.</li>
@@ -834,11 +867,15 @@
 <p>Specify <code>tokenize_text</code> function</p>
 </div>
 <h2 id="footnotes">Footnotes<a class="headerlink" href="#footnotes" title="Permanent link">&para;</a></h2>
+<p>.</p>
 <div class="footnote">
 <hr />
 <ol>
 <li id="fn:base32">
-<p>The final base encoding of this specification might change before version 1. Base32 was chosen because it is a widely accepted standard and has implementations in most popular programming languages. It is url save, case sensitive and encodes the ISCC octets to a fixed size alphanumeric string. The predictable size of the encoding is a property that we need for composition and decomposition of components without having to rely on a delimiter (hyphen) in the ISCC code representation. We might change to a non standard base62, mixed case encoding to create shorter ISCC codes before the final version 1 specification. &#160;<a class="footnote-backref" href="#fnref:base32" rev="footnote" title="Jump back to footnote 1 in the text">&#8617;</a></p>
+<p>The final base encoding of this specification might change before version 1. Base32 was chosen because it is a widely accepted standard and has implementations in most popular programming languages. It is url save, case sensitive and encodes the ISCC octets to a fixed size alphanumeric string. The predictable size of the encoding is a property that we need for composition and decomposition of components without having to rely on a delimiter (hyphen) in the ISCC code representation. We might change to a non standard base62, mixed case encoding to create shorter ISCC codes before the final version 1 specification.&#160;<a class="footnote-backref" href="#fnref:base32" rev="footnote" title="Jump back to footnote 1 in the text">&#8617;</a></p>
+</li>
+<li id="fn:component-length">
+<p>We might switch to a different base structure for components. For example we might use a variable length header and a bigger 8-byte body. The header would only be carried in the encoded representation and applications could use full 64-bit space per component. Similarity searches make no sense accross different components the type information of the header can be ignored after an ISCC has been decomposed by an application.&#160;<a class="footnote-backref" href="#fnref:component-length" rev="footnote" title="Jump back to footnote 2 in the text">&#8617;</a></p>
 </li>
 </ol>
 </div>
@@ -860,7 +897,7 @@
     <div class="md-footer-nav">
       <nav class="md-footer-nav__inner md-grid">
         
-          <a href="../concept/" title="ISCC - Concept" class="md-flex md-footer-nav__link md-footer-nav__link--prev" rel="prev">
+          <a href="../concept/" title="Concept" class="md-flex md-footer-nav__link md-footer-nav__link--prev" rel="prev">
             <div class="md-flex__cell md-flex__cell--shrink">
               <i class="md-icon md-icon--arrow-back md-footer-nav__button"></i>
             </div>
@@ -869,7 +906,7 @@
                 <span class="md-footer-nav__direction">
                   Previous
                 </span>
-                ISCC - Concept
+                Concept
               </span>
             </div>
           </a>
