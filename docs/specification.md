@@ -144,7 +144,7 @@ The Instance-ID is built from the raw data of the media object to be identified 
 
 ![iscc-creation-instance-id](images/iscc-creation-instance-id.svg)
 
-Applications may carry or store the full hash-tree for advanced partial data integrity verification. An ISCC generating application must provide a `generate_instance_id` function that accepts the raw data file as input and returns an encoded Instance-ID. Generate an Instance-ID by this procedure:
+An ISCC generating application must provide a `generate_instance_id` function that accepts the raw data file as input and returns an encoded Instance-ID. Generate an Instance-ID by this procedure:
 
 1. Apply `chunk_data` to the raw bytes of the encoded media object.
 2. For each chunk calculate the sha256d[^sha256d] digest of the concatenation of a `0x00`-byte and the chunk bytes. We call the resulting values *leaf node hashes* (LNH).
@@ -153,6 +153,8 @@ Applications may carry or store the full hash-tree for advanced partial data int
 5. Trim the resulting *top hash* to the first 7 bytes.
 6. Prepend the 1-byte component header (e.g. `0x30`).
 7. Encode the resulting 8-byte sequence with base32 (no-padding) and return the result.
+
+Applications may carry, store, and process the full hash-tree for advanced partial data integrity verification.
 
 
 ## Procedures & Algorithms
@@ -180,6 +182,8 @@ We define a text normalization function that is specific to our application. It 
 !!! todo
 
     Specify `tokenize_text` function
+
+*[CDC]: Content defined chunking
 
 *[ISCC Code]: Base32 encoded representation of an ISCC
 
