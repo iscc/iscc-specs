@@ -123,6 +123,23 @@ def test_hamming_distance():
     assert iscc.hamming_distance(mid1, mid2) >= 30
 
 
-def test_jaccard():
-    assert iscc.jaccard_similarity(1, 2) == 0
+def test_generate_instance_id():
+    zero_bytes_even = b'\x00' * 16
+    iid = iscc.generate_instance_id(zero_bytes_even)
+    assert iscc.c2d(iid)[0] == 48
+    assert iid == 'GB6JPXHBHVZNY'
 
+    ff_bytes_uneven = b'\xff' * 17
+    iid = iscc.generate_instance_id(ff_bytes_uneven)
+    assert iscc.c2d(iid)[0] == 48
+    assert iid == 'GBSV66PQLOITI'
+
+
+def test_data_chunks():
+    a = b'\x00' * 8
+    b = b'\x01' * 8
+    c = b'\x11' * 4
+    chunks = list(iscc.data_chunks(a + b + c))
+    assert len(chunks) == 3
+    assert chunks[0] == a
+    assert chunks[-1] == c

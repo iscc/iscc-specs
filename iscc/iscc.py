@@ -1,13 +1,18 @@
 # -*- coding: utf-8 -*-
+"""
+ISCC Reference Implementation
+"""
 import re
 import base64
+from io import BytesIO
 from hashlib import sha256
 import unicodedata
-from typing import List, ByteString, Sequence
+from typing import List, ByteString, Sequence, BinaryIO, TypeVar
 
 # Magic Constants
 
 INPUT_TRIM = 128
+B = TypeVar('B', BinaryIO, bytes)
 
 
 def generate_meta_id(title: str, creators: str='', extra: str='', version: int=0) -> str:
@@ -28,14 +33,56 @@ def generate_meta_id(title: str, creators: str='', extra: str='', version: int=0
     n_grams = a + b + c
 
     hash_digests = [sha256(s.encode('utf-8')).digest() for s in n_grams]
-
     simhash_digest = simhash(hash_digests)
-    prefix = b'\x00'
-    suffix = simhash_digest[:7]
-    meta_id_digest = prefix + suffix
-    meta_id_code = base64.b32encode(meta_id_digest).rstrip(b'=').decode('ascii')
+    meta_id_digest = b'\x00' + simhash_digest[:7]
 
-    return meta_id_code
+    return base64.b32encode(meta_id_digest).rstrip(b'=').decode('ascii')
+
+
+def generate_instance_id(data: B) -> str:
+
+    leaf_node_digests = [sha256d(b'\x00' + chunk) for chunk in data_chunks(data)]
+    top_hash_digest = top_hash(leaf_node_digests)
+    instance_id_digest = b'\x30' + top_hash_digest[:7]
+    return base64.b32encode(instance_id_digest).rstrip(b'=').decode('ascii')
+
+
+def top_hash(hashes: List[bytes]) -> bytes:
+
+    size = len(hashes)
+    if size == 1:
+        return hashes[0]
+
+    pairwise_hashed = []
+
+    for i in range(0, len(hashes) - 1, 2):
+        pairwise_hashed.append(hash_inner_nodes(hashes[i], hashes[i + 1]))
+
+    if size % 2 == 1:
+        pairwise_hashed.append(hash_inner_nodes(hashes[-1], hashes[-1]))
+
+    return top_hash(pairwise_hashed)
+
+
+def sha256d(data: bytes) -> bytes:
+    return sha256(sha256(data).digest()).digest()
+
+
+def hash_inner_nodes(a: bytes, b: bytes) -> bytes:
+    return sha256d(b'\x01' + a + b)
+
+
+def data_chunks(data: B) -> List[bytes]:
+    # TODO use cdc
+
+    if not hasattr(data, 'read'):
+        data = BytesIO(data)
+
+    while True:
+        chunk = data.read(8)
+        if not chunk:
+            break
+        yield chunk
 
 
 def normalize_text(text: str) -> str:
@@ -136,10 +183,3 @@ def c2i(code):
 def hamming_distance(ident1: int, ident2: int) -> int:
 
     return bin(ident1 ^ ident2).count('1')
-
-
-def jaccard_similarity(ident1, ident2):
-    """Bitwise jaccard coefficient of integers a, b"""
-    and_bits = bin(ident1 & ident2).count("1")
-    xor_bits = bin(ident1 ^ ident2).count("1")
-    return 1 - xor_bits / (and_bits + xor_bits)
