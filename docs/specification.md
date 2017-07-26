@@ -152,7 +152,7 @@ The Data-ID is built from the raw encoded data of the content to be identified. 
 
 ## Instance-ID
 
-The Instance-ID is built from the raw data of the media object to be identified and serves as basic checksum of the media object. The raw data of the media object is split into data-chunks. Then we build hash-tree from those chunks and use the truncated top-hash as the Instance-ID:
+The Instance-ID is built from the raw data of the media object to be identified and serves as basic checksum for the media object. The raw data of the media object is split into data-chunks. Then we build a hash-tree from those chunks and use the truncated top-hash for the Instance-ID:
 
 ![iscc-creation-instance-id](images/iscc-creation-instance-id.svg)
 
@@ -160,8 +160,8 @@ An ISCC generating application must provide a `generate_instance_id` function th
 
 1. Apply `chunk_data` to the raw bytes of the encoded media object.
 2. For each chunk calculate the sha256d[^sha256d] digest of the concatenation of a `0x00`-byte and the chunk bytes. We call the resulting values *leaf node hashes* (LNH).
-3. Calculate the next level of the hash tree by applying sha256d to the concatenation of a `0x01`-byte and adjacent pairs of LNH values. If the length of the list of LNH values is uneven concatenete the last LNH value with itself. We call the resulting values* internal node hashes* (INH).
-4. Recursively apply `0x01`-prefexed pairwise hashing to the results of  step 3 until the process yields only one hash value. We call this value the *top hash*.
+3. Calculate the next level of the hash tree by applying sha256d to the concatenation of a `0x01`-byte and adjacent pairs of LNH values. If the length of the list of LNH values is uneven concatenate the last LNH value with itself. We call the resulting values *internal node hashes* (INH).
+4. Recursively apply `0x01`-prefixed pairwise hashing to the results of  step 3 until the process yields only one hash value. We call this value the *top hash*.
 5. Trim the resulting *top hash* to the first 7 bytes.
 6. Prepend the 1-byte component header (e.g. `0x30`).
 7. Encode the resulting 8-byte sequence with base32 (no-padding) and return the result.
