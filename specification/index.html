@@ -636,7 +636,7 @@
 <dd>The integer representation of an ISCC</dd>
 </dl>
 <h2 id="overview">Overview<a class="headerlink" href="#overview" title="Permanent link">&para;</a></h2>
-<p>The ISCC is used to permanently identify a given digital media object. It is algorithmically generated from basic metadata and the contents of the digital media object which it identifies. The <abbr title="Raw binary data of an ISCC">ISCC Digest</abbr> is a fixed size sequence of 32 bytes (256 bits) assembled from multiple sub-components. The printable <abbr title="Base32 encoded representation of an ISCC">ISCC Code</abbr> is an <a href="https://tools.ietf.org/html/rfc4648#section-6">RFC 4648</a> base32<sup id="fnref:base32"><a class="footnote-ref" href="#fn:base32" rel="footnote">1</a></sup> encoded string representation of an <abbr title="Raw binary data of an ISCC">ISCC Digest</abbr>. This is a high-level overview of the ISCC creation process:</p>
+<p>The ISCC is used to permanently identify the content of a given digital media object. It is algorithmically generated from basic metadata and the contents of the digital media object which it identifies. The <abbr title="Raw binary data of an ISCC">ISCC Digest</abbr> is a fixed size sequence of 32 bytes (256 bits) assembled from multiple sub-components. The printable <abbr title="Base32 encoded representation of an ISCC">ISCC Code</abbr> is an <a href="https://tools.ietf.org/html/rfc4648#section-6">RFC 4648</a> base32<sup id="fnref:base32"><a class="footnote-ref" href="#fn:base32" rel="footnote">1</a></sup> encoded string representation of an <abbr title="Raw binary data of an ISCC">ISCC Digest</abbr>. This is a high-level overview of the ISCC creation process:</p>
 <p><img alt="iscc-creation-process" src="../images/iscc-creation-process.svg" /></p>
 <h2 id="iscc-components">ISCC Components<a class="headerlink" href="#iscc-components" title="Permanent link">&para;</a></h2>
 <p>The <abbr title="Raw binary data of an ISCC">ISCC Digest</abbr> is built from multiple self-describing 64-bit components:</p>
@@ -835,14 +835,17 @@ the Meta-, Data-, and Instance-IDs are the compound key for the magazine issue, 
 <li>Encode the resulting 8-byte sequence with base32 (no-padding) and return the result</li>
 </ol>
 <h3 id="instance-id">Instance-ID<a class="headerlink" href="#instance-id" title="Permanent link">&para;</a></h3>
-<p>The Instance-ID is built from the raw data file of the content to be identified. It is serves as basic checksum of the media object. Applications may carry or store the full merkle root for an advanced data integrity verification. An ISCC generating application must provide a <code>generate_instance_id</code> function that accepts the raw data file as input. Generate an Instance-ID by this procedure:</p>
+<p>The Instance-ID is built from the raw data of the media object to be identified and serves as basic checksum of the media object. The raw data of the media object is split into data-chunks. Then we build hash-tree from those chunks and use the truncated top-hash as the Instance-ID:</p>
+<p><img alt="iscc-creation-instance-id" src="../images/iscc-creation-instance-id.svg" /></p>
+<p>Applications may carry or store the full hash-tree for advanced partial data integrity verification. An ISCC generating application must provide a <code>generate_instance_id</code> function that accepts the raw data file as input and returns an encoded Instance-ID. Generate an Instance-ID by this procedure:</p>
 <ol>
-<li>Apply <code>chunk_data</code> to the raw encoded content data.</li>
-<li>For each chunk calculate its sha256 digest.</li>
-<li>Calculate the merkle root from the list sha256 digests (in order of chunks).</li>
-<li>Trim the resulting byte sequence to the first 7 bytes.</li>
-<li>Prepend the 1 byte component header (e.g. 0x30).</li>
-<li>Encode the resulting 8 byte sequence with base32 (no-padding) and return the result.</li>
+<li>Apply <code>chunk_data</code> to the raw bytes of the encoded media object.</li>
+<li>For each chunk calculate the sha256d<sup id="fnref:sha256d"><a class="footnote-ref" href="#fn:sha256d" rel="footnote">3</a></sup> digest of the concatenation of a <code>0x00</code>-byte and the chunk bytes. We call the resulting values <em>leaf node hashes</em> (<abbr title="Leaf Node Hash">LNH</abbr>).</li>
+<li>Calculate the next level of the hash tree by applying sha256d to the concatenation of a <code>0x01</code>-byte and adjacent pairs of <abbr title="Leaf Node Hash">LNH</abbr> values. If the length of the list of <abbr title="Leaf Node Hash">LNH</abbr> values is uneven concatenete the last <abbr title="Leaf Node Hash">LNH</abbr> value with itself. We call the resulting values<em> internal node hashes</em> (<abbr title="Internal Node Hash">INH</abbr>).</li>
+<li>Recursively apply <code>0x01</code>-prefexed pairwise hashing to the results of  step 3 until the process yields only one hash value. We call this value the <em>top hash</em>.</li>
+<li>Trim the resulting <em>top hash</em> to the first 7 bytes.</li>
+<li>Prepend the 1-byte component header (e.g. <code>0x30</code>).</li>
+<li>Encode the resulting 8-byte sequence with base32 (no-padding) and return the result.</li>
 </ol>
 <h2 id="procedures-algorithms">Procedures &amp; Algorithms<a class="headerlink" href="#procedures-algorithms" title="Permanent link">&para;</a></h2>
 <h3 id="normalize-text">Normalize Text<a class="headerlink" href="#normalize-text" title="Permanent link">&para;</a></h3>
@@ -872,10 +875,13 @@ the Meta-, Data-, and Instance-IDs are the compound key for the magazine issue, 
 <hr />
 <ol>
 <li id="fn:base32">
-<p>The final base encoding of this specification might change before version 1. Base32 was chosen because it is a widely accepted standard and has implementations in most popular programming languages. It is url save, case sensitive and encodes the ISCC octets to a fixed size alphanumeric string. The predictable size of the encoding is a property that we need for composition and decomposition of components without having to rely on a delimiter (hyphen) in the ISCC code representation. We might change to a non standard base62, mixed case encoding to create shorter ISCC codes before the final version 1 specification.&#160;<a class="footnote-backref" href="#fnref:base32" rev="footnote" title="Jump back to footnote 1 in the text">&#8617;</a></p>
+<p>The final base encoding of this specification might change before version 1. Base32 was chosen because it is a widely accepted standard and has implementations in most popular programming languages. It is url safe, case insensitive and encodes the ISCC octets to a fixed size alphanumeric string. The predictable size of the encoding is a property that we need for composition and decomposition of components without having to rely on a delimiter (hyphen) in the ISCC code representation. We might change to a non standard base62, mixed case encoding to create shorter ISCC codes before the final version 1 specification.&#160;<a class="footnote-backref" href="#fnref:base32" rev="footnote" title="Jump back to footnote 1 in the text">&#8617;</a></p>
 </li>
 <li id="fn:component-length">
-<p>We might switch to a different base structure for components. For example we might use a variable length header and a bigger 8-byte body. The header would only be carried in the encoded representation and applications could use full 64-bit space per component. Similarity searches make no sense accross different components the type information of the header can be ignored after an ISCC has been decomposed by an application.&#160;<a class="footnote-backref" href="#fnref:component-length" rev="footnote" title="Jump back to footnote 2 in the text">&#8617;</a></p>
+<p>We might switch to a different base structure for components. For example we might use a variable length header and a bigger 8-byte body. The header would only be carried in the encoded representation and applications could use full 64-bit space per component. As similarity searches accross different components make no sense, the type information contained in the header of each component can be safely ignored after an ISCC has been decomposed and internaly typed by an application.&#160;<a class="footnote-backref" href="#fnref:component-length" rev="footnote" title="Jump back to footnote 2 in the text">&#8617;</a></p>
+</li>
+<li id="fn:sha256d">
+<p>To guard against length-extension attacks and second pre-image attacks we use double sha256 for hashing. We also prefix the hash input data with a <code>0x00</code>-byte for the leaf nodes hashes and with a <code>0x01</code>-byte for the  internal node hashes.&#160;<a class="footnote-backref" href="#fnref:sha256d" rev="footnote" title="Jump back to footnote 3 in the text">&#8617;</a></p>
 </li>
 </ol>
 </div>
