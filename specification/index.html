@@ -669,8 +669,8 @@
 <td align="left"><strong>Algorithms:</strong></td>
 <td align="left">Similarity Hash</td>
 <td align="left">Type specific</td>
-<td align="left">CDC, Similarity Hash</td>
-<td align="left">CDC, Merkle tree</td>
+<td align="left"><abbr title="Content defined chunking">CDC</abbr>, Similarity Hash</td>
+<td align="left"><abbr title="Content defined chunking">CDC</abbr>, Merkle tree</td>
 </tr>
 <tr>
 <td align="left"><strong>Size:</strong></td>
@@ -837,7 +837,7 @@ the Meta-, Data-, and Instance-IDs are the compound key for the magazine issue, 
 <h3 id="instance-id">Instance-ID<a class="headerlink" href="#instance-id" title="Permanent link">&para;</a></h3>
 <p>The Instance-ID is built from the raw data of the media object to be identified and serves as basic checksum of the media object. The raw data of the media object is split into data-chunks. Then we build hash-tree from those chunks and use the truncated top-hash as the Instance-ID:</p>
 <p><img alt="iscc-creation-instance-id" src="../images/iscc-creation-instance-id.svg" /></p>
-<p>Applications may carry or store the full hash-tree for advanced partial data integrity verification. An ISCC generating application must provide a <code>generate_instance_id</code> function that accepts the raw data file as input and returns an encoded Instance-ID. Generate an Instance-ID by this procedure:</p>
+<p>An ISCC generating application must provide a <code>generate_instance_id</code> function that accepts the raw data file as input and returns an encoded Instance-ID. Generate an Instance-ID by this procedure:</p>
 <ol>
 <li>Apply <code>chunk_data</code> to the raw bytes of the encoded media object.</li>
 <li>For each chunk calculate the sha256d<sup id="fnref:sha256d"><a class="footnote-ref" href="#fn:sha256d" rel="footnote">3</a></sup> digest of the concatenation of a <code>0x00</code>-byte and the chunk bytes. We call the resulting values <em>leaf node hashes</em> (<abbr title="Leaf Node Hash">LNH</abbr>).</li>
@@ -847,6 +847,7 @@ the Meta-, Data-, and Instance-IDs are the compound key for the magazine issue, 
 <li>Prepend the 1-byte component header (e.g. <code>0x30</code>).</li>
 <li>Encode the resulting 8-byte sequence with base32 (no-padding) and return the result.</li>
 </ol>
+<p>Applications may carry, store, and process the full hash-tree for advanced partial data integrity verification.</p>
 <h2 id="procedures-algorithms">Procedures &amp; Algorithms<a class="headerlink" href="#procedures-algorithms" title="Permanent link">&para;</a></h2>
 <h3 id="normalize-text">Normalize Text<a class="headerlink" href="#normalize-text" title="Permanent link">&para;</a></h3>
 <p>We define a text normalization function that is specific to our application. It takes unicode text as an input and returns <em>normalized</em> Unicode text for further algorithmic processing. We reference this function by the name <code>normalize_text</code>. The <code>normalize_text</code> function performs the following operations in the given order while each step works with the results of the previous operation:</p>
