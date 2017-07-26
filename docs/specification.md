@@ -35,7 +35,7 @@ ISCC ID
 
 ## Overview
 
-The ISCC is used to permanently identify a given digital media object. It is algorithmically generated from basic metadata and the contents of the digital media object which it identifies. The ISCC Digest is a fixed size sequence of 32 bytes (256 bits) assembled from multiple sub-components. The printable ISCC Code is an [RFC 4648](https://tools.ietf.org/html/rfc4648#section-6) base32[^base32] encoded string representation of an ISCC Digest. This is a high-level overview of the ISCC creation process:
+The ISCC is used to permanently identify the content of a given digital media object. It is algorithmically generated from basic metadata and the contents of the digital media object which it identifies. The ISCC Digest is a fixed size sequence of 32 bytes (256 bits) assembled from multiple sub-components. The printable ISCC Code is an [RFC 4648](https://tools.ietf.org/html/rfc4648#section-6) base32[^base32] encoded string representation of an ISCC Digest. This is a high-level overview of the ISCC creation process:
 
 ![iscc-creation-process](images/iscc-creation-process.svg)
 
@@ -109,13 +109,13 @@ A Content-ID is generated in two broad steps. In the first step, we extract and 
 The  Content-ID type is signaled by the first 3 bits of the second nibble of the first byte of the Content-ID:
 
 | Conent-ID Type | Nibble-2 Bits 0-3 |
-| :----------------- | :---------------- |
-| text               | 000               |
-| image              | 001               |
-| audio              | 010               |
-| video              | 011               |
-| mixed              | 100               |
-| Reserved           | 101, 110, 111     |
+| :------------- | :---------------- |
+| text           | 000               |
+| image          | 001               |
+| audio          | 010               |
+| video          | 011               |
+| mixed          | 100               |
+| Reserved       | 101, 110, 111     |
 
 #### Partial Content Flag (PCF)
 
@@ -140,14 +140,19 @@ The Data-ID is built from the raw encoded data of the content to be identified. 
 
 ### Instance-ID
 
-The Instance-ID is built from the raw data file of the content to be identified. It is serves as basic checksum of the media object. Applications may carry or store the full merkle root for an advanced data integrity verification. An ISCC generating application must provide a `generate_instance_id` function that accepts the raw data file as input. Generate an Instance-ID by this procedure:
+The Instance-ID is built from the raw data of the media object to be identified and serves as basic checksum of the media object. The raw data of the media object is split into data-chunks. Then we build hash-tree from those chunks and use the truncated top-hash as the Instance-ID:
 
-1. Apply `chunk_data` to the raw encoded content data.
-2. For each chunk calculate its sha256 digest.
-3. Calculate the merkle root from the list sha256 digests (in order of chunks).
-4. Trim the resulting byte sequence to the first 7 bytes.
-5. Prepend the 1 byte component header (e.g. 0x30).
-6. Encode the resulting 8 byte sequence with base32 (no-padding) and return the result.
+![iscc-creation-instance-id](images/iscc-creation-instance-id.svg)
+
+Applications may carry or store the full hash-tree for advanced partial data integrity verification. An ISCC generating application must provide a `generate_instance_id` function that accepts the raw data file as input and returns an encoded Instance-ID. Generate an Instance-ID by this procedure:
+
+1. Apply `chunk_data` to the raw bytes of the encoded media object.
+2. For each chunk calculate the sha256d[^sha256d] digest of the concatenation of a `0x00`-byte and the chunk bytes. We call the resulting values *leaf node hashes* (LNH).
+3. Calculate the next level of the hash tree by applying sha256d to the concatenation of a `0x01`-byte and adjacent pairs of LNH values. If the length of the list of LNH values is uneven concatenete the last LNH value with itself. We call the resulting values* internal node hashes* (INH).
+4. Recursively apply `0x01`-prefexed pairwise hashing to the results of  step 3 until the process yields only one hash value. We call this value the *top hash*.
+5. Trim the resulting *top hash* to the first 7 bytes.
+6. Prepend the 1-byte component header (e.g. `0x30`).
+7. Encode the resulting 8-byte sequence with base32 (no-padding) and return the result.
 
 
 ## Procedures & Algorithms
@@ -194,13 +199,19 @@ We define a text normalization function that is specific to our application. It 
 
 *[PCF]: Partial Content Flag
 
+*[LNH]: Leaf Node Hash
+
+*[INH]: Internal Node Hash
+
 *[character]: A character is defined as one Unicode code point
 
 ## Footnotes
 
-[^base32]: The final base encoding of this specification might change before version 1. Base32 was chosen because it is a widely accepted standard and has implementations in most popular programming languages. It is url save, case sensitive and encodes the ISCC octets to a fixed size alphanumeric string. The predictable size of the encoding is a property that we need for composition and decomposition of components without having to rely on a delimiter (hyphen) in the ISCC code representation. We might change to a non standard base62, mixed case encoding to create shorter ISCC codes before the final version 1 specification.
+[^base32]: The final base encoding of this specification might change before version 1. Base32 was chosen because it is a widely accepted standard and has implementations in most popular programming languages. It is url safe, case insensitive and encodes the ISCC octets to a fixed size alphanumeric string. The predictable size of the encoding is a property that we need for composition and decomposition of components without having to rely on a delimiter (hyphen) in the ISCC code representation. We might change to a non standard base62, mixed case encoding to create shorter ISCC codes before the final version 1 specification.
 
-[^component-length]: We might switch to a different base structure for components. For example we might use a variable length header and a bigger 8-byte body. The header would only be carried in the encoded representation and applications could use full 64-bit space per component. Similarity searches make no sense accross different components the type information of the header can be ignored after an ISCC has been decomposed by an application.
+[^component-length]: We might switch to a different base structure for components. For example we might use a variable length header and a bigger 8-byte body. The header would only be carried in the encoded representation and applications could use full 64-bit space per component. As similarity searches accross different components make no sense, the type information contained in the header of each component can be safely ignored after an ISCC has been decomposed and internaly typed by an application.
+
+[^sha256d]: To guard against length-extension attacks and second pre-image attacks we use double sha256 for hashing. We also prefix the hash input data with a `0x00`-byte for the leaf nodes hashes and with a `0x01`-byte for the  internal node hashes.
 
 .
 
