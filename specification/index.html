@@ -855,14 +855,14 @@ the Meta-, Data-, and Instance-IDs are the compound key for the magazine issue, 
 <li>Encode the resulting 8-byte sequence with base32 (no-padding) and return the result</li>
 </ol>
 <h2 id="instance-id">Instance-ID<a class="headerlink" href="#instance-id" title="Permanent link">&para;</a></h2>
-<p>The Instance-ID is built from the raw data of the media object to be identified and serves as basic checksum of the media object. The raw data of the media object is split into data-chunks. Then we build hash-tree from those chunks and use the truncated top-hash as the Instance-ID:</p>
+<p>The Instance-ID is built from the raw data of the media object to be identified and serves as basic checksum for the media object. The raw data of the media object is split into data-chunks. Then we build a hash-tree from those chunks and use the truncated top-hash for the Instance-ID:</p>
 <p><img alt="iscc-creation-instance-id" src="../images/iscc-creation-instance-id.svg" /></p>
 <p>An ISCC generating application must provide a <code>generate_instance_id</code> function that accepts the raw data file as input and returns an encoded Instance-ID. Generate an Instance-ID by this procedure:</p>
 <ol>
 <li>Apply <code>chunk_data</code> to the raw bytes of the encoded media object.</li>
 <li>For each chunk calculate the sha256d<sup id="fnref:sha256d"><a class="footnote-ref" href="#fn:sha256d" rel="footnote">3</a></sup> digest of the concatenation of a <code>0x00</code>-byte and the chunk bytes. We call the resulting values <em>leaf node hashes</em> (<abbr title="Leaf Node Hash">LNH</abbr>).</li>
-<li>Calculate the next level of the hash tree by applying sha256d to the concatenation of a <code>0x01</code>-byte and adjacent pairs of <abbr title="Leaf Node Hash">LNH</abbr> values. If the length of the list of <abbr title="Leaf Node Hash">LNH</abbr> values is uneven concatenete the last <abbr title="Leaf Node Hash">LNH</abbr> value with itself. We call the resulting values<em> internal node hashes</em> (<abbr title="Internal Node Hash">INH</abbr>).</li>
-<li>Recursively apply <code>0x01</code>-prefexed pairwise hashing to the results of  step 3 until the process yields only one hash value. We call this value the <em>top hash</em>.</li>
+<li>Calculate the next level of the hash tree by applying sha256d to the concatenation of a <code>0x01</code>-byte and adjacent pairs of <abbr title="Leaf Node Hash">LNH</abbr> values. If the length of the list of <abbr title="Leaf Node Hash">LNH</abbr> values is uneven concatenate the last <abbr title="Leaf Node Hash">LNH</abbr> value with itself. We call the resulting values <em>internal node hashes</em> (<abbr title="Internal Node Hash">INH</abbr>).</li>
+<li>Recursively apply <code>0x01</code>-prefixed pairwise hashing to the results of  step 3 until the process yields only one hash value. We call this value the <em>top hash</em>.</li>
 <li>Trim the resulting <em>top hash</em> to the first 7 bytes.</li>
 <li>Prepend the 1-byte component header (e.g. <code>0x30</code>).</li>
 <li>Encode the resulting 8-byte sequence with base32 (no-padding) and return the result.</li>
