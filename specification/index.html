@@ -258,19 +258,19 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#overview" title="Overview" class="md-nav__link">
-    Overview
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#iscc-components" title="ISCC Components" class="md-nav__link">
-    ISCC Components
+  <a href="#iscc-structure" title="ISCC Structure" class="md-nav__link">
+    ISCC Structure
   </a>
   
     <nav class="md-nav">
       <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#components" title="Components" class="md-nav__link">
+    Components
+  </a>
+  
+</li>
         
           <li class="md-nav__item">
   <a href="#component-types" title="Component types" class="md-nav__link">
@@ -279,7 +279,12 @@
   
 </li>
         
-          <li class="md-nav__item">
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#meta-id" title="Meta-ID" class="md-nav__link">
     Meta-ID
   </a>
@@ -294,12 +299,19 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#dealing-with-collisions" title="Dealing with collisions" class="md-nav__link">
+    Dealing with collisions
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
 </li>
-        
-          <li class="md-nav__item">
+      
+        <li class="md-nav__item">
   <a href="#content-id" title="Content-ID" class="md-nav__link">
     Content-ID
   </a>
@@ -332,23 +344,18 @@
     </nav>
   
 </li>
-        
-          <li class="md-nav__item">
+      
+        <li class="md-nav__item">
   <a href="#data-id" title="Data-ID" class="md-nav__link">
     Data-ID
   </a>
   
 </li>
-        
-          <li class="md-nav__item">
+      
+        <li class="md-nav__item">
   <a href="#instance-id" title="Instance-ID" class="md-nav__link">
     Instance-ID
   </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
       
@@ -461,19 +468,19 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#overview" title="Overview" class="md-nav__link">
-    Overview
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#iscc-components" title="ISCC Components" class="md-nav__link">
-    ISCC Components
+  <a href="#iscc-structure" title="ISCC Structure" class="md-nav__link">
+    ISCC Structure
   </a>
   
     <nav class="md-nav">
       <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#components" title="Components" class="md-nav__link">
+    Components
+  </a>
+  
+</li>
         
           <li class="md-nav__item">
   <a href="#component-types" title="Component types" class="md-nav__link">
@@ -482,7 +489,12 @@
   
 </li>
         
-          <li class="md-nav__item">
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#meta-id" title="Meta-ID" class="md-nav__link">
     Meta-ID
   </a>
@@ -497,12 +509,19 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#dealing-with-collisions" title="Dealing with collisions" class="md-nav__link">
+    Dealing with collisions
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
 </li>
-        
-          <li class="md-nav__item">
+      
+        <li class="md-nav__item">
   <a href="#content-id" title="Content-ID" class="md-nav__link">
     Content-ID
   </a>
@@ -535,23 +554,18 @@
     </nav>
   
 </li>
-        
-          <li class="md-nav__item">
+      
+        <li class="md-nav__item">
   <a href="#data-id" title="Data-ID" class="md-nav__link">
     Data-ID
   </a>
   
 </li>
-        
-          <li class="md-nav__item">
+      
+        <li class="md-nav__item">
   <a href="#instance-id" title="Instance-ID" class="md-nav__link">
     Instance-ID
   </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
       
@@ -635,10 +649,10 @@
 <dt><abbr title="Integer representation of an ISCC">ISCC ID</abbr></dt>
 <dd>The integer representation of an ISCC</dd>
 </dl>
-<h2 id="overview">Overview<a class="headerlink" href="#overview" title="Permanent link">&para;</a></h2>
+<h2 id="iscc-structure">ISCC Structure<a class="headerlink" href="#iscc-structure" title="Permanent link">&para;</a></h2>
 <p>The ISCC is used to permanently identify the content of a given digital media object. It is algorithmically generated from basic metadata and the contents of the digital media object which it identifies. The <abbr title="Raw binary data of an ISCC">ISCC Digest</abbr> is a fixed size sequence of 32 bytes (256 bits) assembled from multiple sub-components. The printable <abbr title="Base32 encoded representation of an ISCC">ISCC Code</abbr> is an <a href="https://tools.ietf.org/html/rfc4648#section-6">RFC 4648</a> base32<sup id="fnref:base32"><a class="footnote-ref" href="#fn:base32" rel="footnote">1</a></sup> encoded string representation of an <abbr title="Raw binary data of an ISCC">ISCC Digest</abbr>. This is a high-level overview of the ISCC creation process:</p>
 <p><img alt="iscc-creation-process" src="../images/iscc-creation-process.svg" /></p>
-<h2 id="iscc-components">ISCC Components<a class="headerlink" href="#iscc-components" title="Permanent link">&para;</a></h2>
+<h3 id="components">Components<a class="headerlink" href="#components" title="Permanent link">&para;</a></h3>
 <p>The <abbr title="Raw binary data of an ISCC">ISCC Digest</abbr> is built from multiple self-describing 64-bit components:</p>
 <table>
 <thead>
@@ -652,7 +666,7 @@
 </thead>
 <tbody>
 <tr>
-<td align="left"><strong>Identifies:</strong></td>
+<td align="left"><strong>Context:</strong></td>
 <td align="left">Intangible creation</td>
 <td align="left">Content similarity</td>
 <td align="left">Data similarity</td>
@@ -670,7 +684,7 @@
 <td align="left">Similarity Hash</td>
 <td align="left">Type specific</td>
 <td align="left"><abbr title="Content defined chunking">CDC</abbr>, Similarity Hash</td>
-<td align="left"><abbr title="Content defined chunking">CDC</abbr>, Merkle tree</td>
+<td align="left"><abbr title="Content defined chunking">CDC</abbr>, Hash Tree</td>
 </tr>
 <tr>
 <td align="left"><strong>Size:</strong></td>
@@ -724,7 +738,7 @@
 </tr>
 </tbody>
 </table>
-<h3 id="meta-id">Meta-ID<a class="headerlink" href="#meta-id" title="Permanent link">&para;</a></h3>
+<h2 id="meta-id">Meta-ID<a class="headerlink" href="#meta-id" title="Permanent link">&para;</a></h2>
 <p>The Meta-ID is built from minimal and generic metadata of the content to be identified. An ISCC generating application must provide a <code>generate_meta_id</code> function that accepts the following input fields:</p>
 <table>
 <thead>
@@ -762,8 +776,8 @@
 </tr>
 </tbody>
 </table>
-<p>The <code>generate_meta_id</code> function must return a valid base32hex encoded Meta-ID code.</p>
-<h4 id="generate-meta-id">Generate Meta-ID<a class="headerlink" href="#generate-meta-id" title="Permanent link">&para;</a></h4>
+<p>The <code>generate_meta_id</code> function must return a valid base32 encoded Meta-ID component without padding.</p>
+<h3 id="generate-meta-id">Generate Meta-ID<a class="headerlink" href="#generate-meta-id" title="Permanent link">&para;</a></h3>
 <p>An ISCC generating application must follow these steps in the given order to produce a stable Meta-ID:</p>
 <ol>
 <li>Apply Unicode standard <a href="http://www.unicode.org/reports/tr15/#Norm_Forms">Normalization Form KC (NFKC)</a> separately to all text input values.</li>
@@ -779,7 +793,13 @@
 <li>Prepend the 1-byte component header according to component type and ISCC version (e.g. <code>0x00</code>).</li>
 <li>Encode the resulting 8 byte sequence with base32 (no-padding) and return the result.</li>
 </ol>
-<h3 id="content-id">Content-ID<a class="headerlink" href="#content-id" title="Permanent link">&para;</a></h3>
+<h3 id="dealing-with-collisions">Dealing with collisions<a class="headerlink" href="#dealing-with-collisions" title="Permanent link">&para;</a></h3>
+<p>Ideally we want multiple ISCCs that identify different manifestations of the <em>same intangible creation</em> to be automatically grouped by an identical leading Meta-ID component. We call such a natural grouping an <strong>intended collision</strong>. Metadata, captured and edited by humans, is notoriously unreliable. By using normalization and a similarity hash on the metadata we account for some of this variation while keeping the Meta-ID component stable. </p>
+<p>Auto-generated Meta-IDs components are <strong>expected</strong> to miss some intended collisions. An application should check for such <strong>missed intended collisions</strong> before registering a new Meta-ID with the <em>canonical registry</em> of ISCCs by conducting a similarity search and asking for user feedback.</p>
+<p>But what about <strong>unintended collisions</strong>? Such collisions might happen because two <em>different intangible creations</em> have very similar or even identical metadata. But they might also happen simply by chance. With 2^56 possibile Meta-ID components the probability of random collisions rises in an S-cuved shape with the number of deployed ISCCs (see: <a href="http://preshing.com/20110504/hash-collision-probabilities/">Hash Collision Probabilities</a>).  We should keep in mind that, the Meta-ID component is only one part of an ISCC. Sporadic unintended collisions of the Meta-ID component are generally deemed as <strong>acceptable and expected</strong>. </p>
+<p>If for any reason an application wants to avoid unintended collisions with pre-existing Meta-ID components it may utilze the <code>extra</code>-field. An application must first generate a Meta-ID without asking the user for input to the <code>extra</code>-field and then first check for collisions with the <em>canonical registry</em> of ISCCs. After it finds a collision with a pre-existing Meta-ID it may display the metadata of the colliding entry and interact with the user to determine if it indeed is an unintended collision. Only if the user indicates an unintended collision, may the application ask for a disambiguation that is than added as an ammendment to the metadata via the <code>extra</code>-field to create a different Meta-ID component. The application may repeat the pre-existence check until it finds no collision or a user intended collision. The application must not supply autogenerated input to the <code>extra</code>-field.</p>
+<p>It is our opinion that the concept of <strong>intended collisions</strong> of Meta-ID components is generally usefull concept and a net positive. But one must be aware that this characteristic also has its pitfalls. It is by no means an attempt to provide an unambigous - agreed upon - definition of <em>"identical intangible creations"</em>.</p>
+<h2 id="content-id">Content-ID<a class="headerlink" href="#content-id" title="Permanent link">&para;</a></h2>
 <p>The Content-ID component has multiple subtypes. Except for the <em>mixed type</em> all subtypes correspond with the <strong>Generic Media Types</strong>. A fully qualified ISCC can only have a Content-ID component of one specific type, but there can be multiple ISCCs with different Content-ID types per digital media object.</p>
 <p>A Content-ID is generated in two broad steps. In the first step, we extract and convert content from a rich media type to a normalized <abbr title="Generic Media Type">GMT</abbr>. In the second step, we use a <abbr title="Generic Media Type">GMT</abbr>-specific process to generate the Content-ID component of an ISCC. </p>
 <h4 id="content-id-types">Content-ID Types<a class="headerlink" href="#content-id-types" title="Permanent link">&para;</a></h4>
@@ -823,7 +843,7 @@
 the Meta-, Data-, and Instance-IDs are the compound key for the magazine issue, while the Content-ID-Text component distinguishes the different articles of the issue. The different Content-ID-Text components would automatically be "bound" together by the other 3 components.</p>
 <h4 id="content-id-text">Content-ID-Text<a class="headerlink" href="#content-id-text" title="Permanent link">&para;</a></h4>
 <p>The Content-ID-Text is built from the extracted plain-text content of an encoded media object. To build a stable Content-ID-Text the plain text content must be extracted in a way that is reproducible. To make this possible we specify that the plain-text content must be extracted with <a href="https://tika.apache.org/">Apache Tika v1.16</a>.</p>
-<h3 id="data-id">Data-ID<a class="headerlink" href="#data-id" title="Permanent link">&para;</a></h3>
+<h2 id="data-id">Data-ID<a class="headerlink" href="#data-id" title="Permanent link">&para;</a></h2>
 <p>The Data-ID is built from the raw encoded data of the content to be identified. An ISCC generating application must provide a <code>generate_data_id</code> function that accepts the raw encoded data as input. Generate a Data-ID by this procedure:</p>
 <ol>
 <li>Apply <code>chunk_data</code> to the raw encoded content data</li>
@@ -834,7 +854,7 @@ the Meta-, Data-, and Instance-IDs are the compound key for the magazine issue, 
 <li>Prepend the 1-byte component header (e.g. 0x20).</li>
 <li>Encode the resulting 8-byte sequence with base32 (no-padding) and return the result</li>
 </ol>
-<h3 id="instance-id">Instance-ID<a class="headerlink" href="#instance-id" title="Permanent link">&para;</a></h3>
+<h2 id="instance-id">Instance-ID<a class="headerlink" href="#instance-id" title="Permanent link">&para;</a></h2>
 <p>The Instance-ID is built from the raw data of the media object to be identified and serves as basic checksum of the media object. The raw data of the media object is split into data-chunks. Then we build hash-tree from those chunks and use the truncated top-hash as the Instance-ID:</p>
 <p><img alt="iscc-creation-instance-id" src="../images/iscc-creation-instance-id.svg" /></p>
 <p>An ISCC generating application must provide a <code>generate_instance_id</code> function that accepts the raw data file as input and returns an encoded Instance-ID. Generate an Instance-ID by this procedure:</p>
@@ -871,7 +891,6 @@ the Meta-, Data-, and Instance-IDs are the compound key for the magazine issue, 
 <p>Specify <code>tokenize_text</code> function</p>
 </div>
 <h2 id="footnotes">Footnotes<a class="headerlink" href="#footnotes" title="Permanent link">&para;</a></h2>
-<p>.</p>
 <div class="footnote">
 <hr />
 <ol>
