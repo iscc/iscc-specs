@@ -69,14 +69,16 @@ Each component has the same basic structure of a 1-byte header and a 7-byte main
 
 ## Meta-ID
 
-The Meta-ID is built from minimal and generic metadata of the content to be identified. An ISCC generating application must provide a `generate_meta_id` function that accepts the following input fields:
+The Meta-ID is built from minimal and generic metadata of the content to be identified. All *text* information supplied to the META-ID generating function is assumed to be UTF-8 encoded. Errors during decoding the bytestring input to a native Unicode must terminate the process and should not be silenced. An ISCC generating application must provide a `generate_meta_id` function that accepts the following input fields:
 
 | Name                  | Type    | Required | Description                              |
 | :-------------------- | :------ | :------- | :--------------------------------------- |
-| *title*               | unicode | Yes      | The title of an intangible creation.     |
-| *creators*[^creators] | unicode | No       | One or more semicolon separated names of the original creators of the content. |
-| *extra*               | unicode | No       | A short statement that distinguishes this intangible creation from another one. |
+| *title*               | text    | Yes      | The title of an intangible creation.     |
+| *creators*[^creators] | text    | No       | One or more semicolon separated names of the original creators of the content. |
+| *extra*               | text    | No       | A short statement that distinguishes this intangible creation from another one. |
 | version               | integer | No       | ISCC version number.                     |
+
+
 
 The `generate_meta_id` function must return a valid base32 encoded Meta-ID component without padding.
 
@@ -85,17 +87,20 @@ The `generate_meta_id` function must return a valid base32 encoded Meta-ID compo
 An ISCC generating application must follow these steps in the given order to produce a stable Meta-ID:
 
 1. Apply Unicode standard [Normalization Form KC (NFKC)](http://www.unicode.org/reports/tr15/#Norm_Forms) separately to all text input values.
-2. Trim each normalized input value to its first 128 characters.
-3. Apply [`normalize_text`](#normalize-text) to the trimmed `title` input value.
-4. Apply [`normalize_creators`](#normalize-creators) to the trimmed `creators` input value.
-5. Apply [`normalize_text`](#normalize-text) to the trimmed `extra` input value.
-6. Concatenate the results of step 3, 4 and 5 in ascending order.
-7. Create a list of 4 character [n-grams](https://en.wikipedia.org/wiki/N-gram) by sliding character-wise through the result of step 6.
-8. Encode each n-gram from step 7 to an UTF-8 bytestring and calculate its sha256 digest.
-9. Apply `simhash` to the list sha256 digests from step 8.
-10. Trim the resulting byte sequence to the first 7 bytes.
-11. Prepend the 1-byte component header according to component type and ISCC version (e.g. `0x00`).
-12. Encode the resulting 8 byte sequence with base32 (no-padding) and return the result.
+2. Remove all pairs of brackets  `[]`,  `()`,  `{}`, and text inbetween them from `title` and `creators` fields.
+3. Trim all text fields, such that their UTF-8 encoded byte representation does not exceed 128-bytes each. The trim point must be such, that it does not cut into multibyte characters. The results of this operation will later be stored as base metadata on the blockchain.
+4. Cut all text after the first occurence of a semicolon (`;`) if that semicolon is after the first 25 characters of text.
+5. Trim each normalized input value to its first 128 characters.
+6. Apply [`normalize_text`](#normalize-text) to the trimmed `title` input value.
+7. Apply [`normalize_creators`](#normalize-creators) to the trimmed `creators` input value.
+8. Apply [`normalize_text`](#normalize-text) to the trimmed `extra` input value.
+9. Concatenate the results of step 3, 4 and 5 in ascending order.
+10. Create a list of 4 character [n-grams](https://en.wikipedia.org/wiki/N-gram) by sliding character-wise through the result of step 6.
+11. Encode each n-gram from step 7 to an UTF-8 bytestring and calculate its sha256 digest.
+12. Apply `simhash` to the list sha256 digests from step 8.
+13. Trim the resulting byte sequence to the first 7 bytes.
+14. Prepend the 1-byte component header according to component type and ISCC version (e.g. `0x00`).
+15. Encode the resulting 8 byte sequence with base32 (no-padding) and return the result.
 
 
 ### Dealing with collisions
@@ -228,5 +233,4 @@ We define a text normalization function that is specific to our application. It 
 [^component-length]: We might switch to a different base structure for components. For example we might use a variable length header and a bigger 8-byte body. The header would only be carried in the encoded representation and applications could use full 64-bit space per component. As similarity searches accross different components make no sense, the type information contained in the header of each component can be safely ignored after an ISCC has been decomposed and internaly typed by an application.
 
 [^creators]: We have tested multiple normalization strategies for *creators* metadata and it works fairly well. The optional `creators`-field is a strong discriminator when dealing with similar title texts. But our tests indicate that the main problem for a generic conent identifier is in the semantic ambiguity of the `creators`-field accross industries. For example, who would you list as the creators of a movie, the directors, writers, main actors? Would you list some of them or if not how do you decide whom you will list. We will do some more evaluation and might remove the `creators`-field altogether for the final version 1 specification. All disambiguation of similar title data would then have to move to the `extra`-field.
-
 [^sha256d]: To guard against length-extension attacks and second pre-image attacks we use double sha256 for hashing. We also prefix the hash input data with a `0x00`-byte for the leaf nodes hashes and with a `0x01`-byte for the  internal node hashes.
