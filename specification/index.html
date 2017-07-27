@@ -739,7 +739,7 @@
 </tbody>
 </table>
 <h2 id="meta-id">Meta-ID<a class="headerlink" href="#meta-id" title="Permanent link">&para;</a></h2>
-<p>The Meta-ID is built from minimal and generic metadata of the content to be identified. An ISCC generating application must provide a <code>generate_meta_id</code> function that accepts the following input fields:</p>
+<p>The Meta-ID is built from minimal and generic metadata of the content to be identified. All <em>text</em> information supplied to the META-ID generating function is assumed to be UTF-8 encoded. Errors during decoding the bytestring input to a native Unicode must terminate the process and should not be silenced. An ISCC generating application must provide a <code>generate_meta_id</code> function that accepts the following input fields:</p>
 <table>
 <thead>
 <tr>
@@ -752,19 +752,19 @@
 <tbody>
 <tr>
 <td align="left"><em>title</em></td>
-<td align="left">unicode</td>
+<td align="left">text</td>
 <td align="left">Yes</td>
 <td align="left">The title of an intangible creation.</td>
 </tr>
 <tr>
-<td align="left"><em>creators</em></td>
-<td align="left">unicode</td>
+<td align="left"><em>creators</em><sup id="fnref:creators"><a class="footnote-ref" href="#fn:creators" rel="footnote">3</a></sup></td>
+<td align="left">text</td>
 <td align="left">No</td>
 <td align="left">One or more semicolon separated names of the original creators of the content.</td>
 </tr>
 <tr>
 <td align="left"><em>extra</em></td>
-<td align="left">unicode</td>
+<td align="left">text</td>
 <td align="left">No</td>
 <td align="left">A short statement that distinguishes this intangible creation from another one.</td>
 </tr>
@@ -781,6 +781,9 @@
 <p>An ISCC generating application must follow these steps in the given order to produce a stable Meta-ID:</p>
 <ol>
 <li>Apply Unicode standard <a href="http://www.unicode.org/reports/tr15/#Norm_Forms">Normalization Form KC (NFKC)</a> separately to all text input values.</li>
+<li>Remove all pairs of brackets  <code>[]</code>,  <code>()</code>,  <code>{}</code>, and text inbetween them from <code>title</code> and <code>creators</code> fields.</li>
+<li>Trim all text fields, such that their UTF-8 encoded byte representation does not exceed 128-bytes each. The trim point must be such, that it does not cut into multibyte characters. The results of this operation will later be stored as base metadata on the blockchain.</li>
+<li>Cut all text after the first occurence of a semicolon (<code>;</code>) if that semicolon is after the first 25 characters of text.</li>
 <li>Trim each normalized input value to its first 128 characters.</li>
 <li>Apply <a href="#normalize-text"><code>normalize_text</code></a> to the trimmed <code>title</code> input value.</li>
 <li>Apply <a href="#normalize-creators"><code>normalize_creators</code></a> to the trimmed <code>creators</code> input value.</li>
@@ -860,7 +863,7 @@ the Meta-, Data-, and Instance-IDs are the compound key for the magazine issue, 
 <p>An ISCC generating application must provide a <code>generate_instance_id</code> function that accepts the raw data file as input and returns an encoded Instance-ID. Generate an Instance-ID by this procedure:</p>
 <ol>
 <li>Apply <code>chunk_data</code> to the raw bytes of the encoded media object.</li>
-<li>For each chunk calculate the sha256d<sup id="fnref:sha256d"><a class="footnote-ref" href="#fn:sha256d" rel="footnote">3</a></sup> digest of the concatenation of a <code>0x00</code>-byte and the chunk bytes. We call the resulting values <em>leaf node hashes</em> (<abbr title="Leaf Node Hash">LNH</abbr>).</li>
+<li>For each chunk calculate the sha256d<sup id="fnref:sha256d"><a class="footnote-ref" href="#fn:sha256d" rel="footnote">4</a></sup> digest of the concatenation of a <code>0x00</code>-byte and the chunk bytes. We call the resulting values <em>leaf node hashes</em> (<abbr title="Leaf Node Hash">LNH</abbr>).</li>
 <li>Calculate the next level of the hash tree by applying sha256d to the concatenation of a <code>0x01</code>-byte and adjacent pairs of <abbr title="Leaf Node Hash">LNH</abbr> values. If the length of the list of <abbr title="Leaf Node Hash">LNH</abbr> values is uneven concatenate the last <abbr title="Leaf Node Hash">LNH</abbr> value with itself. We call the resulting values <em>internal node hashes</em> (<abbr title="Internal Node Hash">INH</abbr>).</li>
 <li>Recursively apply <code>0x01</code>-prefixed pairwise hashing to the results of  step 3 until the process yields only one hash value. We call this value the <em>top hash</em>.</li>
 <li>Trim the resulting <em>top hash</em> to the first 7 bytes.</li>
@@ -900,8 +903,11 @@ the Meta-, Data-, and Instance-IDs are the compound key for the magazine issue, 
 <li id="fn:component-length">
 <p>We might switch to a different base structure for components. For example we might use a variable length header and a bigger 8-byte body. The header would only be carried in the encoded representation and applications could use full 64-bit space per component. As similarity searches accross different components make no sense, the type information contained in the header of each component can be safely ignored after an ISCC has been decomposed and internaly typed by an application.&#160;<a class="footnote-backref" href="#fnref:component-length" rev="footnote" title="Jump back to footnote 2 in the text">&#8617;</a></p>
 </li>
+<li id="fn:creators">
+<p>We have tested multiple normalization strategies for <em>creators</em> metadata and it works fairly well. The optional <code>creators</code>-field is a strong discriminator when dealing with similar title texts. But our tests indicate that the main problem for a generic conent identifier is in the semantic ambiguity of the <code>creators</code>-field accross industries. For example, who would you list as the creators of a movie, the directors, writers, main actors? Would you list some of them or if not how do you decide whom you will list. We will do some more evaluation and might remove the <code>creators</code>-field altogether for the final version 1 specification. All disambiguation of similar title data would then have to move to the <code>extra</code>-field.&#160;<a class="footnote-backref" href="#fnref:creators" rev="footnote" title="Jump back to footnote 3 in the text">&#8617;</a></p>
+</li>
 <li id="fn:sha256d">
-<p>To guard against length-extension attacks and second pre-image attacks we use double sha256 for hashing. We also prefix the hash input data with a <code>0x00</code>-byte for the leaf nodes hashes and with a <code>0x01</code>-byte for the  internal node hashes.&#160;<a class="footnote-backref" href="#fnref:sha256d" rev="footnote" title="Jump back to footnote 3 in the text">&#8617;</a></p>
+<p>To guard against length-extension attacks and second pre-image attacks we use double sha256 for hashing. We also prefix the hash input data with a <code>0x00</code>-byte for the leaf nodes hashes and with a <code>0x01</code>-byte for the  internal node hashes.&#160;<a class="footnote-backref" href="#fnref:sha256d" rev="footnote" title="Jump back to footnote 4 in the text">&#8617;</a></p>
 </li>
 </ol>
 </div>
