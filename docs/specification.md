@@ -71,12 +71,12 @@ Each component has the same basic structure of a 1-byte header and a 7-byte main
 
 The Meta-ID is built from minimal and generic metadata of the content to be identified. An ISCC generating application must provide a `generate_meta_id` function that accepts the following input fields:
 
-| Name       | Type    | Required | Description                              |
-| :--------- | :------ | :------- | :--------------------------------------- |
-| *title*    | unicode | Yes      | The title of an intangible creation.     |
-| *creators* | unicode | No       | One or more semicolon separated names of the original creators of the content. |
-| *extra*    | unicode | No       | A short statement that distinguishes this intangible creation from another one. |
-| version    | integer | No       | ISCC version number.                     |
+| Name                  | Type    | Required | Description                              |
+| :-------------------- | :------ | :------- | :--------------------------------------- |
+| *title*               | unicode | Yes      | The title of an intangible creation.     |
+| *creators*[^creators] | unicode | No       | One or more semicolon separated names of the original creators of the content. |
+| *extra*               | unicode | No       | A short statement that distinguishes this intangible creation from another one. |
+| version               | integer | No       | ISCC version number.                     |
 
 The `generate_meta_id` function must return a valid base32 encoded Meta-ID component without padding.
 
@@ -224,6 +224,9 @@ We define a text normalization function that is specific to our application. It 
 ## Footnotes
 
 [^base32]: The final base encoding of this specification might change before version 1. Base32 was chosen because it is a widely accepted standard and has implementations in most popular programming languages. It is url safe, case insensitive and encodes the ISCC octets to a fixed size alphanumeric string. The predictable size of the encoding is a property that we need for composition and decomposition of components without having to rely on a delimiter (hyphen) in the ISCC code representation. We might change to a non standard base62, mixed case encoding to create shorter ISCC codes before the final version 1 specification.
-[^component-length]: We might switch to a different base structure for components. For example we might use a variable length header and a bigger 8-byte body. The header would only be carried in the encoded representation and applications could use full 64-bit space per component. As similarity searches accross different components make no sense, the type information contained in the header of each component can be safely ignored after an ISCC has been decomposed and internaly typed by an application.
-[^sha256d]: To guard against length-extension attacks and second pre-image attacks we use double sha256 for hashing. We also prefix the hash input data with a `0x00`-byte for the leaf nodes hashes and with a `0x01`-byte for the  internal node hashes.
 
+[^component-length]: We might switch to a different base structure for components. For example we might use a variable length header and a bigger 8-byte body. The header would only be carried in the encoded representation and applications could use full 64-bit space per component. As similarity searches accross different components make no sense, the type information contained in the header of each component can be safely ignored after an ISCC has been decomposed and internaly typed by an application.
+
+[^creators]: We have tested multiple normalization strategies for *creators* metadata and it works fairly well. The optional `creators`-field is a strong discriminator when dealing with similar title texts. But our tests indicate that the main problem for a generic conent identifier is in the semantic ambiguity of the `creators`-field accross industries. For example, who would you list as the creators of a movie, the directors, writers, main actors? Would you list some of them or if not how do you decide whom you will list. We will do some more evaluation and might remove the `creators`-field altogether for the final version 1 specification. All disambiguation of similar title data would then have to move to the `extra`-field.
+
+[^sha256d]: To guard against length-extension attacks and second pre-image attacks we use double sha256 for hashing. We also prefix the hash input data with a `0x00`-byte for the leaf nodes hashes and with a `0x01`-byte for the  internal node hashes.
