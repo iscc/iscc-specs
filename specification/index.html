@@ -18,7 +18,7 @@
       
         <link rel="shortcut icon" href="../images/favicon.png">
       
-      <meta name="generator" content="mkdocs-0.16.3, mkdocs-material-1.7.4">
+      <meta name="generator" content="mkdocs-0.16.3, mkdocs-material-1.7.5">
     
     
       
@@ -39,8 +39,8 @@
         
         
         
-        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open Sans:300,400,400i,700|Ubuntu+Mono">
-        <style>body,input{font-family:"Open Sans","Helvetica Neue",Helvetica,Arial,sans-serif}code,kbd,pre{font-family:"Ubuntu Mono","Courier New",Courier,monospace}</style>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,400i,700|Roboto+Mono">
+        <style>body,input{font-family:"Roboto","Helvetica Neue",Helvetica,Arial,sans-serif}code,kbd,pre{font-family:"Roboto Mono","Courier New",Courier,monospace}</style>
       
       <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
     
@@ -84,7 +84,7 @@
             
               
             
-            Specification (Draft)
+            Specification Draft
           
         </span>
       </div>
@@ -92,11 +92,11 @@
         
           <label class="md-icon md-icon--search md-header-nav__button" for="search"></label>
           
-<div class="md-search" data-md-component="search">
+<div class="md-search" data-md-component="search" role="dialog">
   <label class="md-search__overlay" for="search"></label>
   <div class="md-search__inner">
     <form class="md-search__form" name="search">
-      <input type="text" class="md-search__input" name="query" required placeholder="Search" accesskey="s" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="query">
+      <input type="text" class="md-search__input" name="query" required placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="query">
       <label class="md-icon md-search__icon" for="search"></label>
       <button type="reset" class="md-icon md-search__icon" data-md-component="reset">close</button>
     </form>
@@ -226,11 +226,11 @@
     
     
       <label class="md-nav__link md-nav__link--active" for="toc">
-        Specification (Draft)
+        Specification Draft
       </label>
     
-    <a href="./" title="Specification (Draft)" class="md-nav__link md-nav__link--active">
-      Specification (Draft)
+    <a href="./" title="Specification Draft" class="md-nav__link md-nav__link--active">
+      Specification Draft
     </a>
     
       
@@ -301,8 +301,8 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#component-types" title="Component types" class="md-nav__link">
-    Component types
+  <a href="#component-types" title="Component Types" class="md-nav__link">
+    Component Types
   </a>
   
 </li>
@@ -399,6 +399,26 @@
   <a href="#normalize-text" title="Normalize Text" class="md-nav__link">
     Normalize Text
   </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#similarity-hash" title="Similarity Hash" class="md-nav__link">
+    Similarity Hash
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#python-3-reference-code" title="Python 3 - Reference Code" class="md-nav__link">
+    Python 3 - Reference Code
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
         
@@ -539,8 +559,8 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#component-types" title="Component types" class="md-nav__link">
-    Component types
+  <a href="#component-types" title="Component Types" class="md-nav__link">
+    Component Types
   </a>
   
 </li>
@@ -641,6 +661,26 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#similarity-hash" title="Similarity Hash" class="md-nav__link">
+    Similarity Hash
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#python-3-reference-code" title="Python 3 - Reference Code" class="md-nav__link">
+    Python 3 - Reference Code
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#normalize-creators" title="Normalize Creators" class="md-nav__link">
     Normalize Creators
   </a>
@@ -683,38 +723,42 @@
                   <a href="https://github.com/coblo/iscc-specs/edit/master/docs/specification.md" title="Edit this page" class="md-icon md-content__icon">edit</a>
                 
                 
-                <h1 id="iscc-specification-draft">ISCC - Specification Draft<a class="headerlink" href="#iscc-specification-draft" title="Permanent link">&para;</a></h1>
+                <h1 id="iscc-specification-draft"><abbr title="International Standard Content Code">ISCC</abbr> - Specification Draft<a class="headerlink" href="#iscc-specification-draft" title="Permanent link">&para;</a></h1>
 <div class="admonition danger">
 <p class="admonition-title">Warning</p>
 <p>This document is a work in progress draft! It may be updated, replaced, or obsoleted by other documents at any time. This document must not be used as reference material or cited other than as "work in progress".</p>
 </div>
 <h2 id="abstract">Abstract<a class="headerlink" href="#abstract" title="Permanent link">&para;</a></h2>
-<p>The <strong>International Standard Content Code</strong> (ISCC), is an open and decentralized digital media identifier. An ISCC can be created from digital content and its basic metadata by anybody who follows the procedures of the ISCC specification or by using open source software that supports ISCC creation conforming to the ISCC specification.</p>
+<p>The <strong>International Standard Content Code</strong> (<abbr title="International Standard Content Code">ISCC</abbr>), is an open and decentralized digital media identifier. An <abbr title="International Standard Content Code">ISCC</abbr> can be created from digital content and its basic metadata by anybody who follows the procedures of the <abbr title="International Standard Content Code">ISCC</abbr> specification or by using open source software that supports <abbr title="International Standard Content Code">ISCC</abbr> creation conforming to the <abbr title="International Standard Content Code">ISCC</abbr> specification.</p>
 <h2 id="note-to-readers">Note to Readers<a class="headerlink" href="#note-to-readers" title="Permanent link">&para;</a></h2>
 <p>For public discussion of issues for this draft please use the Github issue tracker: <a href="https://github.com/coblo/iscc-specs/issues">https://github.com/coblo/iscc-specs/issues</a>.</p>
 <p>The latest published version of this draft can be found at <a href="http://iscc.codes/specification/">http://iscc.codes/specification/</a>. </p>
 <p>Public discussion and contributions are welcome.</p>
 <h2 id="about-this-document">About this Document<a class="headerlink" href="#about-this-document" title="Permanent link">&para;</a></h2>
-<p>This document proposes an open and vendor neutral ISCC standard and describes the technical procedures to create and manage ISCC identifiers. It is produced by the <a href="https://content-blockchain.org">Content Blockchain Project</a> and it aimed to become the definitive guide to the ISCC standard for technical implementors. The content is determined by its authors in an open consensus process.</p>
+<p>This document proposes an open and vendor neutral <abbr title="International Standard Content Code">ISCC</abbr> standard and describes the technical procedures to create and manage <abbr title="International Standard Content Code">ISCC</abbr> identifiers. It is produced by the <a href="https://content-blockchain.org">Content Blockchain Project</a> and it aimed to become the definitive guide to the <abbr title="International Standard Content Code">ISCC</abbr> standard for technical implementors. The content is determined by its authors in an open consensus process.</p>
 <h2 id="conventions-and-terminology">Conventions and Terminology<a class="headerlink" href="#conventions-and-terminology" title="Permanent link">&para;</a></h2>
 <p>The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in <a href="https://tools.ietf.org/html/rfc2119">RFC 2119</a> [RFC2119].</p>
 <h2 id="definitions">Definitions<a class="headerlink" href="#definitions" title="Permanent link">&para;</a></h2>
 <dl>
-<dt><abbr title="Generic Media Type">GMT</abbr></dt>
-<dd>Generic Media Type: A basic digital content type such as UTF-8 encoded plain text or raw pixel data.</dd>
-<dt>ISCC</dt>
+<dt>Base Metadata</dt>
+<dd>Minimal information about the content identified by an <abbr title="International Standard Content Code">ISCC</abbr> that must be provided when registering an <abbr title="International Standard Content Code">ISCC</abbr>.  </dd>
+<dt>Digital Media Object</dt>
+<dd>A file on a computer or more generically blob of raw data bytes that encodes one ore multiple GMTs in a specific media. </dd>
+<dt>Generic Media Type</dt>
+<dd>A basic digital content type such as UTF-8 encoded plain text or raw pixel data.</dd>
+<dt><abbr title="International Standard Content Code">ISCC</abbr></dt>
 <dd>International Standard Content Code</dd>
 <dt><abbr title="Base32 encoded representation of an ISCC">ISCC Code</abbr></dt>
-<dd>The base32 encoded representation of an ISCC</dd>
+<dd>The base32 encoded representation of an <abbr title="International Standard Content Code">ISCC</abbr></dd>
 <dt><abbr title="Raw binary data of an ISCC">ISCC Digest</abbr></dt>
-<dd>The raw binary data of an ISCC</dd>
+<dd>The raw binary data of an <abbr title="International Standard Content Code">ISCC</abbr></dd>
 <dt><abbr title="Integer representation of an ISCC">ISCC ID</abbr></dt>
-<dd>The integer representation of an ISCC</dd>
+<dd>The integer representation of an <abbr title="International Standard Content Code">ISCC</abbr></dd>
 </dl>
 <h2 id="introduction">Introduction<a class="headerlink" href="#introduction" title="Permanent link">&para;</a></h2>
-<p>The ISCC aims to permanently identify the content of a given digital media object at multiple levels of <em>granularity</em>. It is algorithmically generated from basic metadata and the contents of the digital media object which it identifies. It is designed for being registered and stored on a public decentralized blockchain. An ISCC for a media object can be created by anybody, not just by the author or publisher of a content or by a centralized registrar. By itself the ISCC does not make any statement or claim about authorship or ownership of the identified content.</p>
-<h2 id="iscc-structure">ISCC Structure<a class="headerlink" href="#iscc-structure" title="Permanent link">&para;</a></h2>
-<p>The <abbr title="Raw binary data of an ISCC">ISCC Digest</abbr> is a fixed size sequence of 32 bytes (256 bits) assembled from multiple sub-components. The printable <abbr title="Base32 encoded representation of an ISCC">ISCC Code</abbr> is an <a href="https://tools.ietf.org/html/rfc4648#section-6">RFC 4648</a> base32<sup id="fnref:base32"><a class="footnote-ref" href="#fn:base32" rel="footnote">1</a></sup> encoded string representation of an <abbr title="Raw binary data of an ISCC">ISCC Digest</abbr>. This is a high-level overview of the ISCC creation process:</p>
+<p>An <abbr title="International Standard Content Code">ISCC</abbr> permanently identifies the content of a given digital media object at multiple levels of <em>granularity</em>. It is algorithmically generated from basic metadata and the contents of the digital media object which it identifies. It is designed for being registered and stored on a public decentralized blockchain. An <abbr title="International Standard Content Code">ISCC</abbr> for a media object can be created by anybody, not just by the author or publisher of a content or by a centralized registrar. By itself the <abbr title="International Standard Content Code">ISCC</abbr> does not make any statement or claim about authorship or ownership of the identified content.</p>
+<h2 id="iscc-structure"><abbr title="International Standard Content Code">ISCC</abbr> Structure<a class="headerlink" href="#iscc-structure" title="Permanent link">&para;</a></h2>
+<p>The <abbr title="Raw binary data of an ISCC">ISCC Digest</abbr> is a fixed size sequence of 32 bytes (256 bits) assembled from multiple sub-components. The printable <abbr title="Base32 encoded representation of an ISCC">ISCC Code</abbr> is an <a href="https://tools.ietf.org/html/rfc4648#section-6">RFC 4648</a> base32<sup id="fnref:base32"><a class="footnote-ref" href="#fn:base32" rel="footnote">1</a></sup> encoded string representation of an <abbr title="Raw binary data of an ISCC">ISCC Digest</abbr>. This is a high-level overview of the <abbr title="International Standard Content Code">ISCC</abbr> creation process:</p>
 <p><img alt="iscc-creation-process" src="../images/iscc-creation-process.svg" /></p>
 <h3 id="components">Components<a class="headerlink" href="#components" title="Permanent link">&para;</a></h3>
 <p>The <abbr title="Raw binary data of an ISCC">ISCC Digest</abbr> is built from multiple self-describing 64-bit components:</p>
@@ -759,12 +803,12 @@
 </tr>
 </tbody>
 </table>
-<p>Each component is guaranteed to fit into a 64-bit unsigned integer value. The components may be used independently by applications for various purposes but must be combined into a 52 <abbr title="A character is defined as one Unicode code point">character</abbr> string (55 with hyphens) for a fully qualified ISCC code. The components must be combined in the fixed order of Meta-ID, Content-ID, Data-ID, Instance-ID and may be separated by hyphens.</p>
+<p>Each component is guaranteed to fit into a 64-bit unsigned integer value. The components may be used independently by applications for various purposes but must be combined into a 52 <abbr title="A character is defined as one Unicode code point">character</abbr> string (55 with hyphens) for a fully qualified <abbr title="International Standard Content Code">ISCC</abbr> code. The components must be combined in the fixed order of Meta-ID, Content-ID, Data-ID, Instance-ID and may be separated by hyphens.</p>
 <div class="admonition todo">
 <p class="admonition-title">Todo</p>
 <p>Describe coded format with prefix, colon, components +- hyphens</p>
 </div>
-<h3 id="component-types">Component types<a class="headerlink" href="#component-types" title="Permanent link">&para;</a></h3>
+<h3 id="component-types">Component Types<a class="headerlink" href="#component-types" title="Permanent link">&para;</a></h3>
 <p>Each component has the same basic structure of a 1-byte header and a 7-byte main section<sup id="fnref:component-length"><a class="footnote-ref" href="#fn:component-length" rel="footnote">2</a></sup>. Each component can thus be fit into a 64-bit integer value. The header-byte of each component is subdivided into 2 nibbles (4 bits). The first nibble specifies the component type while the second nibble is component specific.</p>
 <table>
 <thead>
@@ -779,7 +823,7 @@
 <tr>
 <td align="left"><em>Meta-ID</em></td>
 <td align="left">0000</td>
-<td align="left">0000 - ISCC version (0)</td>
+<td align="left">0000 - <abbr title="International Standard Content Code">ISCC</abbr> version (0)</td>
 <td align="left">0x00</td>
 </tr>
 <tr>
@@ -803,7 +847,7 @@
 </tbody>
 </table>
 <h2 id="meta-id">Meta-ID<a class="headerlink" href="#meta-id" title="Permanent link">&para;</a></h2>
-<p>The Meta-ID is built from minimal and generic metadata of the content to be identified. All <em>text</em> information supplied to the META-ID generating function is assumed to be UTF-8 encoded. Errors during decoding the bytestring input to a native Unicode must terminate the process and should not be silenced. An ISCC generating application must provide a <code>generate_meta_id</code> function that accepts the following input fields:</p>
+<p>The Meta-ID is built from minimal and generic metadata of the content to be identified. All <em>text</em> information supplied to the META-ID generating function is assumed to be UTF-8 encoded. Errors during decoding the bytestring input to a native Unicode must terminate the process and should not be silenced. An <abbr title="International Standard Content Code">ISCC</abbr> generating application must provide a <code>generate_meta_id</code> function that accepts the following input fields:</p>
 <table>
 <thead>
 <tr>
@@ -836,39 +880,38 @@
 <td align="left">version</td>
 <td align="left">integer</td>
 <td align="left">No</td>
-<td align="left">ISCC version number.</td>
+<td align="left"><abbr title="International Standard Content Code">ISCC</abbr> version number.</td>
 </tr>
 </tbody>
 </table>
 <p>The <code>generate_meta_id</code> function must return a valid base32 encoded Meta-ID component without padding.</p>
 <h3 id="generate-meta-id">Generate Meta-ID<a class="headerlink" href="#generate-meta-id" title="Permanent link">&para;</a></h3>
-<p>An ISCC generating application must follow these steps in the given order to produce a stable Meta-ID:</p>
+<p>An <abbr title="International Standard Content Code">ISCC</abbr> generating application must follow these steps in the given order to produce a stable Meta-ID:</p>
 <ol>
 <li>Apply Unicode standard <a href="http://www.unicode.org/reports/tr15/#Norm_Forms">Normalization Form KC (NFKC)</a> separately to all text input values.</li>
 <li>Remove all pairs of brackets  <code>[]</code>,  <code>()</code>,  <code>{}</code>, and text inbetween them from <code>title</code> and <code>creators</code> fields.</li>
 <li>Trim all text fields, such that their UTF-8 encoded byte representation does not exceed 128-bytes each. The trim point must be such, that it does not cut into multibyte characters. The results of this operation will later be stored as base metadata on the blockchain.</li>
 <li>Cut all text after the first occurence of a semicolon (<code>;</code>) if that semicolon is after the first 25 characters of text.</li>
-<li>Trim each normalized input value to its first 128 characters.</li>
 <li>Apply <a href="#normalize-text"><code>normalize_text</code></a> to the trimmed <code>title</code> input value.</li>
 <li>Apply <a href="#normalize-creators"><code>normalize_creators</code></a> to the trimmed <code>creators</code> input value.</li>
 <li>Apply <a href="#normalize-text"><code>normalize_text</code></a> to the trimmed <code>extra</code> input value.</li>
 <li>Concatenate the results of step 3, 4 and 5 in ascending order.</li>
 <li>Create a list of 4 <abbr title="A character is defined as one Unicode code point">character</abbr> <a href="https://en.wikipedia.org/wiki/N-gram">n-grams</a> by sliding <abbr title="A character is defined as one Unicode code point">character</abbr>-wise through the result of step 6.</li>
 <li>Encode each n-gram from step 7 to an UTF-8 bytestring and calculate its sha256 digest.</li>
-<li>Apply <code>simhash</code> to the list sha256 digests from step 8.</li>
+<li>Apply <a href="#similarity-hash"><code>similarity_hash</code></a> to the list of sha256 digests from step 8.</li>
 <li>Trim the resulting byte sequence to the first 7 bytes.</li>
-<li>Prepend the 1-byte component header according to component type and ISCC version (e.g. <code>0x00</code>).</li>
+<li>Prepend the 1-byte component header according to component type and <abbr title="International Standard Content Code">ISCC</abbr> version (e.g. <code>0x00</code>).</li>
 <li>Encode the resulting 8 byte sequence with base32 (no-padding) and return the result.</li>
 </ol>
 <h3 id="dealing-with-collisions">Dealing with collisions<a class="headerlink" href="#dealing-with-collisions" title="Permanent link">&para;</a></h3>
 <p>Ideally we want multiple ISCCs that identify different manifestations of the <em>same intangible creation</em> to be automatically grouped by an identical leading Meta-ID component. We call such a natural grouping an <strong>intended collision</strong>. Metadata, captured and edited by humans, is notoriously unreliable. By using normalization and a similarity hash on the metadata we account for some of this variation while keeping the Meta-ID component stable. </p>
 <p>Auto-generated Meta-IDs components are <strong>expected</strong> to miss some intended collisions. An application should check for such <strong>missed intended collisions</strong> before registering a new Meta-ID with the <em>canonical registry</em> of ISCCs by conducting a similarity search and asking for user feedback.</p>
-<p>But what about <strong>unintended collisions</strong>? Such collisions might happen because two <em>different intangible creations</em> have very similar or even identical metadata. But they might also happen simply by chance. With 2^56 possibile Meta-ID components the probability of random collisions rises in an S-cuved shape with the number of deployed ISCCs (see: <a href="http://preshing.com/20110504/hash-collision-probabilities/">Hash Collision Probabilities</a>).  We should keep in mind that, the Meta-ID component is only one part of an ISCC. Sporadic unintended collisions of the Meta-ID component are generally deemed as <strong>acceptable and expected</strong>. </p>
+<p>But what about <strong>unintended collisions</strong>? Such collisions might happen because two <em>different intangible creations</em> have very similar or even identical metadata. But they might also happen simply by chance. With 2^56 possibile Meta-ID components the probability of random collisions rises in an S-cuved shape with the number of deployed ISCCs (see: <a href="http://preshing.com/20110504/hash-collision-probabilities/">Hash Collision Probabilities</a>).  We should keep in mind that, the Meta-ID component is only one part of an <abbr title="International Standard Content Code">ISCC</abbr>. Sporadic unintended collisions of the Meta-ID component are generally deemed as <strong>acceptable and expected</strong>. </p>
 <p>If for any reason an application wants to avoid unintended collisions with pre-existing Meta-ID components it may utilze the <code>extra</code>-field. An application must first generate a Meta-ID without asking the user for input to the <code>extra</code>-field and then first check for collisions with the <em>canonical registry</em> of ISCCs. After it finds a collision with a pre-existing Meta-ID it may display the metadata of the colliding entry and interact with the user to determine if it indeed is an unintended collision. Only if the user indicates an unintended collision, may the application ask for a disambiguation that is than added as an ammendment to the metadata via the <code>extra</code>-field to create a different Meta-ID component. The application may repeat the pre-existence check until it finds no collision or a user intended collision. The application must not supply autogenerated input to the <code>extra</code>-field.</p>
 <p>It is our opinion that the concept of <strong>intended collisions</strong> of Meta-ID components is generally usefull concept and a net positive. But one must be aware that this characteristic also has its pitfalls. It is by no means an attempt to provide an unambigous - agreed upon - definition of <em>"identical intangible creations"</em>.</p>
 <h2 id="content-id">Content-ID<a class="headerlink" href="#content-id" title="Permanent link">&para;</a></h2>
-<p>The Content-ID component has multiple subtypes. Except for the <em>mixed type</em> all subtypes correspond with the <strong>Generic Media Types</strong>. A fully qualified ISCC can only have a Content-ID component of one specific type, but there can be multiple ISCCs with different Content-ID types per digital media object.</p>
-<p>A Content-ID is generated in two broad steps. In the first step, we extract and convert content from a rich media type to a normalized <abbr title="Generic Media Type">GMT</abbr>. In the second step, we use a <abbr title="Generic Media Type">GMT</abbr>-specific process to generate the Content-ID component of an ISCC. </p>
+<p>The Content-ID component has multiple subtypes. Except for the <em>mixed type</em> all subtypes correspond with the <strong>Generic Media Types</strong>. A fully qualified <abbr title="International Standard Content Code">ISCC</abbr> can only have a Content-ID component of one specific type, but there can be multiple ISCCs with different Content-ID types per digital media object.</p>
+<p>A Content-ID is generated in two broad steps. In the first step, we extract and convert content from a rich media type to a normalized <abbr title="Generic Media Type">GMT</abbr>. In the second step, we use a <abbr title="Generic Media Type">GMT</abbr>-specific process to generate the Content-ID component of an <abbr title="International Standard Content Code">ISCC</abbr>. </p>
 <h4 id="content-id-types">Content-ID Types<a class="headerlink" href="#content-id-types" title="Permanent link">&para;</a></h4>
 <p>The  Content-ID type is signaled by the first 3 bits of the second nibble of the first byte of the Content-ID:</p>
 <table>
@@ -906,12 +949,12 @@
 </tbody>
 </table>
 <h4 id="partial-content-flag-pcf">Partial Content Flag (<abbr title="Partial Content Flag">PCF</abbr>)<a class="headerlink" href="#partial-content-flag-pcf" title="Permanent link">&para;</a></h4>
-<p>The last bit of the header byte is the "Partial Content Flag". It designates if the Content-ID applies to the full content or just some part of it. The <abbr title="Partial Content Flag">PCF</abbr> must be set as a <code>0</code>-bit (full <abbr title="Generic Media Type">GMT</abbr>-specific content) by default. Setting the <abbr title="Partial Content Flag">PCF</abbr> to <code>1</code> enables applications to create multiple ISCCs for partial extracts of one and the same digital file. The exact semantics of <em>partial content</em> are outside of the scope of this specification. Applications that plan to support partial Content-IDs should clearly define their semantics. For example, an application might create separate ISCC for the text contents of multiple articles of a magazine issue. In such a scenario
+<p>The last bit of the header byte is the "Partial Content Flag". It designates if the Content-ID applies to the full content or just some part of it. The <abbr title="Partial Content Flag">PCF</abbr> must be set as a <code>0</code>-bit (full <abbr title="Generic Media Type">GMT</abbr>-specific content) by default. Setting the <abbr title="Partial Content Flag">PCF</abbr> to <code>1</code> enables applications to create multiple ISCCs for partial extracts of one and the same digital file. The exact semantics of <em>partial content</em> are outside of the scope of this specification. Applications that plan to support partial Content-IDs should clearly define their semantics. For example, an application might create separate <abbr title="International Standard Content Code">ISCC</abbr> for the text contents of multiple articles of a magazine issue. In such a scenario
 the Meta-, Data-, and Instance-IDs are the compound key for the magazine issue, while the Content-ID-Text component distinguishes the different articles of the issue. The different Content-ID-Text components would automatically be "bound" together by the other 3 components.</p>
 <h4 id="content-id-text">Content-ID-Text<a class="headerlink" href="#content-id-text" title="Permanent link">&para;</a></h4>
 <p>The Content-ID-Text is built from the extracted plain-text content of an encoded media object. To build a stable Content-ID-Text the plain text content must be extracted in a way that is reproducible. To make this possible we specify that the plain-text content must be extracted with <a href="https://tika.apache.org/">Apache Tika v1.16</a>.</p>
 <h2 id="data-id">Data-ID<a class="headerlink" href="#data-id" title="Permanent link">&para;</a></h2>
-<p>The Data-ID is built from the raw encoded data of the content to be identified. An ISCC generating application must provide a <code>generate_data_id</code> function that accepts the raw encoded data as input. Generate a Data-ID by this procedure:</p>
+<p>The Data-ID is built from the raw encoded data of the content to be identified. An <abbr title="International Standard Content Code">ISCC</abbr> generating application must provide a <code>generate_data_id</code> function that accepts the raw encoded data as input. Generate a Data-ID by this procedure:</p>
 <ol>
 <li>Apply <code>chunk_data</code> to the raw encoded content data</li>
 <li>For each chunk calculate the sha256 digest</li>
@@ -924,7 +967,7 @@ the Meta-, Data-, and Instance-IDs are the compound key for the magazine issue, 
 <h2 id="instance-id">Instance-ID<a class="headerlink" href="#instance-id" title="Permanent link">&para;</a></h2>
 <p>The Instance-ID is built from the raw data of the media object to be identified and serves as basic checksum for the media object. The raw data of the media object is split into data-chunks. Then we build a hash-tree from those chunks and use the truncated top-hash for the Instance-ID:</p>
 <p><img alt="iscc-creation-instance-id" src="../images/iscc-creation-instance-id.svg" /></p>
-<p>An ISCC generating application must provide a <code>generate_instance_id</code> function that accepts the raw data file as input and returns an encoded Instance-ID. Generate an Instance-ID by this procedure:</p>
+<p>An <abbr title="International Standard Content Code">ISCC</abbr> generating application must provide a <code>generate_instance_id</code> function that accepts the raw data file as input and returns an encoded Instance-ID. Generate an Instance-ID by this procedure:</p>
 <ol>
 <li>Apply <code>chunk_data</code> to the raw bytes of the encoded media object.</li>
 <li>For each chunk calculate the sha256d<sup id="fnref:sha256d"><a class="footnote-ref" href="#fn:sha256d" rel="footnote">4</a></sup> digest of the concatenation of a <code>0x00</code>-byte and the chunk bytes. We call the resulting values <em>leaf node hashes</em> (<abbr title="Leaf Node Hash">LNH</abbr>).</li>
@@ -947,6 +990,56 @@ the Meta-, Data-, and Instance-IDs are the compound key for the magazine issue, 
 <li>Re-Compose the text by applying <code>Unicode Normalization Form C (NFC)</code>.</li>
 <li>Return the resulting text</li>
 </ol>
+<h3 id="similarity-hash">Similarity Hash<a class="headerlink" href="#similarity-hash" title="Permanent link">&para;</a></h3>
+<p>The <code>similarity_hash</code> function takes a sequence of hash digests (raw 8-bit bytes) which represent a set of content features. Each of the digests must be of equal size. The function returns a new hash digest (raw 8-bit bytes) of the same size. For each bit in the input hashes calulate the number of hashes with that bit set and substract the the count of hashes where it is not set. For the output hash set the same bit position to <code>0</code> if the count is negative or <code>1</code> if it is zero or positive. The resulting hash digest will retain similarity for similar sets of input hashes. See also  <a href="http://dx.doi.org/10.1145/509907.509965" title="Charikar, M.S., 2002, May. Similarity estimation techniques from rounding algorithms. In Proceedings of the thiry-fourth annual ACM symposium on Theory of computing (pp. 380-388). ACM.">[Charikar2002]</a>.</p>
+<p><img alt="iscc-similarity-hash" src="../images/iscc-similarity-hash.svg" /></p>
+<h4 id="python-3-reference-code">Python 3 - Reference Code<a class="headerlink" href="#python-3-reference-code" title="Permanent link">&para;</a></h4>
+<table class="codehilitetable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22</pre></div></td><td class="code"><div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">similarity_hash</span><span class="p">(</span><span class="n">hash_digests</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">ByteString</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">ByteString</span><span class="p">:</span>
+
+    <span class="n">n_bytes</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">hash_digests</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="n">n_bits</span> <span class="o">=</span> <span class="p">(</span><span class="n">n_bytes</span> <span class="o">*</span> <span class="mi">8</span><span class="p">)</span>
+    <span class="n">vector</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">n_bits</span>
+
+    <span class="k">for</span> <span class="n">digest</span> <span class="ow">in</span> <span class="n">hash_digests</span><span class="p">:</span>
+
+        <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">digest</span><span class="p">)</span> <span class="o">==</span> <span class="n">n_bytes</span>
+        <span class="n">h</span> <span class="o">=</span> <span class="nb">int</span><span class="o">.</span><span class="n">from_bytes</span><span class="p">(</span><span class="n">digest</span><span class="p">,</span> <span class="s1">&#39;big&#39;</span><span class="p">,</span> <span class="n">signed</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_bits</span><span class="p">):</span>
+            <span class="n">vector</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">+=</span> <span class="n">h</span> <span class="o">&amp;</span> <span class="mi">1</span>
+            <span class="n">h</span> <span class="o">&gt;&gt;=</span> <span class="mi">1</span>
+
+    <span class="n">minfeatures</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">hash_digests</span><span class="p">)</span> <span class="o">*</span> <span class="mf">1.</span> <span class="o">/</span> <span class="mi">2</span>
+    <span class="n">shash</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_bits</span><span class="p">):</span>
+        <span class="n">shash</span> <span class="o">|=</span> <span class="nb">int</span><span class="p">(</span><span class="n">vector</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="n">minfeatures</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="n">i</span>
+
+    <span class="k">return</span> <span class="n">shash</span><span class="o">.</span><span class="n">to_bytes</span><span class="p">(</span><span class="n">n_bytes</span><span class="p">,</span> <span class="s1">&#39;big&#39;</span><span class="p">,</span> <span class="n">signed</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+</pre></div>
+</td></tr></table>
+
 <h3 id="normalize-creators">Normalize Creators<a class="headerlink" href="#normalize-creators" title="Permanent link">&para;</a></h3>
 <div class="admonition todo">
 <p class="admonition-title">Todo</p>
@@ -962,10 +1055,10 @@ the Meta-, Data-, and Instance-IDs are the compound key for the magazine issue, 
 <hr />
 <ol>
 <li id="fn:base32">
-<p><strong>Base Encoding:</strong> The final base encoding of this specification might change before version 1. Base32 was chosen because it is a widely accepted standard and has implementations in most popular programming languages. It is url safe, case insensitive and encodes the ISCC octets to a fixed size alphanumeric string. The predictable size of the encoding is a property that we need for composition and decomposition of components without having to rely on a delimiter (hyphen) in the ISCC code representation. We might change to a non standard base62, mixed case encoding to create shorter ISCC codes before the final version 1 specification.&#160;<a class="footnote-backref" href="#fnref:base32" rev="footnote" title="Jump back to footnote 1 in the text">&#8617;</a></p>
+<p><strong>Base Encoding:</strong> The final base encoding for this specification might change before version 1. Base32 was chosen because it is a widely accepted standard and has implementations in most popular programming languages. It is url safe, case insensitive and encodes the <abbr title="International Standard Content Code">ISCC</abbr> octets to a fixed size alphanumeric string. The predictable size of the encoding is a property that we need for composition and decomposition of components without having to rely on a delimiter (hyphen) in the <abbr title="International Standard Content Code">ISCC</abbr> code representation. We might change to a non standard base62, mixed case encoding to create shorter <abbr title="International Standard Content Code">ISCC</abbr> codes before the final version 1 specification.&#160;<a class="footnote-backref" href="#fnref:base32" rev="footnote" title="Jump back to footnote 1 in the text">&#8617;</a></p>
 </li>
 <li id="fn:component-length">
-<p><strong>Components structure:</strong> We might switch to a different base structure for components. For example we might use a variable length header and a bigger 8-byte body. The header would only be carried in the encoded representation and applications could use full 64-bit space per component. As similarity searches accross different components make no sense, the type information contained in the header of each component can be safely ignored after an ISCC has been decomposed and internaly typed by an application.&#160;<a class="footnote-backref" href="#fnref:component-length" rev="footnote" title="Jump back to footnote 2 in the text">&#8617;</a></p>
+<p><strong>Component structure:</strong> We might switch to a different base structure for components. For example we might use a variable length header and a bigger 8-byte body. The header would only be carried in the encoded representation and applications could use full 64-bit space per component. As similarity searches accross different components make no sense, the type information contained in the header of each component can be safely ignored after an <abbr title="International Standard Content Code">ISCC</abbr> has been decomposed and internaly typed by an application.&#160;<a class="footnote-backref" href="#fnref:component-length" rev="footnote" title="Jump back to footnote 2 in the text">&#8617;</a></p>
 </li>
 <li id="fn:creators">
 <p><strong>Meta-ID creators field:</strong> We have tested multiple normalization strategies for <em>creators</em> metadata and it works fairly well. The optional <code>creators</code>-field is a strong discriminator when dealing with similar title texts. But our tests indicate that the main problem for a generic conent identifier is in the semantic ambiguity of the <code>creators</code>-field accross industries. For example, who would you list as the creators of a movie, the directors, writers, main actors? Would you list some of them or if not how do you decide whom you will list. We will do some more evaluation and might remove the <code>creators</code>-field altogether for the final version 1 specification. All disambiguation of similar title data would then have to move to the <code>extra</code>-field.&#160;<a class="footnote-backref" href="#fnref:creators" rev="footnote" title="Jump back to footnote 3 in the text">&#8617;</a></p>
@@ -1061,7 +1154,7 @@ the Meta-, Data-, and Instance-IDs are the compound key for the magazine issue, 
       
     </div>
     
-      <script src="../assets/javascripts/application-c35428f87f.js"></script>
+      <script src="../assets/javascripts/application-07b0fbb49b.js"></script>
       
       
       <script>app.initialize({url:{base:".."}})</script>
