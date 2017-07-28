@@ -33,7 +33,7 @@ def generate_meta_id(title: str, creators: str='', extra: str='', version: int=0
     n_grams = a + b + c
 
     hash_digests = [sha256(s.encode('utf-8')).digest() for s in n_grams]
-    simhash_digest = simhash(hash_digests)
+    simhash_digest = similarity_hash(hash_digests)
     meta_id_digest = b'\x00' + simhash_digest[:7]
 
     return base64.b32encode(meta_id_digest).rstrip(b'=').decode('ascii')
@@ -144,30 +144,28 @@ def sliding_window(text: str, width: int) -> List:
     return [text[i:i + width] for i in idx]
 
 
-def simhash(hash_digests: Sequence[ByteString]) -> ByteString:
+def similarity_hash(hash_digests: Sequence[ByteString]) -> ByteString:
 
     n_bytes = len(hash_digests[0])
-    hashbits = (n_bytes * 8)
+    n_bits = (n_bytes * 8)
+    vector = [0] * n_bits
 
-    vector = [0] * hashbits
-    for token in hash_digests:
+    for digest in hash_digests:
 
-        assert len(token) == n_bytes, 'All digests must have the same number of bytes'
+        assert len(digest) == n_bytes
+        h = int.from_bytes(digest, 'big', signed=False)
 
-        h = int.from_bytes(token, 'big', signed=False)
-
-        for i in range(hashbits):
+        for i in range(n_bits):
             vector[i] += h & 1
             h >>= 1
 
     minfeatures = len(hash_digests) * 1. / 2
-
     shash = 0
-    for i in range(hashbits):
+
+    for i in range(n_bits):
         shash |= int(vector[i] >= minfeatures) << i
 
     return shash.to_bytes(n_bytes, 'big', signed=False)
-
 
 def c2d(code: str) -> ByteString:
 

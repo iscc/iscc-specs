@@ -30,8 +30,14 @@ The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "S
 
 ## Definitions
 
-GMT
-:	Generic Media Type: A basic digital content type such as UTF-8 encoded plain text or raw pixel data.
+Base Metadata
+:	Minimal information about the content identified by an ISCC that must be provided when registering an ISCC.  
+
+Digital Media Object
+:	A file on a computer or more generically blob of raw data bytes that encodes one ore multiple GMTs in a specific media. 
+
+Generic Media Type
+:	A basic digital content type such as UTF-8 encoded plain text or raw pixel data.
 
 ISCC
 :	International Standard Content Code
@@ -47,7 +53,7 @@ ISCC ID
 
 ## Introduction
 
-The ISCC aims to permanently identify the content of a given digital media object at multiple levels of *granularity*. It is algorithmically generated from basic metadata and the contents of the digital media object which it identifies. It is designed for being registered and stored on a public decentralized blockchain. An ISCC for a media object can be created by anybody, not just by the author or publisher of a content or by a centralized registrar. By itself the ISCC does not make any statement or claim about authorship or ownership of the identified content.
+An ISCC permanently identifies the content of a given digital media object at multiple levels of *granularity*. It is algorithmically generated from basic metadata and the contents of the digital media object which it identifies. It is designed for being registered and stored on a public decentralized blockchain. An ISCC for a media object can be created by anybody, not just by the author or publisher of a content or by a centralized registrar. By itself the ISCC does not make any statement or claim about authorship or ownership of the identified content.
 
 ## ISCC Structure
 
@@ -72,7 +78,7 @@ Each component is guaranteed to fit into a 64-bit unsigned integer value. The co
 !!! todo
 
     Describe coded format with prefix, colon, components +- hyphens
-### Component types
+### Component Types
 
 Each component has the same basic structure of a 1-byte header and a 7-byte main section[^component-length]. Each component can thus be fit into a 64-bit integer value. The header-byte of each component is subdivided into 2 nibbles (4 bits). The first nibble specifies the component type while the second nibble is component specific.
 
@@ -94,8 +100,6 @@ The Meta-ID is built from minimal and generic metadata of the content to be iden
 | *extra*               | text    | No       | A short statement that distinguishes this intangible creation from another one. |
 | version               | integer | No       | ISCC version number.                     |
 
-
-
 The `generate_meta_id` function must return a valid base32 encoded Meta-ID component without padding.
 
 ### Generate Meta-ID
@@ -106,17 +110,16 @@ An ISCC generating application must follow these steps in the given order to pro
 2. Remove all pairs of brackets  `[]`,  `()`,  `{}`, and text inbetween them from `title` and `creators` fields.
 3. Trim all text fields, such that their UTF-8 encoded byte representation does not exceed 128-bytes each. The trim point must be such, that it does not cut into multibyte characters. The results of this operation will later be stored as base metadata on the blockchain.
 4. Cut all text after the first occurence of a semicolon (`;`) if that semicolon is after the first 25 characters of text.
-5. Trim each normalized input value to its first 128 characters.
-6. Apply [`normalize_text`](#normalize-text) to the trimmed `title` input value.
-7. Apply [`normalize_creators`](#normalize-creators) to the trimmed `creators` input value.
-8. Apply [`normalize_text`](#normalize-text) to the trimmed `extra` input value.
-9. Concatenate the results of step 3, 4 and 5 in ascending order.
-10. Create a list of 4 character [n-grams](https://en.wikipedia.org/wiki/N-gram) by sliding character-wise through the result of step 6.
-11. Encode each n-gram from step 7 to an UTF-8 bytestring and calculate its sha256 digest.
-12. Apply `simhash` to the list sha256 digests from step 8.
-13. Trim the resulting byte sequence to the first 7 bytes.
-14. Prepend the 1-byte component header according to component type and ISCC version (e.g. `0x00`).
-15. Encode the resulting 8 byte sequence with base32 (no-padding) and return the result.
+5. Apply [`normalize_text`](#normalize-text) to the trimmed `title` input value.
+6. Apply [`normalize_creators`](#normalize-creators) to the trimmed `creators` input value.
+7. Apply [`normalize_text`](#normalize-text) to the trimmed `extra` input value.
+8. Concatenate the results of step 3, 4 and 5 in ascending order.
+9. Create a list of 4 character [n-grams](https://en.wikipedia.org/wiki/N-gram) by sliding character-wise through the result of step 6.
+10. Encode each n-gram from step 7 to an UTF-8 bytestring and calculate its sha256 digest.
+11. Apply [`similarity_hash`](#similarity-hash) to the list of sha256 digests from step 8.
+12. Trim the resulting byte sequence to the first 7 bytes.
+13. Prepend the 1-byte component header according to component type and ISCC version (e.g. `0x00`).
+14. Encode the resulting 8 byte sequence with base32 (no-padding) and return the result.
 
 
 ### Dealing with collisions
@@ -206,6 +209,39 @@ We define a text normalization function that is specific to our application. It 
 6. Re-Compose the text by applying `Unicode Normalization Form C (NFC)`.
 7. Return the resulting text
 
+### Similarity Hash
+
+The `similarity_hash` function takes a sequence of hash digests (raw 8-bit bytes) which represent a set of content features. Each of the digests must be of equal size. The function returns a new hash digest (raw 8-bit bytes) of the same size. For each bit in the input hashes calulate the number of hashes with that bit set and substract the the count of hashes where it is not set. For the output hash set the same bit position to `0` if the count is negative or `1` if it is zero or positive. The resulting hash digest will retain similarity for similar sets of input hashes. See also  [[Charikar2002]][#Charikar2002].
+
+![iscc-similarity-hash](images/iscc-similarity-hash.svg)
+
+#### Python 3 - Reference Code
+
+```python3
+def similarity_hash(hash_digests: Sequence[ByteString]) -> ByteString:
+
+    n_bytes = len(hash_digests[0])
+    n_bits = (n_bytes * 8)
+    vector = [0] * n_bits
+
+    for digest in hash_digests:
+
+        assert len(digest) == n_bytes
+        h = int.from_bytes(digest, 'big', signed=False)
+
+        for i in range(n_bits):
+            vector[i] += h & 1
+            h >>= 1
+
+    minfeatures = len(hash_digests) * 1. / 2
+    shash = 0
+
+    for i in range(n_bits):
+        shash |= int(vector[i] >= minfeatures) << i
+
+    return shash.to_bytes(n_bytes, 'big', signed=False)
+```
+
 ### Normalize Creators
 
 !!! todo
@@ -220,11 +256,25 @@ We define a text normalization function that is specific to our application. It 
 
 *[CDC]: Content defined chunking
 
+## Footnotes
+
+[^base32]: **Base Encoding:** The final base encoding for this specification might change before version 1. Base32 was chosen because it is a widely accepted standard and has implementations in most popular programming languages. It is url safe, case insensitive and encodes the ISCC octets to a fixed size alphanumeric string. The predictable size of the encoding is a property that we need for composition and decomposition of components without having to rely on a delimiter (hyphen) in the ISCC code representation. We might change to a non standard base62, mixed case encoding to create shorter ISCC codes before the final version 1 specification.
+
+[^component-length]: **Component structure:** We might switch to a different base structure for components. For example we might use a variable length header and a bigger 8-byte body. The header would only be carried in the encoded representation and applications could use full 64-bit space per component. As similarity searches accross different components make no sense, the type information contained in the header of each component can be safely ignored after an ISCC has been decomposed and internaly typed by an application.
+
+[^creators]: **Meta-ID creators field:** We have tested multiple normalization strategies for *creators* metadata and it works fairly well. The optional `creators`-field is a strong discriminator when dealing with similar title texts. But our tests indicate that the main problem for a generic conent identifier is in the semantic ambiguity of the `creators`-field accross industries. For example, who would you list as the creators of a movie, the directors, writers, main actors? Would you list some of them or if not how do you decide whom you will list. We will do some more evaluation and might remove the `creators`-field altogether for the final version 1 specification. All disambiguation of similar title data would then have to move to the `extra`-field.
+
+[^sha256d]: **Instance-ID data integrity:**  To guard against length-extension attacks and second pre-image attacks we use double sha256 for hashing. We also prefix the hash input data with a `0x00`-byte for the leaf nodes hashes and with a `0x01`-byte for the  internal node hashes.
+
+[^tophash]: **Instance-ID binding:** We might add an additional step to the final Instance-ID component by hashing the concatenation of the preceeding components and the **top-hash**. This would bind the Instance-ID to the other components. But this would also chainge its semantics to encode integrity of data and metadata together.
+
 *[ISCC Code]: Base32 encoded representation of an ISCC
 
 *[ISCC Digest]: Raw binary data of an ISCC
 
 *[ISCC ID]: Integer representation of an ISCC
+
+*[ISCC]: International Standard Content Code
 
 *[M-ID]: Meta-ID Component
 
@@ -244,12 +294,4 @@ We define a text normalization function that is specific to our application. It 
 
 *[character]: A character is defined as one Unicode code point
 
-## Footnotes
-
-[^base32]: **Base Encoding:** The final base encoding of this specification might change before version 1. Base32 was chosen because it is a widely accepted standard and has implementations in most popular programming languages. It is url safe, case insensitive and encodes the ISCC octets to a fixed size alphanumeric string. The predictable size of the encoding is a property that we need for composition and decomposition of components without having to rely on a delimiter (hyphen) in the ISCC code representation. We might change to a non standard base62, mixed case encoding to create shorter ISCC codes before the final version 1 specification.
-[^component-length]: **Components structure:** We might switch to a different base structure for components. For example we might use a variable length header and a bigger 8-byte body. The header would only be carried in the encoded representation and applications could use full 64-bit space per component. As similarity searches accross different components make no sense, the type information contained in the header of each component can be safely ignored after an ISCC has been decomposed and internaly typed by an application.
-
-[^creators]: **Meta-ID creators field:** We have tested multiple normalization strategies for *creators* metadata and it works fairly well. The optional `creators`-field is a strong discriminator when dealing with similar title texts. But our tests indicate that the main problem for a generic conent identifier is in the semantic ambiguity of the `creators`-field accross industries. For example, who would you list as the creators of a movie, the directors, writers, main actors? Would you list some of them or if not how do you decide whom you will list. We will do some more evaluation and might remove the `creators`-field altogether for the final version 1 specification. All disambiguation of similar title data would then have to move to the `extra`-field.
-[^sha256d]: **Instance-ID data integrity:**  To guard against length-extension attacks and second pre-image attacks we use double sha256 for hashing. We also prefix the hash input data with a `0x00`-byte for the leaf nodes hashes and with a `0x01`-byte for the  internal node hashes.
-
-[^tophash]: **Instance-ID binding:** We might add an additional step to the final Instance-ID component by hashing the concatenation of the preceeding components and the **top-hash**. This would bind the Instance-ID to the other components. But this would also chainge its semantics to encode integrity of data and metadata together.
+[#Charikar2002]:  http://dx.doi.org/10.1145/509907.509965 "Charikar, M.S., 2002, May. Similarity estimation techniques from rounding algorithms. In Proceedings of the thiry-fourth annual ACM symposium on Theory of computing (pp. 380-388). ACM."

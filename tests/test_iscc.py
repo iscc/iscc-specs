@@ -57,30 +57,30 @@ def test_sliding_window():
     assert iscc.sliding_window('Hello', width=4) == ['Hell', 'ello']
 
 
-def test_simhash():
+def test_similarity_hash():
 
     all_zero = 0b0.to_bytes(8, 'big')
-    assert iscc.simhash((all_zero, all_zero)) == all_zero
+    assert iscc.similarity_hash((all_zero, all_zero)) == all_zero
 
     all_ones = 0b11111111.to_bytes(1, 'big')
-    assert iscc.simhash((all_ones, all_ones)) == all_ones
+    assert iscc.similarity_hash((all_ones, all_ones)) == all_ones
 
     a = 0b0110.to_bytes(1, 'big')
     b = 0b1100.to_bytes(1, 'big')
     r = 0b1110.to_bytes(1, 'big')
-    assert iscc.simhash((a, b)) == r
+    assert iscc.similarity_hash((a, b)) == r
 
     a = 0b01101001.to_bytes(1, 'big')
     b = 0b00111000.to_bytes(1, 'big')
     c = 0b11100100.to_bytes(1, 'big')
     r = 0b01101000.to_bytes(1, 'big')
-    assert iscc.simhash((a, b, c)) == r
+    assert iscc.similarity_hash((a, b, c)) == r
 
     a = 0b0110100101101001.to_bytes(2, 'big')
     b = 0b0011100000111000.to_bytes(2, 'big')
     c = 0b1110010011100100.to_bytes(2, 'big')
     r = 0b0110100001101000.to_bytes(2, 'big')
-    assert iscc.simhash((a, b, c)) == r
+    assert iscc.similarity_hash((a, b, c)) == r
 
 
 def test_c2d():
