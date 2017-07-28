@@ -166,12 +166,14 @@ An ISCC generating application must provide a `generate_instance_id` function th
 1. Apply `chunk_data` to the raw bytes of the encoded media object.
 2. For each chunk calculate the sha256d[^sha256d] digest of the concatenation of a `0x00`-byte and the chunk bytes. We call the resulting values *leaf node hashes* (LNH).
 3. Calculate the next level of the hash tree by applying sha256d to the concatenation of a `0x01`-byte and adjacent pairs of LNH values. If the length of the list of LNH values is uneven concatenate the last LNH value with itself. We call the resulting values *internal node hashes* (INH).
-4. Recursively apply `0x01`-prefixed pairwise hashing to the results of  step 3 until the process yields only one hash value. We call this value the *top hash*.
+4. Recursively apply `0x01`-prefixed pairwise hashing to the results of  step 3 until the process yields only one hash value. We call this value the *top hash*[^tophash].
 5. Trim the resulting *top hash* to the first 7 bytes.
 6. Prepend the 1-byte component header (e.g. `0x30`).
 7. Encode the resulting 8-byte sequence with base32 (no-padding) and return the result.
 
 Applications may carry, store, and process the full hash-tree for advanced partial data integrity verification.
+
+
 
 
 ## Procedures & Algorithms
@@ -228,9 +230,11 @@ We define a text normalization function that is specific to our application. It 
 
 ## Footnotes
 
-[^base32]: The final base encoding of this specification might change before version 1. Base32 was chosen because it is a widely accepted standard and has implementations in most popular programming languages. It is url safe, case insensitive and encodes the ISCC octets to a fixed size alphanumeric string. The predictable size of the encoding is a property that we need for composition and decomposition of components without having to rely on a delimiter (hyphen) in the ISCC code representation. We might change to a non standard base62, mixed case encoding to create shorter ISCC codes before the final version 1 specification.
+[^base32]: **Base Encoding:** The final base encoding of this specification might change before version 1. Base32 was chosen because it is a widely accepted standard and has implementations in most popular programming languages. It is url safe, case insensitive and encodes the ISCC octets to a fixed size alphanumeric string. The predictable size of the encoding is a property that we need for composition and decomposition of components without having to rely on a delimiter (hyphen) in the ISCC code representation. We might change to a non standard base62, mixed case encoding to create shorter ISCC codes before the final version 1 specification.
 
-[^component-length]: We might switch to a different base structure for components. For example we might use a variable length header and a bigger 8-byte body. The header would only be carried in the encoded representation and applications could use full 64-bit space per component. As similarity searches accross different components make no sense, the type information contained in the header of each component can be safely ignored after an ISCC has been decomposed and internaly typed by an application.
+[^component-length]: **Components structure:** We might switch to a different base structure for components. For example we might use a variable length header and a bigger 8-byte body. The header would only be carried in the encoded representation and applications could use full 64-bit space per component. As similarity searches accross different components make no sense, the type information contained in the header of each component can be safely ignored after an ISCC has been decomposed and internaly typed by an application.
 
-[^creators]: We have tested multiple normalization strategies for *creators* metadata and it works fairly well. The optional `creators`-field is a strong discriminator when dealing with similar title texts. But our tests indicate that the main problem for a generic conent identifier is in the semantic ambiguity of the `creators`-field accross industries. For example, who would you list as the creators of a movie, the directors, writers, main actors? Would you list some of them or if not how do you decide whom you will list. We will do some more evaluation and might remove the `creators`-field altogether for the final version 1 specification. All disambiguation of similar title data would then have to move to the `extra`-field.
-[^sha256d]: To guard against length-extension attacks and second pre-image attacks we use double sha256 for hashing. We also prefix the hash input data with a `0x00`-byte for the leaf nodes hashes and with a `0x01`-byte for the  internal node hashes.
+[^creators]: **Meta-ID creators field:** We have tested multiple normalization strategies for *creators* metadata and it works fairly well. The optional `creators`-field is a strong discriminator when dealing with similar title texts. But our tests indicate that the main problem for a generic conent identifier is in the semantic ambiguity of the `creators`-field accross industries. For example, who would you list as the creators of a movie, the directors, writers, main actors? Would you list some of them or if not how do you decide whom you will list. We will do some more evaluation and might remove the `creators`-field altogether for the final version 1 specification. All disambiguation of similar title data would then have to move to the `extra`-field.
+[^sha256d]: **Instance-ID data integrity:**  To guard against length-extension attacks and second pre-image attacks we use double sha256 for hashing. We also prefix the hash input data with a `0x00`-byte for the leaf nodes hashes and with a `0x01`-byte for the  internal node hashes.
+
+[^tophash]: **Instance-ID binding:** We might add an additional step to the final Instance-ID component by hashing the concatenation of the preceeding components and the **top-hash**. This would bind the Instance-ID to the other components. But this would also chainge its semantics to encode integrity of data and metadata together.
