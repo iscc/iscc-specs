@@ -2,21 +2,33 @@ title: ISCC - Specification
 description: Draft Specification of International Standard Content Codes
 authors: Titusz Pan
 
-# ISCC - Specification (Draft)
+# ISCC - Specification Draft
 
-**International Standard Content Code**
+!!! danger "Warning"
 
-!!! attention
+    This document is a work in progress draft! It may be updated, replaced, or obsoleted by other documents at any time. This document must not be used as reference material or cited other than as "work in progress".
 
-    This document is work in progress!
+## Abstract
 
-The latest version of this specification can be found at [iscc.codes/specification](http://iscc.codes/specification/)
+The **International Standard Content Code** (ISCC), is an open and decentralized digital media identifier. An ISCC can be created from digital content and its basic metadata by anybody who follows the procedures of the ISCC specification or by using open source software that supports ISCC creation conforming to the ISCC specification.
+
+## Note to Readers
+
+For public discussion of issues for this draft please use the Github issue tracker: <https://github.com/coblo/iscc-specs/issues>.
+
+The latest published version of this draft can be found at <http://iscc.codes/specification/>. 
+
+Public discussion and contributions are welcome.
 
 ## About this Document
 
-This document is the **first draft** of the open and vendor neutral ISCC specification and describes the technical procedures to create and manage ISCC identifiers. It is produced by the [Content Blockchain Project](https://content-blockchain.org) and it should be regarded as the definitive guide to the ISCC standard for technical implementors. The content is determined by its authors in an open consensus process. Participants of the media ecosystem are welcome to contribute.
+This document proposes an open and vendor neutral ISCC standard and describes the technical procedures to create and manage ISCC identifiers. It is produced by the [Content Blockchain Project](https://content-blockchain.org) and it aimed to become the definitive guide to the ISCC standard for technical implementors. The content is determined by its authors in an open consensus process.
 
-## Definitions and Terminology
+## Conventions and Terminology
+
+The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in [RFC 2119](https://tools.ietf.org/html/rfc2119) [RFC2119].
+
+## Definitions
 
 GMT
 :	Generic Media Type: A basic digital content type such as UTF-8 encoded plain text or raw pixel data.
@@ -33,9 +45,13 @@ ISCC Digest
 ISCC ID
 :	The integer representation of an ISCC
 
+## Introduction
+
+The ISCC aims to permanently identify the content of a given digital media object at multiple levels of *granularity*. It is algorithmically generated from basic metadata and the contents of the digital media object which it identifies. It is designed for being registered and stored on a public decentralized blockchain. An ISCC for a media object can be created by anybody, not just by the author or publisher of a content or by a centralized registrar. By itself the ISCC does not make any statement or claim about authorship or ownership of the identified content.
+
 ## ISCC Structure
 
-The ISCC is used to permanently identify the content of a given digital media object. It is algorithmically generated from basic metadata and the contents of the digital media object which it identifies. The ISCC Digest is a fixed size sequence of 32 bytes (256 bits) assembled from multiple sub-components. The printable ISCC Code is an [RFC 4648](https://tools.ietf.org/html/rfc4648#section-6) base32[^base32] encoded string representation of an ISCC Digest. This is a high-level overview of the ISCC creation process:
+The ISCC Digest is a fixed size sequence of 32 bytes (256 bits) assembled from multiple sub-components. The printable ISCC Code is an [RFC 4648](https://tools.ietf.org/html/rfc4648#section-6) base32[^base32] encoded string representation of an ISCC Digest. This is a high-level overview of the ISCC creation process:
 
 ![iscc-creation-process](images/iscc-creation-process.svg)
 
@@ -231,7 +247,6 @@ We define a text normalization function that is specific to our application. It 
 ## Footnotes
 
 [^base32]: **Base Encoding:** The final base encoding of this specification might change before version 1. Base32 was chosen because it is a widely accepted standard and has implementations in most popular programming languages. It is url safe, case insensitive and encodes the ISCC octets to a fixed size alphanumeric string. The predictable size of the encoding is a property that we need for composition and decomposition of components without having to rely on a delimiter (hyphen) in the ISCC code representation. We might change to a non standard base62, mixed case encoding to create shorter ISCC codes before the final version 1 specification.
-
 [^component-length]: **Components structure:** We might switch to a different base structure for components. For example we might use a variable length header and a bigger 8-byte body. The header would only be carried in the encoded representation and applications could use full 64-bit space per component. As similarity searches accross different components make no sense, the type information contained in the header of each component can be safely ignored after an ISCC has been decomposed and internaly typed by an application.
 
 [^creators]: **Meta-ID creators field:** We have tested multiple normalization strategies for *creators* metadata and it works fairly well. The optional `creators`-field is a strong discriminator when dealing with similar title texts. But our tests indicate that the main problem for a generic conent identifier is in the semantic ambiguity of the `creators`-field accross industries. For example, who would you list as the creators of a movie, the directors, writers, main actors? Would you list some of them or if not how do you decide whom you will list. We will do some more evaluation and might remove the `creators`-field altogether for the final version 1 specification. All disambiguation of similar title data would then have to move to the `extra`-field.
