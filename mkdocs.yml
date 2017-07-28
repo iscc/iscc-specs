@@ -19,7 +19,7 @@ theme: 'material'
 pages:
     - Introduction: 'index.md'
     - Concept: 'concept.md'
-    - Specification (Draft): 'specification.md'
+    - Specification Draft: 'specification.md'
     - Contributing: 'contributing.md'
     - License: 'license.md'
 
@@ -29,9 +29,6 @@ extra:
     palette:
         primary: 'blue'
         accent: 'red'
-    font:
-        text: 'Open Sans'
-        code: 'Ubuntu Mono'
     social:
     - type: 'github'
       link: 'https://github.com/coblo'
