@@ -411,8 +411,15 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#python-3-reference-code" title="Python 3 - Reference Code" class="md-nav__link">
-    Python 3 - Reference Code
+  <a href="#diagram-sh" title="Diagram (SH)" class="md-nav__link">
+    Diagram (SH)
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#reference-code-sh" title="Reference Code (SH)" class="md-nav__link">
+    Reference Code (SH)
   </a>
   
 </li>
@@ -669,8 +676,15 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#python-3-reference-code" title="Python 3 - Reference Code" class="md-nav__link">
-    Python 3 - Reference Code
+  <a href="#diagram-sh" title="Diagram (SH)" class="md-nav__link">
+    Diagram (SH)
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#reference-code-sh" title="Reference Code (SH)" class="md-nav__link">
+    Reference Code (SH)
   </a>
   
 </li>
@@ -741,15 +755,15 @@
 <h2 id="definitions">Definitions<a class="headerlink" href="#definitions" title="Permanent link">&para;</a></h2>
 <dl>
 <dt>Base Metadata</dt>
-<dd>Minimal information about the content identified by an <abbr title="International Standard Content Code">ISCC</abbr> that must be provided when registering an <abbr title="International Standard Content Code">ISCC</abbr>.  </dd>
+<dd>Minimal set of required metadata about the content that is identified by an <abbr title="International Standard Content Code">ISCC</abbr>.  </dd>
 <dt>Digital Media Object</dt>
-<dd>A file on a computer or more generically blob of raw data bytes that encodes one ore multiple GMTs in a specific media. </dd>
+<dd>A blob of raw bytes that with media type specific encoding. </dd>
 <dt>Generic Media Type</dt>
-<dd>A basic digital content type such as UTF-8 encoded plain text or raw pixel data.</dd>
+<dd>A basic digital content type such as UTF-8 encoded plain text or raw pixel data of images.</dd>
 <dt><abbr title="International Standard Content Code">ISCC</abbr></dt>
 <dd>International Standard Content Code</dd>
 <dt><abbr title="Base32 encoded representation of an ISCC">ISCC Code</abbr></dt>
-<dd>The base32 encoded representation of an <abbr title="International Standard Content Code">ISCC</abbr></dd>
+<dd>The printable base32 encoded representation of an <abbr title="International Standard Content Code">ISCC</abbr></dd>
 <dt><abbr title="Raw binary data of an ISCC">ISCC Digest</abbr></dt>
 <dd>The raw binary data of an <abbr title="International Standard Content Code">ISCC</abbr></dd>
 <dt><abbr title="Integer representation of an ISCC">ISCC ID</abbr></dt>
@@ -847,7 +861,7 @@
 </tbody>
 </table>
 <h2 id="meta-id">Meta-ID<a class="headerlink" href="#meta-id" title="Permanent link">&para;</a></h2>
-<p>The Meta-ID is built from minimal and generic metadata of the content to be identified. All <em>text</em> information supplied to the META-ID generating function is assumed to be UTF-8 encoded. Errors during decoding the bytestring input to a native Unicode must terminate the process and should not be silenced. An <abbr title="International Standard Content Code">ISCC</abbr> generating application must provide a <code>generate_meta_id</code> function that accepts the following input fields:</p>
+<p>The Meta-ID is built from minimal and generic metadata of the content to be identified. All <em>text</em> information supplied to the META-ID generating function is assumed to be UTF-8 encoded. Errors that occur during the decoding of such a bytestring input to a native Unicode must terminate the process and must not be silenced. An <abbr title="International Standard Content Code">ISCC</abbr> generating application must provide a <code>generate_meta_id</code> function that accepts the following input fields:</p>
 <table>
 <thead>
 <tr>
@@ -992,8 +1006,9 @@ the Meta-, Data-, and Instance-IDs are the compound key for the magazine issue, 
 </ol>
 <h3 id="similarity-hash">Similarity Hash<a class="headerlink" href="#similarity-hash" title="Permanent link">&para;</a></h3>
 <p>The <code>similarity_hash</code> function takes a sequence of hash digests (raw 8-bit bytes) which represent a set of content features. Each of the digests must be of equal size. The function returns a new hash digest (raw 8-bit bytes) of the same size. For each bit in the input hashes calulate the number of hashes with that bit set and substract the the count of hashes where it is not set. For the output hash set the same bit position to <code>0</code> if the count is negative or <code>1</code> if it is zero or positive. The resulting hash digest will retain similarity for similar sets of input hashes. See also  <a href="http://dx.doi.org/10.1145/509907.509965" title="Charikar, M.S., 2002, May. Similarity estimation techniques from rounding algorithms. In Proceedings of the thiry-fourth annual ACM symposium on Theory of computing (pp. 380-388). ACM.">[Charikar2002]</a>.</p>
+<h4 id="diagram-sh">Diagram (SH)<a class="headerlink" href="#diagram-sh" title="Permanent link">&para;</a></h4>
 <p><img alt="iscc-similarity-hash" src="../images/iscc-similarity-hash.svg" /></p>
-<h4 id="python-3-reference-code">Python 3 - Reference Code<a class="headerlink" href="#python-3-reference-code" title="Permanent link">&para;</a></h4>
+<h4 id="reference-code-sh">Reference Code (SH)<a class="headerlink" href="#reference-code-sh" title="Permanent link">&para;</a></h4>
 <table class="codehilitetable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
  2
  3
