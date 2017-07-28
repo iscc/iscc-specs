@@ -244,6 +244,20 @@
     <ul class="md-nav__list" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#abstract" title="Abstract" class="md-nav__link">
+    Abstract
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#note-to-readers" title="Note to Readers" class="md-nav__link">
+    Note to Readers
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#about-this-document" title="About this Document" class="md-nav__link">
     About this Document
   </a>
@@ -251,8 +265,22 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#definitions-and-terminology" title="Definitions and Terminology" class="md-nav__link">
-    Definitions and Terminology
+  <a href="#conventions-and-terminology" title="Conventions and Terminology" class="md-nav__link">
+    Conventions and Terminology
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#definitions" title="Definitions" class="md-nav__link">
+    Definitions
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#introduction" title="Introduction" class="md-nav__link">
+    Introduction
   </a>
   
 </li>
@@ -454,6 +482,20 @@
     <ul class="md-nav__list" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#abstract" title="Abstract" class="md-nav__link">
+    Abstract
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#note-to-readers" title="Note to Readers" class="md-nav__link">
+    Note to Readers
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#about-this-document" title="About this Document" class="md-nav__link">
     About this Document
   </a>
@@ -461,8 +503,22 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#definitions-and-terminology" title="Definitions and Terminology" class="md-nav__link">
-    Definitions and Terminology
+  <a href="#conventions-and-terminology" title="Conventions and Terminology" class="md-nav__link">
+    Conventions and Terminology
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#definitions" title="Definitions" class="md-nav__link">
+    Definitions
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#introduction" title="Introduction" class="md-nav__link">
+    Introduction
   </a>
   
 </li>
@@ -627,16 +683,22 @@
                   <a href="https://github.com/coblo/iscc-specs/edit/master/docs/specification.md" title="Edit this page" class="md-icon md-content__icon">edit</a>
                 
                 
-                <h1 id="iscc-specification-draft">ISCC - Specification (Draft)<a class="headerlink" href="#iscc-specification-draft" title="Permanent link">&para;</a></h1>
-<p><strong>International Standard Content Code</strong></p>
-<div class="admonition attention">
-<p class="admonition-title">Attention</p>
-<p>This document is work in progress!</p>
+                <h1 id="iscc-specification-draft">ISCC - Specification Draft<a class="headerlink" href="#iscc-specification-draft" title="Permanent link">&para;</a></h1>
+<div class="admonition danger">
+<p class="admonition-title">Warning</p>
+<p>This document is a work in progress draft! It may be updated, replaced, or obsoleted by other documents at any time. This document must not be used as reference material or cited other than as "work in progress".</p>
 </div>
-<p>The latest version of this specification can be found at <a href="http://iscc.codes/specification/">iscc.codes/specification</a></p>
+<h2 id="abstract">Abstract<a class="headerlink" href="#abstract" title="Permanent link">&para;</a></h2>
+<p>The <strong>International Standard Content Code</strong> (ISCC), is an open and decentralized digital media identifier. An ISCC can be created from digital content and its basic metadata by anybody who follows the procedures of the ISCC specification or by using open source software that supports ISCC creation conforming to the ISCC specification.</p>
+<h2 id="note-to-readers">Note to Readers<a class="headerlink" href="#note-to-readers" title="Permanent link">&para;</a></h2>
+<p>For public discussion of issues for this draft please use the Github issue tracker: <a href="https://github.com/coblo/iscc-specs/issues">https://github.com/coblo/iscc-specs/issues</a>.</p>
+<p>The latest published version of this draft can be found at <a href="http://iscc.codes/specification/">http://iscc.codes/specification/</a>. </p>
+<p>Public discussion and contributions are welcome.</p>
 <h2 id="about-this-document">About this Document<a class="headerlink" href="#about-this-document" title="Permanent link">&para;</a></h2>
-<p>This document is the <strong>first draft</strong> of the open and vendor neutral ISCC specification and describes the technical procedures to create and manage ISCC identifiers. It is produced by the <a href="https://content-blockchain.org">Content Blockchain Project</a> and it should be regarded as the definitive guide to the ISCC standard for technical implementors. The content is determined by its authors in an open consensus process. Participants of the media ecosystem are welcome to contribute.</p>
-<h2 id="definitions-and-terminology">Definitions and Terminology<a class="headerlink" href="#definitions-and-terminology" title="Permanent link">&para;</a></h2>
+<p>This document proposes an open and vendor neutral ISCC standard and describes the technical procedures to create and manage ISCC identifiers. It is produced by the <a href="https://content-blockchain.org">Content Blockchain Project</a> and it aimed to become the definitive guide to the ISCC standard for technical implementors. The content is determined by its authors in an open consensus process.</p>
+<h2 id="conventions-and-terminology">Conventions and Terminology<a class="headerlink" href="#conventions-and-terminology" title="Permanent link">&para;</a></h2>
+<p>The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in <a href="https://tools.ietf.org/html/rfc2119">RFC 2119</a> [RFC2119].</p>
+<h2 id="definitions">Definitions<a class="headerlink" href="#definitions" title="Permanent link">&para;</a></h2>
 <dl>
 <dt><abbr title="Generic Media Type">GMT</abbr></dt>
 <dd>Generic Media Type: A basic digital content type such as UTF-8 encoded plain text or raw pixel data.</dd>
@@ -649,8 +711,10 @@
 <dt><abbr title="Integer representation of an ISCC">ISCC ID</abbr></dt>
 <dd>The integer representation of an ISCC</dd>
 </dl>
+<h2 id="introduction">Introduction<a class="headerlink" href="#introduction" title="Permanent link">&para;</a></h2>
+<p>The ISCC aims to permanently identify the content of a given digital media object at multiple levels of <em>granularity</em>. It is algorithmically generated from basic metadata and the contents of the digital media object which it identifies. It is designed for being registered and stored on a public decentralized blockchain. An ISCC for a media object can be created by anybody, not just by the author or publisher of a content or by a centralized registrar. By itself the ISCC does not make any statement or claim about authorship or ownership of the identified content.</p>
 <h2 id="iscc-structure">ISCC Structure<a class="headerlink" href="#iscc-structure" title="Permanent link">&para;</a></h2>
-<p>The ISCC is used to permanently identify the content of a given digital media object. It is algorithmically generated from basic metadata and the contents of the digital media object which it identifies. The <abbr title="Raw binary data of an ISCC">ISCC Digest</abbr> is a fixed size sequence of 32 bytes (256 bits) assembled from multiple sub-components. The printable <abbr title="Base32 encoded representation of an ISCC">ISCC Code</abbr> is an <a href="https://tools.ietf.org/html/rfc4648#section-6">RFC 4648</a> base32<sup id="fnref:base32"><a class="footnote-ref" href="#fn:base32" rel="footnote">1</a></sup> encoded string representation of an <abbr title="Raw binary data of an ISCC">ISCC Digest</abbr>. This is a high-level overview of the ISCC creation process:</p>
+<p>The <abbr title="Raw binary data of an ISCC">ISCC Digest</abbr> is a fixed size sequence of 32 bytes (256 bits) assembled from multiple sub-components. The printable <abbr title="Base32 encoded representation of an ISCC">ISCC Code</abbr> is an <a href="https://tools.ietf.org/html/rfc4648#section-6">RFC 4648</a> base32<sup id="fnref:base32"><a class="footnote-ref" href="#fn:base32" rel="footnote">1</a></sup> encoded string representation of an <abbr title="Raw binary data of an ISCC">ISCC Digest</abbr>. This is a high-level overview of the ISCC creation process:</p>
 <p><img alt="iscc-creation-process" src="../images/iscc-creation-process.svg" /></p>
 <h3 id="components">Components<a class="headerlink" href="#components" title="Permanent link">&para;</a></h3>
 <p>The <abbr title="Raw binary data of an ISCC">ISCC Digest</abbr> is built from multiple self-describing 64-bit components:</p>
@@ -865,7 +929,7 @@ the Meta-, Data-, and Instance-IDs are the compound key for the magazine issue, 
 <li>Apply <code>chunk_data</code> to the raw bytes of the encoded media object.</li>
 <li>For each chunk calculate the sha256d<sup id="fnref:sha256d"><a class="footnote-ref" href="#fn:sha256d" rel="footnote">4</a></sup> digest of the concatenation of a <code>0x00</code>-byte and the chunk bytes. We call the resulting values <em>leaf node hashes</em> (<abbr title="Leaf Node Hash">LNH</abbr>).</li>
 <li>Calculate the next level of the hash tree by applying sha256d to the concatenation of a <code>0x01</code>-byte and adjacent pairs of <abbr title="Leaf Node Hash">LNH</abbr> values. If the length of the list of <abbr title="Leaf Node Hash">LNH</abbr> values is uneven concatenate the last <abbr title="Leaf Node Hash">LNH</abbr> value with itself. We call the resulting values <em>internal node hashes</em> (<abbr title="Internal Node Hash">INH</abbr>).</li>
-<li>Recursively apply <code>0x01</code>-prefixed pairwise hashing to the results of  step 3 until the process yields only one hash value. We call this value the <em>top hash</em>.</li>
+<li>Recursively apply <code>0x01</code>-prefixed pairwise hashing to the results of  step 3 until the process yields only one hash value. We call this value the <em>top hash</em><sup id="fnref:tophash"><a class="footnote-ref" href="#fn:tophash" rel="footnote">5</a></sup>.</li>
 <li>Trim the resulting <em>top hash</em> to the first 7 bytes.</li>
 <li>Prepend the 1-byte component header (e.g. <code>0x30</code>).</li>
 <li>Encode the resulting 8-byte sequence with base32 (no-padding) and return the result.</li>
@@ -898,16 +962,19 @@ the Meta-, Data-, and Instance-IDs are the compound key for the magazine issue, 
 <hr />
 <ol>
 <li id="fn:base32">
-<p>The final base encoding of this specification might change before version 1. Base32 was chosen because it is a widely accepted standard and has implementations in most popular programming languages. It is url safe, case insensitive and encodes the ISCC octets to a fixed size alphanumeric string. The predictable size of the encoding is a property that we need for composition and decomposition of components without having to rely on a delimiter (hyphen) in the ISCC code representation. We might change to a non standard base62, mixed case encoding to create shorter ISCC codes before the final version 1 specification.&#160;<a class="footnote-backref" href="#fnref:base32" rev="footnote" title="Jump back to footnote 1 in the text">&#8617;</a></p>
+<p><strong>Base Encoding:</strong> The final base encoding of this specification might change before version 1. Base32 was chosen because it is a widely accepted standard and has implementations in most popular programming languages. It is url safe, case insensitive and encodes the ISCC octets to a fixed size alphanumeric string. The predictable size of the encoding is a property that we need for composition and decomposition of components without having to rely on a delimiter (hyphen) in the ISCC code representation. We might change to a non standard base62, mixed case encoding to create shorter ISCC codes before the final version 1 specification.&#160;<a class="footnote-backref" href="#fnref:base32" rev="footnote" title="Jump back to footnote 1 in the text">&#8617;</a></p>
 </li>
 <li id="fn:component-length">
-<p>We might switch to a different base structure for components. For example we might use a variable length header and a bigger 8-byte body. The header would only be carried in the encoded representation and applications could use full 64-bit space per component. As similarity searches accross different components make no sense, the type information contained in the header of each component can be safely ignored after an ISCC has been decomposed and internaly typed by an application.&#160;<a class="footnote-backref" href="#fnref:component-length" rev="footnote" title="Jump back to footnote 2 in the text">&#8617;</a></p>
+<p><strong>Components structure:</strong> We might switch to a different base structure for components. For example we might use a variable length header and a bigger 8-byte body. The header would only be carried in the encoded representation and applications could use full 64-bit space per component. As similarity searches accross different components make no sense, the type information contained in the header of each component can be safely ignored after an ISCC has been decomposed and internaly typed by an application.&#160;<a class="footnote-backref" href="#fnref:component-length" rev="footnote" title="Jump back to footnote 2 in the text">&#8617;</a></p>
 </li>
 <li id="fn:creators">
-<p>We have tested multiple normalization strategies for <em>creators</em> metadata and it works fairly well. The optional <code>creators</code>-field is a strong discriminator when dealing with similar title texts. But our tests indicate that the main problem for a generic conent identifier is in the semantic ambiguity of the <code>creators</code>-field accross industries. For example, who would you list as the creators of a movie, the directors, writers, main actors? Would you list some of them or if not how do you decide whom you will list. We will do some more evaluation and might remove the <code>creators</code>-field altogether for the final version 1 specification. All disambiguation of similar title data would then have to move to the <code>extra</code>-field.&#160;<a class="footnote-backref" href="#fnref:creators" rev="footnote" title="Jump back to footnote 3 in the text">&#8617;</a></p>
+<p><strong>Meta-ID creators field:</strong> We have tested multiple normalization strategies for <em>creators</em> metadata and it works fairly well. The optional <code>creators</code>-field is a strong discriminator when dealing with similar title texts. But our tests indicate that the main problem for a generic conent identifier is in the semantic ambiguity of the <code>creators</code>-field accross industries. For example, who would you list as the creators of a movie, the directors, writers, main actors? Would you list some of them or if not how do you decide whom you will list. We will do some more evaluation and might remove the <code>creators</code>-field altogether for the final version 1 specification. All disambiguation of similar title data would then have to move to the <code>extra</code>-field.&#160;<a class="footnote-backref" href="#fnref:creators" rev="footnote" title="Jump back to footnote 3 in the text">&#8617;</a></p>
 </li>
 <li id="fn:sha256d">
-<p>To guard against length-extension attacks and second pre-image attacks we use double sha256 for hashing. We also prefix the hash input data with a <code>0x00</code>-byte for the leaf nodes hashes and with a <code>0x01</code>-byte for the  internal node hashes.&#160;<a class="footnote-backref" href="#fnref:sha256d" rev="footnote" title="Jump back to footnote 4 in the text">&#8617;</a></p>
+<p><strong>Instance-ID data integrity:</strong>  To guard against length-extension attacks and second pre-image attacks we use double sha256 for hashing. We also prefix the hash input data with a <code>0x00</code>-byte for the leaf nodes hashes and with a <code>0x01</code>-byte for the  internal node hashes.&#160;<a class="footnote-backref" href="#fnref:sha256d" rev="footnote" title="Jump back to footnote 4 in the text">&#8617;</a></p>
+</li>
+<li id="fn:tophash">
+<p><strong>Instance-ID binding:</strong> We might add an additional step to the final Instance-ID component by hashing the concatenation of the preceeding components and the <strong>top-hash</strong>. This would bind the Instance-ID to the other components. But this would also chainge its semantics to encode integrity of data and metadata together.&#160;<a class="footnote-backref" href="#fnref:tophash" rev="footnote" title="Jump back to footnote 5 in the text">&#8617;</a></p>
 </li>
 </ol>
 </div>
