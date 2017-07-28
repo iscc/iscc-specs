@@ -31,19 +31,19 @@ The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "S
 ## Definitions
 
 Base Metadata
-:	Minimal information about the content identified by an ISCC that must be provided when registering an ISCC.  
+:	Minimal set of required metadata about the content that is identified by an ISCC.  
 
 Digital Media Object
-:	A file on a computer or more generically blob of raw data bytes that encodes one ore multiple GMTs in a specific media. 
+:	A blob of raw bytes that with media type specific encoding. 
 
 Generic Media Type
-:	A basic digital content type such as UTF-8 encoded plain text or raw pixel data.
+:	A basic digital content type such as UTF-8 encoded plain text or raw pixel data of images.
 
 ISCC
 :	International Standard Content Code
 
 ISCC Code
-:	The base32 encoded representation of an ISCC
+:	The printable base32 encoded representation of an ISCC
 
 ISCC Digest
 :	The raw binary data of an ISCC
@@ -91,7 +91,7 @@ Each component has the same basic structure of a 1-byte header and a 7-byte main
 
 ## Meta-ID
 
-The Meta-ID is built from minimal and generic metadata of the content to be identified. All *text* information supplied to the META-ID generating function is assumed to be UTF-8 encoded. Errors during decoding the bytestring input to a native Unicode must terminate the process and should not be silenced. An ISCC generating application must provide a `generate_meta_id` function that accepts the following input fields:
+The Meta-ID is built from minimal and generic metadata of the content to be identified. All *text* information supplied to the META-ID generating function is assumed to be UTF-8 encoded. Errors that occur during the decoding of such a bytestring input to a native Unicode must terminate the process and must not be silenced. An ISCC generating application must provide a `generate_meta_id` function that accepts the following input fields:
 
 | Name                  | Type    | Required | Description                              |
 | :-------------------- | :------ | :------- | :--------------------------------------- |
@@ -213,9 +213,11 @@ We define a text normalization function that is specific to our application. It 
 
 The `similarity_hash` function takes a sequence of hash digests (raw 8-bit bytes) which represent a set of content features. Each of the digests must be of equal size. The function returns a new hash digest (raw 8-bit bytes) of the same size. For each bit in the input hashes calulate the number of hashes with that bit set and substract the the count of hashes where it is not set. For the output hash set the same bit position to `0` if the count is negative or `1` if it is zero or positive. The resulting hash digest will retain similarity for similar sets of input hashes. See also  [[Charikar2002]][#Charikar2002].
 
+#### Diagram (SH)
+
 ![iscc-similarity-hash](images/iscc-similarity-hash.svg)
 
-#### Python 3 - Reference Code
+#### Reference Code (SH)
 
 ```python3
 def similarity_hash(hash_digests: Sequence[ByteString]) -> ByteString:
