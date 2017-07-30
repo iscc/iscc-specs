@@ -368,6 +368,13 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#reference-code-cid-t" title="Reference Code (CID-T)" class="md-nav__link">
+    Reference Code (CID-T)
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -633,6 +640,13 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#reference-code-cid-t" title="Reference Code (CID-T)" class="md-nav__link">
+    Reference Code (CID-T)
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -755,7 +769,9 @@
 <h2 id="definitions">Definitions<a class="headerlink" href="#definitions" title="Permanent link">&para;</a></h2>
 <dl>
 <dt>Base Metadata</dt>
-<dd>Minimal set of required metadata about the content that is identified by an <abbr title="International Standard Content Code">ISCC</abbr>.  </dd>
+<dd>Minimal set of required metadata about the content that is identified by an <abbr title="International Standard Content Code">ISCC</abbr>.</dd>
+<dt>Character</dt>
+<dd>Throughout this specification a <strong><abbr title="A character is defined as one Unicode code point">character</abbr></strong> is meant to be interpreted as one Unicode code point. This also means that due to the structure of Unicode a <abbr title="A character is defined as one Unicode code point">character</abbr> is not necessarily a full glyph but might be a combining accent or similar.</dd>
 <dt>Digital Media Object</dt>
 <dd>A blob of raw bytes that with media type specific encoding. </dd>
 <dt>Generic Media Type</dt>
@@ -770,7 +786,7 @@
 <dd>The integer representation of an <abbr title="International Standard Content Code">ISCC</abbr></dd>
 </dl>
 <h2 id="introduction">Introduction<a class="headerlink" href="#introduction" title="Permanent link">&para;</a></h2>
-<p>An <abbr title="International Standard Content Code">ISCC</abbr> permanently identifies the content of a given digital media object at multiple levels of <em>granularity</em>. It is algorithmically generated from basic metadata and the contents of the digital media object which it identifies. It is designed for being registered and stored on a public decentralized blockchain. An <abbr title="International Standard Content Code">ISCC</abbr> for a media object can be created by anybody, not just by the author or publisher of a content or by a centralized registrar. By itself the <abbr title="International Standard Content Code">ISCC</abbr> does not make any statement or claim about authorship or ownership of the identified content.</p>
+<p>An <abbr title="International Standard Content Code">ISCC</abbr> permanently identifies the content of a given digital media object at multiple levels of <em>granularity</em>. It is algorithmically generated from basic metadata and the contents of the digital media object which it identifies. It is designed for being registered and stored on a public and decentralized blockchain. An <abbr title="International Standard Content Code">ISCC</abbr> for a media object can be created and registered by the content author, a publisher, a service provider or anybody else. By itself the <abbr title="International Standard Content Code">ISCC</abbr> and its basic registration on a blockchain does not make any statement or claim about authorship or ownership of the identified content.</p>
 <h2 id="iscc-structure"><abbr title="International Standard Content Code">ISCC</abbr> Structure<a class="headerlink" href="#iscc-structure" title="Permanent link">&para;</a></h2>
 <p>The <abbr title="Raw binary data of an ISCC">ISCC Digest</abbr> is a fixed size sequence of 32 bytes (256 bits) assembled from multiple sub-components. The printable <abbr title="Base32 encoded representation of an ISCC">ISCC Code</abbr> is an <a href="https://tools.ietf.org/html/rfc4648#section-6">RFC 4648</a> base32<sup id="fnref:base32"><a class="footnote-ref" href="#fn:base32" rel="footnote">1</a></sup> encoded string representation of an <abbr title="Raw binary data of an ISCC">ISCC Digest</abbr>. This is a high-level overview of the <abbr title="International Standard Content Code">ISCC</abbr> creation process:</p>
 <p><img alt="iscc-creation-process" src="../images/iscc-creation-process.svg" /></p>
@@ -844,7 +860,7 @@
 <td align="left"><em>Content-ID</em></td>
 <td align="left">0001</td>
 <td align="left">0000 - ContentType Text (0)</td>
-<td align="left">0x10</td>
+<td align="left">0x10 ...</td>
 </tr>
 <tr>
 <td align="left"><em>Data-ID</em></td>
@@ -904,7 +920,7 @@
 <ol>
 <li>Apply Unicode standard <a href="http://www.unicode.org/reports/tr15/#Norm_Forms">Normalization Form KC (NFKC)</a> separately to all text input values.</li>
 <li>Remove all pairs of brackets  <code>[]</code>,  <code>()</code>,  <code>{}</code>, and text inbetween them from <code>title</code> and <code>creators</code> fields.</li>
-<li>Trim all text fields, such that their UTF-8 encoded byte representation does not exceed 128-bytes each. The trim point must be such, that it does not cut into multibyte characters. The results of this operation will later be stored as base metadata on the blockchain.</li>
+<li>Trim all text fields, such that their UTF-8 encoded byte representation does not exceed 128-bytes each. The trim point must be such, that it does not cut into multibyte characters. This is necessary because the results of this operation will be stored as base metadata with strict byte size limits on the blockchain.</li>
 <li>Cut all text after the first occurence of a semicolon (<code>;</code>) if that semicolon is after the first 25 characters of text.</li>
 <li>Apply <a href="#normalize-text"><code>normalize_text</code></a> to the trimmed <code>title</code> input value.</li>
 <li>Apply <a href="#normalize-creators"><code>normalize_creators</code></a> to the trimmed <code>creators</code> input value.</li>
@@ -926,7 +942,7 @@
 <h2 id="content-id">Content-ID<a class="headerlink" href="#content-id" title="Permanent link">&para;</a></h2>
 <p>The Content-ID component has multiple subtypes. Except for the <em>mixed type</em> all subtypes correspond with the <strong>Generic Media Types</strong>. A fully qualified <abbr title="International Standard Content Code">ISCC</abbr> can only have a Content-ID component of one specific type, but there can be multiple ISCCs with different Content-ID types per digital media object.</p>
 <p>A Content-ID is generated in two broad steps. In the first step, we extract and convert content from a rich media type to a normalized <abbr title="Generic Media Type">GMT</abbr>. In the second step, we use a <abbr title="Generic Media Type">GMT</abbr>-specific process to generate the Content-ID component of an <abbr title="International Standard Content Code">ISCC</abbr>. </p>
-<h4 id="content-id-types">Content-ID Types<a class="headerlink" href="#content-id-types" title="Permanent link">&para;</a></h4>
+<h3 id="content-id-types">Content-ID Types<a class="headerlink" href="#content-id-types" title="Permanent link">&para;</a></h3>
 <p>The  Content-ID type is signaled by the first 3 bits of the second nibble of the first byte of the Content-ID:</p>
 <table>
 <thead>
@@ -962,17 +978,32 @@
 </tr>
 </tbody>
 </table>
-<h4 id="partial-content-flag-pcf">Partial Content Flag (<abbr title="Partial Content Flag">PCF</abbr>)<a class="headerlink" href="#partial-content-flag-pcf" title="Permanent link">&para;</a></h4>
+<h3 id="partial-content-flag-pcf">Partial Content Flag (<abbr title="Partial Content Flag">PCF</abbr>)<a class="headerlink" href="#partial-content-flag-pcf" title="Permanent link">&para;</a></h3>
 <p>The last bit of the header byte is the "Partial Content Flag". It designates if the Content-ID applies to the full content or just some part of it. The <abbr title="Partial Content Flag">PCF</abbr> must be set as a <code>0</code>-bit (full <abbr title="Generic Media Type">GMT</abbr>-specific content) by default. Setting the <abbr title="Partial Content Flag">PCF</abbr> to <code>1</code> enables applications to create multiple ISCCs for partial extracts of one and the same digital file. The exact semantics of <em>partial content</em> are outside of the scope of this specification. Applications that plan to support partial Content-IDs should clearly define their semantics. For example, an application might create separate <abbr title="International Standard Content Code">ISCC</abbr> for the text contents of multiple articles of a magazine issue. In such a scenario
 the Meta-, Data-, and Instance-IDs are the compound key for the magazine issue, while the Content-ID-Text component distinguishes the different articles of the issue. The different Content-ID-Text components would automatically be "bound" together by the other 3 components.</p>
-<h4 id="content-id-text">Content-ID-Text<a class="headerlink" href="#content-id-text" title="Permanent link">&para;</a></h4>
-<p>The Content-ID-Text is built from the extracted plain-text content of an encoded media object. To build a stable Content-ID-Text the plain text content must be extracted in a way that is reproducible. To make this possible we specify that the plain-text content must be extracted with <a href="https://tika.apache.org/">Apache Tika v1.16</a>.</p>
+<h3 id="content-id-text">Content-ID-Text<a class="headerlink" href="#content-id-text" title="Permanent link">&para;</a></h3>
+<p>The Content-ID-Text is built from the extracted plain-text content of an encoded media object. To build a stable Content-ID-Text the plain text content must be extracted in a way that is reproducible. To make this possible we specify that the plain-text content must be extracted with <a href="https://tika.apache.org/">Apache Tika v1.16</a>. An <abbr title="International Standard Content Code">ISCC</abbr> generating application must provide a <code>generate_content_id_text(text, partial=False)</code> function that accepts UTF-8 encoded plain text and an boolean partial content flag as input and returns a Content-ID with <abbr title="Generic Media Type">GMT</abbr> type <code>text</code>. The procedure to create a Content-ID-Text is as follows:</p>
+<ol>
+<li>Apply <a href="#normalize-text"><code>normalize_text</code></a> to the text input.</li>
+<li>Split the text into a list of words at whitespace boundaries.</li>
+<li>Create a list of 5 word shingles by sliding word-wise through the list of words.</li>
+<li>Apply <code>minhash</code> to the resulting list of shingles</li>
+<li>Apply <a href="#similarity-hash"><code>similarity_hash</code></a> to the list of digests returned from step 4.</li>
+<li>Trim the resulting byte sequence to the first 7 bytes</li>
+<li>Prepend the 1-byte component header (<code>0x10</code> full content, <code>0x11</code> partial content)</li>
+<li>Encode the resulting 8-byte sequence with base32 (no-padding) and return the result</li>
+</ol>
+<h3 id="reference-code-cid-t">Reference Code (CID-T)<a class="headerlink" href="#reference-code-cid-t" title="Permanent link">&para;</a></h3>
+<div class="admonition todo">
+<p class="admonition-title">Todo</p>
+<p>Reference Code for Content-ID-Text creation</p>
+</div>
 <h2 id="data-id">Data-ID<a class="headerlink" href="#data-id" title="Permanent link">&para;</a></h2>
 <p>The Data-ID is built from the raw encoded data of the content to be identified. An <abbr title="International Standard Content Code">ISCC</abbr> generating application must provide a <code>generate_data_id</code> function that accepts the raw encoded data as input. Generate a Data-ID by this procedure:</p>
 <ol>
 <li>Apply <code>chunk_data</code> to the raw encoded content data</li>
 <li>For each chunk calculate the sha256 digest</li>
-<li>Apply <code>minhash</code> with 256 permutations to the resulting list of digests</li>
+<li>Apply <code>minhash</code> to the resulting list of digests</li>
 <li>Take the lowest bit from each minhash value and concatenate them to a 256 string</li>
 <li>Trim the resulting byte sequence to the first 7 bytes.</li>
 <li>Prepend the 1-byte component header (e.g. 0x20).</li>
@@ -1000,9 +1031,9 @@ the Meta-, Data-, and Instance-IDs are the compound key for the magazine issue, 
 <li>Replace each group of one or more consecutive <code>Separator</code> characters (<a href="https://en.wikipedia.org/wiki/Unicode_character_property">Unicode categories</a> Zs, Zl and Zp) with exactly one Unicode <code>SPACE</code> <abbr title="A character is defined as one Unicode code point">character</abbr> (<code>U+0020</code>) .</li>
 <li>Remove any leading or trailing <code>Separator</code> characters.</li>
 <li>Remove each <abbr title="A character is defined as one Unicode code point">character</abbr> that is not in one of the Unicode categories <code>Separator</code> , <code>Letter</code>, <code>Number</code> or <code>Symbol</code>.</li>
-<li>Convert all characters to their lower case</li>
+<li>Convert all characters to lower case.</li>
 <li>Re-Compose the text by applying <code>Unicode Normalization Form C (NFC)</code>.</li>
-<li>Return the resulting text</li>
+<li>Return the resulting text.</li>
 </ol>
 <h3 id="similarity-hash">Similarity Hash<a class="headerlink" href="#similarity-hash" title="Permanent link">&para;</a></h3>
 <p>The <code>similarity_hash</code> function takes a sequence of hash digests (raw 8-bit bytes) which represent a set of content features. Each of the digests must be of equal size. The function returns a new hash digest (raw 8-bit bytes) of the same size. For each bit in the input hashes calulate the number of hashes with that bit set and substract the the count of hashes where it is not set. For the output hash set the same bit position to <code>0</code> if the count is negative or <code>1</code> if it is zero or positive. The resulting hash digest will retain similarity for similar sets of input hashes. See also  <a href="http://dx.doi.org/10.1145/509907.509965" title="Charikar, M.S., 2002, May. Similarity estimation techniques from rounding algorithms. In Proceedings of the thiry-fourth annual ACM symposium on Theory of computing (pp. 380-388). ACM.">[Charikar2002]</a>.</p>
