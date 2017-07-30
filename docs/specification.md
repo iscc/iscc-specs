@@ -31,7 +31,10 @@ The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "S
 ## Definitions
 
 Base Metadata
-:	Minimal set of required metadata about the content that is identified by an ISCC.  
+:	Minimal set of required metadata about the content that is identified by an ISCC.
+
+Character
+:	Throughout this specification the a **character** is meant to be interpreted as one Unicode code point. This also means that due to the structure of Unicode a character is not necessarily a full glyph but might be a combining accent or similar.
 
 Digital Media Object
 :	A blob of raw bytes that with media type specific encoding. 
