@@ -34,7 +34,7 @@ Base Metadata
 :	Minimal set of required metadata about the content that is identified by an ISCC.
 
 Character
-:	Throughout this specification the a **character** is meant to be interpreted as one Unicode code point. This also means that due to the structure of Unicode a character is not necessarily a full glyph but might be a combining accent or similar.
+:	Throughout this specification a **character** is meant to be interpreted as one Unicode code point. This also means that due to the structure of Unicode a character is not necessarily a full glyph but might be a combining accent or similar.
 
 Digital Media Object
 :	A blob of raw bytes that with media type specific encoding. 
@@ -56,7 +56,7 @@ ISCC ID
 
 ## Introduction
 
-An ISCC permanently identifies the content of a given digital media object at multiple levels of *granularity*. It is algorithmically generated from basic metadata and the contents of the digital media object which it identifies. It is designed for being registered and stored on a public decentralized blockchain. An ISCC for a media object can be created by anybody, not just by the author or publisher of a content or by a centralized registrar. By itself the ISCC does not make any statement or claim about authorship or ownership of the identified content.
+An ISCC permanently identifies the content of a given digital media object at multiple levels of *granularity*. It is algorithmically generated from basic metadata and the contents of the digital media object which it identifies. It is designed for being registered and stored on a public and decentralized blockchain. An ISCC for a media object can be created and registered by the content author, a publisher, a service provider or anybody else. By itself the ISCC and its basic registration on a blockchain does not make any statement or claim about authorship or ownership of the identified content.
 
 ## ISCC Structure
 
@@ -85,12 +85,12 @@ Each component is guaranteed to fit into a 64-bit unsigned integer value. The co
 
 Each component has the same basic structure of a 1-byte header and a 7-byte main section[^component-length]. Each component can thus be fit into a 64-bit integer value. The header-byte of each component is subdivided into 2 nibbles (4 bits). The first nibble specifies the component type while the second nibble is component specific.
 
-| Component     | Nibble-1 | Nibble-2                    | Byte |
-| :------------ | :------- | :-------------------------- | :--- |
-| *Meta-ID*     | 0000     | 0000 - ISCC version (0)     | 0x00 |
-| *Content-ID*  | 0001     | 0000 - ContentType Text (0) | 0x10 |
-| *Data-ID*     | 0010     | 0000 - Reserved             | 0x20 |
-| *Instance-ID* | 0011     | 0000 - Reserved             | 0x30 |
+| Component     | Nibble-1 | Nibble-2                    | Byte     |
+| :------------ | :------- | :-------------------------- | :------- |
+| *Meta-ID*     | 0000     | 0000 - ISCC version (0)     | 0x00     |
+| *Content-ID*  | 0001     | 0000 - ContentType Text (0) | 0x10 ... |
+| *Data-ID*     | 0010     | 0000 - Reserved             | 0x20     |
+| *Instance-ID* | 0011     | 0000 - Reserved             | 0x30     |
 
 ## Meta-ID
 
@@ -111,7 +111,7 @@ An ISCC generating application must follow these steps in the given order to pro
 
 1. Apply Unicode standard [Normalization Form KC (NFKC)](http://www.unicode.org/reports/tr15/#Norm_Forms) separately to all text input values.
 2. Remove all pairs of brackets  `[]`,  `()`,  `{}`, and text inbetween them from `title` and `creators` fields.
-3. Trim all text fields, such that their UTF-8 encoded byte representation does not exceed 128-bytes each. The trim point must be such, that it does not cut into multibyte characters. The results of this operation will later be stored as base metadata on the blockchain.
+3. Trim all text fields, such that their UTF-8 encoded byte representation does not exceed 128-bytes each. The trim point must be such, that it does not cut into multibyte characters. This is necessary because the results of this operation will be stored as base metadata with strict byte size limits on the blockchain.
 4. Cut all text after the first occurence of a semicolon (`;`) if that semicolon is after the first 25 characters of text.
 5. Apply [`normalize_text`](#normalize-text) to the trimmed `title` input value.
 6. Apply [`normalize_creators`](#normalize-creators) to the trimmed `creators` input value.
@@ -143,7 +143,7 @@ The Content-ID component has multiple subtypes. Except for the *mixed type* all 
 
 A Content-ID is generated in two broad steps. In the first step, we extract and convert content from a rich media type to a normalized GMT. In the second step, we use a GMT-specific process to generate the Content-ID component of an ISCC. 
 
-#### Content-ID Types
+### Content-ID Types
 
 The  Content-ID type is signaled by the first 3 bits of the second nibble of the first byte of the Content-ID:
 
@@ -156,22 +156,36 @@ The  Content-ID type is signaled by the first 3 bits of the second nibble of the
 | mixed          | 100               |
 | Reserved       | 101, 110, 111     |
 
-#### Partial Content Flag (PCF)
+### Partial Content Flag (PCF)
 
 The last bit of the header byte is the "Partial Content Flag". It designates if the Content-ID applies to the full content or just some part of it. The PCF must be set as a `0`-bit (full GMT-specific content) by default. Setting the PCF to `1` enables applications to create multiple ISCCs for partial extracts of one and the same digital file. The exact semantics of *partial content* are outside of the scope of this specification. Applications that plan to support partial Content-IDs should clearly define their semantics. For example, an application might create separate ISCC for the text contents of multiple articles of a magazine issue. In such a scenario
 the Meta-, Data-, and Instance-IDs are the compound key for the magazine issue, while the Content-ID-Text component distinguishes the different articles of the issue. The different Content-ID-Text components would automatically be "bound" together by the other 3 components.
 
-#### Content-ID-Text
+### Content-ID-Text
 
-The Content-ID-Text is built from the extracted plain-text content of an encoded media object. To build a stable Content-ID-Text the plain text content must be extracted in a way that is reproducible. To make this possible we specify that the plain-text content must be extracted with [Apache Tika v1.16](https://tika.apache.org/).
+The Content-ID-Text is built from the extracted plain-text content of an encoded media object. To build a stable Content-ID-Text the plain text content must be extracted in a way that is reproducible. To make this possible we specify that the plain-text content must be extracted with [Apache Tika v1.16](https://tika.apache.org/). An ISCC generating application must provide a `generate_content_id_text(text, partial=False)` function that accepts UTF-8 encoded plain text and an boolean partial content flag as input and returns a Content-ID with GMT type `text`. The procedure to create a Content-ID-Text is as follows:
 
+1. Apply [`normalize_text`](#normalize-text) to the text input.
+2. Split the text into a list of words at whitespace boundaries.
+3. Create a list of 5 word shingles by sliding word-wise through the list of words.
+4. Apply `minhash` to the resulting list of shingles
+5. Apply [`similarity_hash`](#similarity-hash) to the list of digests returned from step 4.
+6. Trim the resulting byte sequence to the first 7 bytes
+7. Prepend the 1-byte component header (`0x10` full content, `0x11` partial content)
+8. Encode the resulting 8-byte sequence with base32 (no-padding) and return the result
+
+### Reference Code (CID-T)
+
+!!! todo
+
+    Reference Code for Content-ID-Text creation
 ## Data-ID
 
 The Data-ID is built from the raw encoded data of the content to be identified. An ISCC generating application must provide a `generate_data_id` function that accepts the raw encoded data as input. Generate a Data-ID by this procedure:
 
 1. Apply `chunk_data` to the raw encoded content data
 2. For each chunk calculate the sha256 digest
-3. Apply `minhash` with 256 permutations to the resulting list of digests
+3. Apply `minhash` to the resulting list of digests
 4. Take the lowest bit from each minhash value and concatenate them to a 256 string
 5. Trim the resulting byte sequence to the first 7 bytes.
 6. Prepend the 1-byte component header (e.g. 0x20).
@@ -208,9 +222,9 @@ We define a text normalization function that is specific to our application. It 
 2. Replace each group of one or more consecutive `Separator` characters ([Unicode categories](https://en.wikipedia.org/wiki/Unicode_character_property) Zs, Zl and Zp) with exactly one Unicode `SPACE` character (`U+0020`) .
 3. Remove any leading or trailing `Separator` characters.
 4. Remove each character that is not in one of the Unicode categories `Separator` , `Letter`, `Number` or `Symbol`.
-5. Convert all characters to their lower case
+5. Convert all characters to lower case.
 6. Re-Compose the text by applying `Unicode Normalization Form C (NFC)`.
-7. Return the resulting text
+7. Return the resulting text.
 
 ### Similarity Hash
 
