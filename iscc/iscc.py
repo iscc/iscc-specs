@@ -167,6 +167,12 @@ def similarity_hash(hash_digests: Sequence[ByteString]) -> ByteString:
 
     return shash.to_bytes(n_bytes, 'big', signed=False)
 
+
+def minimum_hash(hash_digests: Sequence[ByteString]) -> ByteString:
+    # TODO Implement pure python minhash
+    pass
+
+
 def c2d(code: str) -> ByteString:
 
     return base64.b32decode(code + '===')
