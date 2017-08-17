@@ -136,8 +136,13 @@ def test_generate_instance_id():
 
 
 def test_data_chunks():
-    test_image = open('lenna.jpg', 'rb').read()
-    chunks = list(iscc.data_chunks(test_image))
-    assert len(chunks) == 112
-    assert len(chunks[0]) == 38
-    assert len(chunks[-1]) == 2840
+    with open('lenna.jpg', 'rb') as infile:
+        chunks1 = list(iscc.data_chunks(infile))
+        infile.seek(0)
+        chunks2 = list(iscc.data_chunks(infile.read()))
+    assert len(chunks1) == 112
+    assert len(chunks1[0]) == 38
+    assert len(chunks1[-1]) == 2840
+    assert len(chunks2) == 112
+    assert len(chunks2[0]) == 38
+    assert len(chunks2[-1]) == 2840
