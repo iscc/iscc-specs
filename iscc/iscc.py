@@ -8,6 +8,7 @@ from io import BytesIO
 from hashlib import sha256
 import unicodedata
 from typing import List, ByteString, Sequence, BinaryIO, TypeVar
+from iscc.const import CHUNKING_GEAR
 
 # Magic Constants
 
@@ -73,16 +74,49 @@ def hash_inner_nodes(a: bytes, b: bytes) -> bytes:
 
 
 def data_chunks(data: B) -> List[bytes]:
-    # TODO use cdc
-
     if not hasattr(data, 'read'):
         data = BytesIO(data)
 
+    section = data.read(640)
+    counter = 0
     while True:
-        chunk = data.read(8)
-        if not chunk:
-            break
-        yield chunk
+        if counter < 100:
+            if len(section) < 640:
+                section += data.read(640)
+            if len(section) == 0:
+                break
+            boundary = chunk_length(section, 40, 20, 640, 0x016118, 0x00a0b1)
+        else:
+            if len(section) < 65536:
+                section += data.read(65536)
+            if len(section) == 0:
+                break
+            boundary = chunk_length(section, 4096, 2048, 65536, 0x0003590703530000, 0x0000d90003530000)
+
+        yield section[:boundary]
+        section = section[boundary:]
+        counter += 1
+
+
+def chunk_length(data: bytes, norm_size: int, min_size: int, max_size: int, mask_1: int, mask_2: int) -> int:
+    data_length = len(data)
+    i = min_size
+    pattern = 0
+
+    if data_length <= min_size:
+        return data_length
+
+    while i < min(norm_size, data_length):
+        pattern = (pattern << 1) + CHUNKING_GEAR[data[i]]
+        if not pattern & mask_1:
+            return i
+        i = i + 1
+    while i < min(max_size, data_length):
+        pattern = (pattern << 1) + CHUNKING_GEAR[data[i]]
+        if not pattern & mask_2:
+            return i
+        i = i + 1
+    return i
 
 
 def normalize_text(text: str) -> str:

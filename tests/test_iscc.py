@@ -127,19 +127,17 @@ def test_generate_instance_id():
     zero_bytes_even = b'\x00' * 16
     iid = iscc.generate_instance_id(zero_bytes_even)
     assert iscc.c2d(iid)[0] == 48
-    assert iid == 'GB6JPXHBHVZNY'
+    assert iid == 'GAWKP4EYOCOTO'
 
     ff_bytes_uneven = b'\xff' * 17
     iid = iscc.generate_instance_id(ff_bytes_uneven)
     assert iscc.c2d(iid)[0] == 48
-    assert iid == 'GBSV66PQLOITI'
+    assert iid == 'GAQV3LN3WYTQO'
 
 
 def test_data_chunks():
-    a = b'\x00' * 8
-    b = b'\x01' * 8
-    c = b'\x11' * 4
-    chunks = list(iscc.data_chunks(a + b + c))
-    assert len(chunks) == 3
-    assert chunks[0] == a
-    assert chunks[-1] == c
+    test_image = open('lenna.jpg', 'rb').read()
+    chunks = list(iscc.data_chunks(test_image))
+    assert len(chunks) == 112
+    assert len(chunks[0]) == 38
+    assert len(chunks[-1]) == 2840
