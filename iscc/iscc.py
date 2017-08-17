@@ -7,7 +7,8 @@ import base64
 from io import BytesIO
 from hashlib import sha256
 import unicodedata
-from typing import List, ByteString, Sequence, BinaryIO, TypeVar
+from typing import List, ByteString, Sequence, BinaryIO, TypeVar, Generator
+
 from iscc.const import CHUNKING_GEAR
 
 # Magic Constants
@@ -73,7 +74,8 @@ def hash_inner_nodes(a: bytes, b: bytes) -> bytes:
     return sha256d(b'\x01' + a + b)
 
 
-def data_chunks(data: B) -> List[bytes]:
+def data_chunks(data: B) -> Generator[bytes, None, None]:
+
     if not hasattr(data, 'read'):
         data = BytesIO(data)
 
