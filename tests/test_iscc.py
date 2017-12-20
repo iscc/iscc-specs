@@ -146,3 +146,10 @@ def test_data_chunks():
     assert len(chunks2) == 112
     assert len(chunks2[0]) == 38
     assert len(chunks2[-1]) == 2840
+
+
+def test_image_hash():
+    image_hash = iscc.generate_image_hash('lenna.jpg')
+    assert len(image_hash) == 56
+    assert image_hash.count('1') == image_hash.count('0')
+    assert image_hash == '10011001110001100101011000101101011101010011001110100010'

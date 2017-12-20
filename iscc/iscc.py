@@ -8,7 +8,8 @@ from io import BytesIO
 from hashlib import sha256
 import unicodedata
 from typing import List, ByteString, Sequence, BinaryIO, TypeVar, Generator
-
+import math
+from PIL import Image
 from iscc.const import CHUNKING_GEAR
 
 # Magic Constants
@@ -204,9 +205,49 @@ def similarity_hash(hash_digests: Sequence[ByteString]) -> ByteString:
     return shash.to_bytes(n_bytes, 'big', signed=False)
 
 
-def minimum_hash(hash_digests: Sequence[ByteString]) -> ByteString:
-    # TODO Implement pure python minhash
-    pass
+def generate_image_hash(image_path: str) -> str:
+
+    image = Image.open(image_path)
+    image = image.convert("L").resize((32, 32), Image.BICUBIC)
+
+    # get image pixels as matrix
+    pixels = [[list(image.getdata())[32 * i + j] for j in range(32)] for i in range(32)]
+
+    # discrete cosine transform over every row
+    dct_row_lists = []
+    for pixel_list in pixels:
+        dct_row_lists.append(discrete_cosine_transform(pixel_list))
+
+    # discrete cosine transform over every column
+    dct_row_lists_t = list(map(list, zip(*dct_row_lists)))
+    dct_col_lists_t = []
+    for dct_list in dct_row_lists_t:
+        dct_col_lists_t.append(discrete_cosine_transform(dct_list))
+    dct_lists = list(map(list, zip(*dct_col_lists_t)))
+
+    # extract upper left 8x7 corner as flat list
+    flat_list = [x for sublist in dct_lists[:7] for x in sublist[:8]]
+
+    # compare every value with median and generate hash
+    med = sum(sorted(flat_list)[27: 29]) / 2
+    hash = ''
+    for value in flat_list:
+        if value > med:
+            hash += '1'
+        else:
+            hash += '0'
+    return hash
+
+
+def discrete_cosine_transform(value_list: Sequence[float]) -> Sequence[float]:
+    N = len(value_list)
+    dct_list = []
+    for k in range(N):
+        value = 0.0
+        for n in range(N):
+            value += value_list[n] * math.cos(math.pi * k * (2 * n + 1) / (2 * N))
+        dct_list.append(2 * value)
+    return dct_list
 
 
 def c2d(code: str) -> ByteString:
