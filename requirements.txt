@@ -1,5 +1,7 @@
 # Python PIP requirements file
 # see: https://pip.pypa.io/en/stable/user_guide/#requirements-files
 
-mkdocs==0.16.3
-mkdocs-material==1.7.5
+mkdocs==0.17.2
+mkdocs-material==2.2.6
+pytest==3.3.1
+Pillow==5.0.0
