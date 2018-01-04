@@ -3,7 +3,6 @@ site_name: 'ISCC - Content Identifiers'
 site_description: 'International Standard Content Code - Specification'
 site_author: 'Titusz Pan'
 site_url: 'http://iscc.codes'
-site_favicon: 'images/favicon.png'
 
 # Repository
 repo_name: 'coblo/iscc-specs'
@@ -14,34 +13,46 @@ edit_uri: 'edit/master/docs/'
 copyright: 'Copyright © 2016-2017, Content Blockchain Project'
 
 # Documentation and Ttheme
-theme: 'material'
+theme:
+    name: 'material'
+    language: 'en'
+    logo: 'images/logo-white.svg'
+    favicon: 'images/favicon.png'
+    palette:
+        primary: 'blue'
+        accent: 'pink'
+    font:
+        text: 'Merriweather Sans'
+        code: 'Inconsolata'
+    feature:
+        tabs: false
 
 pages:
-    - Introduction: 'index.md'
+    - Overview: 'index.md'
     - Concept: 'concept.md'
-    - Specification Draft: 'specification.md'
+    - Specification: 'specification.md'
     - Contributing: 'contributing.md'
     - License: 'license.md'
 
 # Options
 extra:
-    logo: 'images/logo-white.svg'
-    palette:
-        primary: 'blue'
-        accent: 'red'
     social:
-    - type: 'github'
-      link: 'https://github.com/coblo'
-    - type: 'home'
-      link: 'https://content-blockchain.org'
-    feature:
-        tabs: false
+        - type: 'home'
+          link: 'https://content-blockchain.org'
+        - type: 'github'
+          link: 'https://github.com/coblo'
+        - type: 'telegram'
+          link: 'https://t.me/ContentBlockchainBeta'
+
 
 markdown_extensions:
-    - meta
-    - footnotes
-    - abbr
-    - admonition
-    - codehilite(linenums=true)
-    - toc(permalink=true)
-    - def_list
+    - markdown.extensions.abbr
+    - markdown.extensions.admonition
+    - markdown.extensions.codehilite:
+        linenums: true
+        guess_lang: false
+    - markdown.extensions.def_list
+    - markdown.extensions.footnotes
+    - markdown.extensions.meta
+    - markdown.extensions.toc:
+        permalink: '#'
