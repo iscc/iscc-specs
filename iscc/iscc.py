@@ -12,10 +12,53 @@ import math
 from PIL import Image
 from iscc.const import CHUNKING_GEAR
 
-# Magic Constants
-
+# Constants
+SYMBOLS = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz"
+VALUES = ''.join([chr(i) for i in range(58)])
+C2VTABLE = str.maketrans(SYMBOLS, VALUES)
+V2CTABLE = str.maketrans(VALUES, SYMBOLS)
+IDTABLE = str.maketrans(SYMBOLS, SYMBOLS)
 INPUT_TRIM = 128
 B = TypeVar('B', BinaryIO, bytes)
+
+
+def encode(digest: bytes) -> str:
+    assert len(digest) == 9, "ISCC component digest must be 9 bytes."
+    digest = reversed(digest)
+    value = 0
+    numvalues = 1
+    for octet in digest:
+        octet *= numvalues
+        value += octet
+        numvalues *= 256
+    chars = []
+    while numvalues > 0:
+        chars.append(value % 58)
+        value //= 58
+        numvalues //= 58
+    return str.translate(''.join([chr(c) for c in reversed(chars)]), V2CTABLE)
+
+
+def decode(code: str) -> bytes:
+    assert len(code) == 13, "ISCC component code must be 13 chars."
+    bit_length = 72
+    code = reversed(str.translate(code, C2VTABLE))
+    value = 0
+    numvalues = 1
+    for c in code:
+        c = ord(c)
+        c *= numvalues
+        value += c
+        numvalues *= 58
+
+    numvalues = 2 ** bit_length
+    data = []
+    while numvalues > 1:
+        data.append(value % 256)
+        value //= 256
+        numvalues //= 256
+
+    return bytes(reversed(data))
 
 
 def generate_meta_id(title: str, creators: str='', extra: str='', version: int=0) -> str:

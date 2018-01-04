@@ -2,6 +2,18 @@
 from iscc import iscc
 
 
+def test_encode():
+    digest = bytes.fromhex('f7d3a5b201dc92f7a7')
+    code = iscc.encode(digest)
+    assert code == '49xmrMuRWRT2v'
+
+
+def test_decode():
+    code = '49xmrMuRWRT2v'
+    digest = iscc.decode(code)
+    assert digest.hex() == 'f7d3a5b201dc92f7a7'
+
+
 def test_generate_meta_id():
 
     mid1 = iscc.generate_meta_id('Die Unendliche Geschichte', 'Michael Ende')
