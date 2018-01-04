@@ -3,4 +3,4 @@ site/
 
 # JetBrains IDE settings
 .idea/
-__py_cache__/
+__pycache__/
