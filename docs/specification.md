@@ -10,7 +10,7 @@ authors: Titusz Pan
 
 ## Abstract
 
-The **International Standard Content Code** (ISCC), is an open and decentralized digital media identifier. An ISCC can be created from digital content and its basic metadata by anybody who follows the procedures of the ISCC specification or by using open source software that supports ISCC creation conforming to the ISCC specification.
+The **International Standard Content Code (ISCC)**, is an open and decentralized digital media identifier. An ISCC can be created from digital content and its basic metadata by anybody who follows the procedures of the ISCC specification or by using open source software that supports ISCC creation conforming to the ISCC specification.
 
 ## Note to Readers
 
@@ -22,7 +22,7 @@ Public discussion and contributions are welcome.
 
 ## About this Document
 
-This document proposes an open and vendor neutral ISCC standard and describes the technical procedures to create and manage ISCC identifiers. It is produced by the [Content Blockchain Project](https://content-blockchain.org) and it aimed to become the definitive guide to the ISCC standard for technical implementors. The content is determined by its authors in an open consensus process.
+This document proposes an open and vendor neutral ISCC standard and describes the technical procedures to create and manage ISCC identifiers. The document is initially produced by the [Content Blockchain Project](https://content-blockchain.org) that received funding from the [Google Digital News Initiative (DNI)](https://digitalnewsinitiative.com/dni-projects/content-blockchain-project/). The content of this document is determined by its authors in an open and public consensus process.
 
 ## Conventions and Terminology
 
@@ -46,13 +46,10 @@ ISCC
 :	International Standard Content Code
 
 ISCC Code
-:	The printable base32 encoded representation of an ISCC
+:	The printable text encoded representation of an ISCC
 
 ISCC Digest
 :	The raw binary data of an ISCC
-
-ISCC ID
-:	The integer representation of an ISCC
 
 ## Introduction
 
@@ -60,13 +57,13 @@ An ISCC permanently identifies the content of a given digital media object at mu
 
 ## ISCC Structure
 
-The ISCC Digest is a fixed size sequence of 32 bytes (256 bits) assembled from multiple sub-components. The printable ISCC Code is an [RFC 4648](https://tools.ietf.org/html/rfc4648#section-6) base32[^base32] encoded string representation of an ISCC Digest. This is a high-level overview of the ISCC creation process:
+The ISCC Digest is a fixed size sequence of 36 bytes (288 bits) assembled from multiple sub-components. The printable ISCC Code is a 52 character encoded string representation of an ISCC Digest. This is a high-level overview of the ISCC creation process:
 
 ![iscc-creation-process](images/iscc-creation-process.svg)
 
 ### Components
 
-The ISCC Digest is built from multiple self-describing 64-bit components:
+The ISCC Digest is built from multiple self-describing 72-bit components:
 
 
 | Components:     | Meta-ID             | Content-ID         | Data-ID              | Instance-ID    |
@@ -74,23 +71,28 @@ The ISCC Digest is built from multiple self-describing 64-bit components:
 | **Context:**    | Intangible creation | Content similarity | Data similarity      | Data checksum  |
 | **Input:**      | Metadata            | Extracted  content | Raw data             | Raw data       |
 | **Algorithms:** | Similarity Hash     | Type specific      | CDC, Similarity Hash | CDC, Hash Tree |
-| **Size:**       | 64 bits             | 64 bits            | 64 bits              | 64 bits        |
+| **Size:**       | 72 bits             | 72 bits            | 72 bits              | 72 bits        |
 
-Each component is guaranteed to fit into a 64-bit unsigned integer value. The components may be used independently by applications for various purposes but must be combined into a 52 character string (55 with hyphens) for a fully qualified ISCC code. The components must be combined in the fixed order of Meta-ID, Content-ID, Data-ID, Instance-ID and may be separated by hyphens.
+These components may be used independently by applications for various purposes but must be combined into a 52 character string (55 with hyphens) for a fully qualified ISCC Code. The components must be combined in the fixed order of Meta-ID, Content-ID, Data-ID, Instance-ID and may be separated by hyphens.
 
 !!! todo
 
     Describe coded format with prefix, colon, components +- hyphens
 ### Component Types
 
-Each component has the same basic structure of a 1-byte header and a 7-byte main section[^component-length]. Each component can thus be fit into a 64-bit integer value. The header-byte of each component is subdivided into 2 nibbles (4 bits). The first nibble specifies the component type while the second nibble is component specific.
+Each component has the same basic structure of a 1-byte header and a 8-byte main section. Each components main section can thus be fit into a 64-bit integer value for efficient data processing. The header-byte of each component is subdivided into 2 nibbles (4 bits). The first nibble specifies the component type while the second nibble is component specific.
 
-| Component     | Nibble-1 | Nibble-2                    | Byte     |
-| :------------ | :------- | :-------------------------- | :------- |
-| *Meta-ID*     | 0000     | 0000 - ISCC version (0)     | 0x00     |
-| *Content-ID*  | 0001     | 0000 - ContentType Text (0) | 0x10 ... |
-| *Data-ID*     | 0010     | 0000 - Reserved             | 0x20     |
-| *Instance-ID* | 0011     | 0000 - Reserved             | 0x30     |
+| Component              | Nibble-1 | Nibble-2                        | Byte |
+| :--------------------- | :------- | :------------------------------ | :--- |
+| *Meta-ID*              | 0000     | 0000 - ISCC version (0)         | 0x00 |
+| *Content-ID*-Text      | 0001     | 0000 - Content Type Text        | 0x10 |
+| *Content-ID-Text PCF*  | 0001     | 0001 - Content Type Text  + PCF | 0x11 |
+| *Content-ID-Image*     | 0001     | 0010 - Content Type Image       | 0x12 |
+| *Content-ID-Image PCF* | 0001     | 0011 - Content Type Image + PCF | 0x13 |
+| *Content-ID-Audio*     | 0001     | 0100 - Content Type Audio       | 0x14 |
+| *Content-ID-Audio PCF* | 0001     | 0101 - Content Type Audio + PCF | 0x15 |
+| *Data-ID*              | 0010     | 0000 - Reserved                 | 0x20 |
+| *Instance-ID*          | 0011     | 0000 - Reserved                 | 0x30 |
 
 ## Meta-ID
 

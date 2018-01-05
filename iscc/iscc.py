@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
-"""
-ISCC Reference Implementation
-"""
+"""ISCC Reference Implementation"""
 import re
 import base64
 from io import BytesIO
@@ -21,44 +19,16 @@ IDTABLE = str.maketrans(SYMBOLS, SYMBOLS)
 INPUT_TRIM = 128
 B = TypeVar('B', BinaryIO, bytes)
 
-
-def encode(digest: bytes) -> str:
-    assert len(digest) == 9, "ISCC component digest must be 9 bytes."
-    digest = reversed(digest)
-    value = 0
-    numvalues = 1
-    for octet in digest:
-        octet *= numvalues
-        value += octet
-        numvalues *= 256
-    chars = []
-    while numvalues > 0:
-        chars.append(value % 58)
-        value //= 58
-        numvalues //= 58
-    return str.translate(''.join([chr(c) for c in reversed(chars)]), V2CTABLE)
-
-
-def decode(code: str) -> bytes:
-    assert len(code) == 13, "ISCC component code must be 13 chars."
-    bit_length = 72
-    code = reversed(str.translate(code, C2VTABLE))
-    value = 0
-    numvalues = 1
-    for c in code:
-        c = ord(c)
-        c *= numvalues
-        value += c
-        numvalues *= 58
-
-    numvalues = 2 ** bit_length
-    data = []
-    while numvalues > 1:
-        data.append(value % 256)
-        value //= 256
-        numvalues //= 256
-
-    return bytes(reversed(data))
+# Component Type Header Markers
+HEAD_MID = b'\x00'
+HEAD_CID_T = b'\x10'
+HEAD_CID_T_PCF = b'\x11'
+HEAD_CID_I = b'\x12'
+HEAD_CID_I_PCF = b'\x13'
+HEAD_CID_A = b'\x14'
+HEAD_CID_A_PCF = b'\x15'
+HEAD_DID = b'\x20'
+HEAD_IID = b'\x30'
 
 
 def generate_meta_id(title: str, creators: str='', extra: str='', version: int=0) -> str:
@@ -80,7 +50,7 @@ def generate_meta_id(title: str, creators: str='', extra: str='', version: int=0
 
     hash_digests = [sha256(s.encode('utf-8')).digest() for s in n_grams]
     simhash_digest = similarity_hash(hash_digests)
-    meta_id_digest = b'\x00' + simhash_digest[:7]
+    meta_id_digest = HEAD_MID + simhash_digest[:7]
 
     return base64.b32encode(meta_id_digest).rstrip(b'=').decode('ascii')
 
@@ -89,7 +59,7 @@ def generate_instance_id(data: B) -> str:
 
     leaf_node_digests = [sha256d(b'\x00' + chunk) for chunk in data_chunks(data)]
     top_hash_digest = top_hash(leaf_node_digests)
-    instance_id_digest = b'\x30' + top_hash_digest[:7]
+    instance_id_digest = HEAD_IID + top_hash_digest[:7]
     return base64.b32encode(instance_id_digest).rstrip(b'=').decode('ascii')
 
 
@@ -307,3 +277,42 @@ def c2i(code):
 def hamming_distance(ident1: int, ident2: int) -> int:
 
     return bin(ident1 ^ ident2).count('1')
+
+
+def encode(digest: bytes) -> str:
+    assert len(digest) == 9, "ISCC component digest must be 9 bytes."
+    digest = reversed(digest)
+    value = 0
+    numvalues = 1
+    for octet in digest:
+        octet *= numvalues
+        value += octet
+        numvalues *= 256
+    chars = []
+    while numvalues > 0:
+        chars.append(value % 58)
+        value //= 58
+        numvalues //= 58
+    return str.translate(''.join([chr(c) for c in reversed(chars)]), V2CTABLE)
+
+
+def decode(code: str) -> bytes:
+    assert len(code) == 13, "ISCC component code must be 13 chars."
+    bit_length = 72
+    code = reversed(str.translate(code, C2VTABLE))
+    value = 0
+    numvalues = 1
+    for c in code:
+        c = ord(c)
+        c *= numvalues
+        value += c
+        numvalues *= 58
+
+    numvalues = 2 ** bit_length
+    data = []
+    while numvalues > 1:
+        data.append(value % 256)
+        value //= 256
+        numvalues //= 256
+
+    return bytes(reversed(data))
