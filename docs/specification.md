@@ -40,7 +40,7 @@ Digital Media Object
 :	A blob of raw bytes that with media type specific encoding. 
 
 Generic Media Type
-:	A basic digital content type such as UTF-8 encoded plain text or raw pixel data of images.
+:	A basic content type such as plain text in a normalized and *generic* ([UTF-8](https://en.wikipedia.org/wiki/UTF-8)) encoding format.
 
 ISCC
 :	International Standard Content Code
@@ -73,11 +73,17 @@ The ISCC Digest is built from multiple self-describing 72-bit components:
 | **Algorithms:** | Similarity Hash     | Type specific      | CDC, Similarity Hash | CDC, Hash Tree |
 | **Size:**       | 72 bits             | 72 bits            | 72 bits              | 72 bits        |
 
-These components may be used independently by applications for various purposes but must be combined into a 52 character string (55 with hyphens) for a fully qualified ISCC Code. The components must be combined in the fixed order of Meta-ID, Content-ID, Data-ID, Instance-ID and may be separated by hyphens.
+These components may be used independently by applications for various purposes but must be combined into a 52 character base58 encoded string (55 with hyphens) for a fully qualified ISCC Code. The components must be combined in the fixed order of Meta-ID, Content-ID, Data-ID, Instance-ID and may be separated by hyphens.
 
-!!! todo
+!!! examples
+    **Printable output:**
 
-    Describe coded format with prefix, colon, components +- hyphens
+    ISCC: 11cS7Y9NjD6DX-1DVcUdv5ewjDQ-1Qhwz8x54CShu-1d8uCbWCNbGWg
+
+    **Machine readable URI:**
+
+    iscc:11TcMGvUSzqoM1CqVA3ykFawyh1R1sH4Bz8A1of1d2Ju4VjWt26S
+
 ### Component Types
 
 Each component has the same basic structure of a 1-byte header and a 8-byte main section. Each components main section can thus be fit into a 64-bit integer value for efficient data processing. The header-byte of each component is subdivided into 2 nibbles (4 bits). The first nibble specifies the component type while the second nibble is component specific.
@@ -96,44 +102,48 @@ Each component has the same basic structure of a 1-byte header and a 8-byte main
 
 ## Meta-ID
 
-The Meta-ID is built from minimal and generic metadata of the content to be identified. All *text* information supplied to the META-ID generating function is assumed to be UTF-8 encoded. Errors that occur during the decoding of such a bytestring input to a native Unicode must terminate the process and must not be silenced. An ISCC generating application must provide a `generate_meta_id` function that accepts the following input fields:
+The Meta-ID is built from minimal and generic metadata of the content to be identified. All *text* information supplied to the META-ID generating function is assumed to be UTF-8 encoded. Errors that occur during the decoding of such a bytestring input to a native Unicode must terminate the process and must not be silenced. An ISCC generating application must provide a `generate_meta_id` function that accepts the following inputs:
 
-| Name                  | Type    | Required | Description                              |
-| :-------------------- | :------ | :------- | :--------------------------------------- |
-| *title*               | text    | Yes      | The title of an intangible creation.     |
-| *creators*[^creators] | text    | No       | One or more semicolon separated names of the original creators of the content. |
+| Name                  | Type    | Required | Description                                                  |
+| :-------------------- | :------ | :------- | :----------------------------------------------------------- |
+| *title*               | text    | Yes      | The title of an intangible creation.                         |
 | *extra*               | text    | No       | A short statement that distinguishes this intangible creation from another one. |
-| version               | integer | No       | ISCC version number.                     |
+| version               | integer | No       | ISCC version number (default: 0)                             |
 
-The `generate_meta_id` function must return a valid base32 encoded Meta-ID component without padding.
+The `generate_meta_id` function must return a valid `base58-iscc` encoded Meta-ID component.
 
 ### Generate Meta-ID
 
 An ISCC generating application must follow these steps in the given order to produce a stable Meta-ID:
 
-1. Apply Unicode standard [Normalization Form KC (NFKC)](http://www.unicode.org/reports/tr15/#Norm_Forms) separately to all text input values.
-2. Remove all pairs of brackets  `[]`,  `()`,  `{}`, and text inbetween them from `title` and `creators` fields.
-3. Trim all text fields, such that their UTF-8 encoded byte representation does not exceed 128-bytes each. The trim point must be such, that it does not cut into multibyte characters. This is necessary because the results of this operation will be stored as base metadata with strict byte size limits on the blockchain.
-4. Cut all text after the first occurence of a semicolon (`;`) if that semicolon is after the first 25 characters of text.
-5. Apply [`normalize_text`](#normalize-text) to the trimmed `title` input value.
-6. Apply [`normalize_creators`](#normalize-creators) to the trimmed `creators` input value.
-7. Apply [`normalize_text`](#normalize-text) to the trimmed `extra` input value.
-8. Concatenate the results of step 3, 4 and 5 in ascending order.
-9. Create a list of 4 character [n-grams](https://en.wikipedia.org/wiki/N-gram) by sliding character-wise through the result of step 6.
-10. Encode each n-gram from step 7 to an UTF-8 bytestring and calculate its sha256 digest.
-11. Apply [`similarity_hash`](#similarity-hash) to the list of sha256 digests from step 8.
-12. Trim the resulting byte sequence to the first 7 bytes.
-13. Prepend the 1-byte component header according to component type and ISCC version (e.g. `0x00`).
-14. Encode the resulting 8 byte sequence with base32 (no-padding) and return the result.
+1. Apply Unicode standard [Normalization Form KC (NFKC)](http://www.unicode.org/reports/tr15/#Norm_Forms) separately to the  `title` and `extra` inputs.
+2. Trim `title` and `extra`, such that their UTF-8 encoded byte representation does not exceed 128-bytes each. *The results of this step must be supplied as basic metadata for ISCC registration.*
+3. Apply [`normalize_text`](#normalize-text) to the trimmed `title` and `extra` values.
+4. Concatenate normalized `title` and `extra` from step 3 using a space ( `\u0020`) as a seperator.
+5. Create a list of 4 character [n-grams](https://en.wikipedia.org/wiki/N-gram) by sliding character-wise through the result of step 4.
+6. Encode each n-gram from step 5 to an UTF-8 bytestring and calculate its sha256 digest.
+7. Apply [`similarity_hash`](#similarity-hash) to the list of sha256 digests from step 6.
+8. Trim the resulting byte sequence to the first 8 bytes and prepend the 1-byte component header according to component type and ISCC version (e.g. `0x00`).
+15. Encode the resulting 9 byte sequence with `base58_iscc` and return the result.
 
 
-### Dealing with collisions
+!!! warning "Text trimming"
+    When trimming text be sure to trim the byte-length of the UTF-8 encoded version and not the number of characters. The trim point must be such, that it does not cut into multibyte characters. Characters might have different UTF-8 byte-length. For example `ü` is 2-bytes, `驩` is 3-bytes and `𠜎` is 4-bytes. So the trimmed version of a string with 128 `驩`-characters will result in a 42-character string with a 126-byte UTF-8 encoded length. This is necessary because the results of this operation will be stored as base metadata with strict byte size limits on the blockchain. 
 
-Ideally we want multiple ISCCs that identify different manifestations of the *same intangible creation* to be automatically grouped by an identical leading Meta-ID component. We call such a natural grouping an **intended collision**. Metadata, captured and edited by humans, is notoriously unreliable. By using normalization and a similarity hash on the metadata we account for some of this variation while keeping the Meta-ID component stable. 
+!!! tip "Preliminary normalization"
+    Applications that perform automated dataingestion should apply a custimized preliminary normalization to title data tailored to the dataset. Depending on catalog data removing pairs of brackets [], (), {}, and text inbetween them or cutting all text after the first occurence of a semicolon (;) or colon (:) can vastly improve de-duplication. 
 
-Auto-generated Meta-IDs components are **expected** to miss some intended collisions. An application should check for such **missed intended collisions** before registering a new Meta-ID with the *canonical registry* of ISCCs by conducting a similarity search and asking for user feedback.
+!!! note "Component tails"
+    We call the last 192-bits of the resulting 256-bit fingerprint from step 7 a **component tail**. The component tail **may** optionally be stored or processed by applications that require higher resolution bit-vectors.
 
-But what about **unintended collisions**? Such collisions might happen because two *different intangible creations* have very similar or even identical metadata. But they might also happen simply by chance. With 2^56 possibile Meta-ID components the probability of random collisions rises in an S-cuved shape with the number of deployed ISCCs (see: [Hash Collision Probabilities](http://preshing.com/20110504/hash-collision-probabilities/)).  We should keep in mind that, the Meta-ID component is only one part of an ISCC. Sporadic unintended collisions of the Meta-ID component are generally deemed as **acceptable and expected**. 
+
+### Dealing with Meta-ID collisions
+
+Ideally we want multiple ISCCs that identify different manifestations of the *same intangible creation* to be automatically grouped by an identical leading Meta-ID component. We call such a natural grouping an **intended component collision**. Metadata, captured and edited by humans, is notoriously unreliable. By using normalization and a similarity hash on the metadata we account for some of this variation while keeping the Meta-ID component somewhat stable. 
+
+Auto-generated Meta-IDs components are **expected** to miss some intended collisions. An application should check for such **missed intended component collisions** before registering a new Meta-ID with the *canonical registry* of ISCCs by conducting a similarity search and asking for user feedback.
+
+But what about **unintended component collisions**? Such collisions might happen because two *different intangible creations* have very similar or even identical metadata. But they might also happen simply by chance. With 2^56 possibile Meta-ID components the probability of random collisions rises in an S-cuved shape with the number of deployed ISCCs (see: [Hash Collision Probabilities](http://preshing.com/20110504/hash-collision-probabilities/)).  We should keep in mind that, the Meta-ID component is only one part of a fully qualified ISCC Code. Sporadic unintended collisions of the Meta-ID component are generally deemed as **acceptable and expected**. 
 
 If for any reason an application wants to avoid unintended collisions with pre-existing Meta-ID components it may utilze the `extra`-field. An application must first generate a Meta-ID without asking the user for input to the `extra`-field and then first check for collisions with the *canonical registry* of ISCCs. After it finds a collision with a pre-existing Meta-ID it may display the metadata of the colliding entry and interact with the user to determine if it indeed is an unintended collision. Only if the user indicates an unintended collision, may the application ask for a disambiguation that is than added as an ammendment to the metadata via the `extra`-field to create a different Meta-ID component. The application may repeat the pre-existence check until it finds no collision or a user intended collision. The application must not supply autogenerated input to the `extra`-field.
 
@@ -289,7 +299,7 @@ def similarity_hash(hash_digests: Sequence[ByteString]) -> ByteString:
 
 [^tophash]: **Instance-ID binding:** We might add an additional step to the final Instance-ID component by hashing the concatenation of the preceeding components and the **top-hash**. This would bind the Instance-ID to the other components. But this would also chainge its semantics to encode integrity of data and metadata together.
 
-*[ISCC Code]: Base32 encoded representation of an ISCC
+*[ISCC Code]: Base58-iscc encoded representation of an ISCC
 
 *[ISCC Digest]: Raw binary data of an ISCC
 
