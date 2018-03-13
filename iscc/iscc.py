@@ -5,7 +5,7 @@ import base64
 from io import BytesIO
 from hashlib import sha256
 import unicodedata
-from typing import List, ByteString, Sequence, BinaryIO, TypeVar, Generator
+from typing import List, ByteString, Sequence, BinaryIO, TypeVar, Generator, Union
 import math
 from PIL import Image
 from iscc.const import CHUNKING_GEAR
@@ -17,6 +17,7 @@ C2VTABLE = str.maketrans(SYMBOLS, VALUES)
 V2CTABLE = str.maketrans(VALUES, SYMBOLS)
 IDTABLE = str.maketrans(SYMBOLS, SYMBOLS)
 INPUT_TRIM = 128
+NGRAM_SIZE_META_ID = 4
 B = TypeVar('B', BinaryIO, bytes)
 
 # Component Type Header Markers
@@ -31,28 +32,56 @@ HEAD_DID = b'\x20'
 HEAD_IID = b'\x30'
 
 
-def generate_meta_id(title: str, creators: str='', extra: str='', version: int=0) -> str:
+def generate_meta_id(title: Union[str, bytes], extra: Union[str, bytes]='', version: int=0) -> str:
 
-    assert version == 0, "Only version 1 supported"
+    assert version == 0, "Only version 0 supported"
 
-    title, creators, extra = trim(title, creators, extra)
+    # 1. Apply Unicode NFKC normalization separately to all text input values.
+    title = pre_normalize(title)
+    extra = pre_normalize(extra)
 
+    # 2. Trim title and extra
+    title = trim(title)
+    extra = trim(extra)
+
+    # 3. Apply `normalize_text` to all trimmed input values
     title = normalize_text(title)
-    creators = normalize_creators(creators)
     extra = normalize_text(extra)
 
-    concat = '\u0020'.join((title, creators, extra)).rstrip('\u007C')
+    # 4. Concatenate
+    concat = '\u0020'.join((title, extra)).strip()
 
-    a = sliding_window(concat, width=2) * 3
-    b = sliding_window(concat, width=3) * 2
-    c = sliding_window(concat, width=4)
-    n_grams = a + b + c
+    # 5. Create a list of n-grams
+    n_grams = sliding_window(concat, width=NGRAM_SIZE_META_ID)
 
+    # 6. Encode n-grams and create sha256-digests
     hash_digests = [sha256(s.encode('utf-8')).digest() for s in n_grams]
-    simhash_digest = similarity_hash(hash_digests)
-    meta_id_digest = HEAD_MID + simhash_digest[:7]
 
-    return base64.b32encode(meta_id_digest).rstrip(b'=').decode('ascii')
+    # 7. Apply similarity_hash
+    simhash_digest = similarity_hash(hash_digests)
+
+    # 8. Trim and prepend header-byte
+    meta_id_digest = HEAD_MID + simhash_digest[:8]
+
+    # 9. Encode with base58_iscc
+    return encode(meta_id_digest)
+
+
+def pre_normalize(text: Union[str, bytes]) -> str:
+    """Decode byte-string and apply NFKC normalization."""
+    if isinstance(text, bytes):
+        text = text.decode('utf-8')
+    return unicodedata.normalize('NFKC', text)
+
+
+def trim(text: str) -> str:
+    """Trim text so utf-8 encoded bytes do not exceed INPUT_TRIM size."""
+    while True:
+        data = text.encode('utf-8')
+        if len(data) <= INPUT_TRIM:
+            return text
+        else:
+            text = text[:-1]
 
 
 def generate_instance_id(data: B) -> str:
@@ -179,14 +208,6 @@ def normalize_creators(text: str) -> str:
     return '\u0020'.join(sorted(creators))
 
 
-def trim(*text: str) -> List[str]:
-
-    trimmed = []
-    for t in text:
-        trimmed.append(unicodedata.normalize('NFKC', t)[:INPUT_TRIM])
-    return trimmed
-
-
 def sliding_window(text: str, width: int) -> List:
 
     assert width >= 2, "Sliding window width must be 2 or bigger."
@@ -277,6 +298,12 @@ def c2i(code):
 def hamming_distance(ident1: int, ident2: int) -> int:
 
     return bin(ident1 ^ ident2).count('1')
+
+
+def component_hamming_distance(component1: str, component2: str):
+    c1 = int.from_bytes(decode(component1)[1:], 'big', signed=False)
+    c2 = int.from_bytes(decode(component2)[1:], 'big', signed=False)
+    return hamming_distance(c1, c2)
 
 
 def encode(digest: bytes) -> str:

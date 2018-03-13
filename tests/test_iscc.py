@@ -16,15 +16,18 @@ def test_decode():
 
 def test_generate_meta_id():
 
-    mid1 = iscc.generate_meta_id('Die Unendliche Geschichte', 'Michael Ende')
+    mid1 = iscc.generate_meta_id('Die Unendliche Geschichte')
     assert len(mid1) == 13
-    assert mid1 == 'AB2GMJUABNYWW'
+    assert "11jm9wZFS2NxJ" == mid1
 
-    mid2 = iscc.generate_meta_id('Die Unendliche Geschichte', 'Ende, Michael')
+    mid2 = iscc.generate_meta_id(' Die unéndlíche,  Geschichte ')
     assert mid1 == mid2
 
-    mid3 = iscc.generate_meta_id('Die Unéndliche Geschichte', 'Ende, M.')
-    assert mid1 == mid3
+    mid3 = iscc.generate_meta_id('Die Unentliche Geschichte')
+    assert 13 == iscc.component_hamming_distance(mid1, mid3)
+
+    mid4 = iscc.generate_meta_id('Geschichte, Die Unendliche')
+    assert 10 == iscc.component_hamming_distance(mid1, mid4)
 
 
 def test_normalize_text():
@@ -52,14 +55,20 @@ def test_normalize_creators():
 
 
 def test_trim():
-    text = 'ABC' * 200
-    trimmed = iscc.trim(text)[0]
-    assert len(trimmed) == 128
+    multibyte_2 = 'ü' * 128
+    trimmed = iscc.trim(multibyte_2)
+    assert 64 == len(trimmed)
+    assert 128 == len(trimmed.encode('utf-8'))
 
-    text = 'Iñtërnâtiônàlizætiøn☃💩'
-    raw_len = len(text)
-    trimmed = iscc.trim(text)[0]
-    assert raw_len == len(trimmed)
+    multibyte_3 = "驩" * 128
+    trimmed = iscc.trim(multibyte_3)
+    assert 42 == len(trimmed)
+    assert 126 == len(trimmed.encode('utf-8'))
+
+    mixed = 'Iñtërnâtiônàlizætiøn☃💩' * 6
+    trimmed = iscc.trim(mixed)
+    assert 85 == len(trimmed)
+    assert 128 == len(trimmed.encode('utf-8'))
 
 
 def test_sliding_window():
@@ -108,31 +117,31 @@ def test_hamming_distance():
     b = 0b1000111
     assert iscc.hamming_distance(a, b) == 2
 
-    mid1 = iscc.c2i(iscc.generate_meta_id('Die Unendliche Geschichte', 'Michael Ende'))
+    mid1 = iscc.generate_meta_id('Die Unendliche Geschichte', 'von Michael Ende')
 
     # Change one Character
-    mid2 = iscc.c2i(iscc.generate_meta_id('Die UnXndliche Geschichte', 'Michael Ende'))
-    assert iscc.hamming_distance(mid1, mid2) <= 5
+    mid2 = iscc.generate_meta_id('Die UnXndliche Geschichte', 'von Michael Ende')
+    assert iscc.component_hamming_distance(mid1, mid2) <= 10
 
     # Delete one Character
-    mid2 = iscc.c2i(iscc.generate_meta_id('Die nendliche Geschichte', 'Michael Ende'))
-    assert iscc.hamming_distance(mid1, mid2) <= 5
+    mid2 = iscc.generate_meta_id('Die nendliche Geschichte', 'von Michael Ende')
+    assert iscc.component_hamming_distance(mid1, mid2) <= 14
 
     # Add one Character
-    mid2 = iscc.c2i(iscc.generate_meta_id('Die UnendlicheX Geschichte', 'Michael Ende'))
-    assert iscc.hamming_distance(mid1, mid2) <= 5
+    mid2 = iscc.generate_meta_id('Die UnendlicheX Geschichte', 'von Michael Ende')
+    assert iscc.component_hamming_distance(mid1, mid2) <= 13
 
     # Add, change, delete
-    mid2 = iscc.c2i(iscc.generate_meta_id('Diex Unandlische Geschiche', 'Michael Ende'))
-    assert iscc.hamming_distance(mid1, mid2) <= 8
+    mid2 = iscc.generate_meta_id('Diex Unandlische Geschiche', 'von Michael Ende')
+    assert iscc.component_hamming_distance(mid1, mid2) <= 18
 
     # Change Word order
-    mid2 = iscc.c2i(iscc.generate_meta_id('Unendliche Geschichte, Die', 'Michael Ende'))
-    assert iscc.hamming_distance(mid1, mid2) <= 5
+    mid2 = iscc.generate_meta_id('Unendliche Geschichte, Die', 'von Michael Ende')
+    assert iscc.component_hamming_distance(mid1, mid2) <= 13
 
     # Totaly different
-    mid2 = iscc.c2i(iscc.generate_meta_id('Now for something different'))
-    assert iscc.hamming_distance(mid1, mid2) >= 30
+    mid2 = iscc.generate_meta_id('Now for something different')
+    assert iscc.component_hamming_distance(mid1, mid2) >= 30
 
 
 def test_generate_instance_id():
