@@ -22,7 +22,7 @@ theme:
         primary: 'blue'
         accent: 'pink'
     font:
-        text: 'Merriweather Sans'
+        text: 'Roboto'
         code: 'Inconsolata'
     feature:
         tabs: false
