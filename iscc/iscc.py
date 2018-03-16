@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
 """ISCC Reference Implementation"""
 import re
+import math
 import base64
 from io import BytesIO
 from hashlib import sha256
 import unicodedata
 from typing import List, ByteString, Sequence, BinaryIO, TypeVar, Generator, Union
-import math
 from PIL import Image
 from iscc.const import CHUNKING_GEAR
 
@@ -15,7 +15,6 @@ SYMBOLS = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz"
 VALUES = ''.join([chr(i) for i in range(58)])
 C2VTABLE = str.maketrans(SYMBOLS, VALUES)
 V2CTABLE = str.maketrans(VALUES, SYMBOLS)
-IDTABLE = str.maketrans(SYMBOLS, SYMBOLS)
 INPUT_TRIM = 128
 NGRAM_SIZE_META_ID = 4
 B = TypeVar('B', BinaryIO, bytes)
@@ -64,7 +63,7 @@ def generate_meta_id(title: Union[str, bytes], extra: Union[str, bytes]='', vers
     meta_id_digest = HEAD_MID + simhash_digest[:8]
 
     # 9. Encode with base58_iscc
-    return encode(meta_id_digest)
+    return encode_component(meta_id_digest)
 
 
 def pre_normalize(text: Union[str, bytes]) -> str:
@@ -301,12 +300,12 @@ def hamming_distance(ident1: int, ident2: int) -> int:
 
 
 def component_hamming_distance(component1: str, component2: str):
-    c1 = int.from_bytes(decode(component1)[1:], 'big', signed=False)
-    c2 = int.from_bytes(decode(component2)[1:], 'big', signed=False)
+    c1 = int.from_bytes(decode_component(component1)[1:], 'big', signed=False)
+    c2 = int.from_bytes(decode_component(component2)[1:], 'big', signed=False)
     return hamming_distance(c1, c2)
 
 
-def encode(digest: bytes) -> str:
+def encode_component(digest: bytes) -> str:
     assert len(digest) == 9, "ISCC component digest must be 9 bytes."
     digest = reversed(digest)
     value = 0
@@ -323,7 +322,7 @@ def encode(digest: bytes) -> str:
     return str.translate(''.join([chr(c) for c in reversed(chars)]), V2CTABLE)
 
 
-def decode(code: str) -> bytes:
+def decode_component(code: str) -> bytes:
     assert len(code) == 13, "ISCC component code must be 13 chars."
     bit_length = 72
     code = reversed(str.translate(code, C2VTABLE))

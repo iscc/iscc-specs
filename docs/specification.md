@@ -37,7 +37,7 @@ Character
 :	Throughout this specification a **character** is meant to be interpreted as one Unicode code point. This also means that due to the structure of Unicode a character is not necessarily a full glyph but might be a combining accent or similar.
 
 Digital Media Object
-:	A blob of raw bytes that with media type specific encoding. 
+:	A blob of raw bytes with some media type specific encoding. 
 
 Generic Media Type
 :	A basic content type such as plain text in a normalized and *generic* ([UTF-8](https://en.wikipedia.org/wiki/UTF-8)) encoding format.
@@ -79,9 +79,9 @@ These components may be used independently by applications for various purposes 
     **Printable output:**
 
     ISCC: 11cS7Y9NjD6DX-1DVcUdv5ewjDQ-1Qhwz8x54CShu-1d8uCbWCNbGWg
-
+    
     **Machine readable URI:**
-
+    
     iscc:11TcMGvUSzqoM1CqVA3ykFawyh1R1sH4Bz8A1of1d2Ju4VjWt26S
 
 ### Component Types
@@ -110,7 +110,7 @@ The Meta-ID is built from minimal and generic metadata of the content to be iden
 | *extra*               | text    | No       | A short statement that distinguishes this intangible creation from another one. |
 | version               | integer | No       | ISCC version number (default: 0)                             |
 
-The `generate_meta_id` function must return a valid `base58-iscc` encoded Meta-ID component.
+The `generate_meta_id` function must return a valid [Base58-ISCC encoded](#base58-iscc-encoding) Meta-ID component.
 
 ### Generate Meta-ID
 
@@ -124,7 +124,7 @@ An ISCC generating application must follow these steps in the given order to pro
 6. Encode each n-gram from step 5 to an UTF-8 bytestring and calculate its sha256 digest.
 7. Apply [`similarity_hash`](#similarity-hash) to the list of sha256 digests from step 6.
 8. Trim the resulting byte sequence to the first 8 bytes and prepend the 1-byte component header according to component type and ISCC version (e.g. `0x00`).
-15. Encode the resulting 9 byte sequence with `base58_iscc` and return the result.
+9. Encode the resulting 9 byte sequence with [Base58-ISCC Encoding](#base58-iscc-encoding) and return the result.
 
 
 !!! warning "Text trimming"
@@ -178,13 +178,24 @@ the Meta-, Data-, and Instance-IDs are the compound key for the magazine issue, 
 The Content-ID-Text is built from the extracted plain-text content of an encoded media object. To build a stable Content-ID-Text the plain text content must be extracted in a way that is reproducible. To make this possible we specify that the plain-text content must be extracted with [Apache Tika v1.16](https://tika.apache.org/). An ISCC generating application must provide a `generate_content_id_text(text, partial=False)` function that accepts UTF-8 encoded plain text and an boolean partial content flag as input and returns a Content-ID with GMT type `text`. The procedure to create a Content-ID-Text is as follows:
 
 1. Apply [`normalize_text`](#normalize-text) to the text input.
+
 2. Split the text into a list of words at whitespace boundaries.
+
 3. Create a list of 5 word shingles by sliding word-wise through the list of words.
+
 4. Apply `minhash` to the resulting list of shingles
+
 5. Apply [`similarity_hash`](#similarity-hash) to the list of digests returned from step 4.
+
 6. Trim the resulting byte sequence to the first 7 bytes
+
 7. Prepend the 1-byte component header (`0x10` full content, `0x11` partial content)
-8. Encode the resulting 8-byte sequence with base32 (no-padding) and return the result
+
+8. Encode the resulting 8-byte sequence with Base58
+
+   [undefined]: 
+
+   -ISCC Encoding and return the result
 
 ### Reference Code (CID-T)
 
@@ -223,8 +234,66 @@ Applications may carry, store, and process the full hash-tree for advanced parti
 
 
 
-
 ## Procedures & Algorithms
+
+### Base58-ISCC Encoding
+
+The ISCC uses a custom per-component data encoding that is based on the [zbase62](https://github.com/simplegeo/zbase62) encoding by [Zooko Wilcox-O'Hearn](https://en.wikipedia.org/wiki/Zooko_Wilcox-O%27Hearn). The encoding does not require padding and will allways yield codes of 13 characters length for our 72-bit component digests. The fixed-length encoding allows us to easily decode a fully qualified ISCC-Code without having to rely on a hypen as separator. The symbol table also minimizes transcription and OCR errors by omitting the easily confused characters `'O', '0', 'I', 'l'`.
+
+#### encode_component(digest)
+
+The `encode_component` function accepts a 9-byte **ISCC Component Digest** and returns the Base58-ISCC encoded  alphanumeric string of 13 characters which we call the **ISCC-Component Code**.
+
+#### decode_component(code)
+
+the `decode_component` function accepts a 13-character **ISCC-Component Code** and returns the corresponding 9-byte **ISCC-Component Digest**.
+
+#### Base58-ISCC Reference Code:
+
+```python
+SYMBOLS = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz"
+VALUES = ''.join([chr(i) for i in range(58)])
+V2CTABLE = str.maketrans(VALUES, SYMBOLS)
+C2VTABLE = str.maketrans(SYMBOLS, VALUES)
+
+def encode_component(digest: bytes) -> str:
+    assert len(digest) == 9, "ISCC component digest must be 9 bytes."
+    digest = reversed(digest)
+    value = 0
+    numvalues = 1
+    for octet in digest:
+        octet *= numvalues
+        value += octet
+        numvalues *= 256
+    chars = []
+    while numvalues > 0:
+        chars.append(value % 58)
+        value //= 58
+        numvalues //= 58
+    return str.translate(''.join([chr(c) for c in reversed(chars)]), V2CTABLE)
+
+def decode_component(code: str) -> bytes:
+    assert len(code) == 13, "ISCC component code must be 13 chars."
+    bit_length = 72
+    code = reversed(str.translate(code, C2VTABLE))
+    value = 0
+    numvalues = 1
+    for c in code:
+        c = ord(c)
+        c *= numvalues
+        value += c
+        numvalues *= 58
+    numvalues = 2 ** bit_length
+    data = []
+    while numvalues > 1:
+        data.append(value % 256)
+        value //= 256
+        numvalues //= 256
+    return bytes(reversed(data))
+```
+
+
+
 
 ### Normalize Text
 

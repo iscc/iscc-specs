@@ -2,15 +2,15 @@
 from iscc import iscc
 
 
-def test_encode():
+def test_encode_component():
     digest = bytes.fromhex('f7d3a5b201dc92f7a7')
-    code = iscc.encode(digest)
+    code = iscc.encode_component(digest)
     assert code == '49xmrMuRWRT2v'
 
 
 def test_decode():
     code = '49xmrMuRWRT2v'
-    digest = iscc.decode(code)
+    digest = iscc.decode_component(code)
     assert digest.hex() == 'f7d3a5b201dc92f7a7'
 
 
