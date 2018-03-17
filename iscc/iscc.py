@@ -1,14 +1,18 @@
 # -*- coding: utf-8 -*-
 """ISCC Reference Implementation"""
 import re
+import struct
+from itertools import islice
 import math
 import base64
 from io import BytesIO
-from hashlib import sha256
+from hashlib import sha256, sha1
 import unicodedata
-from typing import List, ByteString, Sequence, BinaryIO, TypeVar, Generator, Union
+from typing import List, ByteString, Sequence, BinaryIO, TypeVar, Generator, Union, Iterable
 from PIL import Image
-from iscc.const import CHUNKING_GEAR
+from copy import copy, deepcopy
+
+from iscc.const import CHUNKING_GEAR, MINHASH_PERMUTATIONS
 
 # Constants
 SYMBOLS = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz"
@@ -36,8 +40,13 @@ def generate_meta_id(title: Union[str, bytes], extra: Union[str, bytes]='', vers
     assert version == 0, "Only version 0 supported"
 
     # 1. Apply Unicode NFKC normalization separately to all text input values.
-    title = pre_normalize(title)
-    extra = pre_normalize(extra)
+    if isinstance(title, bytes):
+        title = title.decode('utf-8')
+    title = unicodedata.normalize('NFKC', title)
+
+    if isinstance(extra, bytes):
+        extra = extra.decode('utf-8')
+    extra = unicodedata.normalize('NFKC', extra)
 
     # 2. Trim title and extra
     title = trim(title)
@@ -66,11 +75,51 @@ def generate_meta_id(title: Union[str, bytes], extra: Union[str, bytes]='', vers
     return encode_component(meta_id_digest)
 
 
-def pre_normalize(text: Union[str, bytes]) -> str:
-    """Decode byte-string and apply NFKC normalization."""
+def generate_content_id_text(text: Union[str, bytes], partial=False) -> str:
+
+    # 1. Apply Unicode NFKC normalization
     if isinstance(text, bytes):
         text = text.decode('utf-8')
-    return unicodedata.normalize('NFKC', text)
+    text = unicodedata.normalize('NFKC', text)
+
+    # 2. Apply `normalize_text`
+    text = normalize_text(text)
+
+    # 3. Split to words
+    words = text.split()
+
+    # 4. Create 5 word shingles
+    shingles = ('\u0020'.join(l) for l in sliding_window(words, 5))
+
+    hashed_shingles = (sha1(s.encode('utf-8')).digest() for s in shingles)
+
+    # 5. Create 32bit features from shingles
+
+    features = (struct.unpack('<I', h[:4])[0] for h in hashed_shingles)
+
+    # 6. Apply minimum_hash
+    minhash_vector = minimum_hash(features)
+
+    # 7. Convert to list of 4-byte digests
+    byte_features = (struct.pack('<I', i) for i in minhash_vector)
+
+    # 8. Create a list of 256-bit digests
+    hash_digests = tuple(join_bytes(byte_features, n=8))
+
+    # 9. Apply similarity_hash
+    simhash_digest = similarity_hash(hash_digests)
+
+    # 10. Trim  to the first 8 bytes
+    body = simhash_digest[:8]
+
+    # 11. Prepend the 1-byte component header
+    if partial:
+        content_id_text_digest = HEAD_CID_T_PCF + body
+    else:
+        content_id_text_digest = HEAD_CID_T + body
+
+    # 12 Encode and return
+    return encode_component(content_id_text_digest)
 
 
 def trim(text: str) -> str:
@@ -207,11 +256,40 @@ def normalize_creators(text: str) -> str:
     return '\u0020'.join(sorted(creators))
 
 
-def sliding_window(text: str, width: int) -> List:
-
+def sliding_window(text: Sequence, width: int) -> List:
     assert width >= 2, "Sliding window width must be 2 or bigger."
     idx = range(max(len(text) - width + 1, 1))
     return [text[i:i + width] for i in idx]
+
+
+def join_bytes(seq: Iterable[bytes], n=8) -> Iterable[bytes]:
+    """Returns concatenated byte strings of window size n"""
+    it = iter(seq)
+    result = tuple(islice(it, n))
+    if len(result) == n:
+        yield b''.join(result)
+    for elem in it:
+        result = result[1:] + (elem,)
+        yield b''.join(result)
+
+
+def minimum_hash(features: Iterable[int]) -> List[int]:
+
+    max_int64 = (1 << 64) - 1
+    mersenne_prime = (1 << 61) - 1
+    max_hash = (1 << 32) - 1
+    hashvalues = [max_hash] * 128
+    permutations = deepcopy(MINHASH_PERMUTATIONS)
+    a, b = permutations
+
+    for hv in features:
+        nhs = []
+        for x in range(128):
+            nh = (((a[x] * hv + b[x]) & max_int64) % mersenne_prime) & max_hash
+            nhs.append(min(nh, hashvalues[x]))
+        hashvalues = nhs
+
+    return hashvalues
 
 
 def similarity_hash(hash_digests: Sequence[ByteString]) -> ByteString:
@@ -306,7 +384,9 @@ def component_hamming_distance(component1: str, component2: str):
 
 
 def encode_component(digest: bytes) -> str:
-    assert len(digest) == 9, "ISCC component digest must be 9 bytes."
+    if len(digest) == 9:
+        return encode_component(digest[:1]) + encode_component(digest[1:])
+    assert len(digest) in (1, 8), "Digest must be 1, 8 or 9 bytes long"
     digest = reversed(digest)
     value = 0
     numvalues = 1
@@ -323,8 +403,15 @@ def encode_component(digest: bytes) -> str:
 
 
 def decode_component(code: str) -> bytes:
-    assert len(code) == 13, "ISCC component code must be 13 chars."
-    bit_length = 72
+    n = len(code)
+    if n == 13:
+        return decode_component(code[:2]) + decode_component(code[2:])
+    if n == 2:
+        bit_length = 8
+    elif n == 11:
+        bit_length = 64
+    else:
+        raise ValueError('Code must be 2, 11 or 13 chars. Not %s' % n)
     code = reversed(str.translate(code, C2VTABLE))
     value = 0
     numvalues = 1
@@ -333,12 +420,10 @@ def decode_component(code: str) -> bytes:
         c *= numvalues
         value += c
         numvalues *= 58
-
     numvalues = 2 ** bit_length
     data = []
     while numvalues > 1:
         data.append(value % 256)
         value //= 256
         numvalues //= 256
-
     return bytes(reversed(data))

@@ -100,9 +100,9 @@ Each component has the same basic structure of a 1-byte header and a 8-byte main
 | *Data-ID*              | 0010     | 0000 - Reserved                 | 0x20 |
 | *Instance-ID*          | 0011     | 0000 - Reserved                 | 0x30 |
 
-## Meta-ID
+## Meta-ID Component
 
-The Meta-ID is built from minimal and generic metadata of the content to be identified. All *text* information supplied to the META-ID generating function is assumed to be UTF-8 encoded. Errors that occur during the decoding of such a bytestring input to a native Unicode must terminate the process and must not be silenced. An ISCC generating application must provide a `generate_meta_id` function that accepts the following inputs:
+The Meta-ID component is built from minimal and generic metadata of the content to be identified. All *text* information supplied to the META-ID generating function is assumed to be UTF-8 encoded. Errors that occur during the decoding of such a bytestring input to a native Unicode must terminate the process and must not be silenced. An ISCC generating application must provide a `generate_meta_id` function that accepts the following inputs:
 
 | Name                  | Type    | Required | Description                                                  |
 | :-------------------- | :------ | :------- | :----------------------------------------------------------- |
@@ -151,11 +151,11 @@ It is our opinion that the concept of **intended collisions** of Meta-ID compone
 
 ## Content-ID
 
-The Content-ID component has multiple subtypes. Except for the *mixed type* all subtypes correspond with the **Generic Media Types**. A fully qualified ISCC can only have a Content-ID component of one specific type, but there can be multiple ISCCs with different Content-ID types per digital media object.
+The Content-ID component has multiple subtypes. The subtypes correspond with the **Generic Media Types (GMT)**. A fully qualified ISCC can only have a Content-ID component of one specific GMT, but there can be multiple ISCCs with different Content-ID types per digital media object.
 
 A Content-ID is generated in two broad steps. In the first step, we extract and convert content from a rich media type to a normalized GMT. In the second step, we use a GMT-specific process to generate the Content-ID component of an ISCC. 
 
-### Content-ID Types
+### Generic Media Types
 
 The  Content-ID type is signaled by the first 3 bits of the second nibble of the first byte of the Content-ID:
 
@@ -168,40 +168,66 @@ The  Content-ID type is signaled by the first 3 bits of the second nibble of the
 | mixed          | 100               |
 | Reserved       | 101, 110, 111     |
 
-### Partial Content Flag (PCF)
-
-The last bit of the header byte is the "Partial Content Flag". It designates if the Content-ID applies to the full content or just some part of it. The PCF must be set as a `0`-bit (full GMT-specific content) by default. Setting the PCF to `1` enables applications to create multiple ISCCs for partial extracts of one and the same digital file. The exact semantics of *partial content* are outside of the scope of this specification. Applications that plan to support partial Content-IDs should clearly define their semantics. For example, an application might create separate ISCC for the text contents of multiple articles of a magazine issue. In such a scenario
-the Meta-, Data-, and Instance-IDs are the compound key for the magazine issue, while the Content-ID-Text component distinguishes the different articles of the issue. The different Content-ID-Text components would automatically be "bound" together by the other 3 components.
-
 ### Content-ID-Text
 
-The Content-ID-Text is built from the extracted plain-text content of an encoded media object. To build a stable Content-ID-Text the plain text content must be extracted in a way that is reproducible. To make this possible we specify that the plain-text content must be extracted with [Apache Tika v1.16](https://tika.apache.org/). An ISCC generating application must provide a `generate_content_id_text(text, partial=False)` function that accepts UTF-8 encoded plain text and an boolean partial content flag as input and returns a Content-ID with GMT type `text`. The procedure to create a Content-ID-Text is as follows:
+The Content-ID-Text is built from the extracted plain-text content of an encoded media object. To build a stable Content-ID-Text the plain-text content must first be extracted from the digital media object. It should be extracted in a way that is reproducible. There are many different text document formats out in the wilde and extracting plain-text from all of them is anything but a trivial task. While text-extraction is out of scope for this specification it is recommend, that plain-text content should be extracted with the open-source [Apache Tika v1.17](https://tika.apache.org/) toolkit, if a generic reproducibility of the Content-ID-Text component is desired. 
 
-1. Apply [`normalize_text`](#normalize-text) to the text input.
+An ISCC generating application must provide a `generate_content_id_text(text, partial=False)` function that accepts UTF-8 encoded plain text and a boolean indicating the [partial content flag](#partial-content-flag-pcf) as input and returns a Content-ID with GMT type `text`. The procedure to create a Content-ID-Text is as follows:
 
-2. Split the text into a list of words at whitespace boundaries.
+1. Apply Unicode standard [Normalization Form KC (NFKC)](http://www.unicode.org/reports/tr15/#Norm_Forms) to the text input.
 
-3. Create a list of 5 word shingles by sliding word-wise through the list of words.
+2. Apply [`normalize_text`](#normalize-text) to the text input.
 
-4. Apply `minhash` to the resulting list of shingles
+2. Split the normalized text into a list of words at whitespace boundaries.
 
-5. Apply [`similarity_hash`](#similarity-hash) to the list of digests returned from step 4.
+4. Create a list of 5 word shingles by sliding word-wise through the list of words.
 
-6. Trim the resulting byte sequence to the first 7 bytes
+5. Create  a list of 32-bit unsigned integers from first 4 bytes (little-endian) of SHA1 hashed shingles. 
 
-7. Prepend the 1-byte component header (`0x10` full content, `0x11` partial content)
+6. Apply `minimum_hash` to the list of 32-bit features from step 5.
 
-8. Encode the resulting 8-byte sequence with Base58
+7. Convert the resulting list of 32-bit integer features to a list of 4-byte digests.
 
-   [undefined]: 
+8. Create a list of 256-bit digests by joining the items of step 7 in chunks of 8 items by itemwise sliding.
 
-   -ISCC Encoding and return the result
+5. Apply [`similarity_hash`](#similarity-hash) to the list of digests returned from step 8.
+
+6. Trim the resulting byte sequence to the first 8 bytes
+
+7. Prepend the 1-byte component header (`0x10` full content or `0x11` partial content)
+
+12. Encode and return the resulting 9-byte sequence with [Base58-ISCC Encoding](#base58-iscc-encoding)
+
+    ​
 
 ### Reference Code (CID-T)
 
-!!! todo
+```python3
+def generate_content_id_text(text: Union[str, bytes], partial=False) -> str:
+    if isinstance(text, bytes):
+        text = text.decode('utf-8')
+    text = unicodedata.normalize('NFKC', text)
+    text = normalize_text(text)
+    words = text.split()
+    shingles = ('\u0020'.join(l) for l in sliding_window(words, 5))
+    hashed_shingles = (sha1(s.encode('utf-8')).digest() for s in shingles)
+    features = (struct.unpack('<I', h[:4])[0] for h in hashed_shingles)
+    minhash_vector = minimum_hash(features)
+    byte_features = tuple(struct.pack('<I', i) for i in minhash_vector)
+    hash_digests = tuple(join_bytes(byte_features, n=8))
+    simhash_digest = similarity_hash(hash_digests)
+    body = simhash_digest[:8]
+    if partial:
+        content_id_text_digest = HEAD_CID_T_PCF + body
+    else:
+        content_id_text_digest = HEAD_CID_T + body
+    return encode_component(content_id_text_digest)
+```
+### Partial Content Flag (PCF)
 
-    Reference Code for Content-ID-Text creation
+The last bit of the header byte is the "Partial Content Flag". It designates if the Content-ID applies to the full content or just some part of it. The PCF must be set as a `0`-bit (**full GMT-specific content**) by default. Setting the PCF to `1` enables applications to create multiple ISCCs for partial extracts of one and the same digital file. The exact semantics of *partial content* are outside of the scope of this specification. Applications that plan to support partial Content-IDs should clearly define their semantics. For example, an application might create separate ISCC for the text contents of multiple articles of a magazine issue. In such a scenario
+the Meta-, Data-, and Instance-IDs are the compound key for the magazine issue, while the Content-ID-Text component distinguishes the different articles of the issue. The different Content-ID-Text components would automatically be "bound" together by the other 3 components.
+
 ## Data-ID
 
 The Data-ID is built from the raw encoded data of the content to be identified. An ISCC generating application must provide a `generate_data_id` function that accepts the raw encoded data as input. Generate a Data-ID by this procedure:
@@ -238,7 +264,7 @@ Applications may carry, store, and process the full hash-tree for advanced parti
 
 ### Base58-ISCC Encoding
 
-The ISCC uses a custom per-component data encoding that is based on the [zbase62](https://github.com/simplegeo/zbase62) encoding by [Zooko Wilcox-O'Hearn](https://en.wikipedia.org/wiki/Zooko_Wilcox-O%27Hearn). The encoding does not require padding and will allways yield codes of 13 characters length for our 72-bit component digests. The fixed-length encoding allows us to easily decode a fully qualified ISCC-Code without having to rely on a hypen as separator. The symbol table also minimizes transcription and OCR errors by omitting the easily confused characters `'O', '0', 'I', 'l'`.
+The ISCC uses a custom per-component data encoding that is based on the [zbase62](https://github.com/simplegeo/zbase62) encoding by [Zooko Wilcox-O'Hearn](https://en.wikipedia.org/wiki/Zooko_Wilcox-O%27Hearn). The encoding does not require padding and will allways yield codes of 13 characters length for our 72-bit component digests. The fixed-length encoding allows us to easily decode a fully qualified ISCC-Code without having to rely on a hypen as separator. Colliding body segments of the digest are preserved by encoding the header and body separately. The symbol table also minimizes transcription and OCR errors by omitting the easily confused characters `'O', '0', 'I', 'l'`.
 
 #### encode_component(digest)
 
@@ -248,7 +274,7 @@ The `encode_component` function accepts a 9-byte **ISCC Component Digest** and r
 
 the `decode_component` function accepts a 13-character **ISCC-Component Code** and returns the corresponding 9-byte **ISCC-Component Digest**.
 
-#### Base58-ISCC Reference Code:
+#### Reference Code (BI):
 
 ```python
 SYMBOLS = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz"
@@ -257,7 +283,9 @@ V2CTABLE = str.maketrans(VALUES, SYMBOLS)
 C2VTABLE = str.maketrans(SYMBOLS, VALUES)
 
 def encode_component(digest: bytes) -> str:
-    assert len(digest) == 9, "ISCC component digest must be 9 bytes."
+    if len(digest) == 9:
+        return encode_component(digest[:1]) + encode_component(digest[1:])
+    assert len(digest) in (1, 8), "Digest must be 1, 8 or 9 bytes long"
     digest = reversed(digest)
     value = 0
     numvalues = 1
@@ -273,8 +301,15 @@ def encode_component(digest: bytes) -> str:
     return str.translate(''.join([chr(c) for c in reversed(chars)]), V2CTABLE)
 
 def decode_component(code: str) -> bytes:
-    assert len(code) == 13, "ISCC component code must be 13 chars."
-    bit_length = 72
+    n = len(code)
+    if n == 13:
+        return decode_component(code[:2]) + decode_component(code[2:])
+    if n == 2:
+        bit_length = 8
+    elif n == 11:
+        bit_length = 64
+    else:
+        raise ValueError('Code must be 2, 11 or 13 chars. Not %s' % n)
     code = reversed(str.translate(code, C2VTABLE))
     value = 0
     numvalues = 1
@@ -309,7 +344,7 @@ We define a text normalization function that is specific to our application. It 
 
 ### Similarity Hash
 
-The `similarity_hash` function takes a sequence of hash digests (raw 8-bit bytes) which represent a set of content features. Each of the digests must be of equal size. The function returns a new hash digest (raw 8-bit bytes) of the same size. For each bit in the input hashes calulate the number of hashes with that bit set and substract the the count of hashes where it is not set. For the output hash set the same bit position to `0` if the count is negative or `1` if it is zero or positive. The resulting hash digest will retain similarity for similar sets of input hashes. See also  [[Charikar2002]][#Charikar2002].
+The `similarity_hash` function takes a sequence of hash digests (raw 8-bit bytes) which represent a set of features. Each of the digests must be of equal size. The function returns a new hash digest (raw 8-bit bytes) of the same size. For each bit in the input hashes calulate the number of hashes with that bit set and substract the the count of hashes where it is not set. For the output hash set the same bit position to `0` if the count is negative or `1` if it is zero or positive. The resulting hash digest will retain similarity for similar sets of input hashes. See also  [[Charikar2002]][#Charikar2002].
 
 #### Diagram (SH)
 
@@ -319,28 +354,48 @@ The `similarity_hash` function takes a sequence of hash digests (raw 8-bit bytes
 
 ```python3
 def similarity_hash(hash_digests: Sequence[ByteString]) -> ByteString:
-
     n_bytes = len(hash_digests[0])
     n_bits = (n_bytes * 8)
     vector = [0] * n_bits
-
     for digest in hash_digests:
-
         assert len(digest) == n_bytes
         h = int.from_bytes(digest, 'big', signed=False)
-
         for i in range(n_bits):
             vector[i] += h & 1
             h >>= 1
-
     minfeatures = len(hash_digests) * 1. / 2
     shash = 0
-
     for i in range(n_bits):
         shash |= int(vector[i] >= minfeatures) << i
-
     return shash.to_bytes(n_bytes, 'big', signed=False)
 ```
+
+### Minimum Hash
+
+The `minimum_hash` function takes an arbitrary sized set of 32-bit integer features and reduces it to a fixed size vector of 128 features such that it preserves similarity with other sets. It is based on the MinHash implementation of the [datasketch](https://ekzhu.github.io/datasketch/) library by [Eric Zhu](https://github.com/ekzhu).
+
+#### Reference Code (MH)
+
+```python3
+def minimum_hash(features: Sequence[int]) -> List[int]:
+    max_int64 = (1 << 64) - 1
+    mersenne_prime = (1 << 61) - 1
+    max_hash = (1 << 32) - 1
+    hashvalues = [max_hash] * 128
+    permutations = deepcopy(MINHASH_PERMUTATIONS)
+    a, b = permutations
+    for hv in features:
+        nhs = []
+        for x in range(128):
+            nh = (((a[x] * hv + b[x]) & max_int64) % mersenne_prime) & max_hash
+            nhs.append(min(nh, hashvalues[x]))
+        hashvalues = nhs
+    return hashvalues
+```
+
+
+
+
 
 ### Normalize Creators
 

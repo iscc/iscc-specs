@@ -1,15 +1,36 @@
 # -*- coding: utf-8 -*-
 from iscc import iscc
 
+TEXT_A = u"""
+    Their most significant and usefull property of similarity-preserving
+    fingerprints gets lost in the fragmentation of individual, propietary and
+    use case specific implementations. The real benefit lies in similarity
+    preservation beyond your local data archive on a global scale accross
+    vendors.
+"""
+
+TEXT_B = u"""
+    The most significant and usefull property of similarity-preserving
+    fingerprints gets lost in the fragmentation of individual, propietary and
+    use case specific implementations. The real benefit lies in similarity
+    preservation beyond your local data archive on a global scale accross
+    vendors.
+"""
+
+TEXT_C = u"""
+    A need for open standard fingerprinting. We don´t need the best
+    Fingerprinting algorithm just an accessible and widely used one.
+"""
+
 
 def test_encode_component():
     digest = bytes.fromhex('f7d3a5b201dc92f7a7')
     code = iscc.encode_component(digest)
-    assert code == '49xmrMuRWRT2v'
+    assert code == '5GcQF7sC3iY2i'
 
 
 def test_decode():
-    code = '49xmrMuRWRT2v'
+    code = '5GcQF7sC3iY2i'
     digest = iscc.decode_component(code)
     assert digest.hex() == 'f7d3a5b201dc92f7a7'
 
@@ -28,6 +49,19 @@ def test_generate_meta_id():
 
     mid4 = iscc.generate_meta_id('Geschichte, Die Unendliche')
     assert 10 == iscc.component_hamming_distance(mid1, mid4)
+
+
+def test_generate_content_id_text():
+    cid_t_np = iscc.generate_content_id_text('')
+    assert len(cid_t_np) == 13
+    assert "1HD1n7nMDZBjr" == cid_t_np
+    cid_t_p = iscc.generate_content_id_text('', partial=True)
+    assert "1JD1n7nMDZBjr" == cid_t_p
+    assert 0 == iscc.component_hamming_distance(cid_t_p, cid_t_np)
+
+    cid_t_a = iscc.generate_content_id_text(TEXT_A)
+    cid_t_b = iscc.generate_content_id_text(TEXT_B)
+    assert 1 == iscc.component_hamming_distance(cid_t_a, cid_t_b)
 
 
 def test_normalize_text():
