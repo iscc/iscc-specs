@@ -1,4 +1,8 @@
 # -*- coding: utf-8 -*-
+from io import BytesIO
+
+from PIL import Image, ImageFilter, ImageEnhance
+
 from iscc import iscc
 
 TEXT_A = u"""
@@ -203,8 +207,26 @@ def test_data_chunks():
     assert len(chunks2[-1]) == 2840
 
 
-def test_image_hash():
-    image_hash = iscc.generate_image_hash('lenna.jpg')
-    assert len(image_hash) == 56
-    assert image_hash.count('1') == image_hash.count('0')
-    assert image_hash == '10011001110001100101011000101101011101010011001110100010'
+def test_generate_content_id_image():
+    cid_i = iscc.generate_content_id_image('lenna.jpg')
+    assert len(cid_i) == 13
+    assert cid_i == '1KSbKdDLGvf8g'
+
+    data = BytesIO(open('lenna.jpg', 'rb').read())
+    cid_i = iscc.generate_content_id_image(data, partial=True)
+    assert len(cid_i) == 13
+    assert cid_i == '1LSbKdDLGvf8g'
+
+    img1 = Image.open('lenna.jpg')
+    img2 = img1.filter(ImageFilter.GaussianBlur(10))
+    img3 = ImageEnhance.Brightness(img1).enhance(1.4)
+    img4 = ImageEnhance.Contrast(img1).enhance(1.2)
+
+    cid1 = iscc.generate_content_id_image(img1)
+    cid2 = iscc.generate_content_id_image(img2)
+    cid3 = iscc.generate_content_id_image(img3)
+    cid4 = iscc.generate_content_id_image(img4)
+
+    assert iscc.component_hamming_distance(cid1, cid2) == 1
+    assert iscc.component_hamming_distance(cid1, cid3) == 1
+    assert iscc.component_hamming_distance(cid1, cid4) == 1

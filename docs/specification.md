@@ -196,11 +196,9 @@ An ISCC generating application must provide a `generate_content_id_text(text, pa
 
 7. Prepend the 1-byte component header (`0x10` full content or `0x11` partial content)
 
-12. Encode and return the resulting 9-byte sequence with [Base58-ISCC Encoding](#base58-iscc-encoding)
+8. Encode and return the resulting 9-byte sequence with [Base58-ISCC Encoding](#base58-iscc-encoding)
 
-    ​
-
-### Reference Code (CID-T)
+#### Reference Code (CID-T)
 
 ```python3
 def generate_content_id_text(text: Union[str, bytes], partial=False) -> str:
@@ -223,6 +221,63 @@ def generate_content_id_text(text: Union[str, bytes], partial=False) -> str:
         content_id_text_digest = HEAD_CID_T + body
     return encode_component(content_id_text_digest)
 ```
+### Content-ID-Image
+
+For the Content-ID-Image we are opting for a DCT-based perceptual image hash instead of a more sophisticated keypoint detection based method. In view of the generic deployabiility of the ISCC we chose an algorithm that has moderate computation requirements and is easy to implement while still being robust against most common minor image manipulations. 
+
+An ISCC generating application must provide a `generate_content_id_image(image, partial=False)` function that accepts a local file path to an image and returns a Content-ID with GMT type `image`. The procedure to create a Content-ID-Image is as follows:
+
+1. Convert image to greyscale
+2. Resize the image to 64x64 pixels with [bicubic interpolation](https://en.wikipedia.org/wiki/Bicubic_interpolation)
+3. Create a 64x64 two-dimensional array of 8-bit greyscale values from the image data
+4. Perform a discrete cosine transform per row and column
+5. Extract upper left 16x16 corner of array from stap 4 as a flat list
+6. Calculate the median of the results from step 5
+7. Create a 256-bit digest by iterating over the values of step 5 and setting a  `1`- for values above median and `0` for values below or equal to median.
+8. Trim the resulting byte sequence to the first 8 bytes
+9. Prepend the 1-byte component header (`0x12` full content or `0x13` partial content)
+10. Encode and return the resulting 9-byte sequence with [Base58-ISCC Encoding](#base58-iscc-encoding)
+
+#### Reference Code (CID-I)
+
+```python3
+def generate_content_id_image(img: IMG, partial=False) -> str:
+    if not isinstance(img, Image.Image):
+        img = Image.open(img)
+    img = img.convert("L")
+    img = img.resize((64, 64), Image.BICUBIC)
+    pixels = [[list(img.getdata())[64 * i + j] for j in range(64)] for i in range(64)]
+    dct_row_lists = []
+    for pixel_list in pixels:
+        dct_row_lists.append(dct(pixel_list))
+    dct_row_lists_t = list(map(list, zip(*dct_row_lists)))
+    dct_col_lists_t = []
+    for dct_list in dct_row_lists_t:
+        dct_col_lists_t.append(dct(dct_list))
+    dct_lists = list(map(list, zip(*dct_col_lists_t)))
+    flat_list = [x for sublist in dct_lists[:16] for x in sublist[:16]]
+    med = median(flat_list)
+    bitstring = ''
+    for value in flat_list:
+        if value > med:
+            bitstring += '1'
+        else:
+            bitstring += '0'
+    hash_digest = int(bitstring, 2).to_bytes(32, 'big', signed=False)
+    body = hash_digest[:8]
+    if partial:
+        content_id_image_digest = HEAD_CID_I_PCF + body
+    else:
+        content_id_image_digest = HEAD_CID_I + body
+    return encode_component(content_id_image_digest)
+```
+
+
+
+!!! note "Image Data Input"
+    The `generate_content_id_image` function may optionally accept the raw byte data of an encoded image or an internal native image object as input for convenience.
+    
+
 ### Partial Content Flag (PCF)
 
 The last bit of the header byte is the "Partial Content Flag". It designates if the Content-ID applies to the full content or just some part of it. The PCF must be set as a `0`-bit (**full GMT-specific content**) by default. Setting the PCF to `1` enables applications to create multiple ISCCs for partial extracts of one and the same digital file. The exact semantics of *partial content* are outside of the scope of this specification. Applications that plan to support partial Content-IDs should clearly define their semantics. For example, an application might create separate ISCC for the text contents of multiple articles of a magazine issue. In such a scenario

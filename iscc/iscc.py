@@ -3,6 +3,7 @@
 import re
 import struct
 from itertools import islice
+from statistics import median
 import math
 import base64
 from io import BytesIO
@@ -10,7 +11,7 @@ from hashlib import sha256, sha1
 import unicodedata
 from typing import List, ByteString, Sequence, BinaryIO, TypeVar, Generator, Union, Iterable
 from PIL import Image
-from copy import copy, deepcopy
+from copy import deepcopy
 
 from iscc.const import CHUNKING_GEAR, MINHASH_PERMUTATIONS
 
@@ -22,6 +23,7 @@ V2CTABLE = str.maketrans(VALUES, SYMBOLS)
 INPUT_TRIM = 128
 NGRAM_SIZE_META_ID = 4
 B = TypeVar('B', BinaryIO, bytes)
+IMG = TypeVar('I', str, BytesIO, Image.Image)
 
 # Component Type Header Markers
 HEAD_MID = b'\x00'
@@ -120,6 +122,60 @@ def generate_content_id_text(text: Union[str, bytes], partial=False) -> str:
 
     # 12 Encode and return
     return encode_component(content_id_text_digest)
+
+
+def generate_content_id_image(img: IMG, partial=False) -> str:
+
+    if not isinstance(img, Image.Image):
+        img = Image.open(img)
+
+    # 1. Convert to greyscale
+    img = img.convert("L")
+
+    # 2. Resize to 64x64
+    img = img.resize((64, 64), Image.BICUBIC)
+
+    # 3. Create two dimensional array
+    pixels = [[list(img.getdata())[64 * i + j] for j in range(64)] for i in range(64)]
+
+    # 4. DCT per row & col
+    dct_row_lists = []
+    for pixel_list in pixels:
+        dct_row_lists.append(dct(pixel_list))
+
+    dct_row_lists_t = list(map(list, zip(*dct_row_lists)))
+    dct_col_lists_t = []
+    for dct_list in dct_row_lists_t:
+        dct_col_lists_t.append(dct(dct_list))
+
+    dct_lists = list(map(list, zip(*dct_col_lists_t)))
+
+    # 5. Extract upper left 16x16 corner
+    flat_list = [x for sublist in dct_lists[:16] for x in sublist[:16]]
+
+    # 6. Calculate median
+    med = median(flat_list)
+
+    # 7. Create 256-bit digest by comparing to median
+    bitstring = ''
+    for value in flat_list:
+        if value > med:
+            bitstring += '1'
+        else:
+            bitstring += '0'
+    hash_digest = int(bitstring, 2).to_bytes(32, 'big', signed=False)
+
+    # 8. Trim the resulting byte sequence to the first 8 bytes
+    body = hash_digest[:8]
+
+    # 9. Prepend the 1-byte component header
+    if partial:
+        content_id_image_digest = HEAD_CID_I_PCF + body
+    else:
+        content_id_image_digest = HEAD_CID_I + body
+
+    # 10. Encode and return
+    return encode_component(content_id_image_digest)
 
 
 def trim(text: str) -> str:
@@ -316,41 +372,7 @@ def similarity_hash(hash_digests: Sequence[ByteString]) -> ByteString:
     return shash.to_bytes(n_bytes, 'big', signed=False)
 
 
-def generate_image_hash(image_path: str) -> str:
-
-    image = Image.open(image_path)
-    image = image.convert("L").resize((32, 32), Image.BICUBIC)
-
-    # get image pixels as matrix
-    pixels = [[list(image.getdata())[32 * i + j] for j in range(32)] for i in range(32)]
-
-    # discrete cosine transform over every row
-    dct_row_lists = []
-    for pixel_list in pixels:
-        dct_row_lists.append(discrete_cosine_transform(pixel_list))
-
-    # discrete cosine transform over every column
-    dct_row_lists_t = list(map(list, zip(*dct_row_lists)))
-    dct_col_lists_t = []
-    for dct_list in dct_row_lists_t:
-        dct_col_lists_t.append(discrete_cosine_transform(dct_list))
-    dct_lists = list(map(list, zip(*dct_col_lists_t)))
-
-    # extract upper left 8x7 corner as flat list
-    flat_list = [x for sublist in dct_lists[:7] for x in sublist[:8]]
-
-    # compare every value with median and generate hash
-    med = sum(sorted(flat_list)[27: 29]) / 2
-    hash = ''
-    for value in flat_list:
-        if value > med:
-            hash += '1'
-        else:
-            hash += '0'
-    return hash
-
-
-def discrete_cosine_transform(value_list: Sequence[float]) -> Sequence[float]:
+def dct(value_list: Sequence[float]) -> Sequence[float]:
     N = len(value_list)
     dct_list = []
     for k in range(N):
