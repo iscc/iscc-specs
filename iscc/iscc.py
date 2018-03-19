@@ -196,6 +196,26 @@ def generate_data_id(data: B) -> str:
     return encode_component(data_id_digest)
 
 
+def generate_instance_id(data: B) -> str:
+
+    if not hasattr(data, 'read'):
+        data = BytesIO(data)
+
+    leaf_node_digests = []
+
+    while True:
+        chunk = data.read(64000)
+        if chunk:
+            leaf_node_digests.append(sha256d(b'\x00' + chunk))
+        else:
+            break
+
+    top_hash_digest = top_hash(leaf_node_digests)
+    instance_id_digest = HEAD_IID + top_hash_digest[:8]
+
+    return encode_component(instance_id_digest)
+
+
 def trim(text: str) -> str:
     """Trim text so utf-8 encoded bytes do not exceed INPUT_TRIM size."""
     while True:
@@ -204,14 +224,6 @@ def trim(text: str) -> str:
             return text
         else:
             text = text[:-1]
-
-
-def generate_instance_id(data: B) -> str:
-
-    leaf_node_digests = [sha256d(b'\x00' + chunk) for chunk in data_chunks(data)]
-    top_hash_digest = top_hash(leaf_node_digests)
-    instance_id_digest = HEAD_IID + top_hash_digest[:7]
-    return base64.b32encode(instance_id_digest).rstrip(b'=').decode('ascii')
 
 
 def top_hash(hashes: List[bytes]) -> bytes:

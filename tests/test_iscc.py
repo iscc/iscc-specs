@@ -202,13 +202,14 @@ def test_generate_data_id():
 def test_generate_instance_id():
     zero_bytes_even = b'\x00' * 16
     iid = iscc.generate_instance_id(zero_bytes_even)
-    assert iscc.c2d(iid)[0] == 48
-    assert iid == 'GAWKP4EYOCOTO'
-
+    assert iid == '1q8UDifpN1SCd'
     ff_bytes_uneven = b'\xff' * 17
     iid = iscc.generate_instance_id(ff_bytes_uneven)
-    assert iscc.c2d(iid)[0] == 48
-    assert iid == 'GAQV3LN3WYTQO'
+    assert iid == '1q6ah6fQ1xTj9'
+    more_bytes = b'\xcc' * 66000
+    iid = iscc.generate_instance_id(more_bytes)
+    assert iid == '1qdhBrWwK7u7L'
+
 
 
 def test_data_chunks():
