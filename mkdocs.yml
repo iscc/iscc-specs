@@ -21,9 +21,6 @@ theme:
     palette:
         primary: 'blue'
         accent: 'pink'
-    font:
-        text: 'Roboto'
-        code: 'Inconsolata'
     feature:
         tabs: false
 

@@ -121,9 +121,9 @@ An ISCC generating application must follow these steps in the given order to pro
 3. Apply [`normalize_text`](#normalize-text) to the trimmed `title` and `extra` values.
 4. Concatenate normalized `title` and `extra` from step 3 using a space ( `\u0020`) as a seperator.
 5. Create a list of 4 character [n-grams](https://en.wikipedia.org/wiki/N-gram) by sliding character-wise through the result of step 4.
-6. Encode each n-gram from step 5 to an UTF-8 bytestring and calculate its sha256 digest.
-7. Apply [`similarity_hash`](#similarity-hash) to the list of sha256 digests from step 6.
-8. Trim the resulting byte sequence to the first 8 bytes and prepend the 1-byte component header according to component type and ISCC version (e.g. `0x00`).
+6. Encode each n-gram from step 5 to an UTF-8 bytestring and calculate its [xxHash64](http://cyan4973.github.io/xxHash/) digest.
+7. Apply [`similarity_hash`](#similarity-hash) to the list of digests from step 6.
+8. Prepend the 1-byte component header according to component type and ISCC version (e.g. `0x00`) to the results of step 7.
 9. Encode the resulting 9 byte sequence with [Base58-ISCC Encoding](#base58-iscc-encoding) and return the result.
 
 
@@ -131,11 +131,7 @@ An ISCC generating application must follow these steps in the given order to pro
     When trimming text be sure to trim the byte-length of the UTF-8 encoded version and not the number of characters. The trim point must be such, that it does not cut into multibyte characters. Characters might have different UTF-8 byte-length. For example `ü` is 2-bytes, `驩` is 3-bytes and `𠜎` is 4-bytes. So the trimmed version of a string with 128 `驩`-characters will result in a 42-character string with a 126-byte UTF-8 encoded length. This is necessary because the results of this operation will be stored as base metadata with strict byte size limits on the blockchain. 
 
 !!! tip "Preliminary normalization"
-    Applications that perform automated dataingestion should apply a custimized preliminary normalization to title data tailored to the dataset. Depending on catalog data removing pairs of brackets [], (), {}, and text inbetween them or cutting all text after the first occurence of a semicolon (;) or colon (:) can vastly improve de-duplication. 
-
-!!! note "Component tails"
-    We call the last 192-bits of the resulting 256-bit fingerprint from step 7 a **component tail**. The component tail **may** optionally be stored or processed by applications that require higher resolution bit-vectors.
-
+    Applications that perform automated data-ingestion should apply a custimized preliminary normalization to title data tailored to the dataset. Depending on catalog data removing pairs of brackets [], (), {}, and text inbetween them or cutting all text after the first occurence of a semicolon (;) or colon (:) can vastly improve de-duplication. 
 
 ### Dealing with Meta-ID collisions
 
@@ -178,49 +174,24 @@ An ISCC generating application must provide a `generate_content_id_text(text, pa
 
 2. Apply [`normalize_text`](#normalize-text) to the text input.
 
-2. Split the normalized text into a list of words at whitespace boundaries.
+3. Split the normalized text into a list of words at whitespace boundaries.
 
 4. Create a list of 5 word shingles by sliding word-wise through the list of words.
 
-5. Create  a list of 32-bit unsigned integers from first 4 bytes (little-endian) of SHA1 hashed shingles. 
+5. Create  a list of 32-bit unsigned integer features by applying [xxHash32](http://cyan4973.github.io/xxHash/) to shingles from step 4. 
 
 6. Apply `minimum_hash` to the list of 32-bit features from step 5.
 
 7. Convert the resulting list of 32-bit integer features to a list of 4-byte digests.
 
-8. Create a list of 256-bit digests by joining the items of step 7 in chunks of 8 items by itemwise sliding.
+8. Rehash 4-byte digestst from step 7 to 8-byte distest with [xxHash64](http://cyan4973.github.io/xxHash/).
 
-5. Apply [`similarity_hash`](#similarity-hash) to the list of digests returned from step 8.
+9. Apply [`similarity_hash`](#similarity-hash) to the list of digests returned from step 8.
 
-6. Trim the resulting byte sequence to the first 8 bytes
+10. Prepend the 1-byte component header (`0x10` full content or `0x11` partial content).
 
-7. Prepend the 1-byte component header (`0x10` full content or `0x11` partial content)
+11. Encode and return the resulting 9-byte sequence with [Base58-ISCC Encoding](#base58-iscc-encoding).
 
-8. Encode and return the resulting 9-byte sequence with [Base58-ISCC Encoding](#base58-iscc-encoding)
-
-#### Reference Code (CID-T)
-
-```python3
-def generate_content_id_text(text: Union[str, bytes], partial=False) -> str:
-    if isinstance(text, bytes):
-        text = text.decode('utf-8')
-    text = unicodedata.normalize('NFKC', text)
-    text = normalize_text(text)
-    words = text.split()
-    shingles = ('\u0020'.join(l) for l in sliding_window(words, 5))
-    hashed_shingles = (sha1(s.encode('utf-8')).digest() for s in shingles)
-    features = (struct.unpack('<I', h[:4])[0] for h in hashed_shingles)
-    minhash_vector = minimum_hash(features)
-    byte_features = tuple(struct.pack('<I', i) for i in minhash_vector)
-    hash_digests = tuple(join_bytes(byte_features, n=8))
-    simhash_digest = similarity_hash(hash_digests)
-    body = simhash_digest[:8]
-    if partial:
-        content_id_text_digest = HEAD_CID_T_PCF + body
-    else:
-        content_id_text_digest = HEAD_CID_T + body
-    return encode_component(content_id_text_digest)
-```
 ### Content-ID-Image
 
 For the Content-ID-Image we are opting for a DCT-based perceptual image hash instead of a more sophisticated keypoint detection based method. In view of the generic deployabiility of the ISCC we chose an algorithm that has moderate computation requirements and is easy to implement while still being robust against most common minor image manipulations. 
@@ -228,51 +199,14 @@ For the Content-ID-Image we are opting for a DCT-based perceptual image hash ins
 An ISCC generating application must provide a `generate_content_id_image(image, partial=False)` function that accepts a local file path to an image and returns a Content-ID with GMT type `image`. The procedure to create a Content-ID-Image is as follows:
 
 1. Convert image to greyscale
-2. Resize the image to 64x64 pixels with [bicubic interpolation](https://en.wikipedia.org/wiki/Bicubic_interpolation)
-3. Create a 64x64 two-dimensional array of 8-bit greyscale values from the image data
+2. Resize the image to 32x32 pixels with [bicubic interpolation](https://en.wikipedia.org/wiki/Bicubic_interpolation)
+3. Create a 32x32 two-dimensional array of 8-bit greyscale values from the image data
 4. Perform a discrete cosine transform per row and column
-5. Extract upper left 16x16 corner of array from stap 4 as a flat list
+5. Extract upper left 8x8 corner of array from step 4 as a flat list
 6. Calculate the median of the results from step 5
-7. Create a 256-bit digest by iterating over the values of step 5 and setting a  `1`- for values above median and `0` for values below or equal to median.
-8. Trim the resulting byte sequence to the first 8 bytes
+7. Create a 64-bit digest by iterating over the values of step 5 and setting a  `1`- for values above median and `0` for values below or equal to median.
 9. Prepend the 1-byte component header (`0x12` full content or `0x13` partial content)
 10. Encode and return the resulting 9-byte sequence with [Base58-ISCC Encoding](#base58-iscc-encoding)
-
-#### Reference Code (CID-I)
-
-```python3
-def generate_content_id_image(img: IMG, partial=False) -> str:
-    if not isinstance(img, Image.Image):
-        img = Image.open(img)
-    img = img.convert("L")
-    img = img.resize((64, 64), Image.BICUBIC)
-    pixels = [[list(img.getdata())[64 * i + j] for j in range(64)] for i in range(64)]
-    dct_row_lists = []
-    for pixel_list in pixels:
-        dct_row_lists.append(dct(pixel_list))
-    dct_row_lists_t = list(map(list, zip(*dct_row_lists)))
-    dct_col_lists_t = []
-    for dct_list in dct_row_lists_t:
-        dct_col_lists_t.append(dct(dct_list))
-    dct_lists = list(map(list, zip(*dct_col_lists_t)))
-    flat_list = [x for sublist in dct_lists[:16] for x in sublist[:16]]
-    med = median(flat_list)
-    bitstring = ''
-    for value in flat_list:
-        if value > med:
-            bitstring += '1'
-        else:
-            bitstring += '0'
-    hash_digest = int(bitstring, 2).to_bytes(32, 'big', signed=False)
-    body = hash_digest[:8]
-    if partial:
-        content_id_image_digest = HEAD_CID_I_PCF + body
-    else:
-        content_id_image_digest = HEAD_CID_I + body
-    return encode_component(content_id_image_digest)
-```
-
-
 
 !!! note "Image Data Input"
     The `generate_content_id_image` function may optionally accept the raw byte data of an encoded image or an internal native image object as input for convenience.

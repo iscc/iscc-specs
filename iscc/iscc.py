@@ -12,6 +12,7 @@ import unicodedata
 from typing import List, ByteString, Sequence, BinaryIO, TypeVar, Generator, Union, Iterable
 from PIL import Image
 from copy import deepcopy
+import xxhash
 
 from iscc.const import CHUNKING_GEAR, MINHASH_PERMUTATIONS
 
@@ -64,14 +65,14 @@ def generate_meta_id(title: Union[str, bytes], extra: Union[str, bytes]='', vers
     # 5. Create a list of n-grams
     n_grams = sliding_window(concat, width=NGRAM_SIZE_META_ID)
 
-    # 6. Encode n-grams and create sha256-digests
-    hash_digests = [sha256(s.encode('utf-8')).digest() for s in n_grams]
+    # 6. Encode n-grams and create xxhash64-digest
+    hash_digests = [xxhash.xxh64(s.encode('utf-8')).digest() for s in n_grams]
 
     # 7. Apply similarity_hash
     simhash_digest = similarity_hash(hash_digests)
 
-    # 8. Trim and prepend header-byte
-    meta_id_digest = HEAD_MID + simhash_digest[:8]
+    # 8. Prepend header-byte
+    meta_id_digest = HEAD_MID + simhash_digest
 
     # 9. Encode with base58_iscc
     return encode_component(meta_id_digest)
@@ -93,32 +94,26 @@ def generate_content_id_text(text: Union[str, bytes], partial=False) -> str:
     # 4. Create 5 word shingles
     shingles = ('\u0020'.join(l) for l in sliding_window(words, 5))
 
-    hashed_shingles = (sha1(s.encode('utf-8')).digest() for s in shingles)
-
-    # 5. Create 32bit features from shingles
-
-    features = (struct.unpack('<I', h[:4])[0] for h in hashed_shingles)
+    # 5. Create 32-bit features with xxHash32
+    features = (xxhash.xxh32(s.encode('utf-8')).intdigest() for s in shingles)
 
     # 6. Apply minimum_hash
     minhash_vector = minimum_hash(features)
 
-    # 7. Convert to list of 4-byte digests
+    # 7. Convert minhash to 4-byte digests
     byte_features = (struct.pack('<I', i) for i in minhash_vector)
 
-    # 8. Create a list of 256-bit digests
-    hash_digests = tuple(join_bytes(byte_features, n=8))
+    # 8. Reshash byte features to 64-bit
+    rehashed = [xxhash.xxh64(bf).digest() for bf in byte_features]
 
     # 9. Apply similarity_hash
-    simhash_digest = similarity_hash(hash_digests)
+    simhash_digest = similarity_hash(rehashed)
 
-    # 10. Trim  to the first 8 bytes
-    body = simhash_digest[:8]
-
-    # 11. Prepend the 1-byte component header
+    # 10. Prepend the 1-byte component header
     if partial:
-        content_id_text_digest = HEAD_CID_T_PCF + body
+        content_id_text_digest = HEAD_CID_T_PCF + simhash_digest
     else:
-        content_id_text_digest = HEAD_CID_T + body
+        content_id_text_digest = HEAD_CID_T + simhash_digest
 
     # 12 Encode and return
     return encode_component(content_id_text_digest)
@@ -133,10 +128,10 @@ def generate_content_id_image(img: IMG, partial=False) -> str:
     img = img.convert("L")
 
     # 2. Resize to 64x64
-    img = img.resize((64, 64), Image.BICUBIC)
+    img = img.resize((32, 32), Image.BICUBIC)
 
     # 3. Create two dimensional array
-    pixels = [[list(img.getdata())[64 * i + j] for j in range(64)] for i in range(64)]
+    pixels = [[list(img.getdata())[32 * i + j] for j in range(32)] for i in range(32)]
 
     # 4. DCT per row & col
     dct_row_lists = []
@@ -150,31 +145,28 @@ def generate_content_id_image(img: IMG, partial=False) -> str:
 
     dct_lists = list(map(list, zip(*dct_col_lists_t)))
 
-    # 5. Extract upper left 16x16 corner
-    flat_list = [x for sublist in dct_lists[:16] for x in sublist[:16]]
+    # 5. Extract upper left 8x8 corner
+    flat_list = [x for sublist in dct_lists[:8] for x in sublist[:8]]
 
     # 6. Calculate median
     med = median(flat_list)
 
-    # 7. Create 256-bit digest by comparing to median
+    # 7. Create 64-bit digest by comparing to median
     bitstring = ''
     for value in flat_list:
         if value > med:
             bitstring += '1'
         else:
             bitstring += '0'
-    hash_digest = int(bitstring, 2).to_bytes(32, 'big', signed=False)
+    hash_digest = int(bitstring, 2).to_bytes(8, 'big', signed=False)
 
-    # 8. Trim the resulting byte sequence to the first 8 bytes
-    body = hash_digest[:8]
-
-    # 9. Prepend the 1-byte component header
+    # 8. Prepend the 1-byte component header
     if partial:
-        content_id_image_digest = HEAD_CID_I_PCF + body
+        content_id_image_digest = HEAD_CID_I_PCF + hash_digest
     else:
-        content_id_image_digest = HEAD_CID_I + body
+        content_id_image_digest = HEAD_CID_I + hash_digest
 
-    # 10. Encode and return
+    # 9. Encode and return
     return encode_component(content_id_image_digest)
 
 
@@ -348,7 +340,7 @@ def minimum_hash(features: Iterable[int]) -> List[int]:
     return hashvalues
 
 
-def similarity_hash(hash_digests: Sequence[ByteString]) -> ByteString:
+def similarity_hash(hash_digests: Sequence[ByteString]) -> bytes:
 
     n_bytes = len(hash_digests[0])
     n_bits = (n_bytes * 8)

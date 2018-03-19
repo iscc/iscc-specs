@@ -43,24 +43,24 @@ def test_generate_meta_id():
 
     mid1 = iscc.generate_meta_id('Die Unendliche Geschichte')
     assert len(mid1) == 13
-    assert "11jm9wZFS2NxJ" == mid1
+    assert "11MYeQZpECeEi" == mid1
 
     mid2 = iscc.generate_meta_id(' Die unéndlíche,  Geschichte ')
     assert mid1 == mid2
 
     mid3 = iscc.generate_meta_id('Die Unentliche Geschichte')
-    assert 13 == iscc.component_hamming_distance(mid1, mid3)
+    assert 8 == iscc.component_hamming_distance(mid1, mid3)
 
     mid4 = iscc.generate_meta_id('Geschichte, Die Unendliche')
-    assert 10 == iscc.component_hamming_distance(mid1, mid4)
+    assert 9 == iscc.component_hamming_distance(mid1, mid4)
 
 
 def test_generate_content_id_text():
     cid_t_np = iscc.generate_content_id_text('')
     assert len(cid_t_np) == 13
-    assert "1HD1n7nMDZBjr" == cid_t_np
+    assert "1H2YjJrwcz4gb" == cid_t_np
     cid_t_p = iscc.generate_content_id_text('', partial=True)
-    assert "1JD1n7nMDZBjr" == cid_t_p
+    assert "1J2YjJrwcz4gb" == cid_t_p
     assert 0 == iscc.component_hamming_distance(cid_t_p, cid_t_np)
 
     cid_t_a = iscc.generate_content_id_text(TEXT_A)
@@ -171,7 +171,7 @@ def test_hamming_distance():
 
     # Add, change, delete
     mid2 = iscc.generate_meta_id('Diex Unandlische Geschiche', 'von Michael Ende')
-    assert iscc.component_hamming_distance(mid1, mid2) <= 18
+    assert iscc.component_hamming_distance(mid1, mid2) <= 22
 
     # Change Word order
     mid2 = iscc.generate_meta_id('Unendliche Geschichte, Die', 'von Michael Ende')
@@ -179,7 +179,7 @@ def test_hamming_distance():
 
     # Totaly different
     mid2 = iscc.generate_meta_id('Now for something different')
-    assert iscc.component_hamming_distance(mid1, mid2) >= 30
+    assert iscc.component_hamming_distance(mid1, mid2) >= 25
 
 
 def test_generate_instance_id():
@@ -210,12 +210,12 @@ def test_data_chunks():
 def test_generate_content_id_image():
     cid_i = iscc.generate_content_id_image('lenna.jpg')
     assert len(cid_i) == 13
-    assert cid_i == '1KSbKdDLGvf8g'
+    assert cid_i == '1KSiorBqgP32u'
 
     data = BytesIO(open('lenna.jpg', 'rb').read())
     cid_i = iscc.generate_content_id_image(data, partial=True)
     assert len(cid_i) == 13
-    assert cid_i == '1LSbKdDLGvf8g'
+    assert cid_i == '1LSiorBqgP32u'
 
     img1 = Image.open('lenna.jpg')
     img2 = img1.filter(ImageFilter.GaussianBlur(10))
@@ -227,6 +227,6 @@ def test_generate_content_id_image():
     cid3 = iscc.generate_content_id_image(img3)
     cid4 = iscc.generate_content_id_image(img4)
 
-    assert iscc.component_hamming_distance(cid1, cid2) == 1
-    assert iscc.component_hamming_distance(cid1, cid3) == 1
-    assert iscc.component_hamming_distance(cid1, cid4) == 1
+    assert iscc.component_hamming_distance(cid1, cid2) == 0
+    assert iscc.component_hamming_distance(cid1, cid3) == 2
+    assert iscc.component_hamming_distance(cid1, cid4) == 0
