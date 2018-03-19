@@ -7,9 +7,10 @@ from statistics import median
 import math
 import base64
 from io import BytesIO
-from hashlib import sha256, sha1
+from hashlib import sha256
 import unicodedata
 from typing import List, ByteString, Sequence, BinaryIO, TypeVar, Generator, Union, Iterable
+
 from PIL import Image
 from copy import deepcopy
 import xxhash
@@ -103,7 +104,7 @@ def generate_content_id_text(text: Union[str, bytes], partial=False) -> str:
     # 7. Convert minhash to 4-byte digests
     byte_features = (struct.pack('<I', i) for i in minhash_vector)
 
-    # 8. Reshash byte features to 64-bit
+    # 8. Reshash byte features to 64-bit so we don´t clutter lower hash spaces
     rehashed = [xxhash.xxh64(bf).digest() for bf in byte_features]
 
     # 9. Apply similarity_hash
@@ -168,6 +169,31 @@ def generate_content_id_image(img: IMG, partial=False) -> str:
 
     # 9. Encode and return
     return encode_component(content_id_image_digest)
+
+
+def generate_data_id(data: B) -> str:
+
+    # 1. & 2. XxHas32 over CDC-Chunks
+    features = (xxhash.xxh32(chunk).intdigest() for chunk in data_chunks(data))
+
+    # 3. Apply minimum_hash
+    minhash = minimum_hash(features)
+
+    # 4. Collect least significant bits
+    lsb = ''.join([str(x & 1) for x in minhash])
+
+    # 5. Create two 64-bit digests
+    a = int(lsb[:64], 2).to_bytes(8, 'big', signed=False)
+    b = int(lsb[64:], 2).to_bytes(8, 'big', signed=False)
+
+    # 6. Apply simhash
+    simhash_digest = similarity_hash((a, b))
+
+    # 7. Prepend the 1-byte header
+    data_id_digest = HEAD_DID + simhash_digest
+
+    # 8. Encode and return
+    return encode_component(data_id_digest)
 
 
 def trim(text: str) -> str:

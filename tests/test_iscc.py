@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import random
 from io import BytesIO
 
 from PIL import Image, ImageFilter, ImageEnhance
@@ -180,6 +181,22 @@ def test_hamming_distance():
     # Totaly different
     mid2 = iscc.generate_meta_id('Now for something different')
     assert iscc.component_hamming_distance(mid1, mid2) >= 25
+
+
+def test_generate_data_id():
+    random.seed(1)
+    data = bytearray([random.getrandbits(8) for _ in range(1000000)])  # 1 mb
+    did_a = iscc.generate_data_id(data)
+    assert did_a == '1ZjV1oxPC6Vpr'
+    data.insert(500000, 1)
+    data.insert(500001, 2)
+    data.insert(500002, 3)
+    did_b = iscc.generate_data_id(data)
+    assert did_b == did_b
+    for x in range(100):  # insert 100 bytes random noise
+        data.insert(random.randint(0, 1000000), random.randint(0, 255))
+    did_c = iscc.generate_data_id(data)
+    assert iscc.component_hamming_distance(did_a, did_c) == 7
 
 
 def test_generate_instance_id():

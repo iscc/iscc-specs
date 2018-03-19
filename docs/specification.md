@@ -210,7 +210,6 @@ An ISCC generating application must provide a `generate_content_id_image(image, 
 
 !!! note "Image Data Input"
     The `generate_content_id_image` function may optionally accept the raw byte data of an encoded image or an internal native image object as input for convenience.
-    
 
 ### Partial Content Flag (PCF)
 
@@ -219,15 +218,18 @@ the Meta-, Data-, and Instance-IDs are the compound key for the magazine issue, 
 
 ## Data-ID
 
+For the Data-ID that should encode data similarty we use content defined chunking algorithm that provides some shift resistance and calculate the MinHash from those chunks. To accomodate for small files the first 100 chunks have a ~140-byte size target while the remaining chunks target ~ 6kb in size.
+
 The Data-ID is built from the raw encoded data of the content to be identified. An ISCC generating application must provide a `generate_data_id` function that accepts the raw encoded data as input. Generate a Data-ID by this procedure:
 
-1. Apply `chunk_data` to the raw encoded content data
-2. For each chunk calculate the sha256 digest
-3. Apply `minhash` to the resulting list of digests
-4. Take the lowest bit from each minhash value and concatenate them to a 256 string
-5. Trim the resulting byte sequence to the first 7 bytes.
-6. Prepend the 1-byte component header (e.g. 0x20).
-7. Encode the resulting 8-byte sequence with base32 (no-padding) and return the result
+1. Apply `chunk_data` to the raw encoded content data.
+2. For each chunk calculate the xxHash32 integer hash.
+3. Apply `minimum_hash` to the resulting list of 32-bit unsigned integers.
+4. Collect the least significant bits from the 128 MinHash features.
+5. Create two 64-bit digests from the first and second half of the collected bits.
+6. Apply `similarity_hash` to the results of step 5.
+7. Prepend the 1-byte component header (e.g. 0x20).
+8. Encode and return the resulting 9-byte sequence with [Base58-ISCC Encoding](#base58-iscc-encoding).
 
 ## Instance-ID
 
