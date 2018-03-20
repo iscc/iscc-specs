@@ -5,7 +5,7 @@ import math
 from io import BytesIO
 from hashlib import sha256
 import unicodedata
-from typing import List, ByteString, Sequence, BinaryIO, TypeVar, Generator, Union, Iterable
+from typing import List, ByteString, Sequence, BinaryIO, TypeVar, Generator, Union, Iterable, Tuple
 
 from PIL import Image
 from copy import deepcopy
@@ -36,7 +36,7 @@ HEAD_DID = b'\x20'
 HEAD_IID = b'\x30'
 
 
-def meta_id(title: Union[str, bytes], extra: Union[str, bytes]='', version: int=0) -> str:
+def meta_id(title: Union[str, bytes], extra: Union[str, bytes]='', version: int=0) -> Tuple[str, str, str]:
 
     assert version == 0, "Only version 0 supported"
 
@@ -53,15 +53,14 @@ def meta_id(title: Union[str, bytes], extra: Union[str, bytes]='', version: int=
     title = trim(title)
     extra = trim(extra)
 
-    # 3. Apply `normalize_text` to all trimmed input values
-    title = normalize_text(title)
-    extra = normalize_text(extra)
-
-    # 4. Concatenate
+    # 3. Concatenate
     concat = '\u0020'.join((title, extra)).strip()
 
+    # 4. Apply text normalization
+    normalized = normalize_text(concat)
+
     # 5. Create a list of n-grams
-    n_grams = sliding_window(concat, width=WINDOW_SIZE_MID)
+    n_grams = sliding_window(normalized, width=WINDOW_SIZE_MID)
 
     # 6. Encode n-grams and create xxhash64-digest
     hash_digests = [xxhash.xxh64(s.encode('utf-8')).digest() for s in n_grams]
@@ -73,7 +72,7 @@ def meta_id(title: Union[str, bytes], extra: Union[str, bytes]='', version: int=
     meta_id_digest = HEAD_MID + simhash_digest
 
     # 9. Encode with base58_iscc
-    return encode(meta_id_digest)
+    return encode(meta_id_digest), title, extra
 
 
 def content_id_text(text: Union[str, bytes], partial=False) -> str:

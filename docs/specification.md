@@ -102,25 +102,15 @@ Each component has the same basic structure of a 1-byte header and a 8-byte main
 
 ## Meta-ID Component
 
-### Header
-
 The Meta-ID component starts with a 1-byte header `00000000`. The first nibble `0000` indicates that this is a Meta-ID component type. The second nibble `0000` indicates that it belongs to an ISCC of version 1. All subsequent components are expected to follow the specification of a version 1 ISCC.
 
-### Body
-
-The Meta-ID body is built from a 64-bit `similarity_hash` over 4-character n-grams of the basic metadata of the content to be identified. 
-
-### Basic Metadata
-
-All *text* information supplied to the META-ID generating function is assumed to be UTF-8 encoded. Errors that occur during the decoding of such a bytestring input to a native Unicode must terminate the process and must not be silenced. An ISCC generating application must provide a `meta_id` function that accepts the following minimal and generic metadata inputs:
+The Meta-ID body is built from a 64-bit `similarity_hash` over 4-character n-grams of the basic metadata of the content to be identified.  The basic metadata supplied to the META-ID generating function is assumed to be UTF-8 encoded. Errors that occur during the decoding of such a bytestring input to a native Unicode must terminate the process and must not be silenced. An ISCC generating application must provide a `meta_id` function that accepts minimal and generic metadata and returns a [Base58-ISCC encoded](#base58-iscc-encoding) Meta-ID component and trimmed metadata.
 
 | Name    | Type    | Required | Description                                                  |
 | :------ | :------ | :------- | :----------------------------------------------------------- |
 | *title* | text    | Yes      | The title of an intangible creation.                         |
 | *extra* | text    | No       | A short statement that distinguishes this intangible creation from another one. (default: empty string) |
-| version | integer | No       | ISCC version number (default: 0)                             |
-
-The `meta_id` function must return a valid [Base58-ISCC encoded](#base58-iscc-encoding) Meta-ID component.
+| version | integer | No       | ISCC version number. (default: 0)                            |
 
 ### Generate Meta-ID
 
@@ -128,19 +118,20 @@ An ISCC generating application must follow these steps in the given order to pro
 
 1. Apply Unicode standard [Normalization Form KC (NFKC)](http://www.unicode.org/reports/tr15/#Norm_Forms) separately to the  `title` and `extra` inputs.
 2. Trim `title` and `extra`, such that their UTF-8 encoded byte representation does not exceed 128-bytes each. *The results of this step must be supplied as basic metadata for ISCC registration.*
-3. Apply [`normalize_text`](#normalize-text) to the trimmed `title` and `extra` values.
-4. Concatenate normalized `title` and `extra` from step 3 using a space ( `\u0020`) as a seperator.
+3. Concatenate trimmed`title` and `extra` from using a space ( `\u0020`) as a seperator.
+4. Apply [`normalize_text`](#normalize-text) to the results of step 3.
 5. Create a list of 4 character [n-grams](https://en.wikipedia.org/wiki/N-gram) by sliding character-wise through the result of step 4.
 6. Encode each n-gram from step 5 to an UTF-8 bytestring and calculate its [xxHash64](http://cyan4973.github.io/xxHash/) digest.
 7. Apply [`similarity_hash`](#similarity-hash) to the list of digests from step 6.
 8. Prepend the 1-byte component header according to component type and ISCC version (e.g. `0x00`) to the results of step 7.
-9. Encode the resulting 9 byte sequence with [Base58-ISCC Encoding](#base58-iscc-encoding) and return the result.
+9. Encode the resulting 9 byte sequence with [Base58-ISCC Encoding](#base58-iscc-encoding)
+10. Return encoded Meta-ID, trimmed `title` and trimmed `extra` data.
 
 
 !!! warning "Text trimming"
     When trimming text be sure to trim the byte-length of the UTF-8 encoded version and not the number of characters. The trim point must be such, that it does not cut into multibyte characters. Characters might have different UTF-8 byte-length. For example `ü` is 2-bytes, `驩` is 3-bytes and `𠜎` is 4-bytes. So the trimmed version of a string with 128 `驩`-characters will result in a 42-character string with a 126-byte UTF-8 encoded length. This is necessary because the results of this operation will be stored as base metadata with strict byte size limits on the blockchain. 
 
-!!! tip "Preliminary normalization"
+!!! tip "Pre-normalization"
     Applications that perform automated data-ingestion should apply a custimized preliminary normalization to title data tailored to the dataset. Depending on catalog data removing pairs of brackets [], (), {}, and text inbetween them or cutting all text after the first occurence of a semicolon (;) or colon (:) can vastly improve de-duplication. 
 
 ### Dealing with Meta-ID collisions

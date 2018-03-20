@@ -40,17 +40,17 @@ def test_decode():
 
 def test_meta_id():
 
-    mid1 = iscc.meta_id('Die Unendliche Geschichte')
+    mid1 = iscc.meta_id('Die Unendliche Geschichte')[0]
     assert len(mid1) == 13
     assert "11MYeQZpECeEi" == mid1
 
-    mid2 = iscc.meta_id(' Die unéndlíche,  Geschichte ')
+    mid2 = iscc.meta_id(' Die unéndlíche,  Geschichte ')[0]
     assert mid1 == mid2
 
-    mid3 = iscc.meta_id('Die Unentliche Geschichte')
+    mid3 = iscc.meta_id('Die Unentliche Geschichte')[0]
     assert 8 == iscc.distance(mid1, mid3)
 
-    mid4 = iscc.meta_id('Geschichte, Die Unendliche')
+    mid4 = iscc.meta_id('Geschichte, Die Unendliche')[0]
     assert 9 == iscc.distance(mid1, mid4)
 
 
@@ -129,30 +129,30 @@ def test_hamming_distance():
     b = 0b1000111
     assert iscc.distance(a, b) == 2
 
-    mid1 = iscc.meta_id('Die Unendliche Geschichte', 'von Michael Ende')
+    mid1 = iscc.meta_id('Die Unendliche Geschichte', 'von Michael Ende')[0]
 
     # Change one Character
-    mid2 = iscc.meta_id('Die UnXndliche Geschichte', 'von Michael Ende')
+    mid2 = iscc.meta_id('Die UnXndliche Geschichte', 'von Michael Ende')[0]
     assert iscc.distance(mid1, mid2) <= 10
 
     # Delete one Character
-    mid2 = iscc.meta_id('Die nendliche Geschichte', 'von Michael Ende')
+    mid2 = iscc.meta_id('Die nendliche Geschichte', 'von Michael Ende')[0]
     assert iscc.distance(mid1, mid2) <= 14
 
     # Add one Character
-    mid2 = iscc.meta_id('Die UnendlicheX Geschichte', 'von Michael Ende')
+    mid2 = iscc.meta_id('Die UnendlicheX Geschichte', 'von Michael Ende')[0]
     assert iscc.distance(mid1, mid2) <= 13
 
     # Add, change, delete
-    mid2 = iscc.meta_id('Diex Unandlische Geschiche', 'von Michael Ende')
+    mid2 = iscc.meta_id('Diex Unandlische Geschiche', 'von Michael Ende')[0]
     assert iscc.distance(mid1, mid2) <= 22
 
     # Change Word order
-    mid2 = iscc.meta_id('Unendliche Geschichte, Die', 'von Michael Ende')
+    mid2 = iscc.meta_id('Unendliche Geschichte, Die', 'von Michael Ende')[0]
     assert iscc.distance(mid1, mid2) <= 13
 
     # Totaly different
-    mid2 = iscc.meta_id('Now for something different')
+    mid2 = iscc.meta_id('Now for something different')[0]
     assert iscc.distance(mid1, mid2) >= 25
 
 
