@@ -2,7 +2,7 @@ title: ISCC - Specification
 description: Draft Specification of International Standard Content Codes
 authors: Titusz Pan
 
-# ISCC - Specification - v1.0
+# ISCC - Specification v1.0
 
 !!! attention
 
@@ -30,25 +30,29 @@ The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "S
 
 ## Definitions
 
-Base Metadata
-:	Minimal set of required metadata about the digital media object that is identified by an ISCC.
+Basic Metadata:
+: 	Minimal set of required metadata about the digital media object that is identified by an ISCC.
 
-Character
+Character:
 :	Throughout this specification a **character** is meant to be interpreted as one Unicode code point. This also means that due to the structure of Unicode a character is not necessarily a full glyph but might be a combining accent or similar.
 
-Digital Media Object
-:	A blob of raw bytes with some media type specific encoding. 
+Digital Media Object:
+:	A blob of raw bytes with some media type specific encoding.
 
-Generic Media Type
+Extended Metadata:
+:	Metadata that is not encoded within the ISCC but may be supplied together with the ISCC.
+
+
+Generic Media Type:
 :	A basic content type such as plain text in a normalized and *generic* ([UTF-8](https://en.wikipedia.org/wiki/UTF-8)) encoding format.
 
-ISCC
+ISCC:
 :	International Standard Content Code
 
-ISCC Code
+ISCC Code:
 :	The printable text encoded representation of an ISCC
 
-ISCC Digest
+ISCC Digest:
 :	The raw binary data of an ISCC
 
 ## Introduction
@@ -86,7 +90,13 @@ These components may be used independently by applications for various purposes 
 
 ### Component Types
 
-Each component has the same basic structure of a 1-byte header and a 8-byte main section. Each components main section can thus be fit into a 64-bit integer value for efficient data processing. The header-byte of each component is subdivided into 2 nibbles (4 bits). The first nibble specifies the component type while the second nibble is component specific.
+Each component has the same basic structure of a **1-byte header** and a **8-byte body** section. 
+
+The 1-byte header of each component is subdivided into 2 nibbles (4 bits). The first nibble specifies the component type while the second nibble is component specific.
+
+The header only needs to be carried in the encoded representation. As similarity searches accross different components are of little use, the type information contained in the header of each component can be safely ignored after an ISCC has been decomposed and internaly typed by an application. 
+
+The body section of each component is always 8-bytes and can thus be fit into a 64-bit integer for efficient data processing. 
 
 | Component              | Nibble-1 | Nibble-2                        | Byte |
 | :--------------------- | :------- | :------------------------------ | :--- |
@@ -112,6 +122,10 @@ The Meta-ID body is built from a 64-bit `similarity_hash` over 4-character n-gra
 | *extra* | text    | No       | A short statement that distinguishes this intangible creation from another one. (default: empty string) |
 | version | integer | No       | ISCC version number. (default: 0)                            |
 
+!!! note
+
+    The basic metadata inputs are intentionally simple and generic. We abstain from more specific metadata for Meta-ID generation in favor of compatibility accross industries. Imagine a *creators* input-field for metadata. Who would you list as the creators of a movie? The directors, writers the main actors? Would you list some of them or if not how do you decide whom you will list. All disambiguation of similar title data can be acomplished with the extra-field. Industry- and application-specific metadata requirements can be supplied as extended metadata with ISCC registration.
+
 ### Generate Meta-ID
 
 An ISCC generating application must follow these steps in the given order to produce a stable Meta-ID:
@@ -129,7 +143,7 @@ An ISCC generating application must follow these steps in the given order to pro
 
 
 !!! warning "Text trimming"
-    When trimming text be sure to trim the byte-length of the UTF-8 encoded version and not the number of characters. The trim point must be such, that it does not cut into multibyte characters. Characters might have different UTF-8 byte-length. For example `ü` is 2-bytes, `驩` is 3-bytes and `𠜎` is 4-bytes. So the trimmed version of a string with 128 `驩`-characters will result in a 42-character string with a 126-byte UTF-8 encoded length. This is necessary because the results of this operation will be stored as base metadata with strict byte size limits on the blockchain. 
+    When trimming text be sure to trim the byte-length of the UTF-8 encoded version and not the number of characters. The trim point must be such, that it does not cut into multibyte characters. Characters might have different UTF-8 byte-length. For example `ü` is 2-bytes, `驩` is 3-bytes and `𠜎` is 4-bytes. So the trimmed version of a string with 128 `驩`-characters will result in a 42-character string with a 126-byte UTF-8 encoded length. This is necessary because the results of this operation will be stored as basic metadata with strict byte size limits on the blockchain. 
 
 !!! tip "Pre-normalization"
     Applications that perform automated data-ingestion should apply a custimized preliminary normalization to title data tailored to the dataset. Depending on catalog data removing pairs of brackets [], (), {}, and text inbetween them or cutting all text after the first occurence of a semicolon (;) or colon (:) can vastly improve de-duplication. 
@@ -241,13 +255,11 @@ An ISCC generating application must provide a `instance_id` function that accept
 
 Applications may carry, store, and process the full hash-tree for advanced partial data integrity verification.
 
-
-
 ## Procedures & Algorithms
 
 ### Base58-ISCC Encoding
 
-The ISCC uses a custom per-component data encoding that is based on the [zbase62](https://github.com/simplegeo/zbase62) encoding by [Zooko Wilcox-O'Hearn](https://en.wikipedia.org/wiki/Zooko_Wilcox-O%27Hearn). The encoding does not require padding and will allways yield codes of 13 characters length for our 72-bit component digests. The fixed-length encoding allows us to easily decode a fully qualified ISCC-Code without having to rely on a hypen as separator. Colliding body segments of the digest are preserved by encoding the header and body separately. The symbol table also minimizes transcription and OCR errors by omitting the easily confused characters `'O', '0', 'I', 'l'`.
+The ISCC uses a custom per-component data encoding that is based on the [zbase62](https://github.com/simplegeo/zbase62) encoding by [Zooko Wilcox-O'Hearn](https://en.wikipedia.org/wiki/Zooko_Wilcox-O%27Hearn). The encoding does not require padding and will always yield component codes of 13 characters length for our 72-bit digests. The predictable size of the encoding is a property that allows for easy composition and decomposition of components without having to rely on a delimiter (hyphen) in the ISCC code representation. Colliding body segments of the digest are preserved by encoding the header and body separately. The symbol table also minimizes transcription and OCR errors by omitting the easily confused characters `'O', '0', 'I', 'l'`.
 
 #### encode(digest)
 
@@ -373,35 +385,11 @@ def minimum_hash(features: Sequence[int]) -> List[int]:
     return hashvalues
 ```
 
-
-
-
-
-### Normalize Creators
-
-!!! todo
-
-    Specify `normalize_creator` function
-
-### Tokenize Text
-
-!!! todo
-
-    Specify `tokenize_text` function
-
-*[CDC]: Content defined chunking
-
 ## Footnotes
-
-[^base32]: **Base Encoding:** The final base encoding for this specification might change before version 1. Base32 was chosen because it is a widely accepted standard and has implementations in most popular programming languages. It is url safe, case insensitive and encodes the ISCC octets to a fixed size alphanumeric string. The predictable size of the encoding is a property that we need for composition and decomposition of components without having to rely on a delimiter (hyphen) in the ISCC code representation. We might change to a non standard base62, mixed case encoding to create shorter ISCC codes before the final version 1 specification.
-
-[^component-length]: **Component structure:** We might switch to a different base structure for components. For example we might use a variable length header and a bigger 8-byte body. The header would only be carried in the encoded representation and applications could use full 64-bit space per component. As similarity searches accross different components make no sense, the type information contained in the header of each component can be safely ignored after an ISCC has been decomposed and internaly typed by an application.
-
-[^creators]: **Meta-ID creators field:** We have tested multiple normalization strategies for *creators* metadata and it works fairly well. The optional `creators`-field is a strong discriminator when dealing with similar title texts. But our tests indicate that the main problem for a generic conent identifier is in the semantic ambiguity of the `creators`-field accross industries. For example, who would you list as the creators of a movie, the directors, writers, main actors? Would you list some of them or if not how do you decide whom you will list. We will do some more evaluation and might remove the `creators`-field altogether for the final version 1 specification. All disambiguation of similar title data would then have to move to the `extra`-field.
 
 [^sha256d]: **Instance-ID data integrity:**  To guard against length-extension attacks and second pre-image attacks we use double sha256 for hashing. We also prefix the hash input data with a `0x00`-byte for the leaf nodes hashes and with a `0x01`-byte for the  internal node hashes.
 
-[^tophash]: **Instance-ID binding:** We might add an additional step to the final Instance-ID component by hashing the concatenation of the preceeding components and the **top-hash**. This would bind the Instance-ID to the other components. But this would also chainge its semantics to encode integrity of data and metadata together.
+*[CDC]: Content defined chunking
 
 *[ISCC Code]: Base58-ISCC encoded string representation of an ISCC
 
