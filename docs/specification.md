@@ -61,19 +61,19 @@ The ISCC Digest is a fixed size sequence of 36 bytes (288 bits) assembled from m
 
 ![iscc-creation-process](images/iscc-creation-process.svg)
 
-### Components
+### ISCC Components
 
 The ISCC Digest is built from multiple self-describing 72-bit components:
 
 
-| Components:     | Meta-ID             | Content-ID         | Data-ID              | Instance-ID    |
-| :-------------- | :------------------ | :----------------- | :------------------- | :------------- |
-| **Context:**    | Intangible creation | Content similarity | Data similarity      | Data checksum  |
-| **Input:**      | Metadata            | Extracted  content | Raw data             | Raw data       |
-| **Algorithms:** | Similarity Hash     | Type specific      | CDC, Similarity Hash | CDC, Hash Tree |
-| **Size:**       | 72 bits             | 72 bits            | 72 bits              | 72 bits        |
+| Components:     | Meta-ID             | Content-ID         | Data-ID           | Instance-ID    |
+| :-------------- | :------------------ | :----------------- | :---------------- | :------------- |
+| **Context:**    | Intangible creation | Content similarity | Data similarity   | Data checksum  |
+| **Input:**      | Metadata            | Extracted  content | Raw data          | Raw data       |
+| **Algorithms:** | Similarity Hash     | Type specific      | CDC, Minimum Hash | CDC, Hash Tree |
+| **Size:**       | 72 bits             | 72 bits            | 72 bits           | 72 bits        |
 
-These components may be used independently by applications for various purposes but must be combined into a 52 character base58-iscc encoded string (55 with hyphens) for a fully qualified ISCC Code. The components must be combined in the fixed order of Meta-ID, Content-ID, Data-ID, Instance-ID and may be separated by hyphens.
+These components may be used independently by applications for various purposes but must be combined into a 52 character [base58-iscc](#base58-iscc-encoding) encoded string (55 with hyphens) for a fully qualified ISCC Code. The components must be combined in the fixed order of Meta-ID, Content-ID, Data-ID, Instance-ID and may be separated by hyphens.
 
 !!! examples
     **Printable output:**
@@ -102,13 +102,23 @@ Each component has the same basic structure of a 1-byte header and a 8-byte main
 
 ## Meta-ID Component
 
-The Meta-ID component is built from minimal and generic metadata of the content to be identified. All *text* information supplied to the META-ID generating function is assumed to be UTF-8 encoded. Errors that occur during the decoding of such a bytestring input to a native Unicode must terminate the process and must not be silenced. An ISCC generating application must provide a `meta_id` function that accepts the following inputs:
+### Header
 
-| Name                  | Type    | Required | Description                                                  |
-| :-------------------- | :------ | :------- | :----------------------------------------------------------- |
-| *title*               | text    | Yes      | The title of an intangible creation.                         |
-| *extra*               | text    | No       | A short statement that distinguishes this intangible creation from another one. |
-| version               | integer | No       | ISCC version number (default: 0)                             |
+The Meta-ID component starts with a 1-byte header `00000000`. The first nibble `0000` indicates that this is a Meta-ID component type. The second nibble `0000` indicates that it belongs to an ISCC of version 1. All subsequent components are expected to follow the specification of a version 1 ISCC.
+
+### Body
+
+The Meta-ID body is built from a 64-bit `similarity_hash` over 4-character n-grams of the basic metadata of the content to be identified. 
+
+### Basic Metadata
+
+All *text* information supplied to the META-ID generating function is assumed to be UTF-8 encoded. Errors that occur during the decoding of such a bytestring input to a native Unicode must terminate the process and must not be silenced. An ISCC generating application must provide a `meta_id` function that accepts the following minimal and generic metadata inputs:
+
+| Name    | Type    | Required | Description                                                  |
+| :------ | :------ | :------- | :----------------------------------------------------------- |
+| *title* | text    | Yes      | The title of an intangible creation.                         |
+| *extra* | text    | No       | A short statement that distinguishes this intangible creation from another one. (default: empty string) |
+| version | integer | No       | ISCC version number (default: 0)                             |
 
 The `meta_id` function must return a valid [Base58-ISCC encoded](#base58-iscc-encoding) Meta-ID component.
 
@@ -139,7 +149,7 @@ Ideally we want multiple ISCCs that identify different manifestations of the *sa
 
 Auto-generated Meta-IDs components are **expected** to miss some intended collisions. An application should check for such **missed intended component collisions** before registering a new Meta-ID with the *canonical registry* of ISCCs by conducting a similarity search and asking for user feedback.
 
-But what about **unintended component collisions**? Such collisions might happen because two *different intangible creations* have very similar or even identical metadata. But they might also happen simply by chance. With 2^56 possibile Meta-ID components the probability of random collisions rises in an S-cuved shape with the number of deployed ISCCs (see: [Hash Collision Probabilities](http://preshing.com/20110504/hash-collision-probabilities/)).  We should keep in mind that, the Meta-ID component is only one part of a fully qualified ISCC Code. Sporadic unintended collisions of the Meta-ID component are generally deemed as **acceptable and expected**. 
+But what about **unintended component collisions**? Such collisions might happen because two *different intangible creations* have very similar or even identical metadata. But they might also happen simply by chance. With 2^56 possibile Meta-ID components the probability of random collisions rises in an S-cuved shape with the number of deployed ISCCs (see: [Hash Collision Probabilities](http://preshing.com/20110504/hash-collision-probabilities/)).  We should keep in mind that, the Meta-ID component is only one part of a fully qualified ISCC Code. Unintended collisions of the Meta-ID component are generally deemed as **acceptable and expected**. 
 
 If for any reason an application wants to avoid unintended collisions with pre-existing Meta-ID components it may utilze the `extra`-field. An application must first generate a Meta-ID without asking the user for input to the `extra`-field and then first check for collisions with the *canonical registry* of ISCCs. After it finds a collision with a pre-existing Meta-ID it may display the metadata of the colliding entry and interact with the user to determine if it indeed is an unintended collision. Only if the user indicates an unintended collision, may the application ask for a disambiguation that is than added as an ammendment to the metadata via the `extra`-field to create a different Meta-ID component. The application may repeat the pre-existence check until it finds no collision or a user intended collision. The application must not supply autogenerated input to the `extra`-field.
 
@@ -147,7 +157,7 @@ It is our opinion that the concept of **intended collisions** of Meta-ID compone
 
 ## Content-ID
 
-The Content-ID component has multiple subtypes. The subtypes correspond with the **Generic Media Types (GMT)**. A fully qualified ISCC can only have a Content-ID component of one specific GMT, but there can be multiple ISCCs with different Content-ID types per digital media object.
+The Content-ID component has multiple subtypes. The subtypes correspond with the **Generic Media Types (GMT)**. A fully qualified ISCC can only have a Content-ID component of one specific GMT, but there may be multiple ISCCs with different Content-ID types per digital media object.
 
 A Content-ID is generated in two broad steps. In the first step, we extract and convert content from a rich media type to a normalized GMT. In the second step, we use a GMT-specific process to generate the Content-ID component of an ISCC. 
 
