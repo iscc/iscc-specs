@@ -99,24 +99,25 @@ def generate_content_id_text(text: Union[str, bytes], partial=False) -> str:
     features = (xxhash.xxh32(s.encode('utf-8')).intdigest() for s in shingles)
 
     # 6. Apply minimum_hash
-    minhash_vector = minimum_hash(features)
+    minhash = minimum_hash(features)
 
-    # 7. Convert minhash to 4-byte digests
-    byte_features = (struct.pack('<I', i) for i in minhash_vector)
+    # 7. Collect least significant bits
+    lsb = ''.join([str(x & 1) for x in minhash])
 
-    # 8. Reshash byte features to 64-bit so we don´t clutter lower hash spaces
-    rehashed = [xxhash.xxh64(bf).digest() for bf in byte_features]
+    # 8. Create two 64-bit digests
+    a = int(lsb[:64], 2).to_bytes(8, 'big', signed=False)
+    b = int(lsb[64:], 2).to_bytes(8, 'big', signed=False)
 
-    # 9. Apply similarity_hash
-    simhash_digest = similarity_hash(rehashed)
+    # 9. Apply simhash to digests
+    simhash_digest = similarity_hash((a, b))
 
-    # 10. Prepend the 1-byte component header
+    # 10. Prepend component header
     if partial:
         content_id_text_digest = HEAD_CID_T_PCF + simhash_digest
     else:
         content_id_text_digest = HEAD_CID_T + simhash_digest
 
-    # 12 Encode and return
+    # 11. Encode and return
     return encode_component(content_id_text_digest)
 
 
@@ -173,7 +174,7 @@ def generate_content_id_image(img: IMG, partial=False) -> str:
 
 def generate_data_id(data: B) -> str:
 
-    # 1. & 2. XxHas32 over CDC-Chunks
+    # 1. & 2. XxHash32 over CDC-Chunks
     features = (xxhash.xxh32(chunk).intdigest() for chunk in data_chunks(data))
 
     # 3. Apply minimum_hash

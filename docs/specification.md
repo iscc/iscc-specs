@@ -4,7 +4,7 @@ authors: Titusz Pan
 
 # ISCC - Specification Draft
 
-!!! danger "Warning"
+!!! attention
 
     This document is a work in progress draft! It may be updated, replaced, or obsoleted by other documents at any time. This document must not be used as reference material or cited other than as "work in progress".
 
@@ -171,25 +171,15 @@ The Content-ID-Text is built from the extracted plain-text content of an encoded
 An ISCC generating application must provide a `generate_content_id_text(text, partial=False)` function that accepts UTF-8 encoded plain text and a boolean indicating the [partial content flag](#partial-content-flag-pcf) as input and returns a Content-ID with GMT type `text`. The procedure to create a Content-ID-Text is as follows:
 
 1. Apply Unicode standard [Normalization Form KC (NFKC)](http://www.unicode.org/reports/tr15/#Norm_Forms) to the text input.
-
 2. Apply [`normalize_text`](#normalize-text) to the text input.
-
 3. Split the normalized text into a list of words at whitespace boundaries.
-
 4. Create a list of 5 word shingles by sliding word-wise through the list of words.
-
-5. Create  a list of 32-bit unsigned integer features by applying [xxHash32](http://cyan4973.github.io/xxHash/) to shingles from step 4. 
-
-6. Apply `minimum_hash` to the list of 32-bit features from step 5.
-
-7. Convert the resulting list of 32-bit integer features to a list of 4-byte digests.
-
-8. Rehash 4-byte digestst from step 7 to 8-byte distest with [xxHash64](http://cyan4973.github.io/xxHash/).
-
-9. Apply [`similarity_hash`](#similarity-hash) to the list of digests returned from step 8.
-
+5. Create  a list of 32-bit unsigned integer features by applying [xxHash32](http://cyan4973.github.io/xxHash/) to shingles from step 4.
+6. Apply `minimum_hash` to the list of features from step 5.
+7. Collect the least significant bits from the 128 MinHash features from step 6.
+8. Create two 64-bit digests from the first and second half of the collected bits.
+9. Apply [`similarity_hash`](#similarity-hash) to the digests returned from step 8.
 10. Prepend the 1-byte component header (`0x10` full content or `0x11` partial content).
-
 11. Encode and return the resulting 9-byte sequence with [Base58-ISCC Encoding](#base58-iscc-encoding).
 
 ### Content-ID-Image
@@ -414,7 +404,7 @@ def minimum_hash(features: Sequence[int]) -> List[int]:
 
 [^tophash]: **Instance-ID binding:** We might add an additional step to the final Instance-ID component by hashing the concatenation of the preceeding components and the **top-hash**. This would bind the Instance-ID to the other components. But this would also chainge its semantics to encode integrity of data and metadata together.
 
-*[ISCC Code]: Base58-iscc encoded representation of an ISCC
+*[ISCC Code]: Base58-ISCC encoded string representation of an ISCC
 
 *[ISCC Digest]: Raw binary data of an ISCC
 

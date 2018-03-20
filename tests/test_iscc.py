@@ -59,9 +59,9 @@ def test_generate_meta_id():
 def test_generate_content_id_text():
     cid_t_np = iscc.generate_content_id_text('')
     assert len(cid_t_np) == 13
-    assert "1H2YjJrwcz4gb" == cid_t_np
+    assert "1HLesNXNRrbbU" == cid_t_np
     cid_t_p = iscc.generate_content_id_text('', partial=True)
-    assert "1J2YjJrwcz4gb" == cid_t_p
+    assert "1JLesNXNRrbbU" == cid_t_p
     assert 0 == iscc.component_hamming_distance(cid_t_p, cid_t_np)
 
     cid_t_a = iscc.generate_content_id_text(TEXT_A)
@@ -209,7 +209,6 @@ def test_generate_instance_id():
     more_bytes = b'\xcc' * 66000
     iid = iscc.generate_instance_id(more_bytes)
     assert iid == '1qdhBrWwK7u7L'
-
 
 
 def test_data_chunks():
