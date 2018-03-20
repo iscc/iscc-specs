@@ -102,7 +102,7 @@ Each component has the same basic structure of a 1-byte header and a 8-byte main
 
 ## Meta-ID Component
 
-The Meta-ID component is built from minimal and generic metadata of the content to be identified. All *text* information supplied to the META-ID generating function is assumed to be UTF-8 encoded. Errors that occur during the decoding of such a bytestring input to a native Unicode must terminate the process and must not be silenced. An ISCC generating application must provide a `generate_meta_id` function that accepts the following inputs:
+The Meta-ID component is built from minimal and generic metadata of the content to be identified. All *text* information supplied to the META-ID generating function is assumed to be UTF-8 encoded. Errors that occur during the decoding of such a bytestring input to a native Unicode must terminate the process and must not be silenced. An ISCC generating application must provide a `meta_id` function that accepts the following inputs:
 
 | Name                  | Type    | Required | Description                                                  |
 | :-------------------- | :------ | :------- | :----------------------------------------------------------- |
@@ -110,7 +110,7 @@ The Meta-ID component is built from minimal and generic metadata of the content 
 | *extra*               | text    | No       | A short statement that distinguishes this intangible creation from another one. |
 | version               | integer | No       | ISCC version number (default: 0)                             |
 
-The `generate_meta_id` function must return a valid [Base58-ISCC encoded](#base58-iscc-encoding) Meta-ID component.
+The `meta_id` function must return a valid [Base58-ISCC encoded](#base58-iscc-encoding) Meta-ID component.
 
 ### Generate Meta-ID
 
@@ -168,7 +168,7 @@ The  Content-ID type is signaled by the first 3 bits of the second nibble of the
 
 The Content-ID-Text is built from the extracted plain-text content of an encoded media object. To build a stable Content-ID-Text the plain-text content must first be extracted from the digital media object. It should be extracted in a way that is reproducible. There are many different text document formats out in the wilde and extracting plain-text from all of them is anything but a trivial task. While text-extraction is out of scope for this specification it is recommend, that plain-text content should be extracted with the open-source [Apache Tika v1.17](https://tika.apache.org/) toolkit, if a generic reproducibility of the Content-ID-Text component is desired. 
 
-An ISCC generating application must provide a `generate_content_id_text(text, partial=False)` function that accepts UTF-8 encoded plain text and a boolean indicating the [partial content flag](#partial-content-flag-pcf) as input and returns a Content-ID with GMT type `text`. The procedure to create a Content-ID-Text is as follows:
+An ISCC generating application must provide a `content_id(text, partial=False)` function that accepts UTF-8 encoded plain text and a boolean indicating the [partial content flag](#partial-content-flag-pcf) as input and returns a Content-ID with GMT type `text`. The procedure to create a Content-ID-Text is as follows:
 
 1. Apply Unicode standard [Normalization Form KC (NFKC)](http://www.unicode.org/reports/tr15/#Norm_Forms) to the text input.
 2. Apply [`normalize_text`](#normalize-text) to the text input.
@@ -186,12 +186,13 @@ An ISCC generating application must provide a `generate_content_id_text(text, pa
 
 For the Content-ID-Image we are opting for a DCT-based perceptual image hash instead of a more sophisticated keypoint detection based method. In view of the generic deployabiility of the ISCC we chose an algorithm that has moderate computation requirements and is easy to implement while still being robust against most common minor image manipulations. 
 
-An ISCC generating application must provide a `generate_content_id_image(image, partial=False)` function that accepts a local file path to an image and returns a Content-ID with GMT type `image`. The procedure to create a Content-ID-Image is as follows:
+An ISCC generating application must provide a `content_id_image(image, partial=False)` function that accepts a local file path to an image and returns a Content-ID with GMT type `image`. The procedure to create a Content-ID-Image is as follows:
 
 1. Convert image to greyscale
-2. Resize the image to 32x32 pixels with [bicubic interpolation](https://en.wikipedia.org/wiki/Bicubic_interpolation)
+2. Resize the image to 32x32 pixels using [bicubic interpolation](https://en.wikipedia.org/wiki/Bicubic_interpolation)
 3. Create a 32x32 two-dimensional array of 8-bit greyscale values from the image data
-4. Perform a discrete cosine transform per row and column
+4. Perform a discrete cosine transform per row
+5. Perform a DCT per column on the resulting matrix from step 4.
 5. Extract upper left 8x8 corner of array from step 4 as a flat list
 6. Calculate the median of the results from step 5
 7. Create a 64-bit digest by iterating over the values of step 5 and setting a  `1`- for values above median and `0` for values below or equal to median.
@@ -199,7 +200,7 @@ An ISCC generating application must provide a `generate_content_id_image(image, 
 10. Encode and return the resulting 9-byte sequence with [Base58-ISCC Encoding](#base58-iscc-encoding)
 
 !!! note "Image Data Input"
-    The `generate_content_id_image` function may optionally accept the raw byte data of an encoded image or an internal native image object as input for convenience.
+    The `content_id_image` function may optionally accept the raw byte data of an encoded image or an internal native image object as input for convenience.
 
 ### Partial Content Flag (PCF)
 
@@ -210,7 +211,7 @@ the Meta-, Data-, and Instance-IDs are the compound key for the magazine issue, 
 
 For the Data-ID that should encode data similarty we use content defined chunking algorithm that provides some shift resistance and calculate the MinHash from those chunks. To accomodate for small files the first 100 chunks have a ~140-byte size target while the remaining chunks target ~ 6kb in size.
 
-The Data-ID is built from the raw encoded data of the content to be identified. An ISCC generating application must provide a `generate_data_id` function that accepts the raw encoded data as input. Generate a Data-ID by this procedure:
+The Data-ID is built from the raw encoded data of the content to be identified. An ISCC generating application must provide a `data_id` function that accepts the raw encoded data as input. Generate a Data-ID by this procedure:
 
 1. Apply `chunk_data` to the raw encoded content data.
 2. For each chunk calculate the xxHash32 integer hash.
@@ -223,11 +224,11 @@ The Data-ID is built from the raw encoded data of the content to be identified. 
 
 ## Instance-ID
 
-The Instance-ID is built from the raw data of the media object to be identified and serves as basic checksum for the media object. The raw data of the media object is split into 64-kB data-chunks. Then we build a hash-tree from those chunks and use the truncated top-hash for the Instance-ID:
+The Instance-ID is built from the raw data of the media object to be identified and serves as checksum for the media object. The raw data of the media object is split into 64-kB data-chunks. Then we build a hash-tree from those chunks and use the truncated top-hash as component body of the Instance-ID:
 
 ![iscc-creation-instance-id](images/iscc-creation-instance-id.svg)
 
-An ISCC generating application must provide a `generate_instance_id` function that accepts the raw data file as input and returns an encoded Instance-ID. Generate an Instance-ID by this procedure:
+An ISCC generating application must provide a `instance_id` function that accepts the raw data file as input and returns an encoded Instance-ID. Generate an Instance-ID by this procedure:
 
 1. Split the raw bytes of the encoded media object into 64-kB chunks.
 2. For each chunk calculate the sha256d[^sha256d] digest of the concatenation of a `0x00`-byte and the chunk bytes. We call the resulting values *leaf node hashes* (LNH).
@@ -247,13 +248,13 @@ Applications may carry, store, and process the full hash-tree for advanced parti
 
 The ISCC uses a custom per-component data encoding that is based on the [zbase62](https://github.com/simplegeo/zbase62) encoding by [Zooko Wilcox-O'Hearn](https://en.wikipedia.org/wiki/Zooko_Wilcox-O%27Hearn). The encoding does not require padding and will allways yield codes of 13 characters length for our 72-bit component digests. The fixed-length encoding allows us to easily decode a fully qualified ISCC-Code without having to rely on a hypen as separator. Colliding body segments of the digest are preserved by encoding the header and body separately. The symbol table also minimizes transcription and OCR errors by omitting the easily confused characters `'O', '0', 'I', 'l'`.
 
-#### encode_component(digest)
+#### encode(digest)
 
-The `encode_component` function accepts a 9-byte **ISCC Component Digest** and returns the Base58-ISCC encoded  alphanumeric string of 13 characters which we call the **ISCC-Component Code**.
+The `encode` function accepts a 9-byte **ISCC Component Digest** and returns the Base58-ISCC encoded  alphanumeric string of 13 characters which we call the **ISCC-Component Code**.
 
-#### decode_component(code)
+#### decode(code)
 
-the `decode_component` function accepts a 13-character **ISCC-Component Code** and returns the corresponding 9-byte **ISCC-Component Digest**.
+the `decode` function accepts a 13-character **ISCC-Component Code** and returns the corresponding 9-byte **ISCC-Component Digest**.
 
 #### Reference Code (BI):
 
@@ -263,9 +264,9 @@ VALUES = ''.join([chr(i) for i in range(58)])
 V2CTABLE = str.maketrans(VALUES, SYMBOLS)
 C2VTABLE = str.maketrans(SYMBOLS, VALUES)
 
-def encode_component(digest: bytes) -> str:
+def encode(digest: bytes) -> str:
     if len(digest) == 9:
-        return encode_component(digest[:1]) + encode_component(digest[1:])
+        return encode(digest[:1]) + encode(digest[1:])
     assert len(digest) in (1, 8), "Digest must be 1, 8 or 9 bytes long"
     digest = reversed(digest)
     value = 0
@@ -281,10 +282,10 @@ def encode_component(digest: bytes) -> str:
         numvalues //= 58
     return str.translate(''.join([chr(c) for c in reversed(chars)]), V2CTABLE)
 
-def decode_component(code: str) -> bytes:
+def decode(code: str) -> bytes:
     n = len(code)
     if n == 13:
-        return decode_component(code[:2]) + decode_component(code[2:])
+        return decode(code[:2]) + decode(code[2:])
     if n == 2:
         bit_length = 8
     elif n == 11:
@@ -307,9 +308,6 @@ def decode_component(code: str) -> bytes:
         numvalues //= 256
     return bytes(reversed(data))
 ```
-
-
-
 
 ### Normalize Text
 

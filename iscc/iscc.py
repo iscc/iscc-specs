@@ -1,11 +1,7 @@
 # -*- coding: utf-8 -*-
 """ISCC Reference Implementation"""
-import re
-import struct
-from itertools import islice
 from statistics import median
 import math
-import base64
 from io import BytesIO
 from hashlib import sha256
 import unicodedata
@@ -23,11 +19,12 @@ VALUES = ''.join([chr(i) for i in range(58)])
 C2VTABLE = str.maketrans(SYMBOLS, VALUES)
 V2CTABLE = str.maketrans(VALUES, SYMBOLS)
 INPUT_TRIM = 128
-NGRAM_SIZE_META_ID = 4
+WINDOW_SIZE_MID = 4
+WINDOW_SIZE_CID_T = 5
 B = TypeVar('B', BinaryIO, bytes)
 IMG = TypeVar('I', str, BytesIO, Image.Image)
 
-# Component Type Header Markers
+
 HEAD_MID = b'\x00'
 HEAD_CID_T = b'\x10'
 HEAD_CID_T_PCF = b'\x11'
@@ -39,7 +36,7 @@ HEAD_DID = b'\x20'
 HEAD_IID = b'\x30'
 
 
-def generate_meta_id(title: Union[str, bytes], extra: Union[str, bytes]='', version: int=0) -> str:
+def meta_id(title: Union[str, bytes], extra: Union[str, bytes]='', version: int=0) -> str:
 
     assert version == 0, "Only version 0 supported"
 
@@ -64,7 +61,7 @@ def generate_meta_id(title: Union[str, bytes], extra: Union[str, bytes]='', vers
     concat = '\u0020'.join((title, extra)).strip()
 
     # 5. Create a list of n-grams
-    n_grams = sliding_window(concat, width=NGRAM_SIZE_META_ID)
+    n_grams = sliding_window(concat, width=WINDOW_SIZE_MID)
 
     # 6. Encode n-grams and create xxhash64-digest
     hash_digests = [xxhash.xxh64(s.encode('utf-8')).digest() for s in n_grams]
@@ -76,10 +73,10 @@ def generate_meta_id(title: Union[str, bytes], extra: Union[str, bytes]='', vers
     meta_id_digest = HEAD_MID + simhash_digest
 
     # 9. Encode with base58_iscc
-    return encode_component(meta_id_digest)
+    return encode(meta_id_digest)
 
 
-def generate_content_id_text(text: Union[str, bytes], partial=False) -> str:
+def content_id_text(text: Union[str, bytes], partial=False) -> str:
 
     # 1. Apply Unicode NFKC normalization
     if isinstance(text, bytes):
@@ -93,7 +90,7 @@ def generate_content_id_text(text: Union[str, bytes], partial=False) -> str:
     words = text.split()
 
     # 4. Create 5 word shingles
-    shingles = ('\u0020'.join(l) for l in sliding_window(words, 5))
+    shingles = ('\u0020'.join(l) for l in sliding_window(words, WINDOW_SIZE_CID_T))
 
     # 5. Create 32-bit features with xxHash32
     features = (xxhash.xxh32(s.encode('utf-8')).intdigest() for s in shingles)
@@ -118,10 +115,10 @@ def generate_content_id_text(text: Union[str, bytes], partial=False) -> str:
         content_id_text_digest = HEAD_CID_T + simhash_digest
 
     # 11. Encode and return
-    return encode_component(content_id_text_digest)
+    return encode(content_id_text_digest)
 
 
-def generate_content_id_image(img: IMG, partial=False) -> str:
+def content_id_image(img: IMG, partial=False) -> str:
 
     if not isinstance(img, Image.Image):
         img = Image.open(img)
@@ -169,10 +166,10 @@ def generate_content_id_image(img: IMG, partial=False) -> str:
         content_id_image_digest = HEAD_CID_I + hash_digest
 
     # 9. Encode and return
-    return encode_component(content_id_image_digest)
+    return encode(content_id_image_digest)
 
 
-def generate_data_id(data: B) -> str:
+def data_id(data: B) -> str:
 
     # 1. & 2. XxHash32 over CDC-Chunks
     features = (xxhash.xxh32(chunk).intdigest() for chunk in data_chunks(data))
@@ -194,10 +191,10 @@ def generate_data_id(data: B) -> str:
     data_id_digest = HEAD_DID + simhash_digest
 
     # 8. Encode and return
-    return encode_component(data_id_digest)
+    return encode(data_id_digest)
 
 
-def generate_instance_id(data: B) -> str:
+def instance_id(data: B) -> str:
 
     if not hasattr(data, 'read'):
         data = BytesIO(data)
@@ -214,7 +211,7 @@ def generate_instance_id(data: B) -> str:
     top_hash_digest = top_hash(leaf_node_digests)
     instance_id_digest = HEAD_IID + top_hash_digest[:8]
 
-    return encode_component(instance_id_digest)
+    return encode(instance_id_digest)
 
 
 def trim(text: str) -> str:
@@ -319,45 +316,10 @@ def normalize_text(text: str) -> str:
     return normalized
 
 
-def normalize_creators(text: str) -> str:
-
-    nonum = re.sub("\d+", "", text, flags=re.UNICODE)
-
-    creators = []
-
-    for creator in nonum.split(';'):
-
-        if ',' in creator:
-            creator = ' '.join(reversed(creator.split(',')[:2]))
-        ncreators = normalize_text(creator)
-
-        tokens = ncreators.split()
-        if not tokens:
-            continue
-        if tokens[0] == tokens[-1]:
-            abridged = tokens[0]
-        else:
-            abridged = tokens[0][0] + tokens[-1]
-        creators.append(abridged)
-
-    return '\u0020'.join(sorted(creators))
-
-
 def sliding_window(text: Sequence, width: int) -> List:
     assert width >= 2, "Sliding window width must be 2 or bigger."
     idx = range(max(len(text) - width + 1, 1))
     return [text[i:i + width] for i in idx]
-
-
-def join_bytes(seq: Iterable[bytes], n=8) -> Iterable[bytes]:
-    """Returns concatenated byte strings of window size n"""
-    it = iter(seq)
-    result = tuple(islice(it, n))
-    if len(result) == n:
-        yield b''.join(result)
-    for elem in it:
-        result = result[1:] + (elem,)
-        yield b''.join(result)
 
 
 def minimum_hash(features: Iterable[int]) -> List[int]:
@@ -414,31 +376,22 @@ def dct(value_list: Sequence[float]) -> Sequence[float]:
     return dct_list
 
 
-def c2d(code: str) -> ByteString:
+def distance(a: Union[int, str, bytes], b: Union[int, str, bytes]) -> int:
 
-    return base64.b32decode(code + '===')
+    if isinstance(a, str) and isinstance(b, str):
+        a = decode(a)[1:]
+        b = decode(b)[1:]
 
+    if isinstance(a, bytes) and isinstance(b, bytes):
+        a = int.from_bytes(a, 'big', signed=False)
+        b = int.from_bytes(b, 'big', signed=False)
 
-def c2i(code):
-
-    digest = c2d(code)
-    return int.from_bytes(digest[1:8], 'big', signed=False)
-
-
-def hamming_distance(ident1: int, ident2: int) -> int:
-
-    return bin(ident1 ^ ident2).count('1')
+    return bin(a ^ b).count('1')
 
 
-def component_hamming_distance(component1: str, component2: str):
-    c1 = int.from_bytes(decode_component(component1)[1:], 'big', signed=False)
-    c2 = int.from_bytes(decode_component(component2)[1:], 'big', signed=False)
-    return hamming_distance(c1, c2)
-
-
-def encode_component(digest: bytes) -> str:
+def encode(digest: bytes) -> str:
     if len(digest) == 9:
-        return encode_component(digest[:1]) + encode_component(digest[1:])
+        return encode(digest[:1]) + encode(digest[1:])
     assert len(digest) in (1, 8), "Digest must be 1, 8 or 9 bytes long"
     digest = reversed(digest)
     value = 0
@@ -455,10 +408,10 @@ def encode_component(digest: bytes) -> str:
     return str.translate(''.join([chr(c) for c in reversed(chars)]), V2CTABLE)
 
 
-def decode_component(code: str) -> bytes:
+def decode(code: str) -> bytes:
     n = len(code)
     if n == 13:
-        return decode_component(code[:2]) + decode_component(code[2:])
+        return decode(code[:2]) + decode(code[2:])
     if n == 2:
         bit_length = 8
     elif n == 11:
