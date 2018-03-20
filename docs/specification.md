@@ -2,7 +2,7 @@ title: ISCC - Specification
 description: Draft Specification of International Standard Content Codes
 authors: Titusz Pan
 
-# ISCC - Specification Draft
+# ISCC - Specification - v1.0
 
 !!! attention
 
@@ -18,11 +18,11 @@ For public discussion of issues for this draft please use the Github issue track
 
 The latest published version of this draft can be found at <http://iscc.codes/specification/>. 
 
-Public discussion and contributions are welcome.
+Public review, discussion and contributions are welcome.
 
 ## About this Document
 
-This document proposes an open and vendor neutral ISCC standard and describes the technical procedures to create and manage ISCC identifiers. The document is initially produced by the [Content Blockchain Project](https://content-blockchain.org) that received funding from the [Google Digital News Initiative (DNI)](https://digitalnewsinitiative.com/dni-projects/content-blockchain-project/). The content of this document is determined by its authors in an open and public consensus process.
+This document proposes an open and vendor neutral ISCC standard and describes the technical procedures to create and manage ISCC identifiers. The first version of this document is produced by the [Content Blockchain Project](https://content-blockchain.org) as a prototype and received funding from the [Google Digital News Initiative (DNI)](https://digitalnewsinitiative.com/dni-projects/content-blockchain-project/). The content of this document is determined by its authors in an open and public consensus process.
 
 ## Conventions and Terminology
 
@@ -31,7 +31,7 @@ The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "S
 ## Definitions
 
 Base Metadata
-:	Minimal set of required metadata about the content that is identified by an ISCC.
+:	Minimal set of required metadata about the digital media object that is identified by an ISCC.
 
 Character
 :	Throughout this specification a **character** is meant to be interpreted as one Unicode code point. This also means that due to the structure of Unicode a character is not necessarily a full glyph but might be a combining accent or similar.
@@ -73,7 +73,7 @@ The ISCC Digest is built from multiple self-describing 72-bit components:
 | **Algorithms:** | Similarity Hash     | Type specific      | CDC, Similarity Hash | CDC, Hash Tree |
 | **Size:**       | 72 bits             | 72 bits            | 72 bits              | 72 bits        |
 
-These components may be used independently by applications for various purposes but must be combined into a 52 character base58 encoded string (55 with hyphens) for a fully qualified ISCC Code. The components must be combined in the fixed order of Meta-ID, Content-ID, Data-ID, Instance-ID and may be separated by hyphens.
+These components may be used independently by applications for various purposes but must be combined into a 52 character base58-iscc encoded string (55 with hyphens) for a fully qualified ISCC Code. The components must be combined in the fixed order of Meta-ID, Content-ID, Data-ID, Instance-ID and may be separated by hyphens.
 
 !!! examples
     **Printable output:**
