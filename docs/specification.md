@@ -2,7 +2,7 @@ title: ISCC - Specification
 description: Draft Specification of International Standard Content Codes
 authors: Titusz Pan
 
-# ISCC - Specification v0.9.0
+# ISCC - Specification v0.9.1
 
 !!! attention
 
@@ -10,7 +10,7 @@ authors: Titusz Pan
 
 ## Abstract
 
-The **International Standard Content Code (ISCC)**, is an open and decentralized digital media identifier. An ISCC can be created from digital content and its basic metadata by anybody who follows the procedures of the ISCC specification or by using open source software that supports ISCC creation conforming to the ISCC specification.
+The **International Standard Content Code (ISCC)**, is an open and decentralized digital media identifier. An ISCC can be created from digital content and its basic metadata by anybody who follows the procedures of the ISCC specification or by using open source software that supports ISCC creation [conforming to the ISCC specification](#conformance-testing).
 
 ## Note to Readers
 
@@ -387,6 +387,21 @@ def minimum_hash(features: Sequence[int]) -> List[int]:
             nhs.append(min(nh, hashvalues[x]))
         hashvalues = nhs
     return hashvalues
+```
+
+## Conformance Testing
+
+An application that claims ISCC conformance must pass the ISCC conformance test suite. The test suite is available as json data in our [Github Repository](https://raw.githubusercontent.com/coblo/iscc-specs/master/tests/test_data.json). Testdata is stuctured as follows:
+
+```json
+{
+    "<function_name>": {
+        "<test_name>": {
+            "inputs": ["<func_input_value1>", "<func_input_value2>"],
+            "outputs": ["<func_output_value1>", "<func_output_value2>"]
+        }
+    }
+}
 ```
 
 
