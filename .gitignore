@@ -4,3 +4,5 @@ site/
 # JetBrains IDE settings
 .idea/
 __pycache__/
+
+.pytest_cache/
