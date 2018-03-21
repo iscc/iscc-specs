@@ -92,10 +92,11 @@ def test_trim():
 
 
 def test_sliding_window():
-
-    assert iscc.sliding_window('', width=4) == ['']
-    assert iscc.sliding_window('A', width=4) == ['A']
-    assert iscc.sliding_window('Hello', width=4) == ['Hell', 'ello']
+    assert list(iscc.sliding_window('', width=4)) == ['']
+    assert list(iscc.sliding_window('A', width=4)) == ['A']
+    assert list(iscc.sliding_window('Hello', width=4)) == ['Hell', 'ello']
+    words = ('lorem', 'ipsum', 'dolor', 'sit', 'amet')
+    assert list(iscc.sliding_window(words, 2))[0] == ('lorem', 'ipsum')
 
 
 def test_similarity_hash():

@@ -314,11 +314,11 @@ def normalize_text(text):
     return normalized
 
 
-def sliding_window(text, width):
+def sliding_window(seq, width):
 
     assert width >= 2, "Sliding window width must be 2 or bigger."
-    idx = range(max(len(text) - width + 1, 1))
-    return [text[i:i + width] for i in idx]
+    idx = range(max(len(seq) - width + 1, 1))
+    return (seq[i:i + width] for i in idx)
 
 
 def minimum_hash(features):
