@@ -6,34 +6,13 @@ from io import BytesIO
 from hashlib import sha256
 import unicodedata
 from typing import List, ByteString, Sequence, BinaryIO, TypeVar, Generator, Union, Iterable, Tuple
-
 from PIL import Image
 from copy import deepcopy
 import xxhash
+from . import const
 
-from iscc.const import CHUNKING_GEAR, MINHASH_PERMUTATIONS
-
-# Constants
-SYMBOLS = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz"
-VALUES = ''.join([chr(i) for i in range(58)])
-C2VTABLE = str.maketrans(SYMBOLS, VALUES)
-V2CTABLE = str.maketrans(VALUES, SYMBOLS)
-INPUT_TRIM = 128
-WINDOW_SIZE_MID = 4
-WINDOW_SIZE_CID_T = 5
 B = TypeVar('B', BinaryIO, bytes)
 IMG = TypeVar('I', str, BytesIO, Image.Image)
-
-
-HEAD_MID = b'\x00'
-HEAD_CID_T = b'\x10'
-HEAD_CID_T_PCF = b'\x11'
-HEAD_CID_I = b'\x12'
-HEAD_CID_I_PCF = b'\x13'
-HEAD_CID_A = b'\x14'
-HEAD_CID_A_PCF = b'\x15'
-HEAD_DID = b'\x20'
-HEAD_IID = b'\x30'
 
 
 def meta_id(title: Union[str, bytes], extra: Union[str, bytes]='', version: int=0) -> Tuple[str, str, str]:
@@ -60,7 +39,7 @@ def meta_id(title: Union[str, bytes], extra: Union[str, bytes]='', version: int=
     normalized = normalize_text(concat)
 
     # 5. Create a list of n-grams
-    n_grams = sliding_window(normalized, width=WINDOW_SIZE_MID)
+    n_grams = sliding_window(normalized, width=const.WINDOW_SIZE_MID)
 
     # 6. Encode n-grams and create xxhash64-digest
     hash_digests = [xxhash.xxh64(s.encode('utf-8')).digest() for s in n_grams]
@@ -69,7 +48,7 @@ def meta_id(title: Union[str, bytes], extra: Union[str, bytes]='', version: int=
     simhash_digest = similarity_hash(hash_digests)
 
     # 8. Prepend header-byte
-    meta_id_digest = HEAD_MID + simhash_digest
+    meta_id_digest = const.HEAD_MID + simhash_digest
 
     # 9. Encode with base58_iscc
     return encode(meta_id_digest), title, extra
@@ -89,7 +68,7 @@ def content_id_text(text: Union[str, bytes], partial=False) -> str:
     words = text.split()
 
     # 4. Create 5 word shingles
-    shingles = ('\u0020'.join(l) for l in sliding_window(words, WINDOW_SIZE_CID_T))
+    shingles = ('\u0020'.join(l) for l in sliding_window(words, const.WINDOW_SIZE_CID_T))
 
     # 5. Create 32-bit features with xxHash32
     features = (xxhash.xxh32(s.encode('utf-8')).intdigest() for s in shingles)
@@ -109,9 +88,9 @@ def content_id_text(text: Union[str, bytes], partial=False) -> str:
 
     # 10. Prepend component header
     if partial:
-        content_id_text_digest = HEAD_CID_T_PCF + simhash_digest
+        content_id_text_digest = const.HEAD_CID_T_PCF + simhash_digest
     else:
-        content_id_text_digest = HEAD_CID_T + simhash_digest
+        content_id_text_digest = const.HEAD_CID_T + simhash_digest
 
     # 11. Encode and return
     return encode(content_id_text_digest)
@@ -160,9 +139,9 @@ def content_id_image(img: IMG, partial=False) -> str:
 
     # 8. Prepend the 1-byte component header
     if partial:
-        content_id_image_digest = HEAD_CID_I_PCF + hash_digest
+        content_id_image_digest = const.HEAD_CID_I_PCF + hash_digest
     else:
-        content_id_image_digest = HEAD_CID_I + hash_digest
+        content_id_image_digest = const.HEAD_CID_I + hash_digest
 
     # 9. Encode and return
     return encode(content_id_image_digest)
@@ -187,7 +166,7 @@ def data_id(data: B) -> str:
     simhash_digest = similarity_hash((a, b))
 
     # 7. Prepend the 1-byte header
-    data_id_digest = HEAD_DID + simhash_digest
+    data_id_digest = const.HEAD_DID + simhash_digest
 
     # 8. Encode and return
     return encode(data_id_digest)
@@ -208,7 +187,7 @@ def instance_id(data: B) -> str:
             break
 
     top_hash_digest = top_hash(leaf_node_digests)
-    instance_id_digest = HEAD_IID + top_hash_digest[:8]
+    instance_id_digest = const.HEAD_IID + top_hash_digest[:8]
 
     return encode(instance_id_digest)
 
@@ -217,7 +196,7 @@ def trim(text: str) -> str:
     """Trim text so utf-8 encoded bytes do not exceed INPUT_TRIM size."""
     while True:
         data = text.encode('utf-8')
-        if len(data) <= INPUT_TRIM:
+        if len(data) <= const.INPUT_TRIM:
             return text
         else:
             text = text[:-1]
@@ -283,12 +262,12 @@ def chunk_length(data: bytes, norm_size: int, min_size: int, max_size: int, mask
         return data_length
 
     while i < min(norm_size, data_length):
-        pattern = (pattern << 1) + CHUNKING_GEAR[data[i]]
+        pattern = (pattern << 1) + const.CHUNKING_GEAR[data[i]]
         if not pattern & mask_1:
             return i
         i = i + 1
     while i < min(max_size, data_length):
-        pattern = (pattern << 1) + CHUNKING_GEAR[data[i]]
+        pattern = (pattern << 1) + const.CHUNKING_GEAR[data[i]]
         if not pattern & mask_2:
             return i
         i = i + 1
@@ -327,7 +306,7 @@ def minimum_hash(features: Iterable[int]) -> List[int]:
     mersenne_prime = (1 << 61) - 1
     max_hash = (1 << 32) - 1
     hashvalues = [max_hash] * 128
-    permutations = deepcopy(MINHASH_PERMUTATIONS)
+    permutations = deepcopy(const.MINHASH_PERMUTATIONS)
     a, b = permutations
 
     for hv in features:
@@ -404,7 +383,7 @@ def encode(digest: bytes) -> str:
         chars.append(value % 58)
         value //= 58
         numvalues //= 58
-    return str.translate(''.join([chr(c) for c in reversed(chars)]), V2CTABLE)
+    return str.translate(''.join([chr(c) for c in reversed(chars)]), const.V2CTABLE)
 
 
 def decode(code: str) -> bytes:
@@ -417,7 +396,7 @@ def decode(code: str) -> bytes:
         bit_length = 64
     else:
         raise ValueError('Code must be 2, 11 or 13 chars. Not %s' % n)
-    code = reversed(str.translate(code, C2VTABLE))
+    code = reversed(str.translate(code, const.C2VTABLE))
     value = 0
     numvalues = 1
     for c in code:
