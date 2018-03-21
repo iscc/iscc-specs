@@ -1,2 +1,6 @@
+graft src
+
+include LICENSE
 include README.rst
-include iscc/*
+
+global-exclude *.py[cod] __pycache__ *.so *.dylib
