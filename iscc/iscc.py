@@ -196,7 +196,7 @@ def instance_id(data):
 
 
 def trim(text):
-    """Trim text so utf-8 encoded bytes do not exceed INPUT_TRIM size."""
+
     while True:
         data = text.encode('utf-8')
         if len(data) <= INPUT_TRIM:
@@ -223,10 +223,12 @@ def top_hash(hashes):
 
 
 def sha256d(data):
+
     return sha256(sha256(data).digest()).digest()
 
 
 def hash_inner_nodes(a, b):
+
     return sha256d(b'\x01' + a + b)
 
 
@@ -271,6 +273,7 @@ def data_chunks(data):
 
 
 def chunk_length(data, norm_size, min_size, max_size, mask_1, mask_2):
+
     data_length = len(data)
     i = min_size
     pattern = 0
@@ -312,6 +315,7 @@ def normalize_text(text):
 
 
 def sliding_window(text, width):
+
     assert width >= 2, "Sliding window width must be 2 or bigger."
     idx = range(max(len(text) - width + 1, 1))
     return [text[i:i + width] for i in idx]
@@ -361,13 +365,14 @@ def similarity_hash(hash_digests):
 
 
 def dct(value_list):
-    N = len(value_list)
+
+    n = len(value_list)
     dct_list = []
-    for k in range(N):
+    for k in range(n):
         value = 0.0
-        for n in range(N):
-            value += value_list[n] * math.cos(
-                math.pi * k * (2 * n + 1) / (2 * N)
+        for i in range(n):
+            value += value_list[i] * math.cos(
+                math.pi * k * (2 * i + 1) / (2 * n)
             )
         dct_list.append(2 * value)
     return dct_list
@@ -387,6 +392,7 @@ def distance(a, b):
 
 
 def encode(digest):
+
     if len(digest) == 9:
         return encode(digest[:1]) + encode(digest[1:])
     assert len(digest) in (1, 8), "Digest must be 1, 8 or 9 bytes long"
@@ -406,6 +412,7 @@ def encode(digest):
 
 
 def decode(code):
+
     n = len(code)
     if n == 13:
         return decode(code[:2]) + decode(code[2:])

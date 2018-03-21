@@ -1,6 +1,6 @@
 # ISCC Specification
 
-The **International Standard Content Code** is an [open standard](https://en.wikipedia.org/wiki/Open_standard) for decentralized content identifiers. This repository contains the specification of the **ISCC Standard**. The latest published version can be found at [iscc.codes](http://iscc.codes)
+The **International Standard Content Code** is an [open standard](https://en.wikipedia.org/wiki/Open_standard) for decentralized content identifiers. This repository contains the specification of the **ISCC Standard** and a minima reference implementation in Python3. The latest published version of the specification can be found at [iscc.codes](http://iscc.codes)
 
 ## Install
 
@@ -15,7 +15,7 @@ mkdocs serve
 
 ## Usage
 
-All specification documents can be found in the `./docs` subfolder or the repository. The recommended editor for the markdown files is [typora](https://typora.io/). If you have commit rights to the [main repository](https://github.com/coblo/iscc-specs) you can depoy the site with a simple `mkdocs gh-deploy`. 
+All specification documents can be found in the `./docs` subfolder or the repository. The recommended editor for the markdown files is [typora](https://typora.io/). If you have commit rights to the [main repository](https://github.com/coblo/iscc-specs) you can deploy the site with a simple `mkdocs gh-deploy`.
 
 ## Contribute
 

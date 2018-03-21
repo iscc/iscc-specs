@@ -2,7 +2,7 @@ title: ISCC - Specification
 description: Draft Specification of International Standard Content Codes
 authors: Titusz Pan
 
-# ISCC - Specification v1.0
+# ISCC - Specification v0.9.0
 
 !!! attention
 
