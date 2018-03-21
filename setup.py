@@ -22,7 +22,7 @@ setup(
     packages=find_packages('src'),
     package_dir={'': 'src'},
     include_package_data=True,
-    install_requires=['Pillow'],
+    install_requires=['xxhash', 'Pillow'],
     license='BSD 2-clause',
     zip_safe=False,
     keywords=[
