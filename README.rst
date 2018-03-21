@@ -11,12 +11,12 @@ ISCC Specification
    :target: https://pypi.python.org/pypi/iscc/
    :alt: PyPI License
 
-The **International Standard Content Code** is an `open standard <https://en.wikipedia.org/wiki/Open_standard>`_ for decentralized content identifiers. This repository contains the specification of the **ISCC Standard** and a minima reference implementation in Python3. The latest published version of the specification can be found at `iscc.codes <http://iscc.codes>`_
+The **International Standard Content Code** is an `open standard <https://en.wikipedia.org/wiki/Open_standard>`_ for decentralized content identifiers. This repository contains the specification of the **ISCC Standard** and a  reference implementation in Python3. The latest published version of the specification can be found at `iscc.codes <http://iscc.codes>`_
 
 Install
 =======
 
-The entire **ISCC Specification** is written in plain text `Markdow <https://en.wikipedia.org/wiki/Markdown>`_. The markdown content is than built and published with the excellent `mkdocs <http://www.mkdocs.org/>`_ documetation tool. If you have some basic command line skills you can build and run the specification site on your own computer. Make sure you have the `Git <https://git-scm.com/>`_ and `Python <https://www.python.org/>`_ installed on your system and follow these steps on the command line:
+The entire **ISCC Specification** is written in plain text `Markdown <https://en.wikipedia.org/wiki/Markdown>`_. The markdown content is than built and published with the excellent `mkdocs <http://www.mkdocs.org/>`_ documetation tool. If you have some basic command line skills you can build and run the specification site on your own computer. Make sure you have the `Git <https://git-scm.com/>`_ and `Python <https://www.python.org/>`_ installed on your system and follow these steps on the command line:
 
 .. code-block:: bash
 
