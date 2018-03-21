@@ -1,0 +1,207 @@
+{
+  "content_id_image": {
+    "test_001_pixel_png_transp": {
+      "inputs": [
+        "pixel_png_transp.png"
+      ],
+      "outputs": "1K11111111111"
+    },
+    "test_002_pixel_png_white": {
+      "inputs": [
+        "pixel_png_white.png"
+      ],
+      "outputs": "1KSJUvrv6wDB4"
+    },
+    "test_003_pixel_png_black": {
+      "inputs": [
+        "pixel_png_black.png"
+      ],
+      "outputs": "1K11111111111"
+    },
+    "test_004_cat_jpg": {
+      "inputs": [
+        "cat.jpg"
+      ],
+      "outputs": "1KZfHr7vc7FAe"
+    },
+    "test_005_cat_png": {
+      "inputs": [
+        "cat.png"
+      ],
+      "outputs": "1KZfHr7vc7FAe"
+    },
+    "test_006_cat_gif": {
+      "inputs": [
+        "cat.gif"
+      ],
+      "outputs": "1KZfHr7vc7FAe"
+    }
+  },
+  "content_id_text": {
+    "test_001_empty": {
+      "inputs": [
+        ""
+      ],
+      "outputs": "1HLesNXNRrbbU"
+    },
+    "test_002_short": {
+      "inputs": [
+        "Some short text"
+      ],
+      "outputs": "1HNQkwnBnBXX8"
+    },
+    "test_003_long": {
+      "inputs": [
+        "Their most significant and usefull property of similarity-preserving fingerprints gets lost in the fragmentation of individual, propietary and use case specific implementations. The real benefit lies in similarity preservation beyond your local data archive on a global scale accross vendors."
+      ],
+      "outputs": "1HdLDMkk92sjk"
+    }
+  },
+  "data_id": {
+    "test_001_cat_jpg": {
+      "inputs": [
+        "cat.jpg"
+      ],
+      "outputs": "1Zh996Ykqg134"
+    },
+    "test_002_cat_png": {
+      "inputs": [
+        "cat.png"
+      ],
+      "outputs": "1ZMgDjrpbV6qj"
+    },
+    "test_003_cat_gif": {
+      "inputs": [
+        "cat.gif"
+      ],
+      "outputs": "1ZjpNNXR6PLAA"
+    }
+  },
+  "instance_id": {
+    "test_001_cat_jpg": {
+      "inputs": [
+        "cat.jpg"
+      ],
+      "outputs": [
+        "1qidd9g4BmUyK",
+        "f8e5e94f953709ae8930220da8bada303a370a46157a5cdd50ad2476a7f51e42"
+      ]
+    },
+    "test_002_cat_png": {
+      "inputs": [
+        "cat.png"
+      ],
+      "outputs": [
+        "1q6xpnAtkQvZT",
+        "23a5b78a044143b612a0d033384a5ebf95343ec812c3e62caff393852d0328a0"
+      ]
+    },
+    "test_003_cat_gif": {
+      "inputs": [
+        "cat.gif"
+      ],
+      "outputs": [
+        "1qC67E86TVsDP",
+        "424a89d97aa978363b76071510949bf3b3424f3c6d394ccde93d7fa62ced066a"
+      ]
+    }
+  },
+  "meta_id": {
+    "test_001_empty": {
+      "inputs": [
+        "",
+        ""
+      ],
+      "outputs": [
+        "11h2HW8KLFhma",
+        "",
+        ""
+      ]
+    },
+    "test_002_basic": {
+      "inputs": [
+        "Die Unendliche Geschichte",
+        ""
+      ],
+      "outputs": [
+        "11MYeQZpECeEi",
+        "Die Unendliche Geschichte",
+        ""
+      ]
+    },
+    "test_003_punctuation": {
+      "inputs": [
+        "Die Unendliche, Geschichte",
+        ""
+      ],
+      "outputs": [
+        "11MYeQZpECeEi",
+        "Die Unendliche, Geschichte",
+        ""
+      ]
+    },
+    "test_004_white_space": {
+      "inputs": [
+        " Die Unendliche, Geschichte  ",
+        ""
+      ],
+      "outputs": [
+        "11MYeQZpECeEi",
+        "Die Unendliche, Geschichte",
+        ""
+      ]
+    },
+    "test_005_non_ascii": {
+      "inputs": [
+        "Die unéndlíche,  Geschichte",
+        ""
+      ],
+      "outputs": [
+        "11MYeQZpECeEi",
+        "Die unéndlíche,  Geschichte",
+        ""
+      ]
+    },
+    "test_006_i18n": {
+      "inputs": [
+        "Iñtërnâtiônàlizætiøn☃"
+      ],
+      "outputs": [
+        "11j3HvAKcgNox",
+        "Iñtërnâtiônàlizætiøn☃",
+        ""
+      ]
+    },
+    "test_007_extra": {
+      "inputs": [
+        "Die unendliche Geschichte",
+        "The Movie"
+      ],
+      "outputs": [
+        "11NDq5BHtZYCk",
+        "Die unendliche Geschichte",
+        "The Movie"
+      ]
+    },
+    "test_008_long": {
+      "inputs": [
+        "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed"
+      ],
+      "outputs": [
+        "116jkY4iCFY52",
+        "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquy",
+        ""
+      ]
+    },
+    "test_009_long_i18n": {
+      "inputs": [
+        "Iñtërnâtiônàlizætiøn☃ Iñtërnâtiônàlizætiøn☃ Iñtërnâtiônàlizætiøn☃ Iñtërnâtiônàlizætiøn☃ Iñtërnâtiônàlizætiøn☃ Iñtërnâtiônàlizætiøn☃"
+      ],
+      "outputs": [
+        "11j4Vgfus9Rxi",
+        "Iñtërnâtiônàlizætiøn☃ Iñtërnâtiônàlizætiøn☃ Iñtërnâtiônàlizætiøn☃ Iñtërnâtiônàlizætiøn☃ Iñt",
+        ""
+      ]
+    }
+  }
+}

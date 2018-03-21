@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import json
 import random
 from io import BytesIO
 from PIL import Image, ImageFilter, ImageEnhance
@@ -26,6 +27,34 @@ TEXT_C = u"""
 """
 
 
+def test_test_data():
+    with open('test_data.json', encoding='utf-8') as jfile:
+        data = json.load(jfile)
+        assert type(data) == dict
+        for funcname, tests in data.items():
+            for testname, testdata in tests.items():
+                func = getattr(iscc, funcname)
+                args = testdata['inputs']
+                expected = testdata['outputs']
+                assert func(*args) == expected, "%s %s " % (funcname, args)
+
+
+def test_meta_id():
+
+    mid1, title, extra = iscc.meta_id('Die Unendliche Geschichte')
+    assert mid1 == "11MYeQZpECeEi"
+    assert title == 'Die Unendliche Geschichte'
+    assert extra == ''
+    mid2 = iscc.meta_id(' Die unéndlíche,  Geschichte ')[0]
+    assert mid1 == mid2
+
+    mid3 = iscc.meta_id('Die Unentliche Geschichte')[0]
+    assert 8 == iscc.distance(mid1, mid3)
+
+    mid4 = iscc.meta_id('Geschichte, Die Unendliche')[0]
+    assert 9 == iscc.distance(mid1, mid4)
+
+
 def test_encode():
     digest = bytes.fromhex('f7d3a5b201dc92f7a7')
     code = iscc.encode(digest)
@@ -36,22 +65,6 @@ def test_decode():
     code = '5GcQF7sC3iY2i'
     digest = iscc.decode(code)
     assert digest.hex() == 'f7d3a5b201dc92f7a7'
-
-
-def test_meta_id():
-
-    mid1 = iscc.meta_id('Die Unendliche Geschichte')[0]
-    assert len(mid1) == 13
-    assert "11MYeQZpECeEi" == mid1
-
-    mid2 = iscc.meta_id(' Die unéndlíche,  Geschichte ')[0]
-    assert mid1 == mid2
-
-    mid3 = iscc.meta_id('Die Unentliche Geschichte')[0]
-    assert 8 == iscc.distance(mid1, mid3)
-
-    mid4 = iscc.meta_id('Geschichte, Die Unendliche')[0]
-    assert 9 == iscc.distance(mid1, mid4)
 
 
 def test_content_id_text():
