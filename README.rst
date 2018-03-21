@@ -29,7 +29,7 @@ The entire **ISCC Specification** is written in plain text `Markdow <https://en.
 Usage
 =====
 
-All specification documents can be found in the `./docs` subfolder or the repository. The recommended editor for the markdown files is `typora <https://typora.io/>`_. If you have commit rights to the `main repository <https://github.com/coblo/iscc-specs>`_ you can deploy the site with a simple `mkdocs gh-deploy`.
+All specification documents can be found in the ``./docs`` subfolder or the repository. The recommended editor for the markdown files is `typora <https://typora.io/>`_. If you have commit rights to the `main repository <https://github.com/coblo/iscc-specs>`_ you can deploy the site with a simple ``mkdocs gh-deploy``.
 
 Contribute
 ==========
