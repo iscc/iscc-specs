@@ -6,17 +6,13 @@ import math
 from io import BytesIO
 from hashlib import sha256
 import unicodedata
-from typing import List, ByteString, Sequence, BinaryIO, TypeVar, Generator, Union, Iterable, Tuple
 from PIL import Image
 from copy import deepcopy
 import xxhash
 from iscc.const import *
 
-B = TypeVar('B', BinaryIO, bytes)
-IMG = TypeVar('I', str, BytesIO, Image.Image)
 
-
-def meta_id(title: Union[str, bytes], extra: Union[str, bytes]='', version: int=0) -> Tuple[str, str, str]:
+def meta_id(title, extra='', version=0):
 
     assert version == 0, "Only version 0 supported"
 
@@ -55,7 +51,7 @@ def meta_id(title: Union[str, bytes], extra: Union[str, bytes]='', version: int=
     return encode(meta_id_digest), title, extra
 
 
-def content_id_text(text: Union[str, bytes], partial=False) -> str:
+def content_id_text(text, partial=False):
 
     # 1. Apply Unicode NFKC normalization
     if isinstance(text, bytes):
@@ -66,10 +62,10 @@ def content_id_text(text: Union[str, bytes], partial=False) -> str:
     text = normalize_text(text)
 
     # 3. Split to words
-    words = text.split()
+    w = text.split()
 
     # 4. Create 5 word shingles
-    shingles = ('\u0020'.join(l) for l in sliding_window(words, WINDOW_SIZE_CID_T))
+    shingles = ('\u0020'.join(l) for l in sliding_window(w, WINDOW_SIZE_CID_T))
 
     # 5. Create 32-bit features with xxHash32
     features = (xxhash.xxh32(s.encode('utf-8')).intdigest() for s in shingles)
@@ -97,7 +93,7 @@ def content_id_text(text: Union[str, bytes], partial=False) -> str:
     return encode(content_id_text_digest)
 
 
-def content_id_image(img: IMG, partial=False) -> str:
+def content_id_image(img, partial=False):
 
     if not isinstance(img, Image.Image):
         img = Image.open(img)
@@ -109,7 +105,10 @@ def content_id_image(img: IMG, partial=False) -> str:
     img = img.resize((32, 32), Image.BICUBIC)
 
     # 3. Create two dimensional array
-    pixels = [[list(img.getdata())[32 * i + j] for j in range(32)] for i in range(32)]
+    pixels = [
+        [list(img.getdata())[32 * i + j] for j in range(32)]
+        for i in range(32)
+    ]
 
     # 4. DCT per row & col
     dct_row_lists = []
@@ -148,7 +147,7 @@ def content_id_image(img: IMG, partial=False) -> str:
     return encode(content_id_image_digest)
 
 
-def data_id(data: B) -> str:
+def data_id(data):
 
     # 1. & 2. XxHash32 over CDC-Chunks
     features = (xxhash.xxh32(chunk).intdigest() for chunk in data_chunks(data))
@@ -173,7 +172,7 @@ def data_id(data: B) -> str:
     return encode(data_id_digest)
 
 
-def instance_id(data: B) -> Tuple[str, str]:
+def instance_id(data):
 
     if not hasattr(data, 'read'):
         data = BytesIO(data)
@@ -196,7 +195,7 @@ def instance_id(data: B) -> Tuple[str, str]:
     return code, h
 
 
-def trim(text: str) -> str:
+def trim(text):
     """Trim text so utf-8 encoded bytes do not exceed INPUT_TRIM size."""
     while True:
         data = text.encode('utf-8')
@@ -206,7 +205,7 @@ def trim(text: str) -> str:
             text = text[:-1]
 
 
-def top_hash(hashes: List[bytes]) -> bytes:
+def top_hash(hashes):
 
     size = len(hashes)
     if size == 1:
@@ -223,15 +222,15 @@ def top_hash(hashes: List[bytes]) -> bytes:
     return top_hash(pairwise_hashed)
 
 
-def sha256d(data: bytes) -> bytes:
+def sha256d(data):
     return sha256(sha256(data).digest()).digest()
 
 
-def hash_inner_nodes(a: bytes, b: bytes) -> bytes:
+def hash_inner_nodes(a, b):
     return sha256d(b'\x01' + a + b)
 
 
-def data_chunks(data: B) -> Generator[bytes, None, None]:
+def data_chunks(data):
 
     if not hasattr(data, 'read'):
         data = BytesIO(data)
@@ -245,7 +244,12 @@ def data_chunks(data: B) -> Generator[bytes, None, None]:
             if len(section) == 0:
                 break
             boundary = chunk_length(
-                section, GEAR1_NORM, GEAR1_MIN, GEAR1_MAX, GEAR1_MASK1, GEAR1_MASK2
+                section,
+                GEAR1_NORM,
+                GEAR1_MIN,
+                GEAR1_MAX,
+                GEAR1_MASK1,
+                GEAR1_MASK2,
             )
         else:
             if len(section) < GEAR2_MAX:
@@ -253,7 +257,12 @@ def data_chunks(data: B) -> Generator[bytes, None, None]:
             if len(section) == 0:
                 break
             boundary = chunk_length(
-                section, GEAR2_NORM, GEAR2_MIN, GEAR2_MAX, GEAR2_MASK1, GEAR2_MASK2
+                section,
+                GEAR2_NORM,
+                GEAR2_MIN,
+                GEAR2_MAX,
+                GEAR2_MASK1,
+                GEAR2_MASK2,
             )
 
         yield section[:boundary]
@@ -261,7 +270,7 @@ def data_chunks(data: B) -> Generator[bytes, None, None]:
         counter += 1
 
 
-def chunk_length(data: bytes, norm_size: int, min_size: int, max_size: int, mask_1: int, mask_2: int) -> int:
+def chunk_length(data, norm_size, min_size, max_size, mask_1, mask_2):
     data_length = len(data)
     i = min_size
     pattern = 0
@@ -282,7 +291,7 @@ def chunk_length(data: bytes, norm_size: int, min_size: int, max_size: int, mask
     return i
 
 
-def normalize_text(text: str) -> str:
+def normalize_text(text):
 
     whitelist = 'LNS'
     decomposed = unicodedata.normalize('NFD', text)
@@ -302,13 +311,13 @@ def normalize_text(text: str) -> str:
     return normalized
 
 
-def sliding_window(text: Sequence, width: int) -> List:
+def sliding_window(text, width):
     assert width >= 2, "Sliding window width must be 2 or bigger."
     idx = range(max(len(text) - width + 1, 1))
     return [text[i:i + width] for i in idx]
 
 
-def minimum_hash(features: Iterable[int]) -> List[int]:
+def minimum_hash(features):
 
     max_int64 = (1 << 64) - 1
     mersenne_prime = (1 << 61) - 1
@@ -327,7 +336,7 @@ def minimum_hash(features: Iterable[int]) -> List[int]:
     return hashvalues
 
 
-def similarity_hash(hash_digests: Sequence[ByteString]) -> bytes:
+def similarity_hash(hash_digests):
 
     n_bytes = len(hash_digests[0])
     n_bits = (n_bytes * 8)
@@ -351,18 +360,20 @@ def similarity_hash(hash_digests: Sequence[ByteString]) -> bytes:
     return shash.to_bytes(n_bytes, 'big', signed=False)
 
 
-def dct(value_list: Sequence[float]) -> Sequence[float]:
+def dct(value_list):
     N = len(value_list)
     dct_list = []
     for k in range(N):
         value = 0.0
         for n in range(N):
-            value += value_list[n] * math.cos(math.pi * k * (2 * n + 1) / (2 * N))
+            value += value_list[n] * math.cos(
+                math.pi * k * (2 * n + 1) / (2 * N)
+            )
         dct_list.append(2 * value)
     return dct_list
 
 
-def distance(a: Union[int, str, bytes], b: Union[int, str, bytes]) -> int:
+def distance(a, b):
 
     if isinstance(a, str) and isinstance(b, str):
         a = decode(a)[1:]
@@ -375,7 +386,7 @@ def distance(a: Union[int, str, bytes], b: Union[int, str, bytes]) -> int:
     return bin(a ^ b).count('1')
 
 
-def encode(digest: bytes) -> str:
+def encode(digest):
     if len(digest) == 9:
         return encode(digest[:1]) + encode(digest[1:])
     assert len(digest) in (1, 8), "Digest must be 1, 8 or 9 bytes long"
@@ -394,7 +405,7 @@ def encode(digest: bytes) -> str:
     return str.translate(''.join([chr(c) for c in reversed(chars)]), V2CTABLE)
 
 
-def decode(code: str) -> bytes:
+def decode(code):
     n = len(code)
     if n == 13:
         return decode(code[:2]) + decode(code[2:])
