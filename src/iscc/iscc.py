@@ -19,11 +19,11 @@ def meta_id(title, extra='', version=0):
     # 1. Apply Unicode NFKC normalization separately to all text input values.
     if isinstance(title, bytes):
         title = title.decode('utf-8')
-    title = unicodedata.normalize('NFKC', title)
+    title = unicodedata.normalize('NFKC', title).strip()
 
     if isinstance(extra, bytes):
         extra = extra.decode('utf-8')
-    extra = unicodedata.normalize('NFKC', extra)
+    extra = unicodedata.normalize('NFKC', extra).strip()
 
     # 2. Trim title and extra
     title = trim(title)
@@ -48,7 +48,7 @@ def meta_id(title, extra='', version=0):
     meta_id_digest = HEAD_MID + simhash_digest
 
     # 9. Encode with base58_iscc
-    return encode(meta_id_digest), title, extra
+    return [encode(meta_id_digest), title, extra]
 
 
 def content_id_text(text, partial=False):
@@ -95,55 +95,19 @@ def content_id_text(text, partial=False):
 
 def content_id_image(img, partial=False):
 
-    if not isinstance(img, Image.Image):
-        img = Image.open(img)
+    # 1. Normalize image to 2-dimensional pixel array
+    pixels = normalize_image(img)
 
-    # 1. Convert to greyscale
-    img = img.convert("L")
+    # 2. Calculate image hash
+    hash_digest = image_hash(pixels)
 
-    # 2. Resize to 64x64
-    img = img.resize((32, 32), Image.BICUBIC)
-
-    # 3. Create two dimensional array
-    pixels = [
-        [list(img.getdata())[32 * i + j] for j in range(32)]
-        for i in range(32)
-    ]
-
-    # 4. DCT per row & col
-    dct_row_lists = []
-    for pixel_list in pixels:
-        dct_row_lists.append(dct(pixel_list))
-
-    dct_row_lists_t = list(map(list, zip(*dct_row_lists)))
-    dct_col_lists_t = []
-    for dct_list in dct_row_lists_t:
-        dct_col_lists_t.append(dct(dct_list))
-
-    dct_lists = list(map(list, zip(*dct_col_lists_t)))
-
-    # 5. Extract upper left 8x8 corner
-    flat_list = [x for sublist in dct_lists[:8] for x in sublist[:8]]
-
-    # 6. Calculate median
-    med = median(flat_list)
-
-    # 7. Create 64-bit digest by comparing to median
-    bitstring = ''
-    for value in flat_list:
-        if value > med:
-            bitstring += '1'
-        else:
-            bitstring += '0'
-    hash_digest = int(bitstring, 2).to_bytes(8, 'big', signed=False)
-
-    # 8. Prepend the 1-byte component header
+    # 3. Prepend the 1-byte component header
     if partial:
         content_id_image_digest = HEAD_CID_I_PCF + hash_digest
     else:
         content_id_image_digest = HEAD_CID_I + hash_digest
 
-    # 9. Encode and return
+    # 4. Encode and return
     return encode(content_id_image_digest)
 
 
@@ -174,6 +138,9 @@ def data_id(data):
 
 def instance_id(data):
 
+    if isinstance(data, str):
+        data = open(data, 'rb')
+
     if not hasattr(data, 'read'):
         data = BytesIO(data)
 
@@ -190,9 +157,9 @@ def instance_id(data):
     instance_id_digest = HEAD_IID + top_hash_digest[:8]
 
     code = encode(instance_id_digest)
-    h = hexlify(top_hash_digest).decode('ascii')
+    hex_hash = hexlify(top_hash_digest).decode('ascii')
 
-    return code, h
+    return [code, hex_hash]
 
 
 def trim(text):
@@ -233,6 +200,9 @@ def hash_inner_nodes(a, b):
 
 
 def data_chunks(data):
+
+    if isinstance(data, str):
+        data = open(data, 'rb')
 
     if not hasattr(data, 'read'):
         data = BytesIO(data)
@@ -314,6 +284,26 @@ def normalize_text(text):
     return normalized
 
 
+def normalize_image(img):
+
+    if not isinstance(img, Image.Image):
+        img = Image.open(img)
+
+    # 1. Convert to greyscale
+    img = img.convert("L")
+
+    # 2. Resize to 32x32
+    img = img.resize((32, 32), Image.BICUBIC)
+
+    # 3. Create two dimensional array
+    pixels = [
+        [list(img.getdata())[32 * i + j] for j in range(32)]
+        for i in range(32)
+    ]
+
+    return pixels
+
+
 def sliding_window(seq, width):
 
     assert width >= 2, "Sliding window width must be 2 or bigger."
@@ -362,6 +352,36 @@ def similarity_hash(hash_digests):
         shash |= int(vector[i] >= minfeatures) << i
 
     return shash.to_bytes(n_bytes, 'big', signed=False)
+
+
+def image_hash(pixels):
+    dct_row_lists = []
+    for pixel_list in pixels:
+        dct_row_lists.append(dct(pixel_list))
+
+    dct_row_lists_t = list(map(list, zip(*dct_row_lists)))
+    dct_col_lists_t = []
+    for dct_list in dct_row_lists_t:
+        dct_col_lists_t.append(dct(dct_list))
+
+    dct_lists = list(map(list, zip(*dct_col_lists_t)))
+
+    # 5. Extract upper left 8x8 corner
+    flat_list = [x for sublist in dct_lists[:8] for x in sublist[:8]]
+
+    # 6. Calculate median
+    med = median(flat_list)
+
+    # 7. Create 64-bit digest by comparing to median
+    bitstring = ''
+    for value in flat_list:
+        if value > med:
+            bitstring += '1'
+        else:
+            bitstring += '0'
+    hash_digest = int(bitstring, 2).to_bytes(8, 'big', signed=False)
+
+    return hash_digest
 
 
 def dct(value_list):
