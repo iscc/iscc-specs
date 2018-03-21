@@ -174,13 +174,16 @@ def test_data_id():
 
 def test_instance_id():
     zero_bytes_even = b'\x00' * 16
-    iid = iscc.instance_id(zero_bytes_even)
+    iid, h = iscc.instance_id(zero_bytes_even)
     assert iid == '1q8UDifpN1SCd'
+    assert h == '2ca7f098709d37d6f6a1a7e0670f49734c735500894aab4dc14d2c13f042dddd'
     ff_bytes_uneven = b'\xff' * 17
-    iid = iscc.instance_id(ff_bytes_uneven)
+    iid, h = iscc.instance_id(ff_bytes_uneven)
     assert iid == '1q6ah6fQ1xTj9'
+    assert h == '215dadbbb627072c15b2235b521db9896e74d7ef379fdafa731efa52a67d5b7d'
     more_bytes = b'\xcc' * 66000
-    iid = iscc.instance_id(more_bytes)
+    iid, h = iscc.instance_id(more_bytes)
+    assert h == 'db5f55fc6741664fda4ebb364f2cad99f6ac166aedc7551ab0768c6c67218f71'
     assert iid == '1qdhBrWwK7u7L'
 
 

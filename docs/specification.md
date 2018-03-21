@@ -239,21 +239,25 @@ The Data-ID is built from the raw encoded data of the content to be identified. 
 
 ## Instance-ID
 
-The Instance-ID is built from the raw data of the media object to be identified and serves as checksum for the media object. The raw data of the media object is split into 64-kB data-chunks. Then we build a hash-tree from those chunks and use the truncated top-hash as component body of the Instance-ID:
+The Instance-ID is built from the raw data of the media object to be identified and serves as checksum for the media object. The raw data of the media object is split into 64-kB data-chunks. Then we build a hash-tree from those chunks and use the truncated top-hash (merkle root) as component body of the Instance-ID.
+
+To guard against length-extension attacks and second pre-image attacks we use double sha256 for hashing. We also prefix the hash input data with a `0x00`-byte for the leaf nodes hashes and with a `0x01`-byte for the  internal node hashes. While the Instance-ID itself is a non-cryptographic checksum, the full top-hash may be supplied in the extended metadata of an ISCC secure integrity verification is required.
 
 ![iscc-creation-instance-id](images/iscc-creation-instance-id.svg)
 
-An ISCC generating application must provide a `instance_id` function that accepts the raw data file as input and returns an encoded Instance-ID. Generate an Instance-ID by this procedure:
+An ISCC generating application must provide a `instance_id` function that accepts the raw data file as input and returns an encoded Instance-ID and a full hex-encoded 256-bit top-hash. Generate an Instance-ID by this procedure:
 
 1. Split the raw bytes of the encoded media object into 64-kB chunks.
-2. For each chunk calculate the sha256d[^sha256d] digest of the concatenation of a `0x00`-byte and the chunk bytes. We call the resulting values *leaf node hashes* (LNH).
+2. For each chunk calculate the sha256d of the concatenation of a `0x00`-byte and the chunk bytes. We call the resulting values *leaf node hashes* (LNH).
 3. Calculate the next level of the hash tree by applying sha256d to the concatenation of a `0x01`-byte and adjacent pairs of LNH values. If the length of the list of LNH values is uneven concatenate the last LNH value with itself. We call the resulting values *internal node hashes* (INH).
-4. Recursively apply `0x01`-prefixed pairwise hashing to the results of  step 3 until the process yields only one hash value. We call this value the *top hash*[^tophash].
+4. Recursively apply `0x01`-prefixed pairwise hashing to the results of  step 3 until the process yields only one hash value. We call this value the top-hash.
 5. Trim the resulting *top hash* to the first 8 bytes.
 6. Prepend the 1-byte component header (e.g. `0x30`).
-7. Encode and return the resulting 9-byte sequence with [Base58-ISCC Encoding](#base58-iscc-encoding).
+7. Encode resulting 9-byte sequence with [Base58-ISCC Encoding](#base58-iscc-encoding) to an Instance-ID Code
+8. Hex-Encode the *top hash* 
+9. Return the Intance-ID and the hex-encoded top-hash
 
-Applications may carry, store, and process the full hash-tree for advanced partial data integrity verification.
+Applications may carry, store, and process the leaf node hashes or even the full hash-tree for advanced streaming data identification or partial data integrity verification.
 
 ## Procedures & Algorithms
 
@@ -385,9 +389,7 @@ def minimum_hash(features: Sequence[int]) -> List[int]:
     return hashvalues
 ```
 
-## Footnotes
 
-[^sha256d]: **Instance-ID data integrity:**  To guard against length-extension attacks and second pre-image attacks we use double sha256 for hashing. We also prefix the hash input data with a `0x00`-byte for the leaf nodes hashes and with a `0x01`-byte for the  internal node hashes.
 
 *[CDC]: Content defined chunking
 
@@ -411,10 +413,12 @@ def minimum_hash(features: Sequence[int]) -> List[int]:
 
 *[PCF]: Partial Content Flag
 
-*[LNH]: Leaf Node Hash
+*[LNH]: Leaf Node Hash - A hash of a data-chunk.
 
-*[INH]: Internal Node Hash
+*[INH]: Internal Node Hash - A hash of concatenated hashes in a hash-tree.
 
 *[character]: A character is defined as one Unicode code point
+
+*[sha256d]: Double SHA256
 
 [#Charikar2002]:  http://dx.doi.org/10.1145/509907.509965 "Charikar, M.S., 2002, May. Similarity estimation techniques from rounding algorithms. In Proceedings of the thiry-fourth annual ACM symposium on Theory of computing (pp. 380-388). ACM."

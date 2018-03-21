@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 """ISCC Reference Implementation"""
+from binascii import hexlify
 from statistics import median
 import math
 from io import BytesIO
@@ -172,7 +173,7 @@ def data_id(data: B) -> str:
     return encode(data_id_digest)
 
 
-def instance_id(data: B) -> str:
+def instance_id(data: B) -> Tuple[str, str]:
 
     if not hasattr(data, 'read'):
         data = BytesIO(data)
@@ -189,7 +190,10 @@ def instance_id(data: B) -> str:
     top_hash_digest = top_hash(leaf_node_digests)
     instance_id_digest = HEAD_IID + top_hash_digest[:8]
 
-    return encode(instance_id_digest)
+    code = encode(instance_id_digest)
+    h = hexlify(top_hash_digest).decode('ascii')
+
+    return code, h
 
 
 def trim(text: str) -> str:
