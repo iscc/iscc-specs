@@ -25,15 +25,7 @@ setup(
     install_requires=['xxhash', 'Pillow'],
     license='BSD 2-clause',
     zip_safe=False,
-    keywords=[
-        'iscc',
-        'identifier',
-        'media',
-        'content',
-        'hash',
-        'blockchain',
-        'similarity',
-    ],
+    keywords='iscc identifier media content hash blockchain similarity',
     classifiers=[
         'Development Status :: 4 - Beta',
         'Intended Audience :: Developers',
