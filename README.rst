@@ -57,5 +57,5 @@ Pull requests and other contributions are welcome. Use the `Github Issues <https
 License
 =======
 
-All of documentation is licensed under the `CC-BY-SA 4.0 <https://creativecommons.org/licenses/by-sa/4.0/>`_ license © 2017 Content Blockchain Project.
+All of documentation is licensed under the `CC-BY-SA 4.0 <https://creativecommons.org/licenses/by-sa/4.0/>`_ license (c) 2017 Content Blockchain Project.
 Reference code is licensed under BSD-2-Clause.
