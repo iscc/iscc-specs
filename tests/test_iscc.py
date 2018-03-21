@@ -2,7 +2,7 @@
 import random
 from io import BytesIO
 from PIL import Image, ImageFilter, ImageEnhance
-from iscc import iscc
+import iscc
 
 TEXT_A = u"""
     Their most significant and usefull property of similarity-preserving

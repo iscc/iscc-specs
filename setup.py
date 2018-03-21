@@ -19,12 +19,13 @@ setup(
     author="Titusz Pan",
     author_email='tp@py7.de',
     url='https://github.com/coblo/iscc-specs',
-    packages=find_packages(include=['iscc']),
+    packages=find_packages('src'),
+    package_dir={'': 'src'},
     include_package_data=True,
     install_requires=['Pillow'],
     license='BSD 2-clause',
     zip_safe=False,
-    keywords="iscc, identifier, media, content, hash, blockchain, similarity",
+    keywords="iscc identifier media content hash blockchain similarity",
     classifiers=[
         'Development Status :: 4 - Beta',
         'Intended Audience :: Developers',
@@ -32,6 +33,4 @@ setup(
         'Natural Language :: English',
         'Programming Language :: Python :: 3',
     ],
-    setup_requires=['pytest-runner'],
-    tests_require=['pytest'],
 )
