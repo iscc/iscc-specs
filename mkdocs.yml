@@ -24,6 +24,9 @@ theme:
     feature:
         tabs: false
 
+extra_css:
+  - 'stylesheets/custom.css'
+
 pages:
     - Overview: 'index.md'
     - Concept: 'concept.md'
