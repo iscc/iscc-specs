@@ -2,22 +2,27 @@
     "docs": [
         {
             "location": "/",
-            "text": "ISCC - International Standard Content Code\n#\n\n\n\n\nAttention\n\n\nThis site is work in progress!\n\n\n\n\nThe latest version of these pages can be found at \niscc.codes\n\n\nBetter Content Identifiers\n#\n\n\nCurrently, the media industry is mostly relying on identifiers that were designed for physical products such as printed books and magazines. However, traditional content identifiers (like ISBN, ISSN or ISRC) are managed centrally and fall short of the requirements for digital trade.\n\n\nFreely accessible standard \nidentifiers\n, which are specifically designed for \ndigital content\n and \nblockchain\n based management, are a fundamental prerequisite for transactions and sales activities in a digital and increasingly heterogeneous media environment.\n\n\nWith better identifiers for digital content, the entire ecosystem becomes more efficient.\n\n\n\n\nHow it works\n#\n\n\nThe major innovation of the \nISCC\n: identifiers are generated algorithmically and in a decentralized way from a basic set of metadata and the content itself. This inseparably links any specific content to a specific ID.\n\n\nThe \nISCC\n is a unique, hierarchically structured composite identifier. It is built from a generic and balanced mix of content-derived, locality-sensitive and similarity-preserving hashes generated from metadata and content.",
+            "text": "ISCC - Content Identifier\n#\n\n\nThe ISCC (International Standard Content Code) is a modern, generic, and free content identifier:\n\n\n\n\nMotivation\n#\n\n\nThe media industry is still mostly relying on identifiers that were originally designed for physical products such as printed books and magazines. However, traditional content identifiers (like ISBN, ISSN or ISRC) are managed centrally and fall short of the requirements for digital trade.\n\n\nFreely accessible \nstandard identifiers\n, which are specifically designed to manage content in our digital century are a fundamental prerequisite for \nblockchain\n based transactions and sales activities in an increasingly heterogeneous media environment.\n\n\nWith better identifiers for digital content, the entire ecosystem becomes more efficient.\n\n\nKey Differentiators:\n#\n\n\n\n\n\n\n\n\nExisting Media Identifiers\n\n\nISCC\n Content Identifier\n\n\n\n\n\n\n\n\n\n\nCentralized issuance\n\n\nDecentralized issuance\n\n\n\n\n\n\nIndustry specific overspecialization\n\n\nGeneric content identifier\n\n\n\n\n\n\nHigh management costs\n\n\nLow management costs\n\n\n\n\n\n\nHigh barrier of entry\n\n\nLow barrier of entry\n\n\n\n\n\n\nNot designed for blockchain storage\n\n\nDesigned for and registered on blockchain\n\n\n\n\n\n\n\n\nHow it works\n#\n\n\nThe major innovation of the \nISCC\n: identifiers are generated algorithmically and in a decentralized way from a basic set of metadata and the content itself. This inseparably links any specific content to a specific ID.\n\n\nThe \nISCC\n is a unique, hierarchically structured composite identifier. It is built from a generic and balanced mix of content-derived, locality-sensitive and similarity-preserving hashes generated from metadata and content.\n\n\n\n\nThe latest version of these pages can be found at \niscc.codes",
             "title": "Overview"
         },
         {
-            "location": "/#iscc-international-standard-content-code",
-            "text": "Attention  This site is work in progress!   The latest version of these pages can be found at  iscc.codes",
-            "title": "ISCC - International Standard Content Code"
+            "location": "/#iscc-content-identifier",
+            "text": "The ISCC (International Standard Content Code) is a modern, generic, and free content identifier:",
+            "title": "ISCC - Content Identifier"
         },
         {
-            "location": "/#better-content-identifiers",
-            "text": "Currently, the media industry is mostly relying on identifiers that were designed for physical products such as printed books and magazines. However, traditional content identifiers (like ISBN, ISSN or ISRC) are managed centrally and fall short of the requirements for digital trade.  Freely accessible standard  identifiers , which are specifically designed for  digital content  and  blockchain  based management, are a fundamental prerequisite for transactions and sales activities in a digital and increasingly heterogeneous media environment.  With better identifiers for digital content, the entire ecosystem becomes more efficient.",
-            "title": "Better Content Identifiers"
+            "location": "/#motivation",
+            "text": "The media industry is still mostly relying on identifiers that were originally designed for physical products such as printed books and magazines. However, traditional content identifiers (like ISBN, ISSN or ISRC) are managed centrally and fall short of the requirements for digital trade.  Freely accessible  standard identifiers , which are specifically designed to manage content in our digital century are a fundamental prerequisite for  blockchain  based transactions and sales activities in an increasingly heterogeneous media environment.  With better identifiers for digital content, the entire ecosystem becomes more efficient.",
+            "title": "Motivation"
+        },
+        {
+            "location": "/#key-differentiators",
+            "text": "Existing Media Identifiers  ISCC  Content Identifier      Centralized issuance  Decentralized issuance    Industry specific overspecialization  Generic content identifier    High management costs  Low management costs    High barrier of entry  Low barrier of entry    Not designed for blockchain storage  Designed for and registered on blockchain",
+            "title": "Key Differentiators:"
         },
         {
             "location": "/#how-it-works",
-            "text": "The major innovation of the  ISCC : identifiers are generated algorithmically and in a decentralized way from a basic set of metadata and the content itself. This inseparably links any specific content to a specific ID.  The  ISCC  is a unique, hierarchically structured composite identifier. It is built from a generic and balanced mix of content-derived, locality-sensitive and similarity-preserving hashes generated from metadata and content.",
+            "text": "The major innovation of the  ISCC : identifiers are generated algorithmically and in a decentralized way from a basic set of metadata and the content itself. This inseparably links any specific content to a specific ID.  The  ISCC  is a unique, hierarchically structured composite identifier. It is built from a generic and balanced mix of content-derived, locality-sensitive and similarity-preserving hashes generated from metadata and content.   The latest version of these pages can be found at  iscc.codes",
             "title": "How it works"
         },
         {
