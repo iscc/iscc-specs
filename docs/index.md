@@ -16,7 +16,7 @@ Freely accessible **standard identifiers**, which are specifically designed to m
 
 With better identifiers for digital content, the entire ecosystem becomes more efficient.
 
-## Key Differentiators:
+## Key Differentiators
 
 | Existing Media Identifiers           | **ISCC** Content Identifier               |
 | ------------------------------------ | ----------------------------------------- |
