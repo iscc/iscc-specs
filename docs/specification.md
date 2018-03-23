@@ -220,7 +220,9 @@ the Meta-, Data-, and Instance-IDs are the compound key for the magazine issue, 
 
 For the Data-ID that should encode data similarty we use content defined chunking algorithm that provides some shift resistance and calculate the MinHash from those chunks. To accomodate for small files the first 100 chunks have a ~140-byte size target while the remaining chunks target ~ 6kb in size.
 
-The Data-ID is built from the raw encoded data of the content to be identified. An ISCC generating application MUST provide a `data_id` function that accepts the raw encoded data as input. Generate a Data-ID by this procedure:
+The Data-ID is built from the raw encoded data of the content to be identified. An ISCC generating application MUST provide a `data_id` function that accepts the raw encoded data as input. 
+
+##### Generate Data-ID
 
 1. Apply `chunk_data` to the raw encoded content data.
 2. For each chunk calculate the xxHash32 integer hash.
@@ -239,7 +241,9 @@ To guard against length-extension attacks and second pre-image attacks we use do
 
 ![iscc-creation-instance-id](images/iscc-creation-instance-id.svg)
 
-An ISCC generating application MUST provide a `instance_id` function that accepts the raw data file as input and returns an encoded Instance-ID and a full hex-encoded 256-bit top-hash. Generate an Instance-ID by this procedure:
+An ISCC generating application MUST provide a `instance_id` function that accepts the raw data file as input and returns an encoded Instance-ID and a full hex-encoded 256-bit top-hash. 
+
+##### Generate Instance-ID
 
 1. Split the raw bytes of the encoded media object into 64-kB chunks.
 2. For each chunk calculate the sha256d of the concatenation of a `0x00`-byte and the chunk bytes. We call the resulting values *leaf node hashes* (LNH).
@@ -333,59 +337,6 @@ The `encode` function accepts a 9-byte **ISCC Component Digest** and returns the
 
 the `decode` function accepts a 13-character **ISCC-Component Code** and returns the corresponding 9-byte **ISCC-Component Digest**.
 
-#### Reference Code (BI):
-
-```python
-SYMBOLS = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz"
-VALUES = ''.join([chr(i) for i in range(58)])
-V2CTABLE = str.maketrans(VALUES, SYMBOLS)
-C2VTABLE = str.maketrans(SYMBOLS, VALUES)
-
-def encode(digest: bytes) -> str:
-    if len(digest) == 9:
-        return encode(digest[:1]) + encode(digest[1:])
-    assert len(digest) in (1, 8), "Digest must be 1, 8 or 9 bytes long"
-    digest = reversed(digest)
-    value = 0
-    numvalues = 1
-    for octet in digest:
-        octet *= numvalues
-        value += octet
-        numvalues *= 256
-    chars = []
-    while numvalues > 0:
-        chars.append(value % 58)
-        value //= 58
-        numvalues //= 58
-    return str.translate(''.join([chr(c) for c in reversed(chars)]), V2CTABLE)
-
-def decode(code: str) -> bytes:
-    n = len(code)
-    if n == 13:
-        return decode(code[:2]) + decode(code[2:])
-    if n == 2:
-        bit_length = 8
-    elif n == 11:
-        bit_length = 64
-    else:
-        raise ValueError('Code must be 2, 11 or 13 chars. Not %s' % n)
-    code = reversed(str.translate(code, C2VTABLE))
-    value = 0
-    numvalues = 1
-    for c in code:
-        c = ord(c)
-        c *= numvalues
-        value += c
-        numvalues *= 58
-    numvalues = 2 ** bit_length
-    data = []
-    while numvalues > 1:
-        data.append(value % 256)
-        value //= 256
-        numvalues //= 256
-    return bytes(reversed(data))
-```
-
 ### Normalize Text
 
 We define a text normalization function that is specific to our application. It takes unicode text as an input and returns *normalized* Unicode text for further algorithmic processing. We reference this function by the name `normalize_text`. The `normalize_text` function performs the following operations in the given order while each step works with the results of the previous operation:
@@ -406,48 +357,9 @@ The `similarity_hash` function takes a sequence of hash digests (raw 8-bit bytes
 
 ![iscc-similarity-hash](images/iscc-similarity-hash.svg)
 
-#### Reference Code (SH)
-
-```python3
-def similarity_hash(hash_digests: Sequence[ByteString]) -> ByteString:
-    n_bytes = len(hash_digests[0])
-    n_bits = (n_bytes * 8)
-    vector = [0] * n_bits
-    for digest in hash_digests:
-        assert len(digest) == n_bytes
-        h = int.from_bytes(digest, 'big', signed=False)
-        for i in range(n_bits):
-            vector[i] += h & 1
-            h >>= 1
-    minfeatures = len(hash_digests) * 1. / 2
-    shash = 0
-    for i in range(n_bits):
-        shash |= int(vector[i] >= minfeatures) << i
-    return shash.to_bytes(n_bytes, 'big', signed=False)
-```
-
 ### Minimum Hash
 
 The `minimum_hash` function takes an arbitrary sized set of 32-bit integer features and reduces it to a fixed size vector of 128 features such that it preserves similarity with other sets. It is based on the MinHash implementation of the [datasketch](https://ekzhu.github.io/datasketch/) library by [Eric Zhu](https://github.com/ekzhu).
-
-#### Reference Code (MH)
-
-```python3
-def minimum_hash(features: Sequence[int]) -> List[int]:
-    max_int64 = (1 << 64) - 1
-    mersenne_prime = (1 << 61) - 1
-    max_hash = (1 << 32) - 1
-    hashvalues = [max_hash] * 128
-    permutations = deepcopy(MINHASH_PERMUTATIONS)
-    a, b = permutations
-    for hv in features:
-        nhs = []
-        for x in range(128):
-            nh = (((a[x] * hv + b[x]) & max_int64) % mersenne_prime) & max_hash
-            nhs.append(min(nh, hashvalues[x]))
-        hashvalues = nhs
-    return hashvalues
-```
 
 ## Conformance Testing
 
@@ -463,8 +375,6 @@ An application that claims ISCC conformance MUST pass the ISCC conformance test 
     }
 }
 ```
-
-
 
 *[CDC]: Content defined chunking
 
