@@ -164,14 +164,14 @@ A Content-ID is generated in two broad steps. In the first step, we extract and 
 
 The  Content-ID type is signaled by the first 3 bits of the second nibble of the first byte of the Content-ID:
 
-| Conent-ID Type | Nibble-2 Bits 0-3 |
-| :------------- | :---------------- |
-| text           | 000               |
-| image          | 001               |
-| audio          | 010               |
-| video          | 011               |
-| mixed          | 100               |
-| Reserved       | 101, 110, 111     |
+| Conent-ID Type | Nibble-2 Bits 0-3 | Description                                        |
+| :------------- | :---------------- | -------------------------------------------------- |
+| text           | 000               | Generated from extracted and normalized plain-text |
+| image          | 001               | Generated from normalized gray-scale pixel data    |
+| *audio*        | *010*             | To be defined in later version of specification    |
+| *video*        | *011*             | To be defined in later version of specification    |
+| *mixed*        | *100*             | To be defined in later version of specification    |
+|                | 101, 110, 111     | Reserved for future versions of specification      |
 
 ##### Content-ID-Text
 
