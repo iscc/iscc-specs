@@ -110,5 +110,3 @@ The DataID operates on **Layer 4 **and will be a similarity preserving hash gene
 The InstanceID operates on **Layer 5 **and will be the top hash of a merkle tree generated from (potentially content-defined) chunks of raw data of an encoded media blob. It identifies a concrete manifestation and proves the integrity of the full content. We use the merkle tree structure because it also allows as to verify integrity of partial chunks without having to have the full data available. This will be very useful in any scenarios of distributed data storage.
 
 We intentionally skip **Layer 6** at this stage as content ownership and location will be handled on the blockchain layer of the stack and not by the ISCC identifier itself.
-
-A first experimental prototype of the ISCC idea is in development on [Github](https://github.com/coblo/pyiscclib).
