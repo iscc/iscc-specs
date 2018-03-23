@@ -13,7 +13,7 @@ def readme():
 
 setup(
     name='iscc',
-    version='0.9.2',
+    version='0.9.4',
     description="ISCC: Reference Implementation",
     long_description=readme(),
     author="Titusz Pan",
