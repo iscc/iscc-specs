@@ -286,8 +286,8 @@ Extended metadata entries must be wrapped in JSON object of the following struct
 
 | Name      | Description                                                  |
 | --------- | ------------------------------------------------------------ |
-| schema    | The `schema`-field may indicate a well known metadata schema (such as Dublin Core, IPTC, ID3v2, ONIX) that is used. |
-| mediatype | The `mediatype`-field specifies an [IANA Media Type](https://www.iana.org/assignments/media-types/media-types.xhtml). |
+| schema    | The `schema`-field may indicate a well known metadata schema (such as Dublin Core, IPTC, ID3v2, ONIX) that is used. Recommended `schema`: "[schema.org](http://schema.org/)" |
+| mediatype | The `mediatype`-field specifies an [IANA Media Type](https://www.iana.org/assignments/media-types/media-types.xhtml). Recommended `mediatype`: "application/ld+json" |
 | url       | An URL that is expected to host the metadata with the indicated `schema` and `mediatype`. This field is only required if the `data`-field is omitted. |
 | data      | The `data`-field holds the metadata conforming to the indicated `schema` and `mediatype.` It is only required if the`url` field is omitted. |
 
