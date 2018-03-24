@@ -51,4 +51,35 @@ instance_id:
         inputs: ['cat.png']
     test_003_cat_gif:
         inputs: ['cat.gif']
-
+text_pre_normalize:
+    test_001_empty:
+        inputs: ['']
+    test_002_nbsp:
+        inputs: [' ']
+    test_003_four_per_em:
+        inputs: [' ']
+    test_004_pre_post_whitespace:
+        inputs: ['  Hello  World ?  ']
+    test_005_nfkd:
+        inputs: ['Ç 가 Ω ℍ ① ︷ i⁹ ¼ ǆ ⫝̸ ȴ ȷ ɂ ć']
+text_trim:
+    test_001_empty:
+        inputs: ['']
+    test_002_nbsp:
+        inputs: [' ']
+    test_003_full:
+        inputs: ['Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquy']
+    test_002_long:
+        inputs: ['Ç가Ωℍ①︷i⁹¼ǆ⫝̸ȴȷɂćÇ가Ωℍ①︷i⁹¼ǆ⫝̸ȴȷɂć küßî ЌύБЇ ¡¢£¤ ƀƁƂƃƄƅƆƇ ɐɑɒɓɔ ʰʱʲʳʴʵʶʷʸ']
+text_normalize:
+    test_001_decompose:
+        inputs: ['Ç 가 Ω ℍ ① ︷ i⁹ ¼ ǆ ⫝̸ ȴ ȷ ɂ ć']
+    test_002_triky:
+        inputs: ['Iñtërnâtiônàlizætiøn☃ and string escaping are ticky &#160; things']
+image_normalize:
+    test_001_cat_jpg:
+        inputs: ['cat.jpg']
+    test_002_cat_png:
+        inputs: ['cat.png']
+    test_003_cat_gif:
+        inputs: ['cat.gif']

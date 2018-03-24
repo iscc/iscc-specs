@@ -2,7 +2,7 @@ title: ISCC - Specification
 description: Draft Specification of International Standard Content Codes
 authors: Titusz Pan
 
-# ISCC - Specification v0.9.5
+# ISCC - Specification v0.9.6
 
 !!! attention
 
@@ -79,7 +79,7 @@ The ISCC Digest is built from multiple self-describing 72-bit components:
 
 These components MAY be used independently by applications for various purposes but MUST be combined into a case-sensitive 52 character [base58-iscc](#base58-iscc-encoding) encoded string (55 with hyphens) for a fully qualified ISCC Code. The components MUST be combined in the fixed order of Meta-ID, Content-ID, Data-ID, Instance-ID and MAY be separated by hyphens.
 
-!!! example "Pritable ISCC Code"
+!!! example "Printable ISCC Code"
     ISCC: 11cS7Y9NjD6DX-1DVcUdv5ewjDQ-1Qhwz8x54CShu-1d8uCbWCNbGWg
 
 ### Component Types
@@ -139,7 +139,7 @@ An ISCC generating application must follow these steps in the given order to pro
 !!! warning "Text trimming"
     When trimming text be sure to trim the byte-length of the UTF-8 encoded version and not the number of characters. The trim point MUST be such, that it does not cut into multibyte characters. Characters might have different UTF-8 byte-length. For example `ü` is 2-bytes, `驩` is 3-bytes and `𠜎` is 4-bytes. So the trimmed version of a string with 128 `驩`-characters will result in a 42-character string with a 126-byte UTF-8 encoded length. This is necessary because the results of this operation will be stored as basic metadata with strict byte size limits on the blockchain. 
 
-!!! tip "Pre-normalization"
+!!! note "Automated Data-Ingestion"
     Applications that perform automated data-ingestion SHOULD apply a custimized preliminary normalization to title data tailored to the dataset. Depending on catalog data removing pairs of brackets [], (), {}, and text inbetween them or cutting all text after the first occurence of a semicolon (;) or colon (:) can vastly improve de-duplication. 
 
 #### Dealing with Meta-ID collisions
@@ -197,9 +197,7 @@ For the Content-ID-Image we are opting for a DCT-based perceptual image hash ins
 
 An ISCC generating application MUST provide a `content_id_image(image, partial=False)` function that accepts a local file path to an image and returns a Content-ID with GMT type `image`. The procedure to create a Content-ID-Image is as follows:
 
-1. Convert image to greyscale
-2. Resize the image to 32x32 pixels using [bicubic interpolation](https://en.wikipedia.org/wiki/Bicubic_interpolation)
-3. Create a 32x32 two-dimensional array of 8-bit greyscale values from the image data
+1. Apply [`image_normalize`](#image_normalize) to receive a two-dimensional array of grayscale pixel data.
 4. Perform a discrete cosine transform per row
 5. Perform a DCT per column on the resulting matrix from step 4.
 5. Extract upper left 8x8 corner of array from step 4 as a flat list
@@ -347,9 +345,9 @@ the `decode` function accepts a 13-character **ISCC-Component Code** and returns
 
 See also: [Base-ISCC Decoding reference code](https://github.com/coblo/iscc-specs/blob/master/src/iscc/iscc.py#L434) (LINKME)
 
-### Text Normalization
+### Content Normalization
 
-Text normalization functions are used for Meta-ID and Content-ID-Text creation.
+The ISCC standardizes some content normalization procedures to support reproducible and stable identifiers. Following the list of normalization functions that MUST be provided by a conforming implementation.
 
 #### text_pre_normalize
 
@@ -382,6 +380,18 @@ We define a text normalization function that is specific to our application. It 
 4. Re-Compose the text by applying `Unicode Normalization Form C (NFC)`.
 
 See also: Text normalization reference code (LINKME)
+
+#### image_normalize
+
+Signature: `image_normalize(img)-> List[List[int]]`
+
+Accepts a file path, byte-stream or raw binary image data and MUST at least support JPEG, PNG, and GIF image formats. Normalize the image with the following steps:
+
+1. Convertf the image to greyscale
+2. Resize the image to 32x32 pixels using [bicubic interpolation](https://en.wikipedia.org/wiki/Bicubic_interpolation)
+3. Create a 32x32 two-dimensional array of 8-bit grayscale values from the image data
+
+See also: Image normalization reference code (LINKME)
 
 ### Similarity Hash
 

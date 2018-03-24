@@ -12,6 +12,11 @@ import xxhash
 from iscc.const import *
 
 
+###############################################################################
+# Top-Level functions for generating ISCC Component Codes                     #
+###############################################################################
+
+
 def meta_id(title, extra='', version=0):
 
     assert version == 0, "Only version 0 supported"
@@ -92,7 +97,7 @@ def content_id_text(text, partial=False):
 def content_id_image(img, partial=False):
 
     # 1. Normalize image to 2-dimensional pixel array
-    pixels = normalize_image(img)
+    pixels = image_normalize(img)
 
     # 2. Calculate image hash
     hash_digest = image_hash(pixels)
@@ -158,6 +163,11 @@ def instance_id(data):
     return [code, hex_hash]
 
 
+###############################################################################
+# Content Normalization Functions                                             #
+###############################################################################
+
+
 def text_pre_normalize(text):
 
     if isinstance(text, bytes):
@@ -200,6 +210,26 @@ def text_normalize(text):
     recomposed = unicodedata.normalize('NFC', filtered_text)
 
     return recomposed
+
+
+def image_normalize(img):
+
+    if not isinstance(img, Image.Image):
+        img = Image.open(img)
+
+    # 1. Convert to greyscale
+    img = img.convert("L")
+
+    # 2. Resize to 32x32
+    img = img.resize((32, 32), Image.BICUBIC)
+
+    # 3. Create two dimensional array
+    pixels = [
+        [list(img.getdata())[32 * i + j] for j in range(32)]
+        for i in range(32)
+    ]
+
+    return pixels
 
 
 def top_hash(hashes):
@@ -292,26 +322,6 @@ def chunk_length(data, norm_size, min_size, max_size, mask_1, mask_2):
             return i
         i = i + 1
     return i
-
-
-def normalize_image(img):
-
-    if not isinstance(img, Image.Image):
-        img = Image.open(img)
-
-    # 1. Convert to greyscale
-    img = img.convert("L")
-
-    # 2. Resize to 32x32
-    img = img.resize((32, 32), Image.BICUBIC)
-
-    # 3. Create two dimensional array
-    pixels = [
-        [list(img.getdata())[32 * i + j] for j in range(32)]
-        for i in range(32)
-    ]
-
-    return pixels
 
 
 def sliding_window(seq, width):
