@@ -337,8 +337,6 @@ iscc:<fq-iscc-code>[?stream=<name>]
 iscc:11TcMGvUSzqoM1CqVA3ykFawyh1R1sH4Bz8A1of1d2Ju4VjWt26S?stream=smart-license
 ```
 
-
-
 ## Procedures & Algorithms
 
 ### Base58-ISCC
@@ -351,7 +349,7 @@ Signature: `encode(digest: bytes) -> str`
 
 The `encode` function accepts a 9-byte **ISCC Component Digest** and returns the Base58-ISCC encoded  alphanumeric string of 13 characters which we call the **ISCC-Component Code**.
 
-See also: [Base-ISCC Encoding reference code](https://github.com/coblo/iscc-specs/blob/master/src/iscc/iscc.py#L414) (LINKME)
+See also: [Base-ISCC Encoding reference code](https://github.com/coblo/iscc-specs/blob/master/src/iscc/iscc.py#L439)
 
 #### decode
 
@@ -359,7 +357,7 @@ Signature: decode(code: str) -> bytes
 
 the `decode` function accepts a 13-character **ISCC-Component Code** and returns the corresponding 9-byte **ISCC-Component Digest**.
 
-See also: [Base-ISCC Decoding reference code](https://github.com/coblo/iscc-specs/blob/master/src/iscc/iscc.py#L434) (LINKME)
+See also: [Base-ISCC Decoding reference code](https://github.com/coblo/iscc-specs/blob/master/src/iscc/iscc.py#L459)
 
 ### Content Normalization
 
@@ -371,7 +369,7 @@ Signature: `text_pre_normalize(text: str|bytes) -> str `
 
 Decodes raw plain-text data and applies Unicode [Normalization Form KC (NFKC)](http://www.unicode.org/reports/tr15/#Norm_Forms) . The plain-text data MUST be stripped of any markup beforhand. Text input is expected to be UTF-8 encoded plain-text data or a native type of the implementig programming language that supports Unicode. Text decoding errors MUST fail with an error.
 
-See also: Text pre-normalization reference code (LINKME)
+See also: [Text pre-normalization reference code](https://github.com/coblo/iscc-specs/blob/master/src/iscc/iscc.py#L171)
 
 #### text_trim
 
@@ -379,7 +377,7 @@ Signature: `text_trim(text: str) -> str`
 
 Trim text such that its UTF-8 encoded byte representation does not exceed 128-bytes each.
 
-See also: Text trimming reference code (LINKME)
+See also: [Text trimming reference code](https://github.com/coblo/iscc-specs/blob/master/src/iscc/iscc.py#L180)
 
 #### text_normalize
 
@@ -395,7 +393,7 @@ We define a text normalization function that is specific to our application. It 
 3. Remove any leading or trailing `Separator` characters.
 4. Re-Compose the text by applying `Unicode Normalization Form C (NFC)`.
 
-See also: Text normalization reference code (LINKME)
+See also: [Text normalization reference code](https://github.com/coblo/iscc-specs/blob/master/src/iscc/iscc.py#L190)
 
 #### image_normalize
 
@@ -407,7 +405,7 @@ Accepts a file path, byte-stream or raw binary image data and MUST at least supp
 2. Resize the image to 32x32 pixels using [bicubic interpolation](https://en.wikipedia.org/wiki/Bicubic_interpolation)
 3. Create a 32x32 two-dimensional array of 8-bit grayscale values from the image data
 
-See also: Image normalization reference code (LINKME)
+See also: [Image normalization reference code](https://github.com/coblo/iscc-specs/blob/master/src/iscc/iscc.py#L215)
 
 ### Feature Hashing
 
@@ -421,7 +419,7 @@ The `similarity_hash` function takes a sequence of hash digests which represent 
 
 ![iscc-similarity-hash](images/iscc-similarity-hash.svg)
 
-See also: Similarity hash reference code (LINKME)
+See also: [Similarity hash reference code](https://github.com/coblo/iscc-specs/blob/master/src/iscc/iscc.py#L240)
 
 #### minimum_hash
 
@@ -429,7 +427,7 @@ Signature: `minimum_hash(features: Iterable[int]) -> List[int]`
 
 The `minimum_hash` function takes an arbitrary sized set of 32-bit integer features and reduces it to a fixed size vector of 128 features such that it preserves similarity with other sets. It is based on the MinHash implementation of the [datasketch](https://ekzhu.github.io/datasketch/) library by [Eric Zhu](https://github.com/ekzhu).
 
-See also: Minimum hash reference code (LINKME)
+See also: [Minimum hash reference code](https://github.com/coblo/iscc-specs/blob/master/src/iscc/iscc.py#L264)
 
 #### image_hash
 
@@ -442,7 +440,7 @@ Signature: `image_hash(pixels: List[List[int]]) -> bytes`
 5. Create a 64-bit digest by iterating over the values of step 5 and setting a  `1`- for values above median and `0` for values below or equal to median.
 6. Return results from step 5.
 
-See also: Image hash reference code (LINKME)
+See also: [Image hash reference code](https://github.com/coblo/iscc-specs/blob/master/src/iscc/iscc.py#L283)
 
 ### Content Defined Chunking
 
@@ -454,7 +452,7 @@ Signature: `data_chunks(data: stream) -> Iterator[bytes]`
 
 The `data_chunks` function accepts a byte-stream and returns variable sized chunks. Chunk boundaries are determined by a gear based chunking algorithm based on [[WenXia2016]][#WenXia2016].
 
-See also: [CDC reference code]() (LINKME) 
+See also: [CDC reference code](https://github.com/coblo/iscc-specs/blob/master/src/iscc/iscc.py#L340)
 
 ## Conformance Testing
 
