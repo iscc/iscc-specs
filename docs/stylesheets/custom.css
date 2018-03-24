@@ -1,3 +1,21 @@
 .md-typeset__table {
-   min-width: 100%;
+    min-width: 100%;
+}
+
+dt {
+    font-weight: bold;
+    font-size: 1em;
+
+}
+
+dd {
+    margin: 0;
+    font-size: 0.9em;
+    padding: 0 0 0.5em 0;
+}
+
+a code {
+    font-size: 0.8em !important;
+    background-color: lightgray !important;
+    padding: 2px 6px 2px 6px !important;
 }

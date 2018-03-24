@@ -77,7 +77,7 @@ The ISCC Digest is built from multiple self-describing 72-bit components:
 | **Algorithms:** | Similarity Hash     | Type specific      | CDC, Minimum Hash | CDC, Hash Tree |
 | **Size:**       | 72 bits             | 72 bits            | 72 bits           | 72 bits        |
 
-These components MAY be used independently by applications for various purposes but MUST be combined into a case-sensitive 52 character [base58-iscc](#base58-iscc-encoding) encoded string (55 with hyphens) for a fully qualified ISCC Code. The components MUST be combined in the fixed order of Meta-ID, Content-ID, Data-ID, Instance-ID and MAY be separated by hyphens.
+These components MAY be used independently by applications for various purposes but MUST be combined into a case-sensitive 52 character [base58-iscc](#base58-iscc) encoded string (55 with hyphens) for a fully qualified ISCC Code. The components MUST be combined in the fixed order of Meta-ID, Content-ID, Data-ID, Instance-ID and MAY be separated by hyphens.
 
 !!! example "Printable ISCC Code"
     ISCC: 11cS7Y9NjD6DX-1DVcUdv5ewjDQ-1Qhwz8x54CShu-1d8uCbWCNbGWg
@@ -108,7 +108,7 @@ The body section of each component is always 8-bytes and can thus be fit into a 
 
 The Meta-ID component starts with a 1-byte header `00000000`. The first nibble `0000` indicates that this is a Meta-ID component type. The second nibble `0000` indicates that it belongs to an ISCC of version 1. All subsequent components are expected to follow the specification of a version 1 ISCC.
 
-The Meta-ID body is built from a 64-bit `similarity_hash` over 4-character n-grams of the basic metadata of the content to be identified.  The basic metadata supplied to the META-ID generating function is assumed to be UTF-8 encoded. Errors that occur during the decoding of such a bytestring input to a native Unicode MUST terminate the process and must not be silenced. An ISCC generating application MUST provide a `meta_id` function that accepts minimal and generic metadata and returns a [Base58-ISCC encoded](#base58-iscc-encoding) Meta-ID component and trimmed metadata.
+The Meta-ID body is built from a 64-bit `similarity_hash` over 4-character n-grams of the basic metadata of the content to be identified.  The basic metadata supplied to the META-ID generating function is assumed to be UTF-8 encoded. Errors that occur during the decoding of such a bytestring input to a native Unicode MUST terminate the process and must not be silenced. An ISCC generating application MUST provide a `meta_id` function that accepts minimal and generic metadata and returns a [Base58-ISCC encoded](#base58-iscc) Meta-ID component and trimmed metadata.
 
 | Name    | Type    | Required | Description                                                  |
 | :------ | :------ | :------- | :----------------------------------------------------------- |
@@ -124,15 +124,15 @@ The Meta-ID body is built from a 64-bit `similarity_hash` over 4-character n-gra
 
 An ISCC generating application must follow these steps in the given order to produce a stable Meta-ID:
 
-1. Apply [text_pre_normalize](#text_pre_normalize) separately to the  `title` and `extra` inputs.
-2. Apply [text_trim](#text_trim) to the results of step 1. *The results of this step MUST be supplied as basic metadata for ISCC registration.*
+1. Apply [`text_pre_normalize`](#text_pre_normalize) separately to the  `title` and `extra` inputs.
+2. Apply [`text_trim`](#text_trim) to the results of step 1. *The results of this step MUST be supplied as basic metadata for ISCC registration.*
 3. Concatenate trimmed`title` and `extra` from using a space ( `\u0020`) as a seperator.
-4. Apply [text_normalize](#text_normalize) to the results of step 3.
+4. Apply [`text_normalize`](#text_normalize) to the results of step 3.
 5. Create a list of 4 character [n-grams](https://en.wikipedia.org/wiki/N-gram) by sliding character-wise through the result of step 4.
 6. Encode each n-gram from step 5 to an UTF-8 bytestring and calculate its [xxHash64](http://cyan4973.github.io/xxHash/) digest.
 7. Apply [`similarity_hash`](#similarity_hash) to the list of digests from step 6.
 8. Prepend the 1-byte component header according to component type and ISCC version (e.g. `0x00`) to the results of step 7.
-9. Encode the resulting 9 byte sequence with [encode](#encode)
+9. Encode the resulting 9 byte sequence with [`encode`](#encode)
 10. Return encoded Meta-ID, trimmed `title` and trimmed `extra` data.
 
 
@@ -263,7 +263,7 @@ An ISCC generating application MUST provide a `instance_id` function that accept
 4. Recursively apply `0x01`-prefixed pairwise hashing to the results of  step 3 until the process yields only one hash value. We call this value the top-hash.
 5. Trim the resulting *top hash* to the first 8 bytes.
 6. Prepend the 1-byte component header (e.g. `0x30`).
-7. Encode resulting 9-byte sequence with [encode](#encode) to an Instance-ID Code
+7. Encode resulting 9-byte sequence with [`encode`](#encode) to an Instance-ID Code
 8. Hex-Encode the *top hash* 
 9. Return the Intance-ID and the hex-encoded top-hash
 
