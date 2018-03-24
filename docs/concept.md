@@ -83,6 +83,10 @@ Before we settle on the details of the proposed ISCC identifier, we want to buil
 
 ![img](images/iscc-web-demo.svg)
 
+!!! Update
+
+    An interactive demo of the concept is available at https://isccdemo.content-blockchain.org/
+
 The minimal viable, first iteration ISCC will be a byte structure built from the following components:
 
 ### Meta-ID
