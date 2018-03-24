@@ -156,11 +156,11 @@ It is our opinion that the concept of **intended collisions** of Meta-ID compone
 
 ### Content-ID Component
 
-The Content-ID component has multiple subtypes. The subtypes correspond with the **Generic Media Types (GMT)**. A fully qualified ISCC can only have a Content-ID component of one specific GMT, but there may be multiple ISCCs with different Content-ID types per digital media object.
+The Content-ID component has multiple subtypes. The subtypes correspond with the **Generic Media Types (GMT)**. A fully qualified ISCC can only have one Content-ID component of one specific GMT, but there may be multiple ISCCs with different Content-ID types per digital media object.
 
 A Content-ID is generated in two broad steps. In the first step, we extract and convert content from a rich media type to a normalized GMT. In the second step, we use a GMT-specific process to generate the Content-ID component of an ISCC. 
 
-##### Generic Media Types
+#### Generic Media Types
 
 The  Content-ID type is signaled by the first 3 bits of the second nibble of the first byte of the Content-ID:
 
@@ -172,6 +172,21 @@ The  Content-ID type is signaled by the first 3 bits of the second nibble of the
 | *video*        | *011*             | To be defined in later version of specification    |
 | *mixed*        | *100*             | To be defined in later version of specification    |
 |                | 101, 110, 111     | Reserved for future versions of specification      |
+
+#### Partial Content Flag (PCF)
+
+The last bit of the header byte is the "Partial Content Flag". It designates if the Content-ID applies to the full content or just some part of it. The PCF MUST be set as a `0`-bit (**full GMT-specific content**) by default. Setting the PCF to `1` enables applications to create multiple ISCCs for partial extracts of a content collection. The exact semantics of *partial content* are outside of the scope of this specification. Applications that plan to support partial Content-IDs MUST clearly define their semantics. 
+
+!!! example "PCF Linking Example Use Case"
+    Let´s assume we have a single Newspaper issue "The Times - 03 Jan 2009". You would generate one Meta-ID component with title "The Times" and extra "03 Jan 2009". The resulting Meta-ID component will be the grouping prefix in this szenario.
+    
+    The Content-ID component would be of type text with flag `0` (not partial) and calculated over the concatenated plain-text of all contained articles. The remaining components of ISCC are created by running their algorithms over the print PDF data of the complete Newspaper issue. 
+    
+    We now create individual ISCCs for each article that would reuse the Meta-ID of the parent magazine issue (this would link them to the collection identifier). Their content-ids components would get the PCF `1` flag (partial) to mark them as partial to the newspaper issue or "in context" with the collection. The remaining ISCC components would be created from the data for each individual article.
+    
+    Note that the ISCCs of the individual articles could still be linked to their eventually pre-existing standalone IDs (not in context with the newpaper issue) via identical Data-ID and Instance-ID Components.
+    
+    This is just one example that illustrates the flexibility that the PCF-Flag provides in concert with a grouping Meta-ID. With great flexibility comes great danger of incompatibility. Applications SHOULD do carefull planning before using the PCD-Flag with internally defined semantics.
 
 #### Content-ID-Text
 
@@ -193,26 +208,17 @@ An ISCC generating application MUST provide a `content_id(text, partial=False)` 
 
 #### Content-ID-Image
 
-For the Content-ID-Image we are opting for a DCT-based perceptual image hash instead of a more sophisticated keypoint detection based method. In view of the generic deployabiility of the ISCC we chose an algorithm that has moderate computation requirements and is easy to implement while still being robust against most common minor image manipulations. 
+For the Content-ID-Image we are opting for a DCT-based perceptual image hash instead of a more sophisticated keypoint detection based method. In view of the generic deployabiility of the ISCC we chose an algorithm that has moderate computation requirements and is easy to implement while still being robust against common image manipulations. 
 
 An ISCC generating application MUST provide a `content_id_image(image, partial=False)` function that accepts a local file path to an image and returns a Content-ID with GMT type `image`. The procedure to create a Content-ID-Image is as follows:
 
 1. Apply [`image_normalize`](#image_normalize) to receive a two-dimensional array of grayscale pixel data.
-4. Perform a discrete cosine transform per row
-5. Perform a DCT per column on the resulting matrix from step 4.
-5. Extract upper left 8x8 corner of array from step 4 as a flat list
-6. Calculate the median of the results from step 5
-7. Create a 64-bit digest by iterating over the values of step 5 and setting a  `1`- for values above median and `0` for values below or equal to median.
-9. Prepend the 1-byte component header (`0x12` full content or `0x13` partial content)
-10. Encode and return the resulting 9-byte sequence with [Base58-ISCC Encoding](#base58-iscc-encoding)
+2. Apply [`image_hash`](#image_hash) to the results of step 1.
+9. Prepend the 1-byte component header (`0x12` full content or `0x13` partial content) to results of step 2.
+10. Encode and return the resulting 9-byte sequence with [`encode`](#encode)
 
 !!! note "Image Data Input"
     The `content_id_image` function may optionally accept the raw byte data of an encoded image or an internal native image object as input for convenience.
-
-#### Partial Content Flag (PCF)
-
-The last bit of the header byte is the "Partial Content Flag". It designates if the Content-ID applies to the full content or just some part of it. The PCF MUST be set as a `0`-bit (**full GMT-specific content**) by default. Setting the PCF to `1` enables applications to create multiple ISCCs for partial extracts of one and the same digital file. The exact semantics of *partial content* are outside of the scope of this specification. Applications that plan to support partial Content-IDs SHOULD clearly define their semantics. For example, an application might create separate ISCC for the text contents of multiple articles of a magazine issue. In such a scenario
-the Meta-, Data-, and Instance-IDs are the compound key for the magazine issue, while the Content-ID-Text component distinguishes the different articles of the issue. The different Content-ID-Text components would automatically be "bound" together by the other 3 components.
 
 ### Data-ID Component
 
@@ -383,7 +389,7 @@ See also: Text normalization reference code (LINKME)
 
 #### image_normalize
 
-Signature: `image_normalize(img)-> List[List[int]]`
+Signature: `image_normalize(img) -> List[List[int]]`
 
 Accepts a file path, byte-stream or raw binary image data and MUST at least support JPEG, PNG, and GIF image formats. Normalize the image with the following steps:
 
@@ -393,17 +399,40 @@ Accepts a file path, byte-stream or raw binary image data and MUST at least supp
 
 See also: Image normalization reference code (LINKME)
 
-### Similarity Hash
+### Feature Hashing
 
-The `similarity_hash` function takes a sequence of hash digests (raw 8-bit bytes) which represent a set of features. Each of the digests MUST be of equal size. The function returns a new hash digest (raw 8-bit bytes) of the same size. For each bit in the input hashes calulate the number of hashes with that bit set and substract the the count of hashes where it is not set. For the output hash set the same bit position to `0` if the count is negative or `1` if it is zero or positive. The resulting hash digest will retain similarity for similar sets of input hashes. See also  [[Charikar2002]][#Charikar2002].
+The ISCC standardizes various feature hashing algorithms that reduce content features to a binary vector used as the body of the various Content-ID components.
 
-#### Diagram (SH)
+#### similarity_hash
+
+Signature: `similarity_hash(hash_digests: Sequenc[ByteString]) -> bytes `
+
+The `similarity_hash` function takes a sequence of hash digests which represent a set of features. Each of the digests MUST be of equal size. The function returns a new hash digest (raw 8-bit bytes) of the same size. For each bit in the input hashes calulate the number of hashes with that bit set and substract the the count of hashes where it is not set. For the output hash set the same bit position to `0` if the count is negative or `1` if it is zero or positive. The resulting hash digest will retain similarity for similar sets of input hashes. See also  [[Charikar2002]][#Charikar2002].
 
 ![iscc-similarity-hash](images/iscc-similarity-hash.svg)
 
-### Minimum Hash
+See also: Similarity hash reference code (LINKME)
+
+#### minimum_hash
+
+Signature: `minimum_hash(features: Iterable[int]) -> List[int]`
 
 The `minimum_hash` function takes an arbitrary sized set of 32-bit integer features and reduces it to a fixed size vector of 128 features such that it preserves similarity with other sets. It is based on the MinHash implementation of the [datasketch](https://ekzhu.github.io/datasketch/) library by [Eric Zhu](https://github.com/ekzhu).
+
+See also: Minimum hash reference code (LINKME)
+
+#### image_hash
+
+Signature: `image_hash(pixels: List[List[int]]) -> bytes`
+
+1. Perform a discrete cosine transform per row of input pixels.
+2. Perform a discrete cosine transform per column on the resulting matrix from step 2.
+3. Extract upper left 8x8 corner of array from step 2 as a flat list.
+4. Calculate the median of the results from step 3.
+5. Create a 64-bit digest by iterating over the values of step 5 and setting a  `1`- for values above median and `0` for values below or equal to median.
+6. Return results from step 5.
+
+See also: Image hash reference code (LINKME)
 
 ## Conformance Testing
 

@@ -232,6 +232,84 @@ def image_normalize(img):
     return pixels
 
 
+###############################################################################
+# Feature Hashing                                                             #
+###############################################################################
+
+
+def similarity_hash(hash_digests):
+
+    n_bytes = len(hash_digests[0])
+    n_bits = (n_bytes * 8)
+    vector = [0] * n_bits
+
+    for digest in hash_digests:
+
+        assert len(digest) == n_bytes
+        h = int.from_bytes(digest, 'big', signed=False)
+
+        for i in range(n_bits):
+            vector[i] += h & 1
+            h >>= 1
+
+    minfeatures = len(hash_digests) * 1. / 2
+    shash = 0
+
+    for i in range(n_bits):
+        shash |= int(vector[i] >= minfeatures) << i
+
+    return shash.to_bytes(n_bytes, 'big', signed=False)
+
+
+def minimum_hash(features):
+
+    max_int64 = (1 << 64) - 1
+    mersenne_prime = (1 << 61) - 1
+    max_hash = (1 << 32) - 1
+    hashvalues = [max_hash] * 128
+    permutations = deepcopy(MINHASH_PERMUTATIONS)
+    a, b = permutations
+
+    for hv in features:
+        nhs = []
+        for x in range(128):
+            nh = (((a[x] * hv + b[x]) & max_int64) % mersenne_prime) & max_hash
+            nhs.append(min(nh, hashvalues[x]))
+        hashvalues = nhs
+
+    return hashvalues
+
+
+def image_hash(pixels):
+    dct_row_lists = []
+    for pixel_list in pixels:
+        dct_row_lists.append(dct(pixel_list))
+
+    dct_row_lists_t = list(map(list, zip(*dct_row_lists)))
+    dct_col_lists_t = []
+    for dct_list in dct_row_lists_t:
+        dct_col_lists_t.append(dct(dct_list))
+
+    dct_lists = list(map(list, zip(*dct_col_lists_t)))
+
+    # 5. Extract upper left 8x8 corner
+    flat_list = [x for sublist in dct_lists[:8] for x in sublist[:8]]
+
+    # 6. Calculate median
+    med = median(flat_list)
+
+    # 7. Create 64-bit digest by comparing to median
+    bitstring = ''
+    for value in flat_list:
+        if value > med:
+            bitstring += '1'
+        else:
+            bitstring += '0'
+    hash_digest = int(bitstring, 2).to_bytes(8, 'big', signed=False)
+
+    return hash_digest
+
+
 def top_hash(hashes):
 
     size = len(hashes)
@@ -331,77 +409,13 @@ def sliding_window(seq, width):
     return (seq[i:i + width] for i in idx)
 
 
-def minimum_hash(features):
-
-    max_int64 = (1 << 64) - 1
-    mersenne_prime = (1 << 61) - 1
-    max_hash = (1 << 32) - 1
-    hashvalues = [max_hash] * 128
-    permutations = deepcopy(MINHASH_PERMUTATIONS)
-    a, b = permutations
-
-    for hv in features:
-        nhs = []
-        for x in range(128):
-            nh = (((a[x] * hv + b[x]) & max_int64) % mersenne_prime) & max_hash
-            nhs.append(min(nh, hashvalues[x]))
-        hashvalues = nhs
-
-    return hashvalues
 
 
-def similarity_hash(hash_digests):
-
-    n_bytes = len(hash_digests[0])
-    n_bits = (n_bytes * 8)
-    vector = [0] * n_bits
-
-    for digest in hash_digests:
-
-        assert len(digest) == n_bytes
-        h = int.from_bytes(digest, 'big', signed=False)
-
-        for i in range(n_bits):
-            vector[i] += h & 1
-            h >>= 1
-
-    minfeatures = len(hash_digests) * 1. / 2
-    shash = 0
-
-    for i in range(n_bits):
-        shash |= int(vector[i] >= minfeatures) << i
-
-    return shash.to_bytes(n_bytes, 'big', signed=False)
 
 
-def image_hash(pixels):
-    dct_row_lists = []
-    for pixel_list in pixels:
-        dct_row_lists.append(dct(pixel_list))
 
-    dct_row_lists_t = list(map(list, zip(*dct_row_lists)))
-    dct_col_lists_t = []
-    for dct_list in dct_row_lists_t:
-        dct_col_lists_t.append(dct(dct_list))
 
-    dct_lists = list(map(list, zip(*dct_col_lists_t)))
 
-    # 5. Extract upper left 8x8 corner
-    flat_list = [x for sublist in dct_lists[:8] for x in sublist[:8]]
-
-    # 6. Calculate median
-    med = median(flat_list)
-
-    # 7. Create 64-bit digest by comparing to median
-    bitstring = ''
-    for value in flat_list:
-        if value > med:
-            bitstring += '1'
-        else:
-            bitstring += '0'
-    hash_digest = int(bitstring, 2).to_bytes(8, 'big', signed=False)
-
-    return hash_digest
 
 
 def dct(value_list):
