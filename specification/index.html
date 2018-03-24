@@ -1224,7 +1224,7 @@
 </tr>
 </tbody>
 </table>
-<p>These components MAY be used independently by applications for various purposes but MUST be combined into a case-sensitive 52 <abbr title="A character is defined as one Unicode code point">character</abbr> <a href="#base58-iscc-encoding">base58-iscc</a> encoded string (55 with hyphens) for a fully qualified <abbr title="Base58-ISCC encoded string representation of an ISCC">ISCC Code</abbr>. The components MUST be combined in the fixed order of Meta-ID, Content-ID, Data-ID, Instance-ID and MAY be separated by hyphens.</p>
+<p>These components MAY be used independently by applications for various purposes but MUST be combined into a case-sensitive 52 <abbr title="A character is defined as one Unicode code point">character</abbr> <a href="#base58-iscc">base58-iscc</a> encoded string (55 with hyphens) for a fully qualified <abbr title="Base58-ISCC encoded string representation of an ISCC">ISCC Code</abbr>. The components MUST be combined in the fixed order of Meta-ID, Content-ID, Data-ID, Instance-ID and MAY be separated by hyphens.</p>
 <div class="admonition example">
 <p class="admonition-title">Printable <abbr title="Base58-ISCC encoded string representation of an ISCC">ISCC Code</abbr></p>
 <p><abbr title="International Standard Content Code">ISCC</abbr>: 11cS7Y9NjD6DX-1DVcUdv5ewjDQ-1Qhwz8x54CShu-1d8uCbWCNbGWg</p>
@@ -1302,7 +1302,7 @@
 </table>
 <h3 id="meta-id-component">Meta-ID Component<a class="headerlink" href="#meta-id-component" title="Permanent link">#</a></h3>
 <p>The Meta-ID component starts with a 1-byte header <code>00000000</code>. The first nibble <code>0000</code> indicates that this is a Meta-ID component type. The second nibble <code>0000</code> indicates that it belongs to an <abbr title="International Standard Content Code">ISCC</abbr> of version 1. All subsequent components are expected to follow the specification of a version 1 <abbr title="International Standard Content Code">ISCC</abbr>.</p>
-<p>The Meta-ID body is built from a 64-bit <code>similarity_hash</code> over 4-<abbr title="A character is defined as one Unicode code point">character</abbr> n-grams of the basic metadata of the content to be identified.  The basic metadata supplied to the META-ID generating function is assumed to be UTF-8 encoded. Errors that occur during the decoding of such a bytestring input to a native Unicode MUST terminate the process and must not be silenced. An <abbr title="International Standard Content Code">ISCC</abbr> generating application MUST provide a <code>meta_id</code> function that accepts minimal and generic metadata and returns a <a href="#base58-iscc-encoding">Base58-<abbr title="International Standard Content Code">ISCC</abbr> encoded</a> Meta-ID component and trimmed metadata.</p>
+<p>The Meta-ID body is built from a 64-bit <code>similarity_hash</code> over 4-<abbr title="A character is defined as one Unicode code point">character</abbr> n-grams of the basic metadata of the content to be identified.  The basic metadata supplied to the META-ID generating function is assumed to be UTF-8 encoded. Errors that occur during the decoding of such a bytestring input to a native Unicode MUST terminate the process and must not be silenced. An <abbr title="International Standard Content Code">ISCC</abbr> generating application MUST provide a <code>meta_id</code> function that accepts minimal and generic metadata and returns a <a href="#base58-iscc">Base58-<abbr title="International Standard Content Code">ISCC</abbr> encoded</a> Meta-ID component and trimmed metadata.</p>
 <table>
 <thead>
 <tr>
@@ -1340,15 +1340,15 @@
 <h4 id="generate-meta-id">Generate Meta-ID<a class="headerlink" href="#generate-meta-id" title="Permanent link">#</a></h4>
 <p>An <abbr title="International Standard Content Code">ISCC</abbr> generating application must follow these steps in the given order to produce a stable Meta-ID:</p>
 <ol>
-<li>Apply <a href="#text_pre_normalize">text_pre_normalize</a> separately to the  <code>title</code> and <code>extra</code> inputs.</li>
-<li>Apply <a href="#text_trim">text_trim</a> to the results of step 1. <em>The results of this step MUST be supplied as basic metadata for <abbr title="International Standard Content Code">ISCC</abbr> registration.</em></li>
+<li>Apply <a href="#text_pre_normalize"><code>text_pre_normalize</code></a> separately to the  <code>title</code> and <code>extra</code> inputs.</li>
+<li>Apply <a href="#text_trim"><code>text_trim</code></a> to the results of step 1. <em>The results of this step MUST be supplied as basic metadata for <abbr title="International Standard Content Code">ISCC</abbr> registration.</em></li>
 <li>Concatenate trimmed<code>title</code> and <code>extra</code> from using a space ( <code>\u0020</code>) as a seperator.</li>
-<li>Apply <a href="#text_normalize">text_normalize</a> to the results of step 3.</li>
+<li>Apply <a href="#text_normalize"><code>text_normalize</code></a> to the results of step 3.</li>
 <li>Create a list of 4 <abbr title="A character is defined as one Unicode code point">character</abbr> <a href="https://en.wikipedia.org/wiki/N-gram">n-grams</a> by sliding <abbr title="A character is defined as one Unicode code point">character</abbr>-wise through the result of step 4.</li>
 <li>Encode each n-gram from step 5 to an UTF-8 bytestring and calculate its <a href="http://cyan4973.github.io/xxHash/">xxHash64</a> digest.</li>
 <li>Apply <a href="#similarity_hash"><code>similarity_hash</code></a> to the list of digests from step 6.</li>
 <li>Prepend the 1-byte component header according to component type and <abbr title="International Standard Content Code">ISCC</abbr> version (e.g. <code>0x00</code>) to the results of step 7.</li>
-<li>Encode the resulting 9 byte sequence with <a href="#encode">encode</a></li>
+<li>Encode the resulting 9 byte sequence with <a href="#encode"><code>encode</code></a></li>
 <li>Return encoded Meta-ID, trimmed <code>title</code> and trimmed <code>extra</code> data.</li>
 </ol>
 <p>See also: <a href="https://github.com/coblo/iscc-specs/blob/master/src/iscc/iscc.py#L20">Meta-ID reference code</a></p>
@@ -1481,7 +1481,7 @@
 <li>Recursively apply <code>0x01</code>-prefixed pairwise hashing to the results of  step 3 until the process yields only one hash value. We call this value the top-hash.</li>
 <li>Trim the resulting <em>top hash</em> to the first 8 bytes.</li>
 <li>Prepend the 1-byte component header (e.g. <code>0x30</code>).</li>
-<li>Encode resulting 9-byte sequence with <a href="#encode">encode</a> to an Instance-ID Code</li>
+<li>Encode resulting 9-byte sequence with <a href="#encode"><code>encode</code></a> to an Instance-ID Code</li>
 <li>Hex-Encode the <em>top hash</em> </li>
 <li>Return the Intance-ID and the hex-encoded top-hash</li>
 </ol>
