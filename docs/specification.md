@@ -136,7 +136,7 @@ An ISCC generating application must follow these steps in the given order to pro
 10. Return encoded Meta-ID, trimmed `title` and trimmed `extra` data.
 
 
-See also: [Meta-ID reference code]() (LINKME)
+See also: [Meta-ID reference code](https://github.com/coblo/iscc-specs/blob/master/src/iscc/iscc.py#L20)
 
 !!! warning "Text trimming"
     When trimming text be sure to trim the byte-length of the UTF-8 encoded version and not the number of characters. The trim point MUST be such, that it does not cut into multibyte characters. Characters might have different UTF-8 byte-length. For example `ü` is 2-bytes, `驩` is 3-bytes and `𠜎` is 4-bytes. So the trimmed version of a string with 128 `驩`-characters will result in a 42-character string with a 126-byte UTF-8 encoded length. This is necessary because the results of this operation will be stored as basic metadata with strict byte size limits on the blockchain. 
@@ -208,7 +208,7 @@ An ISCC generating application MUST provide a `content_id(text, partial=False)` 
 10. Prepend the 1-byte component header (`0x10` full content or `0x11` partial content).
 11. Encode and return the resulting 9-byte sequence with [`encode`](#encode).
 
-See also: [Content-ID-Text reference code]() (LINKME)
+See also: [Content-ID-Text reference code](https://github.com/coblo/iscc-specs/blob/master/src/iscc/iscc.py#L57)
 
 #### Content-ID-Image
 
@@ -221,7 +221,7 @@ An ISCC generating application MUST provide a `content_id_image(image, partial=F
 9. Prepend the 1-byte component header (`0x12` full content or `0x13` partial content) to results of step 2.
 4. Encode and return the resulting 9-byte sequence with [`encode`](#encode)
 
-See also: [Image-ID reference code]() (LINKME)
+See also: [Content-ID-Image reference code](https://github.com/coblo/iscc-specs/blob/master/src/iscc/iscc.py#L97)
 
 !!! note "Image Data Input"
     The `content_id_image` function may optionally accept the raw byte data of an encoded image or an internal native image object as input for convenience.
@@ -243,7 +243,7 @@ The Data-ID is built from the raw encoded data of the content to be identified. 
 7. Prepend the 1-byte component header (e.g. 0x20).
 8. Encode and return the resulting 9-byte sequence with [encode](#encode).
 
-See also: [Data-ID reference code]() (LINKME) 
+See also: [Data-ID reference code](https://github.com/coblo/iscc-specs/blob/master/src/iscc/iscc.py#L115)
 
 ### Instance-ID Component
 
@@ -267,7 +267,7 @@ An ISCC generating application MUST provide a `instance_id` function that accept
 8. Hex-Encode the *top hash* 
 9. Return the Intance-ID and the hex-encoded top-hash
 
-See also: [Instance-ID reference code]() (LINKME)
+See also: [Instance-ID reference code](https://github.com/coblo/iscc-specs/blob/master/src/iscc/iscc.py#L140) 
 
 Applications may carry, store, and process the leaf node hashes for advanced streaming data identification or partial data integrity verification.
 

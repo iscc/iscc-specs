@@ -409,15 +409,6 @@ def sliding_window(seq, width):
     return (seq[i:i + width] for i in idx)
 
 
-
-
-
-
-
-
-
-
-
 def dct(value_list):
 
     n = len(value_list)
