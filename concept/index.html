@@ -722,6 +722,10 @@
 <h2 id="iscc-proof-of-concept">ISCC Proof-of-Concept<a class="headerlink" href="#iscc-proof-of-concept" title="Permanent link">#</a></h2>
 <p>Before we settle on the details of the proposed ISCC identifier, we want to build a simple and reduced proof-of-concept implementation of our ideas. It will enable us and other developers to test with real world data and systems and find out early what works and what doesn't.</p>
 <p><img alt="img" src="../images/iscc-web-demo.svg" /></p>
+<div class="admonition update">
+<p class="admonition-title">Update</p>
+<p>An interactive demo of the concept is available at <a href="https://isccdemo.content-blockchain.org/">https://isccdemo.content-blockchain.org/</a></p>
+</div>
 <p>The minimal viable, first iteration ISCC will be a byte structure built from the following components:</p>
 <h3 id="meta-id">Meta-ID<a class="headerlink" href="#meta-id" title="Permanent link">#</a></h3>
 <p>The MetaID will be generated as a similarity preserving hash from minimal generic metadata like <em>title </em>and <em>creators</em>. It operates on <strong>Layer 1 </strong> and identifies an intangible creation. It is the first and most generic grouping element of the identifier. We will be experimenting with different n-gram sizes and bit-length to find the practical limits of precision and recall for generic metadata. We will also specify a process to disambiguate unintended collisions by adding optional metadata.</p>
