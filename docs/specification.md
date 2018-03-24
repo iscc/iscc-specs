@@ -2,7 +2,7 @@ title: ISCC - Specification
 description: Draft Specification of International Standard Content Codes
 authors: Titusz Pan
 
-# ISCC - Specification v0.9.4
+# ISCC - Specification v0.9.5
 
 !!! attention
 
@@ -65,7 +65,7 @@ The ISCC Digest is a fixed size sequence of 36 bytes (288 bits) assembled from m
 
 ![iscc-creation-process](images/iscc-creation-process.svg)
 
-### ISCC Components
+## ISCC Components
 
 The ISCC Digest is built from multiple self-describing 72-bit components:
 
@@ -82,7 +82,7 @@ These components MAY be used independently by applications for various purposes 
 !!! example "Pritable ISCC Code"
     ISCC: 11cS7Y9NjD6DX-1DVcUdv5ewjDQ-1Qhwz8x54CShu-1d8uCbWCNbGWg
 
-#### Component Types
+### Component Types
 
 Each component has the same basic structure of a **1-byte header** and a **8-byte body** section. 
 
@@ -104,7 +104,7 @@ The body section of each component is always 8-bytes and can thus be fit into a 
 | *Data-ID*              | 0010     | 0000 - Reserved                 | 0x20 |
 | *Instance-ID*          | 0011     | 0000 - Reserved                 | 0x30 |
 
-#### Meta-ID Component
+### Meta-ID Component
 
 The Meta-ID component starts with a 1-byte header `00000000`. The first nibble `0000` indicates that this is a Meta-ID component type. The second nibble `0000` indicates that it belongs to an ISCC of version 1. All subsequent components are expected to follow the specification of a version 1 ISCC.
 
@@ -120,19 +120,19 @@ The Meta-ID body is built from a 64-bit `similarity_hash` over 4-character n-gra
 
     The basic metadata inputs are intentionally simple and generic. We abstain from more specific metadata for Meta-ID generation in favor of compatibility accross industries. Imagine a *creators* input-field for metadata. Who would you list as the creators of a movie? The directors, writers the main actors? Would you list some of them or if not how do you decide whom you will list. All disambiguation of similar title data can be acomplished with the extra-field. Industry- and application-specific metadata requirements can be supplied as extended metadata with ISCC registration.
 
-##### Generate Meta-ID
+#### Generate Meta-ID
 
 An ISCC generating application must follow these steps in the given order to produce a stable Meta-ID:
 
-1. Apply Unicode standard [Normalization Form KC (NFKC)](http://www.unicode.org/reports/tr15/#Norm_Forms) separately to the  `title` and `extra` inputs.
-2. Trim `title` and `extra`, such that their UTF-8 encoded byte representation does not exceed 128-bytes each. *The results of this step MUST be supplied as basic metadata for ISCC registration.*
+1. Apply [text_pre_normalize](#text_pre_normalize) separately to the  `title` and `extra` inputs.
+2. Apply [text_trim](#text_trim) to the results of step 1. *The results of this step MUST be supplied as basic metadata for ISCC registration.*
 3. Concatenate trimmed`title` and `extra` from using a space ( `\u0020`) as a seperator.
-4. Apply [`normalize_text`](#normalize-text) to the results of step 3.
+4. Apply [text_normalize](#text_normalize) to the results of step 3.
 5. Create a list of 4 character [n-grams](https://en.wikipedia.org/wiki/N-gram) by sliding character-wise through the result of step 4.
 6. Encode each n-gram from step 5 to an UTF-8 bytestring and calculate its [xxHash64](http://cyan4973.github.io/xxHash/) digest.
-7. Apply [`similarity_hash`](#similarity-hash) to the list of digests from step 6.
+7. Apply [`similarity_hash`](#similarity_hash) to the list of digests from step 6.
 8. Prepend the 1-byte component header according to component type and ISCC version (e.g. `0x00`) to the results of step 7.
-9. Encode the resulting 9 byte sequence with [Base58-ISCC Encoding](#base58-iscc-encoding)
+9. Encode the resulting 9 byte sequence with [encode](#encode)
 10. Return encoded Meta-ID, trimmed `title` and trimmed `extra` data.
 
 
@@ -142,7 +142,7 @@ An ISCC generating application must follow these steps in the given order to pro
 !!! tip "Pre-normalization"
     Applications that perform automated data-ingestion SHOULD apply a custimized preliminary normalization to title data tailored to the dataset. Depending on catalog data removing pairs of brackets [], (), {}, and text inbetween them or cutting all text after the first occurence of a semicolon (;) or colon (:) can vastly improve de-duplication. 
 
-##### Dealing with Meta-ID collisions
+#### Dealing with Meta-ID collisions
 
 Ideally we want multiple ISCCs that identify different manifestations of the *same intangible creation* to be automatically grouped by an identical leading Meta-ID component. We call such a natural grouping an **intended component collision**. Metadata, captured and edited by humans, is notoriously unreliable. By using normalization and a similarity hash on the metadata we account for some of this variation while keeping the Meta-ID component somewhat stable. 
 
@@ -154,7 +154,7 @@ If for any reason an application wants to avoid unintended collisions with pre-e
 
 It is our opinion that the concept of **intended collisions** of Meta-ID components is generally usefull concept and a net positive. But one must be aware that this characteristic also has its pitfalls. It is by no means an attempt to provide an unambigous - agreed upon - definition of *"identical intangible creations"*.
 
-#### Content-ID Component
+### Content-ID Component
 
 The Content-ID component has multiple subtypes. The subtypes correspond with the **Generic Media Types (GMT)**. A fully qualified ISCC can only have a Content-ID component of one specific GMT, but there may be multiple ISCCs with different Content-ID types per digital media object.
 
@@ -173,25 +173,25 @@ The  Content-ID type is signaled by the first 3 bits of the second nibble of the
 | *mixed*        | *100*             | To be defined in later version of specification    |
 |                | 101, 110, 111     | Reserved for future versions of specification      |
 
-##### Content-ID-Text
+#### Content-ID-Text
 
 The Content-ID-Text is built from the extracted plain-text content of an encoded media object. To build a stable Content-ID-Text the plain-text content must first be extracted from the digital media object. It should be extracted in a way that is reproducible. There are many different text document formats out in the wilde and extracting plain-text from all of them is anything but a trivial task. While text-extraction is out of scope for this specification it is RECOMMENDED, that plain-text content SHOULD be extracted with the open-source [Apache Tika v1.17](https://tika.apache.org/) toolkit, if a generic reproducibility of the Content-ID-Text component is desired. 
 
 An ISCC generating application MUST provide a `content_id(text, partial=False)` function that accepts UTF-8 encoded plain text and a boolean indicating the [partial content flag](#partial-content-flag-pcf) as input and returns a Content-ID with GMT type `text`. The procedure to create a Content-ID-Text is as follows:
 
-1. Apply Unicode standard [Normalization Form KC (NFKC)](http://www.unicode.org/reports/tr15/#Norm_Forms) to the text input.
-2. Apply [`normalize_text`](#normalize-text) to the text input.
+1. Apply [`text_pre_normalize`](#text_pre_normalize).
+2. Apply [`text_normalize`](#text_normalize) to the text input.
 3. Split the normalized text into a list of words at whitespace boundaries.
 4. Create a list of 5 word shingles by sliding word-wise through the list of words.
 5. Create  a list of 32-bit unsigned integer features by applying [xxHash32](http://cyan4973.github.io/xxHash/) to shingles from step 4.
-6. Apply `minimum_hash` to the list of features from step 5.
+6. Apply [`minimum_hash`](#minimum_hash) to the list of features from step 5.
 7. Collect the least significant bits from the 128 MinHash features from step 6.
 8. Create two 64-bit digests from the first and second half of the collected bits.
-9. Apply [`similarity_hash`](#similarity-hash) to the digests returned from step 8.
+9. Apply [`similarity_hash`](#similarity_hash) to the digests returned from step 8.
 10. Prepend the 1-byte component header (`0x10` full content or `0x11` partial content).
-11. Encode and return the resulting 9-byte sequence with [Base58-ISCC Encoding](#base58-iscc-encoding).
+11. Encode and return the resulting 9-byte sequence with [`encode`](#encode).
 
-##### Content-ID-Image
+#### Content-ID-Image
 
 For the Content-ID-Image we are opting for a DCT-based perceptual image hash instead of a more sophisticated keypoint detection based method. In view of the generic deployabiility of the ISCC we chose an algorithm that has moderate computation requirements and is easy to implement while still being robust against most common minor image manipulations. 
 
@@ -211,18 +211,18 @@ An ISCC generating application MUST provide a `content_id_image(image, partial=F
 !!! note "Image Data Input"
     The `content_id_image` function may optionally accept the raw byte data of an encoded image or an internal native image object as input for convenience.
 
-##### Partial Content Flag (PCF)
+#### Partial Content Flag (PCF)
 
 The last bit of the header byte is the "Partial Content Flag". It designates if the Content-ID applies to the full content or just some part of it. The PCF MUST be set as a `0`-bit (**full GMT-specific content**) by default. Setting the PCF to `1` enables applications to create multiple ISCCs for partial extracts of one and the same digital file. The exact semantics of *partial content* are outside of the scope of this specification. Applications that plan to support partial Content-IDs SHOULD clearly define their semantics. For example, an application might create separate ISCC for the text contents of multiple articles of a magazine issue. In such a scenario
 the Meta-, Data-, and Instance-IDs are the compound key for the magazine issue, while the Content-ID-Text component distinguishes the different articles of the issue. The different Content-ID-Text components would automatically be "bound" together by the other 3 components.
 
-#### Data-ID Component
+### Data-ID Component
 
 For the Data-ID that should encode data similarty we use content defined chunking algorithm that provides some shift resistance and calculate the MinHash from those chunks. To accomodate for small files the first 100 chunks have a ~140-byte size target while the remaining chunks target ~ 6kb in size.
 
 The Data-ID is built from the raw encoded data of the content to be identified. An ISCC generating application MUST provide a `data_id` function that accepts the raw encoded data as input. 
 
-##### Generate Data-ID
+#### Generate Data-ID
 
 1. Apply `chunk_data` to the raw encoded content data.
 2. For each chunk calculate the xxHash32 integer hash.
@@ -233,7 +233,7 @@ The Data-ID is built from the raw encoded data of the content to be identified. 
 7. Prepend the 1-byte component header (e.g. 0x20).
 8. Encode and return the resulting 9-byte sequence with [Base58-ISCC Encoding](#base58-iscc-encoding).
 
-#### Instance-ID Component
+### Instance-ID Component
 
 The Instance-ID is built from the raw data of the media object to be identified and serves as checksum for the media object. The raw data of the media object is split into 64-kB data-chunks. Then we build a hash-tree from those chunks and use the truncated top-hash (merkle root) as component body of the Instance-ID.
 
@@ -243,7 +243,7 @@ To guard against length-extension attacks and second pre-image attacks we use do
 
 An ISCC generating application MUST provide a `instance_id` function that accepts the raw data file as input and returns an encoded Instance-ID and a full hex-encoded 256-bit top-hash. 
 
-##### Generate Instance-ID
+#### Generate Instance-ID
 
 1. Split the raw bytes of the encoded media object into 64-kB chunks.
 2. For each chunk calculate the sha256d of the concatenation of a `0x00`-byte and the chunk bytes. We call the resulting values *leaf node hashes* (LNH).
@@ -293,9 +293,11 @@ Extended metadata entries MUST be wrapped in JSON object of the following struct
 
 The ISCC is a decentralized identifier. ISCCs can be generated for content by anybody who has access to the content. Due to the clustering properties of its components the ISCC provides utility in data interchange and de-duplication scenarios even without a global registry. There is no central authority for the registration of ISCC identifiers or certification of content authorship.
 
-As an open system the ISCC allows any person or organization to offer ISCC registration services as they see fit and without the need to ask anyone for permission. This also presumes that no person or organization may claim exclusive authority about ISCC registration. 
+As an open system the ISCC allows any person or organization to offer ISCC registration services as they see fit and without the need to ask anyone for permission. This also presumes that no person or organization may claim exclusive authority about ISCC registration.
 
-Nevertheless a well known open and public registry for canonical discoverability of ISCC identified content is of great value. For this reason it is RECOMMENDED to register ISCC identifiers on the open `iscc` data-stream of the [Content Blockchain](https://content-blockchain.org/). For details please refer to the [ISCC-Stream specification](https://coblo.github.io/cips/cip-0003-iscc/) of the Content Blockchain.
+### Blockchain Registry
+
+A well known, decentralized, open, and public registry for canonical discoverability of ISCC identified content is of great value. For this reason it is RECOMMENDED to register ISCC identifiers on the open `iscc` data-stream of the [Content Blockchain](https://content-blockchain.org/). For details please refer to the [ISCC-Stream specification](https://coblo.github.io/cips/cip-0003-iscc/) of the Content Blockchain.
 
 ## ISCC URI Scheme
 
@@ -325,29 +327,61 @@ iscc:11TcMGvUSzqoM1CqVA3ykFawyh1R1sH4Bz8A1of1d2Ju4VjWt26S?stream=smart-license
 
 ## Procedures & Algorithms
 
-### Base58-ISCC Encoding
+### Base58-ISCC
 
-The ISCC uses a custom per-component data encoding that is based on the [zbase62](https://github.com/simplegeo/zbase62) encoding by [Zooko Wilcox-O'Hearn](https://en.wikipedia.org/wiki/Zooko_Wilcox-O%27Hearn). The encoding does not require padding and will always yield component codes of 13 characters length for our 72-bit digests. The predictable size of the encoding is a property that allows for easy composition and decomposition of components without having to rely on a delimiter (hyphen) in the ISCC code representation. Colliding body segments of the digest are preserved by encoding the header and body separately. The symbol table also minimizes transcription and OCR errors by omitting the easily confused characters `'O', '0', 'I', 'l'`.
+The ISCC uses a custom per-component data encoding similar to the [zbase62](https://github.com/simplegeo/zbase62) encoding by [Zooko Wilcox-O'Hearn](https://en.wikipedia.org/wiki/Zooko_Wilcox-O%27Hearn) but with a 58-symbol table. The encoding does not require padding and will always yield component codes of 13 characters length for ths 72-bit component digests. The predictable size of the encoding is a property that allows for easy composition and decomposition of components without having to rely on a delimiter (hyphen) in the ISCC code representation. Colliding body segments of the digest are preserved by encoding the header and body separately. The ASCII symbol table also minimizes transcription and OCR errors by omitting the easily confused characters `'O', '0', 'I', 'l'`.
 
-#### encode(digest)
+#### encode
+
+Signature: `encode(digest: bytes) -> str`
 
 The `encode` function accepts a 9-byte **ISCC Component Digest** and returns the Base58-ISCC encoded  alphanumeric string of 13 characters which we call the **ISCC-Component Code**.
 
-#### decode(code)
+See also: [Base-ISCC Encoding reference code](https://github.com/coblo/iscc-specs/blob/master/src/iscc/iscc.py#L414) (LINKME)
+
+#### decode
+
+Signature: decode(code: str) -> bytes
 
 the `decode` function accepts a 13-character **ISCC-Component Code** and returns the corresponding 9-byte **ISCC-Component Digest**.
 
-### Normalize Text
+See also: [Base-ISCC Decoding reference code](https://github.com/coblo/iscc-specs/blob/master/src/iscc/iscc.py#L434) (LINKME)
 
-We define a text normalization function that is specific to our application. It takes unicode text as an input and returns *normalized* Unicode text for further algorithmic processing. We reference this function by the name `normalize_text`. The `normalize_text` function performs the following operations in the given order while each step works with the results of the previous operation:
+### Text Normalization
+
+Text normalization functions are used for Meta-ID and Content-ID-Text creation.
+
+#### text_pre_normalize
+
+Signature: `text_pre_normalize(text: str|bytes) -> str `
+
+Decodes raw plain-text data and applies Unicode [Normalization Form KC (NFKC)](http://www.unicode.org/reports/tr15/#Norm_Forms) . The plain-text data MUST be stripped of any markup beforhand. Text input is expected to be UTF-8 encoded plain-text data or a native type of the implementig programming language that supports Unicode. Text decoding errors MUST fail with an error.
+
+See also: Text pre-normalization reference code (LINKME)
+
+#### text_trim
+
+Signature: `text_trim(text: str) -> str`
+
+Trim text such that its UTF-8 encoded byte representation does not exceed 128-bytes each.
+
+See also: Text trimming reference code (LINKME)
+
+#### text_normalize
+
+Signature: `text_normalize(text: str) -> str`
+
+We define a text normalization function that is specific to our application. It takes unicode text as an input and returns *normalized* Unicode text for further algorithmic processing. The `text_normalize` function performs the following operations in the given order while each step works with the results of the previous operation:
 
 1. Decompose the input text by applying [Unicode Normalization Form D (NFD)](http://www.unicode.org/reports/tr15/#Norm_Forms).
-2. Replace each group of one or more consecutive `Separator` characters ([Unicode categories](https://en.wikipedia.org/wiki/Unicode_character_property) Zs, Zl and Zp) with exactly one Unicode `SPACE` character (`U+0020`) .
+2. Filter and normalize text by iterating over unicode characters while:
+   - replacing groups of one or more consecutive `Separator` characters ([Unicode categories](https://en.wikipedia.org/wiki/Unicode_character_property) Zs, Zl and Zp) with exactly one Unicode `SPACE` character (`U+0020`) .
+   - removing characters that are not in one of the Unicode categories `Separator` , `Letter`, `Number` or `Symbol`.
+   - converting characters to lower case.
 3. Remove any leading or trailing `Separator` characters.
-4. Remove each character that is not in one of the Unicode categories `Separator` , `Letter`, `Number` or `Symbol`.
-5. Convert all characters to lower case.
-6. Re-Compose the text by applying `Unicode Normalization Form C (NFC)`.
-7. Return the resulting text.
+4. Re-Compose the text by applying `Unicode Normalization Form C (NFC)`.
+
+See also: Text normalization reference code (LINKME)
 
 ### Similarity Hash
 
@@ -407,3 +441,5 @@ An application that claims ISCC conformance MUST pass the ISCC conformance test 
 *[sha256d]: Double SHA256
 
 [#Charikar2002]:  http://dx.doi.org/10.1145/509907.509965 "Charikar, M.S., 2002, May. Similarity estimation techniques from rounding algorithms. In Proceedings of the thiry-fourth annual ACM symposium on Theory of computing (pp. 380-388). ACM."
+
+

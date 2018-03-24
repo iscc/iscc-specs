@@ -16,24 +16,19 @@ def meta_id(title, extra='', version=0):
 
     assert version == 0, "Only version 0 supported"
 
-    # 1. Apply Unicode NFKC normalization separately to all text input values.
-    if isinstance(title, bytes):
-        title = title.decode('utf-8')
-    title = unicodedata.normalize('NFKC', title).strip()
+    # 1. Pre-Normalization
+    title = text_pre_normalize(title)
+    extra = text_pre_normalize(extra)
 
-    if isinstance(extra, bytes):
-        extra = extra.decode('utf-8')
-    extra = unicodedata.normalize('NFKC', extra).strip()
-
-    # 2. Trim title and extra
-    title = trim(title)
-    extra = trim(extra)
+    # 2. Trimming
+    title = text_trim(title)
+    extra = text_trim(extra)
 
     # 3. Concatenate
     concat = '\u0020'.join((title, extra)).strip()
 
-    # 4. Apply text normalization
-    normalized = normalize_text(concat)
+    # 4. Normalization
+    normalized = text_normalize(concat)
 
     # 5. Create a list of n-grams
     n_grams = sliding_window(normalized, width=WINDOW_SIZE_MID)
@@ -48,18 +43,19 @@ def meta_id(title, extra='', version=0):
     meta_id_digest = HEAD_MID + simhash_digest
 
     # 9. Encode with base58_iscc
-    return [encode(meta_id_digest), title, extra]
+    meta_id = encode(meta_id_digest)
+
+    # 10. Return encoded Meta-ID, trimmed `title` and trimmed `extra` data.
+    return [meta_id, title, extra]
 
 
 def content_id_text(text, partial=False):
 
-    # 1. Apply Unicode NFKC normalization
-    if isinstance(text, bytes):
-        text = text.decode('utf-8')
-    text = unicodedata.normalize('NFKC', text)
+    # 1. Pre-normalize
+    text = text_pre_normalize(text)
 
-    # 2. Apply `normalize_text`
-    text = normalize_text(text)
+    # 2. Normalize
+    text = text_normalize(text)
 
     # 3. Split to words
     w = text.split()
@@ -162,7 +158,16 @@ def instance_id(data):
     return [code, hex_hash]
 
 
-def trim(text):
+def text_pre_normalize(text):
+
+    if isinstance(text, bytes):
+        text = text.decode('utf-8')
+    text = unicodedata.normalize('NFKC', text).strip()
+
+    return text
+
+
+def text_trim(text):
 
     while True:
         data = text.encode('utf-8')
@@ -170,6 +175,31 @@ def trim(text):
             return text
         else:
             text = text[:-1]
+
+
+def text_normalize(text):
+
+    # 1. Decompose with NFD
+    decomposed = unicodedata.normalize('NFD', text)
+
+    # 2. Filter and normalize
+    chars = []
+    whitelist = 'LNS'
+    for c in decomposed:
+        cat = unicodedata.category(c)
+        if cat.startswith('Z'):
+            if not chars or chars[-1] != '\u0020':
+                chars.append('\u0020')
+        elif cat[0] in whitelist:
+            chars.append(c.lower())
+
+    # 3. Remove leading/trailing whitespace
+    filtered_text = ''.join(chars).strip()
+
+    # 4. Re-Compose with NFC
+    recomposed = unicodedata.normalize('NFC', filtered_text)
+
+    return recomposed
 
 
 def top_hash(hashes):
@@ -262,26 +292,6 @@ def chunk_length(data, norm_size, min_size, max_size, mask_1, mask_2):
             return i
         i = i + 1
     return i
-
-
-def normalize_text(text):
-
-    whitelist = 'LNS'
-    decomposed = unicodedata.normalize('NFD', text)
-    chars = []
-
-    for c in decomposed:
-        cat = unicodedata.category(c)
-        if cat.startswith('Z'):
-            chars.append(' ')
-        elif cat[0] in whitelist:
-            chars.append(c.lower())
-
-    filtered = ''.join(chars)
-    collapsed = '\u0020'.join(filtered.split())
-    normalized = unicodedata.normalize('NFC', collapsed)
-
-    return normalized
 
 
 def normalize_image(img):

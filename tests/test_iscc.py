@@ -80,26 +80,29 @@ def test_content_id_text():
     assert 1 == iscc.distance(cid_t_a, cid_t_b)
 
 
-def test_normalize_text():
+def test_text_normalize():
 
     text = 'Iñtërnâtiônàlizætiøn☃💩 is a ticky \u00A0 thing'
-    normalized = iscc.normalize_text(text)
+    normalized = iscc.text_normalize(text)
     assert normalized == 'internationalizætiøn☃💩 is a ticky thing'
 
+    assert iscc.text_normalize(' ') == ''
+    assert iscc.text_normalize('  Hello  World ? ') == 'hello world'
 
-def test_trim():
+
+def test_trim_text():
     multibyte_2 = 'ü' * 128
-    trimmed = iscc.trim(multibyte_2)
+    trimmed = iscc.text_trim(multibyte_2)
     assert 64 == len(trimmed)
     assert 128 == len(trimmed.encode('utf-8'))
 
     multibyte_3 = "驩" * 128
-    trimmed = iscc.trim(multibyte_3)
+    trimmed = iscc.text_trim(multibyte_3)
     assert 42 == len(trimmed)
     assert 126 == len(trimmed.encode('utf-8'))
 
     mixed = 'Iñtërnâtiônàlizætiøn☃💩' * 6
-    trimmed = iscc.trim(mixed)
+    trimmed = iscc.text_trim(mixed)
     assert 85 == len(trimmed)
     assert 128 == len(trimmed.encode('utf-8'))
 
