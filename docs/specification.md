@@ -136,6 +136,8 @@ An ISCC generating application must follow these steps in the given order to pro
 10. Return encoded Meta-ID, trimmed `title` and trimmed `extra` data.
 
 
+See also: [Meta-ID reference code]() (LINKME)
+
 !!! warning "Text trimming"
     When trimming text be sure to trim the byte-length of the UTF-8 encoded version and not the number of characters. The trim point MUST be such, that it does not cut into multibyte characters. Characters might have different UTF-8 byte-length. For example `ü` is 2-bytes, `驩` is 3-bytes and `𠜎` is 4-bytes. So the trimmed version of a string with 128 `驩`-characters will result in a 42-character string with a 126-byte UTF-8 encoded length. This is necessary because the results of this operation will be stored as basic metadata with strict byte size limits on the blockchain. 
 
@@ -198,13 +200,15 @@ An ISCC generating application MUST provide a `content_id(text, partial=False)` 
 2. Apply [`text_normalize`](#text_normalize) to the text input.
 3. Split the normalized text into a list of words at whitespace boundaries.
 4. Create a list of 5 word shingles by sliding word-wise through the list of words.
-5. Create  a list of 32-bit unsigned integer features by applying [xxHash32](http://cyan4973.github.io/xxHash/) to shingles from step 4.
+5. Create  a list of 32-bit unsigned integer features by applying [xxHash32](http://cyan4973.github.io/xxHash/) to results of step 4.
 6. Apply [`minimum_hash`](#minimum_hash) to the list of features from step 5.
 7. Collect the least significant bits from the 128 MinHash features from step 6.
 8. Create two 64-bit digests from the first and second half of the collected bits.
 9. Apply [`similarity_hash`](#similarity_hash) to the digests returned from step 8.
 10. Prepend the 1-byte component header (`0x10` full content or `0x11` partial content).
 11. Encode and return the resulting 9-byte sequence with [`encode`](#encode).
+
+See also: [Content-ID-Text reference code]() (LINKME)
 
 #### Content-ID-Image
 
@@ -215,27 +219,31 @@ An ISCC generating application MUST provide a `content_id_image(image, partial=F
 1. Apply [`image_normalize`](#image_normalize) to receive a two-dimensional array of grayscale pixel data.
 2. Apply [`image_hash`](#image_hash) to the results of step 1.
 9. Prepend the 1-byte component header (`0x12` full content or `0x13` partial content) to results of step 2.
-10. Encode and return the resulting 9-byte sequence with [`encode`](#encode)
+4. Encode and return the resulting 9-byte sequence with [`encode`](#encode)
+
+See also: [Image-ID reference code]() (LINKME)
 
 !!! note "Image Data Input"
     The `content_id_image` function may optionally accept the raw byte data of an encoded image or an internal native image object as input for convenience.
 
 ### Data-ID Component
 
-For the Data-ID that should encode data similarty we use content defined chunking algorithm that provides some shift resistance and calculate the MinHash from those chunks. To accomodate for small files the first 100 chunks have a ~140-byte size target while the remaining chunks target ~ 6kb in size.
+For the Data-ID that encodes data similarty we use a content defined chunking algorithm that provides some shift resistance and calculate the MinHash from those chunks. To accomodate for small files the first 100 chunks have a ~140-byte size target while the remaining chunks target ~ 6kb in size.
 
-The Data-ID is built from the raw encoded data of the content to be identified. An ISCC generating application MUST provide a `data_id` function that accepts the raw encoded data as input. 
+The Data-ID is built from the raw encoded data of the content to be identified. An ISCC generating application MUST provide a `data_id` function that accepts the raw encoded data as input.
 
 #### Generate Data-ID
 
-1. Apply `chunk_data` to the raw encoded content data.
+1. Apply [`data_chunks`](#data_chunks) to the raw encoded content data.
 2. For each chunk calculate the xxHash32 integer hash.
-3. Apply `minimum_hash` to the resulting list of 32-bit unsigned integers.
+3. Apply [`minimum_hash`](#minimum_hash) to the resulting list of 32-bit unsigned integers.
 4. Collect the least significant bits from the 128 MinHash features.
 5. Create two 64-bit digests from the first and second half of the collected bits.
-6. Apply `similarity_hash` to the results of step 5.
+6. Apply [`similarity_hash`](#similarity_hash) to the results of step 5.
 7. Prepend the 1-byte component header (e.g. 0x20).
-8. Encode and return the resulting 9-byte sequence with [Base58-ISCC Encoding](#base58-iscc-encoding).
+8. Encode and return the resulting 9-byte sequence with [encode](#encode).
+
+See also: [Data-ID reference code]() (LINKME) 
 
 ### Instance-ID Component
 
@@ -255,11 +263,13 @@ An ISCC generating application MUST provide a `instance_id` function that accept
 4. Recursively apply `0x01`-prefixed pairwise hashing to the results of  step 3 until the process yields only one hash value. We call this value the top-hash.
 5. Trim the resulting *top hash* to the first 8 bytes.
 6. Prepend the 1-byte component header (e.g. `0x30`).
-7. Encode resulting 9-byte sequence with [Base58-ISCC Encoding](#base58-iscc-encoding) to an Instance-ID Code
+7. Encode resulting 9-byte sequence with [encode](#encode) to an Instance-ID Code
 8. Hex-Encode the *top hash* 
 9. Return the Intance-ID and the hex-encoded top-hash
 
-Applications may carry, store, and process the leaf node hashes or even the full hash-tree for advanced streaming data identification or partial data integrity verification.
+See also: [Instance-ID reference code]() (LINKME)
+
+Applications may carry, store, and process the leaf node hashes for advanced streaming data identification or partial data integrity verification.
 
 ## ISCC Metadata
 
@@ -434,6 +444,18 @@ Signature: `image_hash(pixels: List[List[int]]) -> bytes`
 
 See also: Image hash reference code (LINKME)
 
+### Content Defined Chunking
+
+For shift resistant data chunking the ISCC requires a custom chunking algorithm:
+
+#### data_chunks
+
+Signature: `data_chunks(data: stream) -> Iterator[bytes]`
+
+The `data_chunks` function accepts a byte-stream and returns variable sized chunks. Chunk boundaries are determined by a gear based chunking algorithm based on [[WenXia2016]][#WenXia2016].
+
+See also: [CDC reference code]() (LINKME) 
+
 ## Conformance Testing
 
 An application that claims ISCC conformance MUST pass the ISCC conformance test suite. The test suite is available as json data in our [Github Repository](https://raw.githubusercontent.com/coblo/iscc-specs/master/tests/test_data.json). Testdata is stuctured as follows:
@@ -480,5 +502,7 @@ An application that claims ISCC conformance MUST pass the ISCC conformance test 
 *[sha256d]: Double SHA256
 
 [#Charikar2002]:  http://dx.doi.org/10.1145/509907.509965 "Charikar, M.S., 2002, May. Similarity estimation techniques from rounding algorithms. In Proceedings of the thiry-fourth annual ACM symposium on Theory of computing (pp. 380-388). ACM."
+
+[#WenXia2016]: http://dx.doi.org/10.1109/TC.2016.2595565 "Wen Xia, Yukun Zhou, Hong Jiang, Yu Hua, Yuchong Hu, Yucheng Zhang, Qing Liu, 2016. FastCDC: a Fast and Efficient Content-Defined Chunking Approach for Data Deduplication."
 
 
