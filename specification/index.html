@@ -421,13 +421,6 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#partial-content-flag-pcf" title="Partial Content Flag (PCF)" class="md-nav__link">
-    Partial Content Flag (PCF)
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#content-id-text" title="Content-ID-Text" class="md-nav__link">
     Content-ID-Text
   </a>
@@ -444,6 +437,13 @@
           <li class="md-nav__item">
   <a href="#content-id-mixed" title="Content-ID-Mixed" class="md-nav__link">
     Content-ID-Mixed
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#partial-content-flag-pcf" title="Partial Content Flag (PCF)" class="md-nav__link">
+    Partial Content Flag (PCF)
   </a>
   
 </li>
@@ -891,13 +891,6 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#partial-content-flag-pcf" title="Partial Content Flag (PCF)" class="md-nav__link">
-    Partial Content Flag (PCF)
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#content-id-text" title="Content-ID-Text" class="md-nav__link">
     Content-ID-Text
   </a>
@@ -914,6 +907,13 @@
           <li class="md-nav__item">
   <a href="#content-id-mixed" title="Content-ID-Mixed" class="md-nav__link">
     Content-ID-Mixed
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#partial-content-flag-pcf" title="Partial Content Flag (PCF)" class="md-nav__link">
+    Partial Content Flag (PCF)
   </a>
   
 </li>
@@ -1521,16 +1521,6 @@
 </tr>
 </tbody>
 </table>
-<h4 id="partial-content-flag-pcf">Partial Content Flag (<abbr title="Partial Content Flag">PCF</abbr>)<a class="headerlink" href="#partial-content-flag-pcf" title="Permanent link">#</a></h4>
-<p>The last bit of the header byte is the "Partial Content Flag". It designates if the Content-ID applies to the full content or just some part of it. The <abbr title="Partial Content Flag">PCF</abbr> MUST be set as a <code>0</code>-bit (<strong>full <abbr title="Generic Media Type">GMT</abbr>-specific content</strong>) by default. Setting the <abbr title="Partial Content Flag">PCF</abbr> to <code>1</code> enables applications to create multiple linked ISCCs of partial extracts of a content collection. The exact semantics of <em>partial content</em> are outside of the scope of this specification. Applications that plan to support partial Content-IDs MUST clearly define their semantics. </p>
-<div class="admonition example">
-<p class="admonition-title"><abbr title="Partial Content Flag">PCF</abbr> Linking Example</p>
-<p>Let´s assume we have a single Newspaper issue "The Times - 03 Jan 2009". You would generate one Meta-ID component with title "The Times" and extra "03 Jan 2009". The resulting Meta-ID component will be the grouping prefix in this szenario.</p>
-<p>The Content-ID component would be of type text with flag <code>0</code> (not partial) and calculated over the concatenated plain-text of all contained articles. The remaining components of <abbr title="International Standard Content Code">ISCC</abbr> are created by running their algorithms over the print PDF data of the complete Newspaper issue. </p>
-<p>We now create individual ISCCs for each article that would reuse the Meta-ID of the parent magazine issue (this would link them to the collection identifier). Their content-ids components would get the <abbr title="Partial Content Flag">PCF</abbr> <code>1</code> flag (partial) to mark them as partial to the newspaper issue or "in context" with the collection. The remaining <abbr title="International Standard Content Code">ISCC</abbr> components would be created from the data for each individual article.</p>
-<p>Note that the ISCCs of the individual articles could still be linked to their eventually pre-existing standalone IDs (not in context with the newpaper issue) via identical Data-ID and Instance-ID Components.</p>
-<p>This is just one example that illustrates the flexibility that the <abbr title="Partial Content Flag">PCF</abbr>-Flag provides in concert with a grouping Meta-ID. With great flexibility comes great danger of incompatibility. Applications SHOULD do carefull planning before using the <abbr title="Partial Content Flag">PCF</abbr>-Flag with internally defined semantics.</p>
-</div>
 <h4 id="content-id-text">Content-ID-Text<a class="headerlink" href="#content-id-text" title="Permanent link">#</a></h4>
 <p>The Content-ID-Text is built from the extracted plain-text content of an encoded media object. To build a stable Content-ID-Text the plain-text content must first be extracted from the digital media object. It should be extracted in a way that is reproducible. There are many different text document formats out in the wilde and extracting plain-text from all of them is anything but a trivial task. While text-extraction is out of scope for this specification it is RECOMMENDED, that plain-text content SHOULD be extracted with the open-source <a href="https://tika.apache.org/">Apache Tika v1.17</a> toolkit, if a generic reproducibility of the Content-ID-Text component is desired. </p>
 <p>An <abbr title="International Standard Content Code">ISCC</abbr> generating application MUST provide a <code>content_id(text, partial=False)</code> function that accepts UTF-8 encoded plain text and a boolean indicating the <a href="#partial-content-flag-pcf">partial content flag</a> as input and returns a Content-ID with <abbr title="Generic Media Type">GMT</abbr> type <code>text</code>. The procedure to create a Content-ID-Text is as follows:</p>
@@ -1563,7 +1553,7 @@
 <p>The <code>content_id_image</code> function may optionally accept the raw byte data of an encoded image or an internal native image object as input for convenience.</p>
 </div>
 <h4 id="content-id-mixed">Content-ID-Mixed<a class="headerlink" href="#content-id-mixed" title="Permanent link">#</a></h4>
-<p>The Content-ID-Mixed aggregates multiple Content-IDs of the same or different types. It may be used for digital media objects that embed multiples types of media or for collections of contents of the same type. First we have to collect contents from the mixed media object or content collection and generate content-ids for each item. An <abbr title="International Standard Content Code">ISCC</abbr> conforming application must provide a <code>content_id_mixed</code> function that takes a list of Content-ID Codes as input and retuns a Content-ID-Mixed. Follow these steps to create a Content-ID-Mixed:</p>
+<p>The Content-ID-Mixed aggregates multiple Content-IDs of the same or different types. It may be used for digital media objects that embed multiples types of media or for collections of contents of the same type. First we have to collect contents from the mixed media object or content collection and generate Content-IDs for each item. An <abbr title="International Standard Content Code">ISCC</abbr> conforming application must provide a <code>content_id_mixed</code> function that takes a list of Content-ID Codes as input and retuns a Content-ID-Mixed. Follow these steps to create a Content-ID-Mixed:</p>
 <p>Signature: <code>conent_id_mixed(cids: List[str], partial: bool=False) -&gt; str</code></p>
 <ol>
 <li>Decode the list of Content-IDs.</li>
@@ -1573,6 +1563,20 @@
 <li>Apply <a href="#encode"><code>encode</code></a> to the result of step 5 and return the result.</li>
 </ol>
 <p>See also: <a href="">Content-ID-Mixed reference code</a> (LINKME)</p>
+<h4 id="partial-content-flag-pcf">Partial Content Flag (<abbr title="Partial Content Flag">PCF</abbr>)<a class="headerlink" href="#partial-content-flag-pcf" title="Permanent link">#</a></h4>
+<p>The last bit of the header byte of the Content-ID is the "Partial Content Flag". It designates if the Content-ID applies to the full content or just some part of it. The <abbr title="Partial Content Flag">PCF</abbr> MUST be set as a <code>0</code>-bit (<strong>full <abbr title="Generic Media Type">GMT</abbr>-specific content</strong>) by default. Setting the <abbr title="Partial Content Flag">PCF</abbr> to <code>1</code> enables applications to create multiple linked ISCCs of partial extracts of a content collection. The exact semantics of <em>partial content</em> are outside of the scope of this specification. Applications that plan to support partial Content-IDs MUST clearly define their semantics.</p>
+<p><img alt="Partial Contant Flag" src="../images/iscc-pcf.svg" /></p>
+<div class="admonition example">
+<p class="admonition-title"><abbr title="Partial Content Flag">PCF</abbr> Linking Example</p>
+<p>Let´s assume we have a single newspaper issue "The Times - 03 Jan 2009". You would generate one Meta-ID component with title "The Times" and extra "03 Jan 2009". The resulting Meta-ID component will be the grouping prefix in this szenario.</p>
+<p>We use a Content-ID-Mixed with <abbr title="Partial Content Flag">PCF</abbr> <code>0</code> (not partial) for the <abbr title="International Standard Content Code">ISCC</abbr> of the newspaper issue. We generate Data-ID and Instance-ID from the print PDF of the newspaper issue.</p>
+<p>To create an <abbr title="International Standard Content Code">ISCC</abbr> for a single extracted image that should convey context with the newspaper issue we reuse the Meta-ID of the newspaper issue and create a Content-ID-Image with <abbr title="Partial Content Flag">PCF</abbr> <code>1</code> (partial to the newspaper issue). For the Data-ID or Instance-ID of the image we are free to choose if we re-use those of the newspaper issue or create separate ones. The former would express strong specialization of the image to the newspaper issue (not likely to be usefull out of context). The latter would create a stronger link to an eventual standalone <abbr title="International Standard Content Code">ISCC</abbr> of the image. Note that in any case the <abbr title="International Standard Content Code">ISCC</abbr> of the individual image retains links in both ways:</p>
+<ul>
+<li>Image is linked to the newspaper issue by identical Meta-ID component</li>
+<li>Image is linked to the standalone version of the image by identical Content-ID-Image body </li>
+</ul>
+<p>This is just one example that illustrates the flexibility that the <abbr title="Partial Content Flag">PCF</abbr>-Flag provides in concert with a grouping Meta-ID. With great flexibility comes great danger of complexity. Applications SHOULD do carefull planning before using the <abbr title="Partial Content Flag">PCF</abbr>-Flag with internally defined semantics.</p>
+</div>
 <h3 id="data-id-component">Data-ID Component<a class="headerlink" href="#data-id-component" title="Permanent link">#</a></h3>
 <p>For the Data-ID that encodes data similarty we use a content defined chunking algorithm that provides some shift resistance and calculate the MinHash from those chunks. To accomodate for small files the first 100 chunks have a ~140-byte size target while the remaining chunks target ~ 6kb in size.</p>
 <p>The Data-ID is built from the raw encoded data of the content to be identified. An <abbr title="International Standard Content Code">ISCC</abbr> generating application MUST provide a <code>data_id</code> function that accepts the raw encoded data as input.</p>
