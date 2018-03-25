@@ -527,7 +527,7 @@ An application that claims ISCC conformance MUST pass the ISCC conformance test 
 
 *[sha256d]: Double SHA256
 
-*[tophash]: Root hash of a hash-tree
+*[tophash]: Root hash of an Instance-ID hash-tree
 
 [#Charikar2002]:  http://dx.doi.org/10.1145/509907.509965 "Charikar, M.S., 2002, May. Similarity estimation techniques from rounding algorithms. In Proceedings of the thiry-fourth annual ACM symposium on Theory of computing (pp. 380-388). ACM."
 [#WenXia2016]: http://dx.doi.org/10.1109/TC.2016.2595565 "Wen Xia, Yukun Zhou, Hong Jiang, Yu Hua, Yuchong Hu, Yucheng Zhang, Qing Liu, 2016. FastCDC: a Fast and Efficient Content-Defined Chunking Approach for Data Deduplication."
