@@ -22,7 +22,7 @@ Public review, discussion and contributions are welcome.
 
 ## About this Document
 
-This document proposes an open and vendor neutral ISCC standard and describes the technical procedures to create and manage ISCC identifiers. The first version of this document is produced by the [Content Blockchain Project](https://content-blockchain.org) as a prototype and received funding from the [Google Digital News Initiative (DNI)](https://digitalnewsinitiative.com/dni-projects/content-blockchain-project/). The content of this document is determined by its authors in an open and public consensus process.
+This document proposes an open and vendor neutral ISCC standard and describes the technical procedures to create and manage ISCC identifiers. The first version of this document is produced as a prototype by the [Content Blockchain Project](https://content-blockchain.org) and received funding from the [Google Digital News Initiative (DNI)](https://digitalnewsinitiative.com/dni-projects/content-blockchain-project/). The content of this document is determined by its authors in an open and public consensus process.
 
 ## Conventions and Terminology
 
@@ -31,37 +31,36 @@ The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "S
 ## Definitions
 
 Basic Metadata:
-: 	Minimal set of required metadata about the digital media object that is identified by an ISCC.
+: 	Minimal set of metadata about the content that is identified by an ISCC. This metadata may impact the derived Meta-ID Component
 
 Character:
-:	Throughout this specification a **character** is meant to be interpreted as one Unicode code point. This also means that due to the structure of Unicode a character is not necessarily a full glyph but might be a combining accent or similar.
+:    Throughout this specification a **character** is meant to be interpreted as one Unicode code point. This also means that due to the structure of Unicode a character is not necessarily a full glyph but might be a combining accent or similar.
 
 Digital Media Object:
-:	A blob of raw bytes with some media type specific encoding.
+:    A blob of raw bytes with some media type specific encoding.
 
 Extended Metadata:
-:	Metadata that is not encoded within the ISCC but may be supplied together with the ISCC.
-
+:    Metadata that is not encoded within the ISCC Meta-ID but may be supplied together with the ISCC.
 
 Generic Media Type:
-:	A basic content type such as plain text in a normalized and *generic* ([UTF-8](https://en.wikipedia.org/wiki/UTF-8)) encoding format.
+:    A basic content type such as plain text in a normalized and *generic* ([UTF-8](https://en.wikipedia.org/wiki/UTF-8)) encoding format.
 
 ISCC:
-:	International Standard Content Code
+:    International Standard Content Code
 
 ISCC Code:
-:	The printable text encoded representation of an ISCC
+:    The printable text encoded representation of an ISCC
 
 ISCC Digest:
-:	The raw binary data of an ISCC
+:    The raw binary data of an ISCC
 
 ## Introduction
 
-An ISCC permanently identifies the content of a given digital media object at multiple levels of *granularity*. It is algorithmically generated from basic metadata and the contents of the digital media object which it identifies. It is designed for being registered and stored on a public and decentralized blockchain. An ISCC for a media object can be created and registered by the content author, a publisher, a service provider or anybody else. By itself the ISCC and its basic registration on a blockchain does not make any statement or claim about authorship or ownership of the identified content.
+An ISCC permanently identifies content at multiple levels of *granularity*. It is algorithmically generated from basic metadata and the contents of a digital media object. It is designed for being registered and stored on a public and decentralized blockchain. An ISCC for a media object can be created and registered by the content author, a publisher, a service provider or anybody else. By itself the ISCC and its basic registration on a blockchain does not make any statement or claim about authorship or ownership of the identified content.
 
 ## ISCC Structure
 
-The ISCC Digest is a fixed size sequence of 36 bytes (288 bits) assembled from multiple sub-components. The printable ISCC Code is a 52 character encoded string representation of an ISCC Digest. This is a high-level overview of the ISCC creation process:
+A **Fully Qualified ISCC Digest** is a fixed size sequence of **36 bytes (288 bits)** assembled from multiple sub-components. The **Fully Qualified  ISCC Code** is a **52 character** encoded printable string representation of a complete ISCC Digest. This is a high-level overview of the ISCC creation process:
 
 ![iscc-creation-process](images/iscc-creation-process.svg)
 
@@ -77,10 +76,25 @@ The ISCC Digest is built from multiple self-describing 72-bit components:
 | **Algorithms:** | Similarity Hash     | Type specific      | CDC, Minimum Hash | CDC, Hash Tree |
 | **Size:**       | 72 bits             | 72 bits            | 72 bits           | 72 bits        |
 
-These components MAY be used independently by applications for various purposes but MUST be combined into a case-sensitive 52 character [base58-iscc](#base58-iscc) encoded string (55 with hyphens) for a fully qualified ISCC Code. The components MUST be combined in the fixed order of Meta-ID, Content-ID, Data-ID, Instance-ID and MAY be separated by hyphens.
+ISCC components MAY be used separately or in combination by applications for various purposes. Individual components MUST be presented as 13-character [base58-iscc](#base58-iscc) encoded strings to end users and MAY be prefixed with their component name.
 
-!!! example "Printable ISCC Code"
-    ISCC: 11cS7Y9NjD6DX-1DVcUdv5ewjDQ-1Qhwz8x54CShu-1d8uCbWCNbGWg
+!!! example "Single component ISCC-Code (13 characters)"
+
+    **Meta-ID**: 11RDXN6ea57QT
+
+Combinations of components MUST include the Meta-ID component and MUST be ordered as **Meta-ID**, **Content-ID**, **Data-ID**, and **Instance-ID**. Individual components MAY be skipped and SHOULD be separated with hyphens. A combination of components SHOULD be prefixed with "ISCC".
+
+!!! example "Combination of ISCC-Code components"
+
+    **ISCC**: 11RDXN6ea57QT-1HWMGKrLki1fL-1ZYcY8d3uTYj8
+
+A **Fully Qualified ISCC Code** is an ordered sequence of Meta-ID, Content-ID, Data-ID, and Instance-ID codes. It SHOULD be prefixed with ISCC and MAY be seperated by hypens.
+
+!!! example "Fully Qualified ISCC-Code (52 characters)"
+    **ISCC**: 11RDXN6ea57QT1HWMGKrLki1fL1ZYcY8d3uTYj81qYuuCMStgpjs
+
+!!! example "Fully Qualified ISCC-Code with hyphens (55 characters)"
+    **ISCC**: 11RDXN6ea57QT-1HWMGKrLki1fL-1ZYcY8d3uTYj8-1qYuuCMStgpjs
 
 ### Component Types
 
@@ -177,9 +191,9 @@ The  Content-ID type is signaled by the first 3 bits of the second nibble of the
 
 #### Partial Content Flag (PCF)
 
-The last bit of the header byte is the "Partial Content Flag". It designates if the Content-ID applies to the full content or just some part of it. The PCF MUST be set as a `0`-bit (**full GMT-specific content**) by default. Setting the PCF to `1` enables applications to create multiple ISCCs for partial extracts of a content collection. The exact semantics of *partial content* are outside of the scope of this specification. Applications that plan to support partial Content-IDs MUST clearly define their semantics. 
+The last bit of the header byte is the "Partial Content Flag". It designates if the Content-ID applies to the full content or just some part of it. The PCF MUST be set as a `0`-bit (**full GMT-specific content**) by default. Setting the PCF to `1` enables applications to create multiple linked ISCCs of partial extracts of a content collection. The exact semantics of *partial content* are outside of the scope of this specification. Applications that plan to support partial Content-IDs MUST clearly define their semantics. 
 
-!!! example "PCF Linking Example Use Case"
+!!! example "PCF Linking Example"
     Let´s assume we have a single Newspaper issue "The Times - 03 Jan 2009". You would generate one Meta-ID component with title "The Times" and extra "03 Jan 2009". The resulting Meta-ID component will be the grouping prefix in this szenario.
     
     The Content-ID component would be of type text with flag `0` (not partial) and calculated over the concatenated plain-text of all contained articles. The remaining components of ISCC are created by running their algorithms over the print PDF data of the complete Newspaper issue. 
@@ -188,7 +202,7 @@ The last bit of the header byte is the "Partial Content Flag". It designates if 
     
     Note that the ISCCs of the individual articles could still be linked to their eventually pre-existing standalone IDs (not in context with the newpaper issue) via identical Data-ID and Instance-ID Components.
     
-    This is just one example that illustrates the flexibility that the PCF-Flag provides in concert with a grouping Meta-ID. With great flexibility comes great danger of incompatibility. Applications SHOULD do carefull planning before using the PCD-Flag with internally defined semantics.
+    This is just one example that illustrates the flexibility that the PCF-Flag provides in concert with a grouping Meta-ID. With great flexibility comes great danger of incompatibility. Applications SHOULD do carefull planning before using the PCF-Flag with internally defined semantics.
 
 #### Content-ID-Text
 
@@ -273,7 +287,7 @@ Applications may carry, store, and process the leaf node hashes for advanced str
 
 ## ISCC Metadata
 
-As a generic content identifier the ISCC makes minimal assumptions about metadata that must or should be supplied together with an ISCC. The RECOMMENDED data-interchange format for ISCC metadata is [JSON](https://www.json.org/). We distingquish between **Basic Metadata** and **Extended Metadata**:
+As a generic content identifier the ISCC makes minimal assumptions about metadata that must or should be supplied together with an ISCC. The RECOMMENDED data-interchange format for ISCC metadata is [JSON](https://www.json.org/). We distinguish between **Basic Metadata** and **Extended Metadata**:
 
 ### Basic Metadata
 
@@ -312,6 +326,20 @@ As an open system the ISCC allows any person or organization to offer ISCC regis
 ### Blockchain Registry
 
 A well known, decentralized, open, and public registry for canonical discoverability of ISCC identified content is of great value. For this reason it is RECOMMENDED to register ISCC identifiers on the open `iscc` data-stream of the [Content Blockchain](https://content-blockchain.org/). For details please refer to the [ISCC-Stream specification](https://coblo.github.io/cips/cip-0003-iscc/) of the Content Blockchain.
+
+## ISCC Embedding
+
+Embedding ISCC codes into content is only RECOMMENDED if it does not ceate a side effect. We call it a side effect if embedding an ISCC code modifies the content to such an extent, that it yields a different ISCC code.
+
+Side effects will depend on the combination of ISCC components that are to be embedded. A Meta-ID can always be embedded without side effect because it does not depend on the content itself. Content-ID and Data-ID may not change if embedded in larger media objects. Instance-IDs cannot easily be embedded as they will inevitably have a side effect on the post-embedding Instance-ID without special processing.
+
+Applications MAY embed ISCC codes that have side effects if they specify a procedure by which the embedded ISCC codes can be stripped in such a way that the stripped content will yield the original embedded ISCC codes.
+
+!!! example "ISCC Embedding"
+
+    We are able to embed the following combination of components from the [markdown version](https://github.com/coblo/iscc-specs/edit/master/docs/specification.md) of this document into the document itself because adding or removing them has no side effect:
+    
+    **ISCC**: 11VabjiTpcGGJ-1HUg6wkr9vCvu
 
 ## ISCC URI Scheme
 
@@ -462,8 +490,8 @@ An application that claims ISCC conformance MUST pass the ISCC conformance test 
 {
     "<function_name>": {
         "<test_name>": {
-            "inputs": ["<func_input_value1>", "<func_input_value2>"],
-            "outputs": ["<func_output_value1>", "<func_output_value2>"]
+            "inputs": ["<value1>", "<value2>"],
+            "outputs": ["value1>", "<value2>"]
         }
     }
 }
