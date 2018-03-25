@@ -37,6 +37,13 @@ content_id_image:
         inputs: ["cat.png"]
     test_006_cat_gif:
         inputs: ["cat.gif"]
+content_id_mixed:
+    test_001_cid_t_one:
+        inputs: [["1HUg6wnerR9jP"]]
+    test_002_cid_t_two_partial:
+        inputs: [["1HUg6wnerR9jP", "1HWMGKt9TCwFG"], true]
+    test_003_cid_t_and_i:
+        inputs: [["1HUg6wnerR9jP", "1KSiorBqgP32u"]]
 data_id:
     test_001_cat_jpg:
         inputs: ['cat.jpg']

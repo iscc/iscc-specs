@@ -17,40 +17,41 @@ from iscc.const import *
 ###############################################################################
 
 
-def meta_id(title, extra='', version=0):
+def meta_id(title, extra='', version=1):
 
-    assert version == 0, "Only version 0 supported"
+    # 1. Verify version is supported
+    assert version == 1, "Only version 1 supported"
 
-    # 1. Pre-Normalization
+    # 2. Pre-Normalization
     title = text_pre_normalize(title)
     extra = text_pre_normalize(extra)
 
-    # 2. Trimming
+    # 3. Trimming
     title = text_trim(title)
     extra = text_trim(extra)
 
-    # 3. Concatenate
+    # 4. Concatenate
     concat = '\u0020'.join((title, extra)).strip()
 
-    # 4. Normalization
+    # 5. Normalization
     normalized = text_normalize(concat)
 
-    # 5. Create a list of n-grams
+    # 6. Create a list of n-grams
     n_grams = sliding_window(normalized, width=WINDOW_SIZE_MID)
 
-    # 6. Encode n-grams and create xxhash64-digest
+    # 7. Encode n-grams and create xxhash64-digest
     hash_digests = [xxhash.xxh64(s.encode('utf-8')).digest() for s in n_grams]
 
-    # 7. Apply similarity_hash
+    # 8. Apply similarity_hash
     simhash_digest = similarity_hash(hash_digests)
 
-    # 8. Prepend header-byte
+    # 9. Prepend header-byte
     meta_id_digest = HEAD_MID + simhash_digest
 
-    # 9. Encode with base58_iscc
+    # 10. Encode with base58_iscc
     meta_id = encode(meta_id_digest)
 
-    # 10. Return encoded Meta-ID, trimmed `title` and trimmed `extra` data.
+    # 11. Return encoded Meta-ID, trimmed `title` and trimmed `extra` data.
     return [meta_id, title, extra]
 
 
@@ -110,6 +111,27 @@ def content_id_image(img, partial=False):
 
     # 4. Encode and return
     return encode(content_id_image_digest)
+
+
+def content_id_mixed(cids, partial=False):
+
+    # 1. Decode CIDs
+    decoded = (decode(code) for code in cids)
+
+    # 2. Extract first 8-bytes
+    tuncated = [data[:8] for data in decoded]
+
+    # 3. Apply Similarity hash
+    simhash_digest = similarity_hash(tuncated)
+
+    # 4. Prepend component header
+    if partial:
+        content_id_mixed_digest = HEAD_CID_M_PCF + simhash_digest
+    else:
+        content_id_mixed_digest = HEAD_CID_M + simhash_digest
+
+    # 5. Encode and return
+    return encode(content_id_mixed_digest)
 
 
 def data_id(data):

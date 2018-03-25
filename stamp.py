@@ -28,7 +28,7 @@ def get_content(mode='text'):
 
 def spec_iscc():
     title = "ISCC - Specification"
-    extra = "v0.9.7"
+    extra = "v0.9.8"
     text = open('docs/specification.md', encoding='utf-8').read()
     data = open('docs/specification.md', 'rb').read()
     mid, title, extra = iscc.meta_id(title, extra)

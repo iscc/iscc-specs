@@ -173,6 +173,21 @@ def test_hamming_distance():
     assert iscc.distance(mid1, mid2) >= 25
 
 
+def test_content_id_mixed():
+    cid_t_1 = iscc.content_id_text('Some Text')
+    cid_t_2 = iscc.content_id_text('Another Text')
+
+    cid_m = iscc.content_id_mixed([cid_t_1])
+    assert cid_m == "1R3oRE4HJXogc"
+
+    cid_m = iscc.content_id_mixed([cid_t_1, cid_t_2])
+    assert cid_m == "1R3qvJGc98nXg"
+
+    cid_i = iscc.content_id_image('lenna.jpg')
+    cid_m = iscc.content_id_mixed([cid_t_1, cid_t_2, cid_i])
+    assert cid_m == "1R3oQx7zUEy38"
+
+
 def test_data_id():
     random.seed(1)
     data = bytearray([random.getrandbits(8) for _ in range(1000000)])  # 1 mb

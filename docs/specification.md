@@ -2,7 +2,7 @@ title: ISCC - Specification
 description: Draft Specification of International Standard Content Codes
 authors: Titusz Pan
 
-# ISCC - Specification v0.9.7
+# ISCC - Specification v0.9.8
 
 !!! attention
 
@@ -104,25 +104,33 @@ The 1-byte header of each component is subdivided into 2 nibbles (4 bits). The f
 
 The header only needs to be carried in the encoded representation. As similarity searches accross different components are of little use, the type information contained in the header of each component can be safely ignored after an ISCC has been decomposed and internaly typed by an application. 
 
-The body section of each component is always 8-bytes and can thus be fit into a 64-bit integer for efficient data processing. 
+#### List of Component Headers
 
-| Component              | Nibble-1 | Nibble-2                        | Byte |
-| :--------------------- | :------- | :------------------------------ | :--- |
-| *Meta-ID*              | 0000     | 0000 - ISCC version (0)         | 0x00 |
-| *Content-ID*-Text      | 0001     | 0000 - Content Type Text        | 0x10 |
-| *Content-ID-Text PCF*  | 0001     | 0001 - Content Type Text  + PCF | 0x11 |
-| *Content-ID-Image*     | 0001     | 0010 - Content Type Image       | 0x12 |
-| *Content-ID-Image PCF* | 0001     | 0011 - Content Type Image + PCF | 0x13 |
-| *Content-ID-Audio*     | 0001     | 0100 - Content Type Audio       | 0x14 |
-| *Content-ID-Audio PCF* | 0001     | 0101 - Content Type Audio + PCF | 0x15 |
-| *Data-ID*              | 0010     | 0000 - Reserved                 | 0x20 |
-| *Instance-ID*          | 0011     | 0000 - Reserved                 | 0x30 |
+| Component                | Nibble-1 | Nibble-2                        | Byte |
+| :----------------------- | :------- | :------------------------------ | :--- |
+| **Meta-ID**              | 0000     | 0000 - ISCC version 1           | 0x00 |
+| **Content-ID-Text**      | 0001     | 0000 - Content Type Text        | 0x10 |
+| **Content-ID-Text PCF**  | 0001     | 0001 - Content Type Text  + PCF | 0x11 |
+| **Content-ID-Image**     | 0001     | 0010 - Content Type Image       | 0x12 |
+| **Content-ID-Image PCF** | 0001     | 0011 - Content Type Image + PCF | 0x13 |
+| *Content-ID-Audio*       | 0001     | 0100 - Content Type Audio       | 0x14 |
+| *Content-ID-Audio PCF*   | 0001     | 0101 - Content Type Audio + PCF | 0x15 |
+| *Content-ID-Video*       | 0001     | 0110 - Content Type Video       | 0x16 |
+| *Content-ID-Video PCF*   | 0001     | 0111 - Content Type Video + PCF | 0x17 |
+| **Content-ID-Mixed**     | 0001     | 1000 - Content Type Mixed       | 0x18 |
+| **Content-ID Mixed PCF** | 0001     | 1001 - Content Type Mixed + PCF | 0x19 |
+| **Data-ID**              | 0010     | 0000 - Reserved                 | 0x20 |
+| **Instance-ID**          | 0011     | 0000 - Reserved                 | 0x30 |
+
+The body section of each component is specific to the component and always 8-bytes and can thus be fit into a 64-bit integer for efficient data processing. The following sections give an overview of how the differen components work and how they are generated.
 
 ### Meta-ID Component
 
 The Meta-ID component starts with a 1-byte header `00000000`. The first nibble `0000` indicates that this is a Meta-ID component type. The second nibble `0000` indicates that it belongs to an ISCC of version 1. All subsequent components are expected to follow the specification of a version 1 ISCC.
 
 The Meta-ID body is built from a 64-bit `similarity_hash` over 4-character n-grams of the basic metadata of the content to be identified.  The basic metadata supplied to the META-ID generating function is assumed to be UTF-8 encoded. Errors that occur during the decoding of such a bytestring input to a native Unicode MUST terminate the process and must not be silenced. An ISCC generating application MUST provide a `meta_id` function that accepts minimal and generic metadata and returns a [Base58-ISCC encoded](#base58-iscc) Meta-ID component and trimmed metadata.
+
+#### Inputs to Meta-ID function
 
 | Name    | Type    | Required | Description                                                  |
 | :------ | :------ | :------- | :----------------------------------------------------------- |
@@ -138,7 +146,8 @@ The Meta-ID body is built from a 64-bit `similarity_hash` over 4-character n-gra
 
 An ISCC generating application must follow these steps in the given order to produce a stable Meta-ID:
 
-1. Apply [`text_pre_normalize`](#text_pre_normalize) separately to the  `title` and `extra` inputs.
+1. Verify the requested ISCC version is supported by your implementation.
+2. Apply [`text_pre_normalize`](#text_pre_normalize) separately to the  `title` and `extra` inputs.
 2. Apply [`text_trim`](#text_trim) to the results of step 1. *The results of this step MUST be supplied as basic metadata for ISCC registration.*
 3. Concatenate trimmed`title` and `extra` from using a space ( `\u0020`) as a seperator.
 4. Apply [`text_normalize`](#text_normalize) to the results of step 3.
@@ -180,13 +189,13 @@ A Content-ID is generated in two broad steps. In the first step, we extract and 
 
 The  Content-ID type is signaled by the first 3 bits of the second nibble of the first byte of the Content-ID:
 
-| Conent-ID Type | Nibble-2 Bits 0-3 | Description                                        |
+| Conent-ID Type | Nibble 2 Bits 0-3 | Description                                        |
 | :------------- | :---------------- | -------------------------------------------------- |
 | text           | 000               | Generated from extracted and normalized plain-text |
 | image          | 001               | Generated from normalized gray-scale pixel data    |
 | *audio*        | *010*             | To be defined in later version of specification    |
 | *video*        | *011*             | To be defined in later version of specification    |
-| *mixed*        | *100*             | To be defined in later version of specification    |
+| mixed          | 100               | Generated from multiplde Content-IDs               |
 |                | 101, 110, 111     | Reserved for future versions of specification      |
 
 #### Partial Content Flag (PCF)
@@ -240,6 +249,20 @@ See also: [Content-ID-Image reference code](https://github.com/coblo/iscc-specs/
 !!! note "Image Data Input"
     The `content_id_image` function may optionally accept the raw byte data of an encoded image or an internal native image object as input for convenience.
 
+#### Content-ID-Mixed
+
+The Content-ID-Mixed aggregates multiple Content-IDs of the same or different types. It may be used for digital media objects that embed multiples types of media or for collections of contents of the same type. First we have to collect contents from the mixed media object or content collection and generate content-ids for each item. An ISCC conforming application must provide a `content_id_mixed` function that takes a list of Content-ID Codes as input and retuns a Content-ID-Mixed. Follow these steps to create a Content-ID-Mixed:
+
+Signature: `conent_id_mixed(cids: List[str], partial: bool=False) -> str`
+
+1. Decode the list of Content-IDs.
+2. Extract the **first 8-bytes** from each digest (**Note**: this includes the header part of the Content-IDs).
+4. Apply [`similarity_hash`](#similarity_hash) to the list of digests from step 2.
+4. Prepend the 1-byte component header(`0x18` full content or `0x19` partial content)
+5. Apply [`encode`](#encode) to the result of step 5 and return the result.
+
+See also: [Content-ID-Mixed reference code]() (LINKME)
+
 ### Data-ID Component
 
 For the Data-ID that encodes data similarty we use a content defined chunking algorithm that provides some shift resistance and calculate the MinHash from those chunks. To accomodate for small files the first 100 chunks have a ~140-byte size target while the remaining chunks target ~ 6kb in size.
@@ -255,7 +278,7 @@ The Data-ID is built from the raw encoded data of the content to be identified. 
 5. Create two 64-bit digests from the first and second half of the collected bits.
 6. Apply [`similarity_hash`](#similarity_hash) to the results of step 5.
 7. Prepend the 1-byte component header (e.g. 0x20).
-8. Encode and return the resulting 9-byte sequence with [encode](#encode).
+8. Apply [`encode`](#encode) to the result of step 5 and return the result.
 
 See also: [Data-ID reference code](https://github.com/coblo/iscc-specs/blob/master/src/iscc/iscc.py#L115)
 
@@ -339,7 +362,7 @@ Applications MAY embed ISCC codes that have side effects if they specify a proce
 
     We are able to embed the following combination of components from the [markdown version](https://github.com/coblo/iscc-specs/edit/master/docs/specification.md) of this document into the document itself because adding or removing them has no side effect:
     
-    **ISCC**: 11VabjiTpcGGJ-1HUg6wkr9vCvu
+    **ISCC**: 11VkJQj3dPoPN-1HUg6wnerR9jP
 
 ## ISCC URI Scheme
 
@@ -530,6 +553,5 @@ An application that claims ISCC conformance MUST pass the ISCC conformance test 
 *[tophash]: Root hash of an Instance-ID hash-tree
 
 [#Charikar2002]:  http://dx.doi.org/10.1145/509907.509965 "Charikar, M.S., 2002, May. Similarity estimation techniques from rounding algorithms. In Proceedings of the thiry-fourth annual ACM symposium on Theory of computing (pp. 380-388). ACM."
+
 [#WenXia2016]: http://dx.doi.org/10.1109/TC.2016.2595565 "Wen Xia, Yukun Zhou, Hong Jiang, Yu Hua, Yuchong Hu, Yucheng Zhang, Qing Liu, 2016. FastCDC: a Fast and Efficient Content-Defined Chunking Approach for Data Deduplication."
-
-
