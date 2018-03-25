@@ -261,25 +261,25 @@ See also: [Data-ID reference code](https://github.com/coblo/iscc-specs/blob/mast
 
 ### Instance-ID Component
 
-The Instance-ID is built from the raw data of the media object to be identified and serves as checksum for the media object. The raw data of the media object is split into 64-kB data-chunks. Then we build a hash-tree from those chunks and use the truncated top-hash (merkle root) as component body of the Instance-ID.
+The Instance-ID is built from the raw data of the media object to be identified and serves as checksum for the media object. The raw data of the media object is split into 64-kB data-chunks. Then we build a hash-tree from those chunks and use the truncated tophash (merkle root) as component body of the Instance-ID.
 
-To guard against length-extension attacks and second pre-image attacks we use double sha256 for hashing. We also prefix the hash input data with a `0x00`-byte for the leaf nodes hashes and with a `0x01`-byte for the  internal node hashes. While the Instance-ID itself is a non-cryptographic checksum, the full top-hash may be supplied in the extended metadata of an ISCC secure integrity verification is required.
+To guard against length-extension attacks and second pre-image attacks we use double sha256 for hashing. We also prefix the hash input data with a `0x00`-byte for the leaf nodes hashes and with a `0x01`-byte for the  internal node hashes. While the Instance-ID itself is a non-cryptographic checksum, the full tophash may be supplied in the extended metadata of an ISCC secure integrity verification is required.
 
 ![iscc-creation-instance-id](images/iscc-creation-instance-id.svg)
 
-An ISCC generating application MUST provide a `instance_id` function that accepts the raw data file as input and returns an encoded Instance-ID and a full hex-encoded 256-bit top-hash. 
+An ISCC generating application MUST provide a `instance_id` function that accepts the raw data file as input and returns an encoded Instance-ID and a full hex-encoded 256-bit tophash. 
 
 #### Generate Instance-ID
 
 1. Split the raw bytes of the encoded media object into 64-kB chunks.
 2. For each chunk calculate the sha256d of the concatenation of a `0x00`-byte and the chunk bytes. We call the resulting values *leaf node hashes* (LNH).
 3. Calculate the next level of the hash tree by applying sha256d to the concatenation of a `0x01`-byte and adjacent pairs of LNH values. If the length of the list of LNH values is uneven concatenate the last LNH value with itself. We call the resulting values *internal node hashes* (INH).
-4. Recursively apply `0x01`-prefixed pairwise hashing to the results of  step 3 until the process yields only one hash value. We call this value the top-hash.
-5. Trim the resulting *top hash* to the first 8 bytes.
+4. Recursively apply `0x01`-prefixed pairwise hashing to the results of  step 3 until the process yields only one hash value. We call this value the tophash.
+5. Trim the resulting tophash to the first 8 bytes.
 6. Prepend the 1-byte component header (e.g. `0x30`).
 7. Encode resulting 9-byte sequence with [`encode`](#encode) to an Instance-ID Code
-8. Hex-Encode the *top hash* 
-9. Return the Intance-ID and the hex-encoded top-hash
+8. Hex-Encode the tophash
+9. Return the Intance-ID and the hex-encoded tophash
 
 See also: [Instance-ID reference code](https://github.com/coblo/iscc-specs/blob/master/src/iscc/iscc.py#L140) 
 
@@ -298,7 +298,7 @@ Basic metadata for an ISCC is metadata that is explicitly defined by this specif
 | version | integer    | No       | Version of ISCC Specification. Assumed to be 1 if omitted.   |
 | title   | text       | Yes      | The title of an intangible creation identified by the ISCC. The normalized and trimmed UTF-8 encoded text MUST not exceed 128 Bytes. The result of processing `title` and `extra` data with the `meta_id` function MUST  match the Meta-ID component of the ISCC. |
 | extra   | text       | No       | An optional short statement that distinguishes this intangible creation from another one for the purpose of Meta-ID uniqueness. |
-| hash    | text (hex) | No       | The full hex-encoded top-hash (merkle root) retuned by the `instance_id`  function. |
+| tophash | text (hex) | No       | The full hex-encoded tophash (merkle root) retuned by the `instance_id`  function. |
 | meta    | array      | No       | A list of one or more **extended metadata** entries. Must include at least one entry if specified. |
 
 !!! attention
@@ -527,8 +527,9 @@ An application that claims ISCC conformance MUST pass the ISCC conformance test 
 
 *[sha256d]: Double SHA256
 
-[#Charikar2002]:  http://dx.doi.org/10.1145/509907.509965 "Charikar, M.S., 2002, May. Similarity estimation techniques from rounding algorithms. In Proceedings of the thiry-fourth annual ACM symposium on Theory of computing (pp. 380-388). ACM."
+*[tophash]: Root hash of a hash-tree
 
+[#Charikar2002]:  http://dx.doi.org/10.1145/509907.509965 "Charikar, M.S., 2002, May. Similarity estimation techniques from rounding algorithms. In Proceedings of the thiry-fourth annual ACM symposium on Theory of computing (pp. 380-388). ACM."
 [#WenXia2016]: http://dx.doi.org/10.1109/TC.2016.2595565 "Wen Xia, Yukun Zhou, Hong Jiang, Yu Hua, Yuchong Hu, Yucheng Zhang, Qing Liu, 2016. FastCDC: a Fast and Efficient Content-Defined Chunking Approach for Data Deduplication."
 
 
