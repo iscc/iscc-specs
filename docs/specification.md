@@ -198,21 +198,6 @@ The  Content-ID type is signaled by the first 3 bits of the second nibble of the
 | mixed          | 100               | Generated from multiplde Content-IDs               |
 |                | 101, 110, 111     | Reserved for future versions of specification      |
 
-#### Partial Content Flag (PCF)
-
-The last bit of the header byte is the "Partial Content Flag". It designates if the Content-ID applies to the full content or just some part of it. The PCF MUST be set as a `0`-bit (**full GMT-specific content**) by default. Setting the PCF to `1` enables applications to create multiple linked ISCCs of partial extracts of a content collection. The exact semantics of *partial content* are outside of the scope of this specification. Applications that plan to support partial Content-IDs MUST clearly define their semantics. 
-
-!!! example "PCF Linking Example"
-    Let´s assume we have a single Newspaper issue "The Times - 03 Jan 2009". You would generate one Meta-ID component with title "The Times" and extra "03 Jan 2009". The resulting Meta-ID component will be the grouping prefix in this szenario.
-    
-    The Content-ID component would be of type text with flag `0` (not partial) and calculated over the concatenated plain-text of all contained articles. The remaining components of ISCC are created by running their algorithms over the print PDF data of the complete Newspaper issue. 
-    
-    We now create individual ISCCs for each article that would reuse the Meta-ID of the parent magazine issue (this would link them to the collection identifier). Their content-ids components would get the PCF `1` flag (partial) to mark them as partial to the newspaper issue or "in context" with the collection. The remaining ISCC components would be created from the data for each individual article.
-    
-    Note that the ISCCs of the individual articles could still be linked to their eventually pre-existing standalone IDs (not in context with the newpaper issue) via identical Data-ID and Instance-ID Components.
-    
-    This is just one example that illustrates the flexibility that the PCF-Flag provides in concert with a grouping Meta-ID. With great flexibility comes great danger of incompatibility. Applications SHOULD do carefull planning before using the PCF-Flag with internally defined semantics.
-
 #### Content-ID-Text
 
 The Content-ID-Text is built from the extracted plain-text content of an encoded media object. To build a stable Content-ID-Text the plain-text content must first be extracted from the digital media object. It should be extracted in a way that is reproducible. There are many different text document formats out in the wilde and extracting plain-text from all of them is anything but a trivial task. While text-extraction is out of scope for this specification it is RECOMMENDED, that plain-text content SHOULD be extracted with the open-source [Apache Tika v1.17](https://tika.apache.org/) toolkit, if a generic reproducibility of the Content-ID-Text component is desired. 
@@ -251,7 +236,7 @@ See also: [Content-ID-Image reference code](https://github.com/coblo/iscc-specs/
 
 #### Content-ID-Mixed
 
-The Content-ID-Mixed aggregates multiple Content-IDs of the same or different types. It may be used for digital media objects that embed multiples types of media or for collections of contents of the same type. First we have to collect contents from the mixed media object or content collection and generate content-ids for each item. An ISCC conforming application must provide a `content_id_mixed` function that takes a list of Content-ID Codes as input and retuns a Content-ID-Mixed. Follow these steps to create a Content-ID-Mixed:
+The Content-ID-Mixed aggregates multiple Content-IDs of the same or different types. It may be used for digital media objects that embed multiples types of media or for collections of contents of the same type. First we have to collect contents from the mixed media object or content collection and generate Content-IDs for each item. An ISCC conforming application must provide a `content_id_mixed` function that takes a list of Content-ID Codes as input and retuns a Content-ID-Mixed. Follow these steps to create a Content-ID-Mixed:
 
 Signature: `conent_id_mixed(cids: List[str], partial: bool=False) -> str`
 
@@ -262,6 +247,25 @@ Signature: `conent_id_mixed(cids: List[str], partial: bool=False) -> str`
 5. Apply [`encode`](#encode) to the result of step 5 and return the result.
 
 See also: [Content-ID-Mixed reference code]() (LINKME)
+
+#### Partial Content Flag (PCF)
+
+The last bit of the header byte of the Content-ID is the "Partial Content Flag". It designates if the Content-ID applies to the full content or just some part of it. The PCF MUST be set as a `0`-bit (**full GMT-specific content**) by default. Setting the PCF to `1` enables applications to create multiple linked ISCCs of partial extracts of a content collection. The exact semantics of *partial content* are outside of the scope of this specification. Applications that plan to support partial Content-IDs MUST clearly define their semantics.
+
+ ![Partial Contant Flag](images/iscc-pcf.svg)
+
+!!! example "PCF Linking Example"
+
+    Let´s assume we have a single newspaper issue "The Times - 03 Jan 2009". You would generate one Meta-ID component with title "The Times" and extra "03 Jan 2009". The resulting Meta-ID component will be the grouping prefix in this szenario.
+    
+    We use a Content-ID-Mixed with PCF `0` (not partial) for the ISCC of the newspaper issue. We generate Data-ID and Instance-ID from the print PDF of the newspaper issue.
+    
+    To create an ISCC for a single extracted image that should convey context with the newspaper issue we reuse the Meta-ID of the newspaper issue and create a Content-ID-Image with PCF `1` (partial to the newspaper issue). For the Data-ID or Instance-ID of the image we are free to choose if we re-use those of the newspaper issue or create separate ones. The former would express strong specialization of the image to the newspaper issue (not likely to be usefull out of context). The latter would create a stronger link to an eventual standalone ISCC of the image. Note that in any case the ISCC of the individual image retains links in both ways:
+    
+    - Image is linked to the newspaper issue by identical Meta-ID component
+    - Image is linked to the standalone version of the image by identical Content-ID-Image body 
+    
+    This is just one example that illustrates the flexibility that the PCF-Flag provides in concert with a grouping Meta-ID. With great flexibility comes great danger of complexity. Applications SHOULD do carefull planning before using the PCF-Flag with internally defined semantics.
 
 ### Data-ID Component
 
