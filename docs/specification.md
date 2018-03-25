@@ -214,7 +214,7 @@ An ISCC generating application MUST provide a `content_id(text, partial=False)` 
 10. Prepend the 1-byte component header (`0x10` full content or `0x11` partial content).
 11. Encode and return the resulting 9-byte sequence with [`encode`](#encode).
 
-See also: [Content-ID-Text reference code](https://github.com/coblo/iscc-specs/blob/master/src/iscc/iscc.py#L57)
+See also: [Content-ID-Text reference code](https://github.com/coblo/iscc-specs/blob/master/src/iscc/iscc.py#L58)
 
 #### Content-ID-Image
 
@@ -227,7 +227,7 @@ An ISCC generating application MUST provide a `content_id_image(image, partial=F
 9. Prepend the 1-byte component header (`0x12` full content or `0x13` partial content) to results of step 2.
 4. Encode and return the resulting 9-byte sequence with [`encode`](#encode)
 
-See also: [Content-ID-Image reference code](https://github.com/coblo/iscc-specs/blob/master/src/iscc/iscc.py#L97)
+See also: [Content-ID-Image reference code](https://github.com/coblo/iscc-specs/blob/master/src/iscc/iscc.py#L98)
 
 !!! note "Image Data Input"
     The `content_id_image` function may optionally accept the raw byte data of an encoded image or an internal native image object as input for convenience.
@@ -244,7 +244,7 @@ Signature: `conent_id_mixed(cids: List[str], partial: bool=False) -> str`
 4. Prepend the 1-byte component header(`0x18` full content or `0x19` partial content)
 5. Apply [`encode`](#encode) to the result of step 5 and return the result.
 
-See also: [Content-ID-Mixed reference code]() (LINKME)
+See also: [Content-ID-Mixed reference code](https://github.com/coblo/iscc-specs/blob/master/src/iscc/iscc.py#L116)
 
 #### Partial Content Flag (PCF)
 
@@ -282,7 +282,7 @@ The Data-ID is built from the raw encoded data of the content to be identified. 
 7. Prepend the 1-byte component header (e.g. 0x20).
 8. Apply [`encode`](#encode) to the result of step 5 and return the result.
 
-See also: [Data-ID reference code](https://github.com/coblo/iscc-specs/blob/master/src/iscc/iscc.py#L115)
+See also: [Data-ID reference code](https://github.com/coblo/iscc-specs/blob/master/src/iscc/iscc.py#L137)
 
 ### Instance-ID Component
 
@@ -306,7 +306,7 @@ An ISCC generating application MUST provide a `instance_id` function that accept
 8. Hex-Encode the tophash
 9. Return the Intance-ID and the hex-encoded tophash
 
-See also: [Instance-ID reference code](https://github.com/coblo/iscc-specs/blob/master/src/iscc/iscc.py#L140) 
+See also: [Instance-ID reference code](https://github.com/coblo/iscc-specs/blob/master/src/iscc/iscc.py#L162) 
 
 Applications may carry, store, and process the leaf node hashes for advanced streaming data identification or partial data integrity verification.
 
@@ -406,7 +406,7 @@ Signature: `encode(digest: bytes) -> str`
 
 The `encode` function accepts a 9-byte **ISCC Component Digest** and returns the Base58-ISCC encoded  alphanumeric string of 13 characters which we call the **ISCC-Component Code**.
 
-See also: [Base-ISCC Encoding reference code](https://github.com/coblo/iscc-specs/blob/master/src/iscc/iscc.py#L439)
+See also: [Base-ISCC Encoding reference code](https://github.com/coblo/iscc-specs/blob/master/src/iscc/iscc.py#L464)
 
 #### decode
 
@@ -414,7 +414,7 @@ Signature: decode(code: str) -> bytes
 
 the `decode` function accepts a 13-character **ISCC-Component Code** and returns the corresponding 9-byte **ISCC-Component Digest**.
 
-See also: [Base-ISCC Decoding reference code](https://github.com/coblo/iscc-specs/blob/master/src/iscc/iscc.py#L459)
+See also: [Base-ISCC Decoding reference code](https://github.com/coblo/iscc-specs/blob/master/src/iscc/iscc.py#L484)
 
 ### Content Normalization
 
@@ -426,7 +426,7 @@ Signature: `text_pre_normalize(text: str|bytes) -> str `
 
 Decodes raw plain-text data and applies Unicode [Normalization Form KC (NFKC)](http://www.unicode.org/reports/tr15/#Norm_Forms) . The plain-text data MUST be stripped of any markup beforhand. Text input is expected to be UTF-8 encoded plain-text data or a native type of the implementig programming language that supports Unicode. Text decoding errors MUST fail with an error.
 
-See also: [Text pre-normalization reference code](https://github.com/coblo/iscc-specs/blob/master/src/iscc/iscc.py#L171)
+See also: [Text pre-normalization reference code](https://github.com/coblo/iscc-specs/blob/master/src/iscc/iscc.py#L193)
 
 #### text_trim
 
@@ -434,7 +434,7 @@ Signature: `text_trim(text: str) -> str`
 
 Trim text such that its UTF-8 encoded byte representation does not exceed 128-bytes each.
 
-See also: [Text trimming reference code](https://github.com/coblo/iscc-specs/blob/master/src/iscc/iscc.py#L180)
+See also: [Text trimming reference code](https://github.com/coblo/iscc-specs/blob/master/src/iscc/iscc.py#L202)
 
 #### text_normalize
 
@@ -450,7 +450,7 @@ We define a text normalization function that is specific to our application. It 
 3. Remove any leading or trailing `Separator` characters.
 4. Re-Compose the text by applying `Unicode Normalization Form C (NFC)`.
 
-See also: [Text normalization reference code](https://github.com/coblo/iscc-specs/blob/master/src/iscc/iscc.py#L190)
+See also: [Text normalization reference code](https://github.com/coblo/iscc-specs/blob/master/src/iscc/iscc.py#L212)
 
 #### image_normalize
 
@@ -462,7 +462,7 @@ Accepts a file path, byte-stream or raw binary image data and MUST at least supp
 2. Resize the image to 32x32 pixels using [bicubic interpolation](https://en.wikipedia.org/wiki/Bicubic_interpolation)
 3. Create a 32x32 two-dimensional array of 8-bit grayscale values from the image data
 
-See also: [Image normalization reference code](https://github.com/coblo/iscc-specs/blob/master/src/iscc/iscc.py#L215)
+See also: [Image normalization reference code](https://github.com/coblo/iscc-specs/blob/master/src/iscc/iscc.py#L237)
 
 ### Feature Hashing
 
@@ -476,7 +476,7 @@ The `similarity_hash` function takes a sequence of hash digests which represent 
 
 ![iscc-similarity-hash](images/iscc-similarity-hash.svg)
 
-See also: [Similarity hash reference code](https://github.com/coblo/iscc-specs/blob/master/src/iscc/iscc.py#L240)
+See also: [Similarity hash reference code](https://github.com/coblo/iscc-specs/blob/master/src/iscc/iscc.py#L262)
 
 #### minimum_hash
 
@@ -484,7 +484,7 @@ Signature: `minimum_hash(features: Iterable[int]) -> List[int]`
 
 The `minimum_hash` function takes an arbitrary sized set of 32-bit integer features and reduces it to a fixed size vector of 128 features such that it preserves similarity with other sets. It is based on the MinHash implementation of the [datasketch](https://ekzhu.github.io/datasketch/) library by [Eric Zhu](https://github.com/ekzhu).
 
-See also: [Minimum hash reference code](https://github.com/coblo/iscc-specs/blob/master/src/iscc/iscc.py#L264)
+See also: [Minimum hash reference code](https://github.com/coblo/iscc-specs/blob/master/src/iscc/iscc.py#L286)
 
 #### image_hash
 
@@ -497,7 +497,7 @@ Signature: `image_hash(pixels: List[List[int]]) -> bytes`
 5. Create a 64-bit digest by iterating over the values of step 5 and setting a  `1`- for values above median and `0` for values below or equal to median.
 6. Return results from step 5.
 
-See also: [Image hash reference code](https://github.com/coblo/iscc-specs/blob/master/src/iscc/iscc.py#L283)
+See also: [Image hash reference code](hhttps://github.com/coblo/iscc-specs/blob/master/src/iscc/iscc.py#L305)
 
 ### Content Defined Chunking
 
@@ -509,7 +509,7 @@ Signature: `data_chunks(data: stream) -> Iterator[bytes]`
 
 The `data_chunks` function accepts a byte-stream and returns variable sized chunks. Chunk boundaries are determined by a gear based chunking algorithm based on [[WenXia2016]][#WenXia2016].
 
-See also: [CDC reference code](https://github.com/coblo/iscc-specs/blob/master/src/iscc/iscc.py#L340)
+See also: [CDC reference code](https://github.com/coblo/iscc-specs/blob/master/src/iscc/iscc.py#L365)
 
 ## Conformance Testing
 
