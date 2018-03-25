@@ -303,10 +303,13 @@ def minimum_hash(features):
 
 
 def image_hash(pixels):
+
+    # 1. DCT per row
     dct_row_lists = []
     for pixel_list in pixels:
         dct_row_lists.append(dct(pixel_list))
 
+    # 2. DCT per col
     dct_row_lists_t = list(map(list, zip(*dct_row_lists)))
     dct_col_lists_t = []
     for dct_list in dct_row_lists_t:
@@ -314,13 +317,13 @@ def image_hash(pixels):
 
     dct_lists = list(map(list, zip(*dct_col_lists_t)))
 
-    # 5. Extract upper left 8x8 corner
+    # 3. Extract upper left 8x8 corner
     flat_list = [x for sublist in dct_lists[:8] for x in sublist[:8]]
 
-    # 6. Calculate median
+    # 4. Calculate median
     med = median(flat_list)
 
-    # 7. Create 64-bit digest by comparing to median
+    # 5. Create 64-bit digest by comparing to median
     bitstring = ''
     for value in flat_list:
         if value > med:
