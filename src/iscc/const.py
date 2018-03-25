@@ -17,7 +17,7 @@ HEAD_DID = b'\x20'
 HEAD_IID = b'\x30'
 
 # Algorithm Constants
-SYMBOLS = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz"
+SYMBOLS = "C23456789rB1ZEFGTtYiAaVvMmHUPWXKDNbcdefghLjkSnopRqsJuQwxyz"
 VALUES = ''.join([chr(i) for i in range(58)])
 C2VTABLE = str.maketrans(SYMBOLS, VALUES)
 V2CTABLE = str.maketrans(VALUES, SYMBOLS)

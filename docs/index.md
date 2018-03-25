@@ -1,8 +1,8 @@
-title: ISCC - Content Identifier
+title: ISCC - Content Identifiers
 description: The intelligent digital media identifier. 
 authors: Titusz Pan
 
-# ISCC - Content Identifier
+# ISCC - Content Identifiers
 
 The ISCC (International Standard Content Code) is a modern, generic, and free content identifier:
 

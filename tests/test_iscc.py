@@ -41,8 +41,11 @@ def test_test_data():
 
 def test_meta_id():
 
+    mid1, _, _ = iscc.meta_id('ISCC Content Identifiers')
+    assert mid1 == 'CCDFPFc87MhdT'
+
     mid1, title, extra = iscc.meta_id('Die Unendliche Geschichte')
-    assert mid1 == "11MYeQZpECeEi"
+    assert mid1 == "CCAKevDpE1eEL"
     assert title == 'Die Unendliche Geschichte'
     assert extra == ''
     mid2 = iscc.meta_id(' Die unéndlíche,  Geschichte ')[0]
@@ -58,21 +61,21 @@ def test_meta_id():
 def test_encode():
     digest = bytes.fromhex('f7d3a5b201dc92f7a7')
     code = iscc.encode(digest)
-    assert code == '5GcQF7sC3iY2i'
+    assert code == '5GcvF7s13LK2L'
 
 
 def test_decode():
     code = '5GcQF7sC3iY2i'
     digest = iscc.decode(code)
-    assert digest.hex() == 'f7d3a5b201dc92f7a7'
+    assert digest.hex() == 'f7d6bd587d22a7cb6d'
 
 
 def test_content_id_text():
     cid_t_np = iscc.content_id_text('')
     assert len(cid_t_np) == 13
-    assert "1HLesNXNRrbbU" == cid_t_np
+    assert "CTiesaXaMqbbU" == cid_t_np
     cid_t_p = iscc.content_id_text('', partial=True)
-    assert "1JLesNXNRrbbU" == cid_t_p
+    assert "CtiesaXaMqbbU" == cid_t_p
     assert 0 == iscc.distance(cid_t_p, cid_t_np)
 
     cid_t_a = iscc.content_id_text(TEXT_A)
@@ -178,21 +181,21 @@ def test_content_id_mixed():
     cid_t_2 = iscc.content_id_text('Another Text')
 
     cid_m = iscc.content_id_mixed([cid_t_1])
-    assert cid_m == "1R3oRE4HJXogc"
+    assert cid_m == "CM3oME4TtXogc"
 
     cid_m = iscc.content_id_mixed([cid_t_1, cid_t_2])
-    assert cid_m == "1R3qvJGc98nXg"
+    assert cid_m == "CM3RQtGc98nXg"
 
     cid_i = iscc.content_id_image('lenna.jpg')
     cid_m = iscc.content_id_mixed([cid_t_1, cid_t_2, cid_i])
-    assert cid_m == "1R3oQx7zUEy38"
+    assert cid_m == "CM3ovx7zUEy38"
 
 
 def test_data_id():
     random.seed(1)
     data = bytearray([random.getrandbits(8) for _ in range(1000000)])  # 1 mb
     did_a = iscc.data_id(data)
-    assert did_a == '1ZjV1oxPC6Vpr'
+    assert did_a == 'CDjPCoxV16Ppq'
     data.insert(500000, 1)
     data.insert(500001, 2)
     data.insert(500002, 3)
@@ -207,16 +210,16 @@ def test_data_id():
 def test_instance_id():
     zero_bytes_even = b'\x00' * 16
     iid, h = iscc.instance_id(zero_bytes_even)
-    assert iid == '1q8UDifpN1SCd'
+    assert iid == 'CR8UZLfpaCm1d'
     assert h == '2ca7f098709d37d6f6a1a7e0670f49734c735500894aab4dc14d2c13f042dddd'
     ff_bytes_uneven = b'\xff' * 17
     iid, h = iscc.instance_id(ff_bytes_uneven)
-    assert iid == '1q6ah6fQ1xTj9'
+    assert iid == 'CR6Nh6fvCxHj9'
     assert h == '215dadbbb627072c15b2235b521db9896e74d7ef379fdafa731efa52a67d5b7d'
     more_bytes = b'\xcc' * 66000
     iid, h = iscc.instance_id(more_bytes)
     assert h == 'db5f55fc6741664fda4ebb364f2cad99f6ac166aedc7551ab0768c6c67218f71'
-    assert iid == '1qdhBrWwK7u7L'
+    assert iid == 'CRdhBqWwY7u7i'
 
 
 def test_data_chunks():
@@ -235,12 +238,12 @@ def test_data_chunks():
 def test_content_id_image():
     cid_i = iscc.content_id_image('lenna.jpg')
     assert len(cid_i) == 13
-    assert cid_i == '1KSiorBqgP32u'
+    assert cid_i == 'CYmLoqBRgV32u'
 
     data = BytesIO(open('lenna.jpg', 'rb').read())
     cid_i = iscc.content_id_image(data, partial=True)
     assert len(cid_i) == 13
-    assert cid_i == '1LSiorBqgP32u'
+    assert cid_i == 'CimLoqBRgV32u'
 
     img1 = Image.open('lenna.jpg')
     img2 = img1.filter(ImageFilter.GaussianBlur(10))

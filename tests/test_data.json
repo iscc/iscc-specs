@@ -4,37 +4,37 @@
       "inputs": [
         "pixel_png_transp.png"
       ],
-      "outputs": "1K11111111111"
+      "outputs": "CYCCCCCCCCCCC"
     },
     "test_002_pixel_png_white": {
       "inputs": [
         "pixel_png_white.png"
       ],
-      "outputs": "1KSJUvrv6wDB4"
+      "outputs": "CYmtUQqQ6wZB4"
     },
     "test_003_pixel_png_black": {
       "inputs": [
         "pixel_png_black.png"
       ],
-      "outputs": "1K11111111111"
+      "outputs": "CYCCCCCCCCCCC"
     },
     "test_004_cat_jpg": {
       "inputs": [
         "cat.jpg"
       ],
-      "outputs": "1KZfHr7vc7FAe"
+      "outputs": "CYDfTq7Qc7Fre"
     },
     "test_005_cat_png": {
       "inputs": [
         "cat.png"
       ],
-      "outputs": "1KZfHr7vc7FAe"
+      "outputs": "CYDfTq7Qc7Fre"
     },
     "test_006_cat_gif": {
       "inputs": [
         "cat.gif"
       ],
-      "outputs": "1KZfHr7vc7FAe"
+      "outputs": "CYDfTq7Qc7Fre"
     }
   },
   "content_id_mixed": {
@@ -44,7 +44,7 @@
           "1HUg6wnerR9jP"
         ]
       ],
-      "outputs": "1R3nVRGp8fuji"
+      "outputs": "CMmXqurbPbdw1"
     },
     "test_002_cid_t_two_partial": {
       "inputs": [
@@ -54,7 +54,7 @@
         ],
         true
       ],
-      "outputs": "1S3nsS53dz3NE"
+      "outputs": "CmmKFyLEKgaxW"
     },
     "test_003_cid_t_and_i": {
       "inputs": [
@@ -63,7 +63,7 @@
           "1KSiorBqgP32u"
         ]
       ],
-      "outputs": "1R48peZnDi3kr"
+      "outputs": "CMHafQ4eR8a7K"
     }
   },
   "content_id_text": {
@@ -71,19 +71,19 @@
       "inputs": [
         ""
       ],
-      "outputs": "1HLesNXNRrbbU"
+      "outputs": "CTiesaXaMqbbU"
     },
     "test_002_short": {
       "inputs": [
         "Some short text"
       ],
-      "outputs": "1HNQkwnBnBXX8"
+      "outputs": "CTavkwnBnBXX8"
     },
     "test_003_long": {
       "inputs": [
         "Their most significant and usefull property of similarity-preserving fingerprints gets lost in the fragmentation of individual, propietary and use case specific implementations. The real benefit lies in similarity preservation beyond your local data archive on a global scale accross vendors."
       ],
-      "outputs": "1HdLDMkk92sjk"
+      "outputs": "CTdiZAkk92sjk"
     }
   },
   "data_id": {
@@ -91,19 +91,19 @@
       "inputs": [
         "cat.jpg"
       ],
-      "outputs": "1Zh996Ykqg134"
+      "outputs": "CDh996KkRgC34"
     },
     "test_002_cat_png": {
       "inputs": [
         "cat.png"
       ],
-      "outputs": "1ZMgDjrpbV6qj"
+      "outputs": "CDAgZjqpbP6Rj"
     },
     "test_003_cat_gif": {
       "inputs": [
         "cat.gif"
       ],
-      "outputs": "1ZjpNNXR6PLAA"
+      "outputs": "CDjpaaXM6Virr"
     }
   },
   "image_normalize": {
@@ -3399,7 +3399,7 @@
         "cat.jpg"
       ],
       "outputs": [
-        "1qidd9g4BmUyK",
+        "CRLdd9g4BSUyY",
         "f8e5e94f953709ae8930220da8bada303a370a46157a5cdd50ad2476a7f51e42"
       ]
     },
@@ -3408,7 +3408,7 @@
         "cat.png"
       ],
       "outputs": [
-        "1q6xpnAtkQvZT",
+        "CR6xpnrJkvQDH",
         "23a5b78a044143b612a0d033384a5ebf95343ec812c3e62caff393852d0328a0"
       ]
     },
@@ -3417,7 +3417,7 @@
         "cat.gif"
       ],
       "outputs": [
-        "1qC67E86TVsDP",
+        "CR167E86HPsZV",
         "424a89d97aa978363b76071510949bf3b3424f3c6d394ccde93d7fa62ced066a"
       ]
     }
@@ -3429,7 +3429,7 @@
         ""
       ],
       "outputs": [
-        "11h2HW8KLFhma",
+        "CCh2TW8YiFhSN",
         "",
         ""
       ]
@@ -3440,7 +3440,7 @@
         ""
       ],
       "outputs": [
-        "11MYeQZpECeEi",
+        "CCAKevDpE1eEL",
         "Die Unendliche Geschichte",
         ""
       ]
@@ -3451,7 +3451,7 @@
         ""
       ],
       "outputs": [
-        "11MYeQZpECeEi",
+        "CCAKevDpE1eEL",
         "Die Unendliche, Geschichte",
         ""
       ]
@@ -3462,7 +3462,7 @@
         ""
       ],
       "outputs": [
-        "11MYeQZpECeEi",
+        "CCAKevDpE1eEL",
         "Die Unendliche, Geschichte",
         ""
       ]
@@ -3473,7 +3473,7 @@
         ""
       ],
       "outputs": [
-        "11MYeQZpECeEi",
+        "CCAKevDpE1eEL",
         "Die unéndlíche,  Geschichte",
         ""
       ]
@@ -3483,7 +3483,7 @@
         "Iñtërnâtiônàlizætiøn☃"
       ],
       "outputs": [
-        "11j3HvAKcgNox",
+        "CCj3TQrYcgaox",
         "Iñtërnâtiônàlizætiøn☃",
         ""
       ]
@@ -3494,7 +3494,7 @@
         "The Movie"
       ],
       "outputs": [
-        "11NDq5BHtZYCk",
+        "CCaZR5BTJDK1k",
         "Die unendliche Geschichte",
         "The Movie"
       ]
@@ -3504,7 +3504,7 @@
         "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed"
       ],
       "outputs": [
-        "116jkY4iCFY52",
+        "CC6jkK4L1FK52",
         "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquy",
         ""
       ]
@@ -3514,7 +3514,7 @@
         "Iñtërnâtiônàlizætiøn☃ Iñtërnâtiônàlizætiøn☃ Iñtërnâtiônàlizætiøn☃ Iñtërnâtiônàlizætiøn☃ Iñtërnâtiônàlizætiøn☃ Iñtërnâtiônàlizætiøn☃"
       ],
       "outputs": [
-        "11j4Vgfus9Rxi",
+        "CCj4Pgfus9MxL",
         "Iñtërnâtiônàlizætiøn☃ Iñtërnâtiônàlizætiøn☃ Iñtërnâtiônàlizætiøn☃ Iñtërnâtiônàlizætiøn☃ Iñt",
         ""
       ]

@@ -1,12 +1,8 @@
 title: ISCC - Specification
-description: Draft Specification of International Standard Content Codes
+description: Specification of International Standard Content Codes
 authors: Titusz Pan
 
-# ISCC - Specification v0.9.8
-
-!!! attention
-
-    This document is a work in progress draft! It may be updated, replaced, or obsoleted by other documents at any time. This document MUST not be used as reference material or cited other than as "work in progress".
+# ISCC - Specification v1.0.0
 
 ## Abstract
 
@@ -14,9 +10,9 @@ The **International Standard Content Code (ISCC)**, is an open and decentralized
 
 ## Note to Readers
 
-For public discussion of issues for this draft please use the Github issue tracker: <https://github.com/coblo/iscc-specs/issues>.
+For public discussion of issues for this specification please use the Github issue tracker: <https://github.com/coblo/iscc-specs/issues>.
 
-The latest published version of this draft can be found at <http://iscc.codes/specification/>. 
+The latest published version of this specification can be found at <http://iscc.codes/specification/>. 
 
 Public review, discussion and contributions are welcome.
 
@@ -80,21 +76,23 @@ ISCC components MAY be used separately or in combination by applications for var
 
 !!! example "Single component ISCC-Code (13 characters)"
 
-    **Meta-ID**: 11RDXN6ea57QT
+    **Meta-ID**: CCDFPFc87MhdT
 
 Combinations of components MUST include the Meta-ID component and MUST be ordered as **Meta-ID**, **Content-ID**, **Data-ID**, and **Instance-ID**. Individual components MAY be skipped and SHOULD be separated with hyphens. A combination of components SHOULD be prefixed with "ISCC".
 
 !!! example "Combination of ISCC-Code components"
 
-    **ISCC**: 11RDXN6ea57QT-1HWMGKrLki1fL-1ZYcY8d3uTYj8
+    **ISCC**: CCPktvj3dVoVa-CTPCWTpGPMaLZ-CDL6QsUZdZzog
 
 A **Fully Qualified ISCC Code** is an ordered sequence of Meta-ID, Content-ID, Data-ID, and Instance-ID codes. It SHOULD be prefixed with ISCC and MAY be seperated by hypens.
 
 !!! example "Fully Qualified ISCC-Code (52 characters)"
-    **ISCC**: 11RDXN6ea57QT1HWMGKrLki1fL1ZYcY8d3uTYj81qYuuCMStgpjs
+
+    **ISCC**: CCDFPFc87MhdTCTWAGYJ9HZGj1CDhydSjutScgECR4GZ8SW5a7uc
 
 !!! example "Fully Qualified ISCC-Code with hyphens (55 characters)"
-    **ISCC**: 11RDXN6ea57QT-1HWMGKrLki1fL-1ZYcY8d3uTYj8-1qYuuCMStgpjs
+
+    **ISCC**: CCDFPFc87MhdT-CTWAGYJ9HZGj1-CDhydSjutScgE-CR4GZ8SW5a7uc
 
 ### Component Types
 
@@ -106,21 +104,21 @@ The header only needs to be carried in the encoded representation. As similarity
 
 #### List of Component Headers
 
-| Component                | Nibble-1 | Nibble-2                        | Byte |
-| :----------------------- | :------- | :------------------------------ | :--- |
-| **Meta-ID**              | 0000     | 0000 - ISCC version 1           | 0x00 |
-| **Content-ID-Text**      | 0001     | 0000 - Content Type Text        | 0x10 |
-| **Content-ID-Text PCF**  | 0001     | 0001 - Content Type Text  + PCF | 0x11 |
-| **Content-ID-Image**     | 0001     | 0010 - Content Type Image       | 0x12 |
-| **Content-ID-Image PCF** | 0001     | 0011 - Content Type Image + PCF | 0x13 |
-| *Content-ID-Audio*       | 0001     | 0100 - Content Type Audio       | 0x14 |
-| *Content-ID-Audio PCF*   | 0001     | 0101 - Content Type Audio + PCF | 0x15 |
-| *Content-ID-Video*       | 0001     | 0110 - Content Type Video       | 0x16 |
-| *Content-ID-Video PCF*   | 0001     | 0111 - Content Type Video + PCF | 0x17 |
-| **Content-ID-Mixed**     | 0001     | 1000 - Content Type Mixed       | 0x18 |
-| **Content-ID Mixed PCF** | 0001     | 1001 - Content Type Mixed + PCF | 0x19 |
-| **Data-ID**              | 0010     | 0000 - Reserved                 | 0x20 |
-| **Instance-ID**          | 0011     | 0000 - Reserved                 | 0x30 |
+| Component                | Nibble-1 | Nibble-2                        | Byte | Code |
+| :----------------------- | :------- | :------------------------------ | :--- | ---- |
+| **Meta-ID**              | 0000     | 0000 - ISCC version 1           | 0x00 | CC   |
+| **Content-ID-Text**      | 0001     | 0000 - Content Type Text        | 0x10 | CT   |
+| **Content-ID-Text PCF**  | 0001     | 0001 - Content Type Text  + PCF | 0x11 | Ct   |
+| **Content-ID-Image**     | 0001     | 0010 - Content Type Image       | 0x12 | CY   |
+| **Content-ID-Image PCF** | 0001     | 0011 - Content Type Image + PCF | 0x13 | Ci   |
+| *Content-ID-Audio*       | 0001     | 0100 - Content Type Audio       | 0x14 | CA   |
+| *Content-ID-Audio PCF*   | 0001     | 0101 - Content Type Audio + PCF | 0x15 | Ca   |
+| *Content-ID-Video*       | 0001     | 0110 - Content Type Video       | 0x16 | CV   |
+| *Content-ID-Video PCF*   | 0001     | 0111 - Content Type Video + PCF | 0x17 | Cv   |
+| **Content-ID-Mixed**     | 0001     | 1000 - Content Type Mixed       | 0x18 | CM   |
+| **Content-ID Mixed PCF** | 0001     | 1001 - Content Type Mixed + PCF | 0x19 | Cm   |
+| **Data-ID**              | 0010     | 0000 - Reserved                 | 0x20 | CD   |
+| **Instance-ID**          | 0011     | 0000 - Reserved                 | 0x30 | CR   |
 
 The body section of each component is specific to the component and always 8-bytes and can thus be fit into a 64-bit integer for efficient data processing. The following sections give an overview of how the differen components work and how they are generated.
 
@@ -366,7 +364,7 @@ Applications MAY embed ISCC codes that have side effects if they specify a proce
 
     We are able to embed the following combination of components from the [markdown version](https://github.com/coblo/iscc-specs/edit/master/docs/specification.md) of this document into the document itself because adding or removing them has no side effect:
     
-    **ISCC**: 11VkJQj3dPoPN-1HUg6wnerR9jP
+    **ISCC**: CCPktvj3dVoVa-CTPCWTpGTDUHH-CDL6QsUZdvLzq
 
 ## ISCC URI Scheme
 
@@ -396,7 +394,11 @@ iscc:11TcMGvUSzqoM1CqVA3ykFawyh1R1sH4Bz8A1of1d2Ju4VjWt26S?stream=smart-license
 
 ### Base58-ISCC
 
-The ISCC uses a custom per-component data encoding similar to the [zbase62](https://github.com/simplegeo/zbase62) encoding by [Zooko Wilcox-O'Hearn](https://en.wikipedia.org/wiki/Zooko_Wilcox-O%27Hearn) but with a 58-symbol table. The encoding does not require padding and will always yield component codes of 13 characters length for ths 72-bit component digests. The predictable size of the encoding is a property that allows for easy composition and decomposition of components without having to rely on a delimiter (hyphen) in the ISCC code representation. Colliding body segments of the digest are preserved by encoding the header and body separately. The ASCII symbol table also minimizes transcription and OCR errors by omitting the easily confused characters `'O', '0', 'I', 'l'`.
+The ISCC uses a custom per-component data encoding similar to the [zbase62](https://github.com/simplegeo/zbase62) encoding by [Zooko Wilcox-O'Hearn](https://en.wikipedia.org/wiki/Zooko_Wilcox-O%27Hearn) but with a 58-character symbol table. The encoding does not require padding and will always yield component codes of 13 characters length for ths 72-bit component digests. The predictable size of the encoding is a property that allows for easy composition and decomposition of components without having to rely on a delimiter (hyphen) in the ISCC code representation. Colliding body segments of the digest are preserved by encoding the header and body separately. The ASCII symbol table also minimizes transcription and OCR errors by omitting the easily confused characters `'O', '0', 'I', 'l'` and is shuffled to generate human readable component headers.
+
+!!! note "Symbol table"
+
+    `SYMBOLS = "C23456789rB1ZEFGTtYiAaVvMmHUPWXKDNbcdefghLjkSnopRqsJuQwxyz"`
 
 #### encode
 
