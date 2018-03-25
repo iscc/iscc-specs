@@ -12,7 +12,7 @@ edit_uri: 'edit/master/docs/'
 # Copyright
 copyright: 'Copyright © 2016-2017 Content Blockchain Project | ISCC: 11ZFVFc87RhdH-1HWMGKrLkhzSn-1ZYcPCjTCjGEr'
 
-# Documentation and Ttheme
+# Documentation and Theme
 theme:
     name: 'material'
     language: 'en'
