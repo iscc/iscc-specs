@@ -11,7 +11,6 @@ import xxhash
 from iscc.const import *
 
 
-
 ###############################################################################
 # Top-Level functions for generating ISCC Component Codes                     #
 ###############################################################################
