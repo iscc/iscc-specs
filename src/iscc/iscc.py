@@ -7,9 +7,9 @@ from io import BytesIO
 from hashlib import sha256
 import unicodedata
 from PIL import Image
-from copy import deepcopy
 import xxhash
 from iscc.const import *
+
 
 
 ###############################################################################
@@ -289,8 +289,8 @@ def minimum_hash(features):
     mersenne_prime = (1 << 61) - 1
     max_hash = (1 << 32) - 1
     hashvalues = [max_hash] * 128
-    permutations = deepcopy(MINHASH_PERMUTATIONS)
-    a, b = permutations
+
+    a, b = MINHASH_PERMUTATIONS
 
     for hv in features:
         nhs = []
