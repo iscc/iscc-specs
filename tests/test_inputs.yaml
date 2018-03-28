@@ -93,4 +93,10 @@ image_normalize:
 minimum_hash:
     test_001_simple:
         inputs: [[2307709831, 4057803343, 1189896175, 998490104, 1957593182, 985638384, 1499267049, 3716940741, 3418313233, 2481613561]]
-
+data_chunks:
+    test_001_cat_jpg:
+        inputs: ['cat.jpg']
+    test_002_cat_png:
+        inputs: ['cat.png']
+    test_003_cat_gif:
+        inputs: ['cat.gif']

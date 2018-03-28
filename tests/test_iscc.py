@@ -35,8 +35,17 @@ def test_test_data():
             for testname, testdata in tests.items():
                 func = getattr(iscc, funcname)
                 args = testdata['inputs']
+                if funcname in ['data_chunks']:
+                    testdata['outputs'] = [
+                        bytes.fromhex(i.split(':')[1]) for i
+                        in testdata['outputs']
+                    ]
+                    result = list(func(*args))
+                else:
+                    result = func(*args)
                 expected = testdata['outputs']
-                assert func(*args) == expected, "%s %s " % (funcname, args)
+
+                assert result == expected, "%s %s " % (funcname, args)
 
 
 def test_meta_id():

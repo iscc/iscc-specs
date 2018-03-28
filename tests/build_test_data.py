@@ -11,6 +11,9 @@ def main():
             func = getattr(iscc, funcname)
             args = testdata['inputs']
             result = func(*args)
+            if funcname in ['data_chunks']:
+                result = ['hex:' + data.hex() for data in result]
+                print(len(result))
             testdata['outputs'] = result
     with open('test_data.json', 'w', encoding='utf-8') as outf:
         json.dump(data, outf, indent=2, sort_keys=True, ensure_ascii=False)
