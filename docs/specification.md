@@ -231,6 +231,9 @@ See also: [Content-ID-Image reference code](https://github.com/coblo/iscc-specs/
 
 !!! note "Image Data Input"
     The `content_id_image` function may optionally accept the raw byte data of an encoded image or an internal native image object as input for convenience.
+    
+!!! warning "JPEG Decoding"
+    Decoding of JPEG images is non-deterministic. Different image processing libraries may yield diverging pixel data and result in different Image-IDs. The reference implementation currently uses the builtin decoder of the [Python Pillow](https://github.com/python-pillow/Pillow) imaging library. Future versions of the ISCC specification may define a custom deterministic JPEG decoding procedure.
 
 #### Content-ID-Mixed
 
