@@ -28,6 +28,25 @@ The reference code is published with the package name `iscc <https://pypi.python
 
     pip install iscc
 
+Using the reference code
+========================
+
+A short example on how to create an ISCC Code with the reference implementation.
+
+.. code-block:: python
+
+    import iscc
+
+    # Generate ISCC Component Codes
+    mid, title, extra = iscc.meta_id('Title of Content')
+    cid = iscc.content_id_text('some text')
+    did = iscc.data_id('path/to/mediafile.doc')
+    iid, tophash = iscc.instance_id('path/to/mediafile.doc')
+
+    # Join ISCC Components to fully qualified ISCC Code
+    iscc_code = '-'.join([mid, cid, did, iid])
+    print('ISCC:{}'.format(iscc_code))
+
 
 Working with the specification
 ==============================
@@ -41,9 +60,6 @@ The entire **ISCC Specification** is written in plain text `Markdown <https://en
     pip install -r requirements.txt
     mkdocs serve
 
-
-Usage
-=====
 
 All specification documents can be found in the ``./docs`` subfolder or the repository. The recommended editor for the markdown files is `typora <https://typora.io/>`_. If you have commit rights to the `main repository <https://github.com/coblo/iscc-specs>`_ you can deploy the site with a simple ``mkdocs gh-deploy``.
 
