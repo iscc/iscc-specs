@@ -28,10 +28,9 @@ def get_content(mode='text'):
 
 def spec_iscc():
     title = "ISCC - Specification"
-    extra = "v0.9.9"
     text = open('docs/specification.md', encoding='utf-8').read()
     data = open('docs/specification.md', 'rb').read()
-    mid, title, extra = iscc.meta_id(title, extra)
+    mid, title, extra = iscc.meta_id(title)
     cidt = iscc.content_id_text(text)
     did = iscc.data_id(data)
     iid, hash_ = iscc.instance_id(data)
