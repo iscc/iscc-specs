@@ -31,6 +31,7 @@ pages:
     - Overview: 'index.md'
     - Concept: 'concept.md'
     - Specification: 'specification.md'
+    - Implementations: 'implementations.md'
     - License: 'license.md'
 
 # Options
