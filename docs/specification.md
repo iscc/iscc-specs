@@ -529,6 +529,22 @@ An application that claims ISCC conformance MUST pass the ISCC conformance test 
 }
 ```
 
+Outputs that are expected to be raw bytes are embedded as HEX encoded strings in JSON and prefixed with  `hex:` to support automated decoding during implementation testing.
+
+!!! example 
+    Byte outputs in JSON testdata:
+
+        {
+          "data_chunks": {
+            "test_001_cat_jpg": {
+              "inputs": ["cat.jpg"],
+              "outputs": ["hex:ffd8ffe1001845786966000049492a0008", ...]
+            }
+          }
+        }
+
+
+## License
 ## License
 
 Copyright © 2016 - 2018 **Content Blockchain Project**
