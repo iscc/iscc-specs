@@ -10,8 +10,10 @@
       <meta name="viewport" content="width=device-width,initial-scale=1">
       <meta http-equiv="x-ua-compatible" content="ie=edge">
       
-        <meta name="description" content="International Standard Content Code - Specification">
+        <meta name="description" content="Implementations of ISCC Codes">
       
+      
+        <link rel="canonical" href="http://iscc.codes/implementations/">
       
       
         <meta name="author" content="Titusz Pan">
@@ -35,22 +37,22 @@
       
         <meta name="lang:search.tokenizer" content="[\s\-]+">
       
-      <link rel="shortcut icon" href="/images/favicon.png">
+      <link rel="shortcut icon" href="../images/favicon.png">
       <meta name="generator" content="mkdocs-0.17.3, mkdocs-material-2.7.1">
     
     
       
-        <title>ISCC - Content Identifiers</title>
+        <title>ISCC - Implementations</title>
       
     
     
-      <link rel="stylesheet" href="/assets/stylesheets/application.78aab2dc.css">
+      <link rel="stylesheet" href="../assets/stylesheets/application.78aab2dc.css">
       
-        <link rel="stylesheet" href="/assets/stylesheets/application-palette.6079476c.css">
+        <link rel="stylesheet" href="../assets/stylesheets/application-palette.6079476c.css">
       
     
     
-      <script src="/assets/javascripts/modernizr.1aa3b519.js"></script>
+      <script src="../assets/javascripts/modernizr.1aa3b519.js"></script>
     
     
       <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
@@ -61,7 +63,7 @@
       <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
     
     
-      <link rel="stylesheet" href="/stylesheets/custom.css">
+      <link rel="stylesheet" href="../stylesheets/custom.css">
     
     
   </head>
@@ -99,6 +101,10 @@
     <input class="md-toggle" data-md-toggle="search" type="checkbox" id="search" autocomplete="off">
     <label class="md-overlay" data-md-component="overlay" for="drawer"></label>
     
+      <a href="#iscc-implementations" tabindex="1" class="md-skip">
+        Skip to content
+      </a>
+    
     
       <header class="md-header" data-md-component="header">
   <nav class="md-header-nav md-grid">
@@ -106,7 +112,7 @@
       <div class="md-flex__cell md-flex__cell--shrink">
         <a href="http://iscc.codes" title="ISCC - Content Identifiers" class="md-header-nav__button md-logo">
           
-            <img src="/images/logo-white.svg" width="24" height="24">
+            <img src="../images/logo-white.svg" width="24" height="24">
           
         </a>
       </div>
@@ -121,7 +127,7 @@
                 ISCC - Content Identifiers
               </span>
               <span class="md-header-nav__topic">
-                
+                Implementations
               </span>
             
           
@@ -202,7 +208,7 @@
   <label class="md-nav__title md-nav__title--site" for="drawer">
     <span class="md-nav__button md-logo">
       
-        <img src="/images/logo-white.svg" width="48" height="48">
+        <img src="../images/logo-white.svg" width="48" height="48">
       
     </span>
     ISCC - Content Identifiers
@@ -238,7 +244,7 @@
 
 
   <li class="md-nav__item">
-    <a href="/" title="Overview" class="md-nav__link">
+    <a href=".." title="Overview" class="md-nav__link">
       Overview
     </a>
   </li>
@@ -250,7 +256,7 @@
 
 
   <li class="md-nav__item">
-    <a href="/concept/" title="Concept" class="md-nav__link">
+    <a href="../concept/" title="Concept" class="md-nav__link">
       Concept
     </a>
   </li>
@@ -262,7 +268,7 @@
 
 
   <li class="md-nav__item">
-    <a href="/specification/" title="Specification" class="md-nav__link">
+    <a href="../specification/" title="Specification" class="md-nav__link">
       Specification
     </a>
   </li>
@@ -272,11 +278,56 @@
       
       
 
+  
 
-  <li class="md-nav__item">
-    <a href="/implementations/" title="Implementations" class="md-nav__link">
+
+  <li class="md-nav__item md-nav__item--active">
+    
+    <input class="md-toggle md-nav__toggle" data-md-toggle="toc" type="checkbox" id="toc">
+    
+      
+    
+    
+      <label class="md-nav__link md-nav__link--active" for="toc">
+        Implementations
+      </label>
+    
+    <a href="./" title="Implementations" class="md-nav__link md-nav__link--active">
       Implementations
     </a>
+    
+      
+<nav class="md-nav md-nav--secondary">
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="toc">Table of contents</label>
+    <ul class="md-nav__list" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#developer-libraries" title="Developer Libraries" class="md-nav__link">
+    Developer Libraries
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#demo-implementations" title="Demo Implementations" class="md-nav__link">
+    Demo Implementations
+  </a>
+  
+</li>
+      
+      
+      
+      
+      
+    </ul>
+  
+</nav>
+    
   </li>
 
     
@@ -286,7 +337,7 @@
 
 
   <li class="md-nav__item">
-    <a href="/license/" title="License" class="md-nav__link">
+    <a href="../license/" title="License" class="md-nav__link">
       License
     </a>
   </li>
@@ -299,12 +350,86 @@
               </div>
             
             
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="toc">
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+<nav class="md-nav md-nav--secondary">
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="toc">Table of contents</label>
+    <ul class="md-nav__list" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#developer-libraries" title="Developer Libraries" class="md-nav__link">
+    Developer Libraries
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#demo-implementations" title="Demo Implementations" class="md-nav__link">
+    Demo Implementations
+  </a>
+  
+</li>
+      
+      
+      
+      
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
           
           <div class="md-content">
             <article class="md-content__inner md-typeset">
               
-  <h1>404 - Not found</h1>
-
+                
+                  <a href="https://github.com/coblo/iscc-specs/edit/master/docs/implementations.md" title="Edit this page" class="md-icon md-content__icon">&#xE3C9;</a>
+                
+                
+                <h1 id="iscc-implementations">ISCC - Implementations<a class="headerlink" href="#iscc-implementations" title="Permanent link">#</a></h1>
+<h2 id="developer-libraries">Developer Libraries<a class="headerlink" href="#developer-libraries" title="Permanent link">#</a></h2>
+<table>
+<thead>
+<tr>
+<th>Language</th>
+<th>Author(s)</th>
+<th>URL</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Python3</td>
+<td>Patricia Schinke, Titusz Pan</td>
+<td><a href="https://pypi.python.org/pypi/iscc">https://pypi.python.org/pypi/iscc</a></td>
+</tr>
+<tr>
+<td>Go (golang)</td>
+<td>Patricia Schinke, Marvin Schmies</td>
+<td><a href="https://github.com/coblo/iscc-golang">https://github.com/coblo/iscc-golang</a></td>
+</tr>
+</tbody>
+</table>
+<p>If you are missing an implementation in your favorite programming language, please feel free to port it over. The reference implementation is a <a href="https://github.com/coblo/iscc-specs/blob/master/src/iscc/iscc.py">single python module</a> and we have language independent <a href="https://github.com/coblo/iscc-specs/blob/master/tests/test_data.json">test data in JSON</a>.</p>
+<h2 id="demo-implementations">Demo Implementations<a class="headerlink" href="#demo-implementations" title="Permanent link">#</a></h2>
+<ul>
+<li>Blockchain wallet demo: <a href="https://github.com/coblo/gui-demo">https://github.com/coblo/gui-demo</a></li>
+<li>Smart License demo: <a href="https://github.com/coblo/smartlicense">https://github.com/coblo/smartlicense</a></li>
+<li>Early concept demo: <a href="https://isccdemo.content-blockchain.org/">https://isccdemo.content-blockchain.org/</a></li>
+</ul>
+                
+                  
+                
+              
               
                 
 
@@ -317,6 +442,41 @@
       
         
 <footer class="md-footer">
+  
+    <div class="md-footer-nav">
+      <nav class="md-footer-nav__inner md-grid">
+        
+          <a href="../specification/" title="Specification" class="md-flex md-footer-nav__link md-footer-nav__link--prev" rel="prev">
+            <div class="md-flex__cell md-flex__cell--shrink">
+              <i class="md-icon md-icon--arrow-back md-footer-nav__button"></i>
+            </div>
+            <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
+              <span class="md-flex__ellipsis">
+                <span class="md-footer-nav__direction">
+                  Previous
+                </span>
+                Specification
+              </span>
+            </div>
+          </a>
+        
+        
+          <a href="../license/" title="License" class="md-flex md-footer-nav__link md-footer-nav__link--next" rel="next">
+            <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
+              <span class="md-flex__ellipsis">
+                <span class="md-footer-nav__direction">
+                  Next
+                </span>
+                License
+              </span>
+            </div>
+            <div class="md-flex__cell md-flex__cell--shrink">
+              <i class="md-icon md-icon--arrow-forward md-footer-nav__button"></i>
+            </div>
+          </a>
+        
+      </nav>
+    </div>
   
   <div class="md-footer-meta md-typeset">
     <div class="md-footer-meta__inner md-grid">
@@ -353,9 +513,9 @@
       
     </div>
     
-      <script src="/assets/javascripts/application.8eb9be28.js"></script>
+      <script src="../assets/javascripts/application.8eb9be28.js"></script>
       
-      <script>app.initialize({version:"0.17.3",url:{base:""}})</script>
+      <script>app.initialize({version:"0.17.3",url:{base:".."}})</script>
       
     
     

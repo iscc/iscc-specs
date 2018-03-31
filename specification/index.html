@@ -38,7 +38,7 @@
         <meta name="lang:search.tokenizer" content="[\s\-]+">
       
       <link rel="shortcut icon" href="../images/favicon.png">
-      <meta name="generator" content="mkdocs-0.17.3, mkdocs-material-2.7.0">
+      <meta name="generator" content="mkdocs-0.17.3, mkdocs-material-2.7.1">
     
     
       
@@ -97,11 +97,11 @@
         
       </defs>
     </svg>
-    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="drawer">
-    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="search">
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="search" autocomplete="off">
     <label class="md-overlay" data-md-component="overlay" for="drawer"></label>
     
-      <a href="#iscc-specification-v099" tabindex="1" class="md-skip">
+      <a href="#iscc-specification-v100" tabindex="1" class="md-skip">
         Skip to content
       </a>
     
@@ -721,6 +721,20 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#license" title="License" class="md-nav__link">
+    License
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#license_1" title="License" class="md-nav__link">
+    License
+  </a>
+  
+</li>
+      
       
       
       
@@ -729,6 +743,18 @@
   
 </nav>
     
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../implementations/" title="Implementations" class="md-nav__link">
+      Implementations
+    </a>
   </li>
 
     
@@ -1191,6 +1217,20 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#license" title="License" class="md-nav__link">
+    License
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#license_1" title="License" class="md-nav__link">
+    License
+  </a>
+  
+</li>
+      
       
       
       
@@ -1210,7 +1250,7 @@
                   <a href="https://github.com/coblo/iscc-specs/edit/master/docs/specification.md" title="Edit this page" class="md-icon md-content__icon">&#xE3C9;</a>
                 
                 
-                <h1 id="iscc-specification-v099"><abbr title="International Standard Content Code">ISCC</abbr> - Specification v0.9.9<a class="headerlink" href="#iscc-specification-v099" title="Permanent link">#</a></h1>
+                <h1 id="iscc-specification-v100"><abbr title="International Standard Content Code">ISCC</abbr> - Specification v1.0.0<a class="headerlink" href="#iscc-specification-v100" title="Permanent link">#</a></h1>
 <h2 id="abstract">Abstract<a class="headerlink" href="#abstract" title="Permanent link">#</a></h2>
 <p>The <strong>International Standard Content Code (<abbr title="International Standard Content Code">ISCC</abbr>)</strong>, is an open and decentralized digital media identifier. An <abbr title="International Standard Content Code">ISCC</abbr> can be created from digital content and its basic metadata by anybody who follows the procedures of the <abbr title="International Standard Content Code">ISCC</abbr> specification or by using open source software that supports <abbr title="International Standard Content Code">ISCC</abbr> creation <a href="#conformance-testing">conforming to the <abbr title="International Standard Content Code">ISCC</abbr> specification</a>.</p>
 <h2 id="note-to-readers">Note to Readers<a class="headerlink" href="#note-to-readers" title="Permanent link">#</a></h2>
@@ -1562,6 +1602,10 @@
 <p class="admonition-title">Image Data Input</p>
 <p>The <code>content_id_image</code> function may optionally accept the raw byte data of an encoded image or an internal native image object as input for convenience.</p>
 </div>
+<div class="admonition warning">
+<p class="admonition-title">JPEG Decoding</p>
+<p>Decoding of JPEG images is non-deterministic. Different image processing libraries may yield diverging pixel data and result in different Image-IDs. The reference implementation currently uses the builtin decoder of the <a href="https://github.com/python-pillow/Pillow">Python Pillow</a> imaging library. Future versions of the <abbr title="International Standard Content Code">ISCC</abbr> specification may define a custom deterministic JPEG decoding procedure.</p>
+</div>
 <h4 id="content-id-mixed">Content-ID-Mixed<a class="headerlink" href="#content-id-mixed" title="Permanent link">#</a></h4>
 <p>The Content-ID-Mixed aggregates multiple Content-IDs of the same or different types. It may be used for digital media objects that embed multiples types of media or for collections of contents of the same type. First we have to collect contents from the mixed media object or content collection and generate Content-IDs for each item. An <abbr title="International Standard Content Code">ISCC</abbr> conforming application must provide a <code>content_id_mixed</code> function that takes a list of Content-ID Codes as input and returns a Content-ID-Mixed. Follow these steps to create a Content-ID-Mixed:</p>
 <p>Signature: <code>conent_id_mixed(cids: List[str], partial: bool=False) -&gt; str</code></p>
@@ -1712,7 +1756,7 @@
 <div class="admonition example">
 <p class="admonition-title"><abbr title="International Standard Content Code">ISCC</abbr> Embedding</p>
 <p>We are able to embed the following combination of components from the <a href="https://github.com/coblo/iscc-specs/edit/master/docs/specification.md">markdown version</a> of this document into the document itself because adding or removing them has no side effect:</p>
-<p><strong><abbr title="International Standard Content Code">ISCC</abbr></strong>: CCvErZCy25Pmq-CTPCWTYV7GJbY-CDL6QbXz3mxtz</p>
+<p><strong><abbr title="International Standard Content Code">ISCC</abbr></strong>: CCDbMYw6NfC8a-CTfLV4GoxGh7f-CDLmtRpfmXZGN</p>
 </div>
 <h2 id="iscc-uri-scheme"><abbr title="International Standard Content Code">ISCC</abbr> URI Scheme<a class="headerlink" href="#iscc-uri-scheme" title="Permanent link">#</a></h2>
 <p>The purpose of the <abbr title="International Standard Content Code">ISCC</abbr> URI scheme based on <a href="https://www.ietf.org/rfc/rfc3986.txt">RFC 3986</a> is to enable users to easily discover information like metadata or license offerings about a <abbr title="International Standard Content Code">ISCC</abbr> marked content by simply clicking a link on a webpage or by scanning a QR-Code. </p>
@@ -1816,12 +1860,36 @@
     <span class="p">}</span>
 <span class="p">}</span>
 </pre></div>
+
+
+<p>Outputs that are expected to be raw bytes are embedded as HEX encoded strings in JSON and prefixed with  <code>hex:</code> to support automated decoding during implementation testing.</p>
+<div class="admonition example">
+<p class="admonition-title">Example</p>
+<p>Byte outputs in JSON testdata:</p>
+<div class="codehilite"><pre><span></span>{
+  &quot;data_chunks&quot;: {
+    &quot;test_001_cat_jpg&quot;: {
+      &quot;inputs&quot;: [&quot;cat.jpg&quot;],
+      &quot;outputs&quot;: [&quot;hex:ffd8ffe1001845786966000049492a0008&quot;, ...]
+    }
+  }
+}
+</pre></div>
+
+
+</div>
+<h2 id="license">License<a class="headerlink" href="#license" title="Permanent link">#</a></h2>
+<h2 id="license_1">License<a class="headerlink" href="#license_1" title="Permanent link">#</a></h2>
+<p>Copyright © 2016 - 2018 <strong>Content Blockchain Project</strong></p>
+<p><a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-nc-sa/4.0/88x31.png" /></a><br />This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/">Creative Commons (CC BY-NC-SA 4.0)</a>.</p>
                 
                   
                 
               
               
                 
+
+
               
             </article>
           </div>
@@ -1849,13 +1917,13 @@
           </a>
         
         
-          <a href="../license/" title="License" class="md-flex md-footer-nav__link md-footer-nav__link--next" rel="next">
+          <a href="../implementations/" title="Implementations" class="md-flex md-footer-nav__link md-footer-nav__link--next" rel="next">
             <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
               <span class="md-flex__ellipsis">
                 <span class="md-footer-nav__direction">
                   Next
                 </span>
-                License
+                Implementations
               </span>
             </div>
             <div class="md-flex__cell md-flex__cell--shrink">
