@@ -529,6 +529,13 @@ An application that claims ISCC conformance MUST pass the ISCC conformance test 
 }
 ```
 
+## License
+
+Copyright © 2016 - 2018 **Content Blockchain Project**
+
+<a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-nc-sa/4.0/88x31.png" /></a><br />This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/">Creative Commons (CC BY-NC-SA 4.0)</a>.
+
+
 *[CDC]: Content defined chunking
 
 *[ISCC Code]: Base58-ISCC encoded string representation of an ISCC
