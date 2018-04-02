@@ -367,7 +367,7 @@ Applications MAY embed ISCC codes that have side effects if they specify a proce
 
     We are able to embed the following combination of components from the [markdown version](https://github.com/coblo/iscc-specs/edit/master/docs/specification.md) of this document into the document itself because adding or removing them has no side effect:
     
-    **ISCC**: CCDbMYw6NfC8a-CTfLV4GoxGh7f-CDLmtRpfmXZGN
+    **ISCC**: CCDbMYw6NfC8a-CTfLV4GoxGh7f-CDLmtRpZGVJhU
 
 ## ISCC URI Scheme
 
@@ -544,7 +544,6 @@ Outputs that are expected to be raw bytes are embedded as HEX encoded strings in
         }
 
 
-## License
 ## License
 
 Copyright © 2016 - 2018 **Content Blockchain Project**
