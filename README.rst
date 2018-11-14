@@ -17,11 +17,6 @@ The **International Standard Content Code** is an `open standard <https://en.wik
 Installing the reference code
 =============================
 
-**Windows Notes**:
-
-The reference implementation requires the ``xxhash`` package. Windows users
-may first want to install the `xxhash binary wheel <https://www.lfd.uci.edu/~gohlke/pythonlibs/#xxhash>`_ to skip the required compilation step.
-
 The reference code is published with the package name `iscc <https://pypi.python.org/pypi/iscc>`_ on Python Package Index. Install it with:
 
 .. code-block:: bash
