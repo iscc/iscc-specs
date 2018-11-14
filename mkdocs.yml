@@ -29,6 +29,7 @@ extra_css:
 
 nav:
     - Overview: 'index.md'
+    - Features: 'features.md'
     - Concept: 'concept.md'
     - Specification: 'specification.md'
     - Implementations: 'implementations.md'
@@ -53,6 +54,7 @@ markdown_extensions:
     - markdown.extensions.codehilite:
         linenums: false
         guess_lang: false
+    - markdown.extensions.attr_list
     - markdown.extensions.def_list
     - markdown.extensions.footnotes
     - markdown.extensions.meta
