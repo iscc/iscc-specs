@@ -34,10 +34,9 @@ During content creation, review processes or distribution, same or similar files
 
 ## Related Product Identification
 
-[![ISCC Image Clustering](images/iscc-image-clustering.svg)](images/iscc-image-clustering.svg){: .right}
-
 The Content-ID is one component of the ISCC. It is a similarity preserving hash generated from extracted content. It identifies the normalized content of a specific file, independent of file format or encoding. As the Content-ID will remain the same for the same content in various formats, the ISCC automatically connects related products, like PDF-, MS-word or EPUB-files or JPEG- and PNG-files, etc.
 
+[![ISCC Image Clustering](images/iscc-image-clustering.svg)](images/iscc-image-clustering.svg)
 
 ## Granular Content Management
 
