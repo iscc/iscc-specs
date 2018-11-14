@@ -27,7 +27,7 @@ theme:
 extra_css:
   - 'stylesheets/custom.css'
 
-pages:
+nav:
     - Overview: 'index.md'
     - Concept: 'concept.md'
     - Specification: 'specification.md'
@@ -36,6 +36,8 @@ pages:
 
 # Options
 extra:
+    search:
+        language: 'en'
     social:
         - type: 'home'
           link: 'https://content-blockchain.org'
