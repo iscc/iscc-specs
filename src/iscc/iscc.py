@@ -435,6 +435,11 @@ def sliding_window(seq, width):
 
 
 def dct(values_list):
+    """
+    Discrete cosine transform algorithm by Project Nayuki. (MIT License)
+    See: https://www.nayuki.io/page/fast-discrete-cosine-transform-algorithms
+    """
+
     n = len(values_list)
     if n == 1:
         return list(values_list)
@@ -455,20 +460,6 @@ def dct(values_list):
         result.append(alpha[-1])
         result.append(beta[-1])
         return result
-
-
-# def dct(value_list):
-#     vals = array('d', value_list)
-#     n = len(vals)
-#     dct_list = []
-#     for k in range(n):
-#         value = 0.0
-#         for i in range(n):
-#             value += vals[i] * math.cos(
-#                 math.pi * k * (2 * i + 1) / (2 * n)
-#             )
-#         dct_list.append(2 * value)
-#     return [float(v) for v in dct_list]
 
 
 def distance(a, b):

@@ -413,7 +413,7 @@ Signature: `encode(digest: bytes) -> str`
 
 The `encode` function accepts a 9-byte **ISCC Component Digest** and returns the Base58-ISCC encoded  alphanumeric string of 13 characters which we call the **ISCC-Component Code**.
 
-See also: [Base-ISCC Encoding reference code](https://github.com/iscc/iscc-specs/blob/master/src/iscc/iscc.py#L464)
+See also: [Base-ISCC Encoding reference code](https://github.com/iscc/iscc-specs/blob/master/src/iscc/iscc.py#L478)
 
 #### decode
 
@@ -421,7 +421,7 @@ Signature: decode(code: str) -> bytes
 
 the `decode` function accepts a 13-character **ISCC-Component Code** and returns the corresponding 9-byte **ISCC-Component Digest**.
 
-See also: [Base-ISCC Decoding reference code](https://github.com/iscc/iscc-specs/blob/master/src/iscc/iscc.py#L484)
+See also: [Base-ISCC Decoding reference code](https://github.com/iscc/iscc-specs/blob/master/src/iscc/iscc.py#L498)
 
 ### Content Normalization
 
@@ -504,7 +504,7 @@ Signature: `image_hash(pixels: List[List[int]]) -> bytes`
 5. Create a 64-bit digest by iterating over the values of step 5 and setting a  `1`- for values above median and `0` for values below or equal to median.
 6. Return results from step 5.
 
-See also: [Image hash reference code](hhttps://github.com/iscc/iscc-specs/blob/master/src/iscc/iscc.py#L305)
+See also: [Image hash reference code](https://github.com/iscc/iscc-specs/blob/master/src/iscc/iscc.py#L305)
 
 ### Content Defined Chunking
 
