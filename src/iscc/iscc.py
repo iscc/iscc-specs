@@ -119,10 +119,10 @@ def content_id_mixed(cids, partial=False):
     decoded = (decode(code) for code in cids)
 
     # 2. Extract first 8-bytes
-    tuncated = [data[:8] for data in decoded]
+    truncated = [data[:8] for data in decoded]
 
     # 3. Apply Similarity hash
-    simhash_digest = similarity_hash(tuncated)
+    simhash_digest = similarity_hash(truncated)
 
     # 4. Prepend component header
     if partial:
