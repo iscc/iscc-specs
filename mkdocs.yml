@@ -10,7 +10,7 @@ repo_url: 'https://github.com/iscc/iscc-specs'
 edit_uri: 'edit/master/docs/'
 
 # Copyright
-copyright: 'Copyright © 2016-2018 Content Blockchain Project'
+copyright: 'Copyright © 2016-2019 Content Blockchain Project'
 
 # Documentation and Theme
 theme:
