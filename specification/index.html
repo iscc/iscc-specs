@@ -303,30 +303,18 @@
       
       
 
-
-  <li class="md-nav__item">
-    <a href="../license/" title="License" class="md-nav__link">
-      License
-    </a>
-  </li>
-
-    
-      
-      
-      
-
   
 
 
   <li class="md-nav__item md-nav__item--active md-nav__item--nested">
     
-      <input class="md-toggle md-nav__toggle" data-md-toggle="nav-7" type="checkbox" id="nav-7" checked>
+      <input class="md-toggle md-nav__toggle" data-md-toggle="nav-6" type="checkbox" id="nav-6" checked>
     
-    <label class="md-nav__link" for="nav-7">
+    <label class="md-nav__link" for="nav-6">
       Versions
     </label>
     <nav class="md-nav" data-md-component="collapsible" data-md-level="1">
-      <label class="md-nav__title" for="nav-7">
+      <label class="md-nav__title" for="nav-6">
         Versions
       </label>
       <ul class="md-nav__list" data-md-scrollfix>
@@ -823,6 +811,18 @@
         
       </ul>
     </nav>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../license/" title="License" class="md-nav__link">
+      License
+    </a>
   </li>
 
     
@@ -1837,11 +1837,11 @@
 <h4 id="encode">encode<a class="headerlink" href="#encode" title="Permanent link">#</a></h4>
 <p>Signature: <code>encode(digest: bytes) -&gt; str</code></p>
 <p>The <code>encode</code> function accepts a 9-byte <strong><abbr title="International Standard Content Code">ISCC</abbr> Component Digest</strong> and returns the Base58-<abbr title="International Standard Content Code">ISCC</abbr> encoded  alphanumeric string of 13 characters which we call the <strong><abbr title="International Standard Content Code">ISCC</abbr>-Component Code</strong>.</p>
-<p>See also: <a href="https://github.com/iscc/iscc-specs/blob/master/src/iscc/iscc.py#L464">Base-<abbr title="International Standard Content Code">ISCC</abbr> Encoding reference code</a></p>
+<p>See also: <a href="https://github.com/iscc/iscc-specs/blob/master/src/iscc/iscc.py#L478">Base-<abbr title="International Standard Content Code">ISCC</abbr> Encoding reference code</a></p>
 <h4 id="decode">decode<a class="headerlink" href="#decode" title="Permanent link">#</a></h4>
 <p>Signature: decode(code: str) -&gt; bytes</p>
 <p>the <code>decode</code> function accepts a 13-<abbr title="A character is defined as one Unicode code point">character</abbr> <strong><abbr title="International Standard Content Code">ISCC</abbr>-Component Code</strong> and returns the corresponding 9-byte <strong><abbr title="International Standard Content Code">ISCC</abbr>-Component Digest</strong>.</p>
-<p>See also: <a href="https://github.com/iscc/iscc-specs/blob/master/src/iscc/iscc.py#L484">Base-<abbr title="International Standard Content Code">ISCC</abbr> Decoding reference code</a></p>
+<p>See also: <a href="https://github.com/iscc/iscc-specs/blob/master/src/iscc/iscc.py#L498">Base-<abbr title="International Standard Content Code">ISCC</abbr> Decoding reference code</a></p>
 <h3 id="content-normalization">Content Normalization<a class="headerlink" href="#content-normalization" title="Permanent link">#</a></h3>
 <p>The <abbr title="International Standard Content Code">ISCC</abbr> standardizes some content normalization procedures to support reproducible and stable identifiers. Following the list of normalization functions that MUST be provided by a conforming implementation.</p>
 <h4 id="text_pre_normalize">text_pre_normalize<a class="headerlink" href="#text_pre_normalize" title="Permanent link">#</a></h4>
@@ -1895,7 +1895,7 @@
 <li>Create a 64-bit digest by iterating over the values of step 5 and setting a  <code>1</code>- for values above median and <code>0</code> for values below or equal to median.</li>
 <li>Return results from step 5.</li>
 </ol>
-<p>See also: <a href="hhttps://github.com/iscc/iscc-specs/blob/master/src/iscc/iscc.py#L305">Image hash reference code</a></p>
+<p>See also: <a href="https://github.com/iscc/iscc-specs/blob/master/src/iscc/iscc.py#L305">Image hash reference code</a></p>
 <h3 id="content-defined-chunking">Content Defined Chunking<a class="headerlink" href="#content-defined-chunking" title="Permanent link">#</a></h3>
 <p>For shift resistant data chunking the <abbr title="International Standard Content Code">ISCC</abbr> requires a custom chunking algorithm:</p>
 <h4 id="data_chunks">data_chunks<a class="headerlink" href="#data_chunks" title="Permanent link">#</a></h4>
@@ -1954,7 +1954,7 @@
     <div class="md-footer-nav">
       <nav class="md-footer-nav__inner md-grid">
         
-          <a href="../license/" title="License" class="md-flex md-footer-nav__link md-footer-nav__link--prev" rel="prev">
+          <a href="../implementations/" title="Implementations" class="md-flex md-footer-nav__link md-footer-nav__link--prev" rel="prev">
             <div class="md-flex__cell md-flex__cell--shrink">
               <i class="md-icon md-icon--arrow-back md-footer-nav__button"></i>
             </div>
@@ -1963,11 +1963,25 @@
                 <span class="md-footer-nav__direction">
                   Previous
                 </span>
-                License
+                Implementations
               </span>
             </div>
           </a>
         
+        
+          <a href="../license/" title="License" class="md-flex md-footer-nav__link md-footer-nav__link--next" rel="next">
+            <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
+              <span class="md-flex__ellipsis">
+                <span class="md-footer-nav__direction">
+                  Next
+                </span>
+                License
+              </span>
+            </div>
+            <div class="md-flex__cell md-flex__cell--shrink">
+              <i class="md-icon md-icon--arrow-forward md-footer-nav__button"></i>
+            </div>
+          </a>
         
       </nav>
     </div>

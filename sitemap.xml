@@ -26,11 +26,6 @@
      <changefreq>daily</changefreq>
     </url>
     <url>
-     <loc>http://iscc.codes/license/</loc>
-     <lastmod>2019-02-14</lastmod>
-     <changefreq>daily</changefreq>
-    </url>
-    <url>
      <loc>http://iscc.codes/specification/</loc>
      <lastmod>2019-02-14</lastmod>
      <changefreq>daily</changefreq>
@@ -38,6 +33,11 @@
     <url>
      <loc></loc>
      
+     <changefreq>daily</changefreq>
+    </url>
+    <url>
+     <loc>http://iscc.codes/license/</loc>
+     <lastmod>2019-02-14</lastmod>
      <changefreq>daily</changefreq>
     </url>
 </urlset>
