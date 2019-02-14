@@ -18,7 +18,7 @@ setup(
     long_description=readme(),
     author="Titusz Pan",
     author_email='tp@py7.de',
-    url='https://github.com/coblo/iscc-specs',
+    url='https://github.com/iscc/iscc-specs',
     packages=find_packages('src'),
     package_dir={'': 'src'},
     include_package_data=True,

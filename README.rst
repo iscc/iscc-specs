@@ -50,19 +50,19 @@ The entire **ISCC Specification** is written in plain text `Markdown <https://en
 
 .. code-block:: bash
 
-    git clone https://github.com/coblo/iscc-specs.git
+    git clone https://github.com/iscc/iscc-specs.git
     cd iscc-specs
     pip install -r requirements.txt
     mkdocs serve
 
 
-All specification documents can be found in the ``./docs`` subfolder or the repository. The recommended editor for the markdown files is `typora <https://typora.io/>`_. If you have commit rights to the `main repository <https://github.com/coblo/iscc-specs>`_ you can deploy the site with a simple ``mkdocs gh-deploy``.
+All specification documents can be found in the ``./docs`` subfolder or the repository. The recommended editor for the markdown files is `typora <https://typora.io/>`_. If you have commit rights to the `main repository <https://github.com/iscc/iscc-specs>`_ you can deploy the site with a simple ``mkdocs gh-deploy``.
 
 
 Contribute
 ==========
 
-Pull requests and other contributions are welcome. Use the `Github Issues <https://github.com/coblo/iscc-specs/issues>`_ section of this project to ask questions or discuss ideas for the **ISCC Specification**.
+Pull requests and other contributions are welcome. Use the `Github Issues <https://github.com/iscc/iscc-specs/issues>`_ section of this project to ask questions or discuss ideas for the **ISCC Specification**.
 
 
 License

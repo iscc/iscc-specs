@@ -2,7 +2,7 @@ title: ISCC - Specification
 description: Specification of International Standard Content Codes
 authors: Titusz Pan
 
-# ISCC - Specification v1.0.0
+# ISCC - Specification v1.x
 
 ## Abstract
 
@@ -10,7 +10,7 @@ The **International Standard Content Code (ISCC)**, is an open and decentralized
 
 ## Note to Readers
 
-For public discussion of issues for this specification please use the Github issue tracker: <https://github.com/coblo/iscc-specs/issues>.
+For public discussion of issues for this specification please use the Github issue tracker: <https://github.com//iscc-specs/issues>.
 
 The latest published version of this specification can be found at <http://iscc.codes/specification/>. 
 
@@ -18,7 +18,11 @@ Public review, discussion and contributions are welcome.
 
 ## About this Document
 
-This document proposes an open and vendor neutral ISCC standard and describes the technical procedures to create and manage ISCC identifiers. The first version of this document is produced as a prototype by the [Content Blockchain Project](https://content-blockchain.org) and received funding from the [Google Digital News Initiative (DNI)](https://digitalnewsinitiative.com/dni-projects/content-blockchain-project/). The content of this document is determined by its authors in an open and public consensus process.
+!!! note "Document Version"
+
+    This is the latest in-development version of the **ISCC Specification**. While there is already a [Version 1.0](https://github.com/iscc/iscc-specs/blob/version-1.0/docs/specification.md) spec, we are still expecting backward incompatible changes until **Version 2.0** is released. Parts of this specification may already be or become stable erlier and will be documented so during minor releases. Partners are encouraged to follow development and test, implement and give feedback based on the latest (this) version of the ISCC Specification.  
+
+This document proposes an open and vendor neutral ISCC standard and describes the technical procedures to create and manage ISCC identifiers. The first version of this document was produced as a prototype by the [Content Blockchain Project](https://content-blockchain.org) and received funding from the [Google Digital News Initiative (DNI)](https://digitalnewsinitiative.com/dni-projects/content-blockchain-project/). The content of this document is determined by its authors in an open and public consensus process.
 
 ## Conventions and Terminology
 
@@ -157,7 +161,7 @@ An ISCC generating application must follow these steps in the given order to pro
 10. Return encoded Meta-ID, trimmed `title` and trimmed `extra` data.
 
 
-See also: [Meta-ID reference code](https://github.com/coblo/iscc-specs/blob/master/src/iscc/iscc.py#L20)
+See also: [Meta-ID reference code](https://github.com/iscc/iscc-specs/blob/master/src/iscc/iscc.py#L20)
 
 !!! warning "Text trimming"
     When trimming text be sure to trim the byte-length of the UTF-8 encoded version and not the number of characters. The trim point MUST be such, that it does not cut into multibyte characters. Characters might have different UTF-8 byte-length. For example `ü` is 2-bytes, `驩` is 3-bytes and `𠜎` is 4-bytes. So the trimmed version of a string with 128 `驩`-characters will result in a 42-character string with a 126-byte UTF-8 encoded length. This is necessary because the results of this operation will be stored as basic metadata with strict byte size limits on the blockchain. 
@@ -214,7 +218,7 @@ An ISCC generating application MUST provide a `content_id(text, partial=False)` 
 10. Prepend the 1-byte component header (`0x10` full content or `0x11` partial content).
 11. Encode and return the resulting 9-byte sequence with [`encode`](#encode).
 
-See also: [Content-ID-Text reference code](https://github.com/coblo/iscc-specs/blob/master/src/iscc/iscc.py#L58)
+See also: [Content-ID-Text reference code](https://github.com/iscc/iscc-specs/blob/master/src/iscc/iscc.py#L58)
 
 #### Content-ID-Image
 
@@ -227,7 +231,7 @@ An ISCC generating application MUST provide a `content_id_image(image, partial=F
 9. Prepend the 1-byte component header (`0x12` full content or `0x13` partial content) to results of step 2.
 4. Encode and return the resulting 9-byte sequence with [`encode`](#encode)
 
-See also: [Content-ID-Image reference code](https://github.com/coblo/iscc-specs/blob/master/src/iscc/iscc.py#L98)
+See also: [Content-ID-Image reference code](https://github.com/iscc/iscc-specs/blob/master/src/iscc/iscc.py#L98)
 
 !!! note "Image Data Input"
     The `content_id_image` function may optionally accept the raw byte data of an encoded image or an internal native image object as input for convenience.
@@ -247,7 +251,7 @@ Signature: `conent_id_mixed(cids: List[str], partial: bool=False) -> str`
 4. Prepend the 1-byte component header(`0x18` full content or `0x19` partial content)
 5. Apply [`encode`](#encode) to the result of step 5 and return the result.
 
-See also: [Content-ID-Mixed reference code](https://github.com/coblo/iscc-specs/blob/master/src/iscc/iscc.py#L116)
+See also: [Content-ID-Mixed reference code](https://github.com/iscc/iscc-specs/blob/master/src/iscc/iscc.py#L116)
 
 #### Partial Content Flag (PCF)
 
@@ -285,7 +289,7 @@ The Data-ID is built from the raw encoded data of the content to be identified. 
 7. Prepend the 1-byte component header (e.g. 0x20).
 8. Apply [`encode`](#encode) to the result of step 5 and return the result.
 
-See also: [Data-ID reference code](https://github.com/coblo/iscc-specs/blob/master/src/iscc/iscc.py#L137)
+See also: [Data-ID reference code](https://github.com/iscc/iscc-specs/blob/master/src/iscc/iscc.py#L137)
 
 ### Instance-ID Component
 
@@ -309,7 +313,7 @@ An ISCC generating application MUST provide a `instance_id` function that accept
 8. Hex-Encode the tophash
 9. Return the Intance-ID and the hex-encoded tophash
 
-See also: [Instance-ID reference code](https://github.com/coblo/iscc-specs/blob/master/src/iscc/iscc.py#L162) 
+See also: [Instance-ID reference code](https://github.com/iscc/iscc-specs/blob/master/src/iscc/iscc.py#L162) 
 
 Applications may carry, store, and process the leaf node hashes for advanced streaming data identification or partial data integrity verification.
 
@@ -365,7 +369,7 @@ Applications MAY embed ISCC codes that have side effects if they specify a proce
 
 !!! example "ISCC Embedding"
 
-    We are able to embed the following combination of components from the [markdown version](https://github.com/coblo/iscc-specs/edit/master/docs/specification.md) of this document into the document itself because adding or removing them has no side effect:
+    We are able to embed the following combination of components from the [markdown version](https://github.com/iscc/iscc-specs/edit/master/docs/specification.md) of this document into the document itself because adding or removing them has no side effect:
     
     **ISCC**: CCDbMYw6NfC8a-CTfLV4GoxGh7f-CDLmtRpZGVJhU
 
@@ -409,7 +413,7 @@ Signature: `encode(digest: bytes) -> str`
 
 The `encode` function accepts a 9-byte **ISCC Component Digest** and returns the Base58-ISCC encoded  alphanumeric string of 13 characters which we call the **ISCC-Component Code**.
 
-See also: [Base-ISCC Encoding reference code](https://github.com/coblo/iscc-specs/blob/master/src/iscc/iscc.py#L464)
+See also: [Base-ISCC Encoding reference code](https://github.com/iscc/iscc-specs/blob/master/src/iscc/iscc.py#L464)
 
 #### decode
 
@@ -417,7 +421,7 @@ Signature: decode(code: str) -> bytes
 
 the `decode` function accepts a 13-character **ISCC-Component Code** and returns the corresponding 9-byte **ISCC-Component Digest**.
 
-See also: [Base-ISCC Decoding reference code](https://github.com/coblo/iscc-specs/blob/master/src/iscc/iscc.py#L484)
+See also: [Base-ISCC Decoding reference code](https://github.com/iscc/iscc-specs/blob/master/src/iscc/iscc.py#L484)
 
 ### Content Normalization
 
@@ -429,7 +433,7 @@ Signature: `text_pre_normalize(text: str|bytes) -> str `
 
 Decodes raw plain-text data and applies Unicode [Normalization Form KC (NFKC)](http://www.unicode.org/reports/tr15/#Norm_Forms) . The plain-text data MUST be stripped of any markup beforehand. Text input is expected to be UTF-8 encoded plain-text data or a native type of the implementing programming language that supports Unicode. Text decoding errors MUST fail with an error.
 
-See also: [Text pre-normalization reference code](https://github.com/coblo/iscc-specs/blob/master/src/iscc/iscc.py#L193)
+See also: [Text pre-normalization reference code](https://github.com/iscc/iscc-specs/blob/master/src/iscc/iscc.py#L193)
 
 #### text_trim
 
@@ -437,7 +441,7 @@ Signature: `text_trim(text: str) -> str`
 
 Trim text such that its UTF-8 encoded byte representation does not exceed 128-bytes each.
 
-See also: [Text trimming reference code](https://github.com/coblo/iscc-specs/blob/master/src/iscc/iscc.py#L202)
+See also: [Text trimming reference code](https://github.com/iscc/iscc-specs/blob/master/src/iscc/iscc.py#L202)
 
 #### text_normalize
 
@@ -453,7 +457,7 @@ We define a text normalization function that is specific to our application. It 
 3. Remove any leading or trailing `Separator` characters.
 4. Re-Compose the text by applying `Unicode Normalization Form C (NFC)`.
 
-See also: [Text normalization reference code](https://github.com/coblo/iscc-specs/blob/master/src/iscc/iscc.py#L212)
+See also: [Text normalization reference code](https://github.com/iscc/iscc-specs/blob/master/src/iscc/iscc.py#L212)
 
 #### image_normalize
 
@@ -465,7 +469,7 @@ Accepts a file path, byte-stream or raw binary image data and MUST at least supp
 2. Resize the image to 32x32 pixels using [bicubic interpolation](https://en.wikipedia.org/wiki/Bicubic_interpolation)
 3. Create a 32x32 two-dimensional array of 8-bit grayscale values from the image data
 
-See also: [Image normalization reference code](https://github.com/coblo/iscc-specs/blob/master/src/iscc/iscc.py#L237)
+See also: [Image normalization reference code](https://github.com/iscc/iscc-specs/blob/master/src/iscc/iscc.py#L237)
 
 ### Feature Hashing
 
@@ -479,7 +483,7 @@ The `similarity_hash` function takes a sequence of hash digests which represent 
 
 ![iscc-similarity-hash](images/iscc-similarity-hash.svg)
 
-See also: [Similarity hash reference code](https://github.com/coblo/iscc-specs/blob/master/src/iscc/iscc.py#L262)
+See also: [Similarity hash reference code](https://github.com/iscc/iscc-specs/blob/master/src/iscc/iscc.py#L262)
 
 #### minimum_hash
 
@@ -487,7 +491,7 @@ Signature: `minimum_hash(features: Iterable[int]) -> List[int]`
 
 The `minimum_hash` function takes an arbitrary sized set of 32-bit integer features and reduces it to a fixed size vector of 128 features such that it preserves similarity with other sets. It is based on the MinHash implementation of the [datasketch](https://ekzhu.github.io/datasketch/) library by [Eric Zhu](https://github.com/ekzhu).
 
-See also: [Minimum hash reference code](https://github.com/coblo/iscc-specs/blob/master/src/iscc/iscc.py#L286)
+See also: [Minimum hash reference code](https://github.com/iscc/iscc-specs/blob/master/src/iscc/iscc.py#L286)
 
 #### image_hash
 
@@ -500,7 +504,7 @@ Signature: `image_hash(pixels: List[List[int]]) -> bytes`
 5. Create a 64-bit digest by iterating over the values of step 5 and setting a  `1`- for values above median and `0` for values below or equal to median.
 6. Return results from step 5.
 
-See also: [Image hash reference code](hhttps://github.com/coblo/iscc-specs/blob/master/src/iscc/iscc.py#L305)
+See also: [Image hash reference code](hhttps://github.com/iscc/iscc-specs/blob/master/src/iscc/iscc.py#L305)
 
 ### Content Defined Chunking
 
@@ -512,11 +516,11 @@ Signature: `data_chunks(data: stream) -> Iterator[bytes]`
 
 The `data_chunks` function accepts a byte-stream and returns variable sized chunks. Chunk boundaries are determined by a gear based chunking algorithm based on [[WenXia2016]][#WenXia2016].
 
-See also: [CDC reference code](https://github.com/coblo/iscc-specs/blob/master/src/iscc/iscc.py#L365)
+See also: [CDC reference code](https://github.com/iscc/iscc-specs/blob/master/src/iscc/iscc.py#L365)
 
 ## Conformance Testing
 
-An application that claims ISCC conformance MUST pass the ISCC conformance test suite. The test suite is available as json data in our [Github Repository](https://raw.githubusercontent.com/coblo/iscc-specs/master/tests/test_data.json). Test Data is structured as follows:
+An application that claims ISCC conformance MUST pass the ISCC conformance test suite. The test suite is available as json data in our [Github Repository](https://raw.githubusercontent.com/iscc/iscc-specs/master/tests/test_data.json). Test Data is structured as follows:
 
 ```json
 {
