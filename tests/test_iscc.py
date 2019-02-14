@@ -98,6 +98,7 @@ def test_text_normalize():
 
     assert iscc.text_normalize(' ') == ''
     assert iscc.text_normalize('  Hello  World ? ') == 'hello world'
+    assert iscc.text_normalize('Hello\nWorld') == 'hello world'
 
 
 def test_trim_text():

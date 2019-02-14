@@ -214,7 +214,7 @@ def text_normalize(text):
     whitelist = 'LNS'
     for c in decomposed:
         cat = unicodedata.category(c)
-        if cat.startswith('Z'):
+        if cat.startswith('Z') or c in ('\n', '\r'):
             if not chars or chars[-1] != '\u0020':
                 chars.append('\u0020')
         elif cat[0] in whitelist:
