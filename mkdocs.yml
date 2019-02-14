@@ -5,8 +5,8 @@ site_author: 'Titusz Pan'
 site_url: 'http://iscc.codes'
 
 # Repository
-repo_name: 'coblo/iscc-specs'
-repo_url: 'https://github.com/coblo/iscc-specs'
+repo_name: 'iscc/iscc-specs'
+repo_url: 'https://github.com/iscc/iscc-specs'
 edit_uri: 'edit/master/docs/'
 
 # Copyright
@@ -43,9 +43,9 @@ extra:
         - type: 'home'
           link: 'https://content-blockchain.org'
         - type: 'github'
-          link: 'https://github.com/coblo'
+          link: 'https://github.com/iscc'
         - type: 'telegram'
-          link: 'https://t.me/ContentBlockchainBeta'
+          link: 'https://t.me/iscc_public'
 
 
 markdown_extensions:
