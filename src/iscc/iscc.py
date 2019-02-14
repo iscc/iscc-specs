@@ -201,12 +201,7 @@ def text_pre_normalize(text):
 
 def text_trim(text):
 
-    while True:
-        data = text.encode('utf-8')
-        if len(data) <= INPUT_TRIM:
-            return text
-        else:
-            text = text[:-1]
+    return text.encode('utf-8')[:INPUT_TRIM].decode('utf-8', 'ignore')
 
 
 def text_normalize(text):
