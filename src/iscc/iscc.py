@@ -445,7 +445,7 @@ def dct(value_list):
                 math.pi * k * (2 * i + 1) / (2 * n)
             )
         dct_list.append(2 * value)
-    return dct_list
+    return [float(v) for v in dct_list]
 
 
 def distance(a, b):

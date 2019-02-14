@@ -267,3 +267,9 @@ def test_content_id_image():
     assert iscc.distance(cid1, cid2) == 0
     assert iscc.distance(cid1, cid3) == 2
     assert iscc.distance(cid1, cid4) == 0
+
+
+def test_pi():
+    """Check that PI has expected value on system"""
+    import math
+    assert math.pi == 3.141592653589793
