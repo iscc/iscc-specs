@@ -1809,7 +1809,7 @@
 <div class="admonition example">
 <p class="admonition-title"><abbr title="International Standard Content Code">ISCC</abbr> Embedding</p>
 <p>We are able to embed the following combination of components from the <a href="https://github.com/iscc/iscc-specs/edit/master/docs/specification.md">markdown version</a> of this document into the document itself because adding or removing them has no side effect:</p>
-<p><strong><abbr title="International Standard Content Code">ISCC</abbr></strong>: CCDbMYw6NfC8a-CTfLV4GoxGh7f-CDLmtRpZGVJhU</p>
+<p><strong><abbr title="International Standard Content Code">ISCC</abbr></strong>: CCDbMYw6NfC8a-CThhWfJ7kCARM-CDhydHnBkcVUm</p>
 </div>
 <h2 id="iscc-uri-scheme"><abbr title="International Standard Content Code">ISCC</abbr> URI Scheme<a class="headerlink" href="#iscc-uri-scheme" title="Permanent link">#</a></h2>
 <p>The purpose of the <abbr title="International Standard Content Code">ISCC</abbr> URI scheme based on <a href="https://www.ietf.org/rfc/rfc3986.txt">RFC 3986</a> is to enable users to easily discover information like metadata or license offerings about a <abbr title="International Standard Content Code">ISCC</abbr> marked content by simply clicking a link on a webpage or by scanning a QR-Code. </p>
@@ -1837,11 +1837,11 @@
 <h4 id="encode">encode<a class="headerlink" href="#encode" title="Permanent link">#</a></h4>
 <p>Signature: <code>encode(digest: bytes) -&gt; str</code></p>
 <p>The <code>encode</code> function accepts a 9-byte <strong><abbr title="International Standard Content Code">ISCC</abbr> Component Digest</strong> and returns the Base58-<abbr title="International Standard Content Code">ISCC</abbr> encoded  alphanumeric string of 13 characters which we call the <strong><abbr title="International Standard Content Code">ISCC</abbr>-Component Code</strong>.</p>
-<p>See also: <a href="https://github.com/iscc/iscc-specs/blob/master/src/iscc/iscc.py#L478">Base-<abbr title="International Standard Content Code">ISCC</abbr> Encoding reference code</a></p>
+<p>See also: <a href="https://github.com/iscc/iscc-specs/blob/master/src/iscc/iscc.py#L476">Base-<abbr title="International Standard Content Code">ISCC</abbr> Encoding reference code</a></p>
 <h4 id="decode">decode<a class="headerlink" href="#decode" title="Permanent link">#</a></h4>
 <p>Signature: decode(code: str) -&gt; bytes</p>
 <p>the <code>decode</code> function accepts a 13-<abbr title="A character is defined as one Unicode code point">character</abbr> <strong><abbr title="International Standard Content Code">ISCC</abbr>-Component Code</strong> and returns the corresponding 9-byte <strong><abbr title="International Standard Content Code">ISCC</abbr>-Component Digest</strong>.</p>
-<p>See also: <a href="https://github.com/iscc/iscc-specs/blob/master/src/iscc/iscc.py#L498">Base-<abbr title="International Standard Content Code">ISCC</abbr> Decoding reference code</a></p>
+<p>See also: <a href="https://github.com/iscc/iscc-specs/blob/master/src/iscc/iscc.py#L496">Base-<abbr title="International Standard Content Code">ISCC</abbr> Decoding reference code</a></p>
 <h3 id="content-normalization">Content Normalization<a class="headerlink" href="#content-normalization" title="Permanent link">#</a></h3>
 <p>The <abbr title="International Standard Content Code">ISCC</abbr> standardizes some content normalization procedures to support reproducible and stable identifiers. Following the list of normalization functions that MUST be provided by a conforming implementation.</p>
 <h4 id="text_pre_normalize">text_pre_normalize<a class="headerlink" href="#text_pre_normalize" title="Permanent link">#</a></h4>
@@ -1864,7 +1864,7 @@
 <li>Remove any leading or trailing <code>Separator</code> characters.</li>
 <li>Re-Compose the text by applying <code>Unicode Normalization Form C (NFC)</code>.</li>
 </ol>
-<p>See also: <a href="https://github.com/iscc/iscc-specs/blob/master/src/iscc/iscc.py#L212">Text normalization reference code</a></p>
+<p>See also: <a href="https://github.com/iscc/iscc-specs/blob/master/src/iscc/iscc.py#L207">Text normalization reference code</a></p>
 <h4 id="image_normalize">image_normalize<a class="headerlink" href="#image_normalize" title="Permanent link">#</a></h4>
 <p>Signature: <code>image_normalize(img) -&gt; List[List[int]]</code></p>
 <p>Accepts a file path, byte-stream or raw binary image data and MUST at least support JPEG, PNG, and GIF image formats. Normalize the image with the following steps:</p>
@@ -1873,18 +1873,18 @@
 <li>Resize the image to 32x32 pixels using <a href="https://en.wikipedia.org/wiki/Bicubic_interpolation">bicubic interpolation</a></li>
 <li>Create a 32x32 two-dimensional array of 8-bit grayscale values from the image data</li>
 </ol>
-<p>See also: <a href="https://github.com/iscc/iscc-specs/blob/master/src/iscc/iscc.py#L237">Image normalization reference code</a></p>
+<p>See also: <a href="https://github.com/iscc/iscc-specs/blob/master/src/iscc/iscc.py#L232">Image normalization reference code</a></p>
 <h3 id="feature-hashing">Feature Hashing<a class="headerlink" href="#feature-hashing" title="Permanent link">#</a></h3>
 <p>The <abbr title="International Standard Content Code">ISCC</abbr> standardizes various feature hashing algorithms that reduce content features to a binary vector used as the body of the various Content-ID components.</p>
 <h4 id="similarity_hash">similarity_hash<a class="headerlink" href="#similarity_hash" title="Permanent link">#</a></h4>
 <p>Signature: <code>similarity_hash(hash_digests: Sequence[ByteString]) -&gt; bytes</code></p>
 <p>The <code>similarity_hash</code> function takes a sequence of hash digests which represent a set of features. Each of the digests MUST be of equal size. The function returns a new hash digest (raw 8-bit bytes) of the same size. For each bit in the input hashes calculate the number of hashes with that bit set and subtract the the count of hashes where it is not set. For the output hash set the same bit position to <code>0</code> if the count is negative or <code>1</code> if it is zero or positive. The resulting hash digest will retain similarity for similar sets of input hashes. See also  <a href="http://dx.doi.org/10.1145/509907.509965" title="Charikar, M.S., 2002, May. Similarity estimation techniques from rounding algorithms. In Proceedings of the thiry-fourth annual ACM symposium on Theory of computing (pp. 380-388). ACM.">[Charikar2002]</a>.</p>
 <p><img alt="iscc-similarity-hash" src="../images/iscc-similarity-hash.svg" /></p>
-<p>See also: <a href="https://github.com/iscc/iscc-specs/blob/master/src/iscc/iscc.py#L262">Similarity hash reference code</a></p>
+<p>See also: <a href="https://github.com/iscc/iscc-specs/blob/master/src/iscc/iscc.py#L257">Similarity hash reference code</a></p>
 <h4 id="minimum_hash">minimum_hash<a class="headerlink" href="#minimum_hash" title="Permanent link">#</a></h4>
 <p>Signature: <code>minimum_hash(features: Iterable[int]) -&gt; List[int]</code></p>
 <p>The <code>minimum_hash</code> function takes an arbitrary sized set of 32-bit integer features and reduces it to a fixed size vector of 128 features such that it preserves similarity with other sets. It is based on the MinHash implementation of the <a href="https://ekzhu.github.io/datasketch/">datasketch</a> library by <a href="https://github.com/ekzhu">Eric Zhu</a>.</p>
-<p>See also: <a href="https://github.com/iscc/iscc-specs/blob/master/src/iscc/iscc.py#L286">Minimum hash reference code</a></p>
+<p>See also: <a href="https://github.com/iscc/iscc-specs/blob/master/src/iscc/iscc.py#L281">Minimum hash reference code</a></p>
 <h4 id="image_hash">image_hash<a class="headerlink" href="#image_hash" title="Permanent link">#</a></h4>
 <p>Signature: <code>image_hash(pixels: List[List[int]]) -&gt; bytes</code></p>
 <ol>
@@ -1895,13 +1895,13 @@
 <li>Create a 64-bit digest by iterating over the values of step 5 and setting a  <code>1</code>- for values above median and <code>0</code> for values below or equal to median.</li>
 <li>Return results from step 5.</li>
 </ol>
-<p>See also: <a href="https://github.com/iscc/iscc-specs/blob/master/src/iscc/iscc.py#L305">Image hash reference code</a></p>
+<p>See also: <a href="https://github.com/iscc/iscc-specs/blob/master/src/iscc/iscc.py#L300">Image hash reference code</a></p>
 <h3 id="content-defined-chunking">Content Defined Chunking<a class="headerlink" href="#content-defined-chunking" title="Permanent link">#</a></h3>
 <p>For shift resistant data chunking the <abbr title="International Standard Content Code">ISCC</abbr> requires a custom chunking algorithm:</p>
 <h4 id="data_chunks">data_chunks<a class="headerlink" href="#data_chunks" title="Permanent link">#</a></h4>
 <p>Signature: <code>data_chunks(data: stream) -&gt; Iterator[bytes]</code></p>
 <p>The <code>data_chunks</code> function accepts a byte-stream and returns variable sized chunks. Chunk boundaries are determined by a gear based chunking algorithm based on <a href="http://dx.doi.org/10.1109/TC.2016.2595565" title="Wen Xia, Yukun Zhou, Hong Jiang, Yu Hua, Yuchong Hu, Yucheng Zhang, Qing Liu, 2016. FastCDC: a Fast and Efficient Content-Defined Chunking Approach for Data Deduplication.">[WenXia2016]</a>.</p>
-<p>See also: <a href="https://github.com/iscc/iscc-specs/blob/master/src/iscc/iscc.py#L365"><abbr title="Content defined chunking">CDC</abbr> reference code</a></p>
+<p>See also: <a href="https://github.com/iscc/iscc-specs/blob/master/src/iscc/iscc.py#L360"><abbr title="Content defined chunking">CDC</abbr> reference code</a></p>
 <h2 id="conformance-testing">Conformance Testing<a class="headerlink" href="#conformance-testing" title="Permanent link">#</a></h2>
 <p>An application that claims <abbr title="International Standard Content Code">ISCC</abbr> conformance MUST pass the <abbr title="International Standard Content Code">ISCC</abbr> conformance test suite. The test suite is available as json data in our <a href="https://raw.githubusercontent.com/iscc/iscc-specs/master/tests/test_data.json">Github Repository</a>. Test Data is structured as follows:</p>
 <div class="codehilite"><pre><span></span><span class="p">{</span>
@@ -1932,7 +1932,7 @@
 
 </div>
 <h2 id="license">License<a class="headerlink" href="#license" title="Permanent link">#</a></h2>
-<p>Copyright © 2016 - 2018 <strong>Content Blockchain Project</strong></p>
+<p>Copyright © 2016 - 2019 <strong>Content Blockchain Project</strong></p>
 <p><a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-nc-sa/4.0/88x31.png" /></a><br />This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/">Creative Commons (CC BY-NC-SA 4.0)</a>.</p>
                 
                   
@@ -1991,7 +1991,7 @@
       <div class="md-footer-copyright">
         
           <div class="md-footer-copyright__highlight">
-            Copyright © 2016-2018 Content Blockchain Project
+            Copyright © 2016-2019 Content Blockchain Project
           </div>
         
         powered by
