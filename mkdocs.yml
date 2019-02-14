@@ -33,10 +33,10 @@ nav:
     - Concept: 'concept.md'
     - Specification: 'specification.md'
     - Implementations: 'implementations.md'
-    - License: 'license.md'
     - Versions:
           - Version 1.x: 'specification.md'
           - Version 1.0: 'https://github.com/iscc/iscc-specs/blob/version-1.0/docs/specification.md'
+    - License: 'license.md'
 
 # Options
 extra:
