@@ -434,15 +434,27 @@ def sliding_window(seq, width):
     return (seq[i:i + width] for i in idx)
 
 
-def dct(value_list):
-    result = []
-    factor = math.pi / len(value_list)
-    for i in range(len(value_list)):
-        sum = 0.0
-        for j, val in enumerate(value_list):
-            sum += val * math.cos((j + 0.5) * i * factor)
-        result.append(sum)
-    return result
+def dct(values_list):
+    n = len(values_list)
+    if n == 1:
+        return list(values_list)
+    elif n == 0 or n % 2 != 0:
+        raise ValueError()
+    else:
+        half = n // 2
+        alpha = [(values_list[i] + values_list[-(i + 1)]) for i in range(half)]
+        beta = [(values_list[i] - values_list[-(i + 1)]) / (
+                math.cos((i + 0.5) * math.pi / n) * 2.0)
+                for i in range(half)]
+        alpha = dct(alpha)
+        beta = dct(beta)
+        result = []
+        for i in range(half - 1):
+            result.append(alpha[i])
+            result.append(beta[i] + beta[i + 1])
+        result.append(alpha[-1])
+        result.append(beta[-1])
+        return result
 
 
 # def dct(value_list):
