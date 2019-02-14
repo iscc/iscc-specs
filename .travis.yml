@@ -1,12 +1,12 @@
 # Travis-CI Configuration
 language: python
 
-python:
-  - 3.5
-  - 3.6
-
 matrix:
   include:
+    - python: "3.5"
+      dist: precise
+    - python: "3.6"
+      dist: trusty
     - python: "3.7"
       dist: xenial
 
