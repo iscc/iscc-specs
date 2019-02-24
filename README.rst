@@ -14,7 +14,7 @@ ISCC Specification
    :target: https://pypi.python.org/pypi/iscc/
    :alt: PyPI License
 
-The **International Standard Content Code** is an `open standard <https://en.wikipedia.org/wiki/Open_standard>`_ for decentralized content identifiers. This repository contains the specification of the **ISCC Standard** and a  reference implementation in Python3. The latest published version of the specification can be found at `iscc.codes <http://iscc.codes>`_
+The **International Standard Content Code** is an `open standard <https://en.wikipedia.org/wiki/Open_standard>`_ for decentralized content identifiers. This repository contains the specification of the proposed **ISCC Standard** and a reference implementation in Python3. The latest published version of the specification can be found at `iscc.codes <http://iscc.codes>`_
 
 
 Installing the reference code
