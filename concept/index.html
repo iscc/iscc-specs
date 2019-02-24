@@ -325,6 +325,13 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#registration-services" title="Registration Services" class="md-nav__link">
+    Registration Services
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#storage-considerations" title="Storage Considerations" class="md-nav__link">
     Storage Considerations
   </a>
@@ -598,6 +605,13 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#registration-services" title="Registration Services" class="md-nav__link">
+    Registration Services
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#storage-considerations" title="Storage Considerations" class="md-nav__link">
     Storage Considerations
   </a>
@@ -746,7 +760,8 @@
                 
                 
                 <h1 id="iscc-concept">ISCC - Concept<a class="headerlink" href="#iscc-concept" title="Permanent link">#</a></h1>
-<p><em>The internet is shifting towards a network of decentralized peer-to-peer transactions. If we want our transactions on the emerging blockchain networks to be about content we need standardized ways to address content. Our transactions might be payments, attributions, reputation, certification, licenses or entirely new kinds of value transfer. All this will happen much faster and easier if we, as a community, can agree on how to identify content in a decentralized environment. This is the first draft of an open proposal to the wider content community for a common content identifier. We would like to share our ideas and spark a conversation with journalists, news agencies, content creators, publishers, distributors, libraries, musicians, scientists, developers, lawyers, rights organizations and all the other participants of the content ecosystem.</em></p>
+<p><em>The internet is shifting towards a network of decentralized peer-to-peer transactions. If we want our transactions on the emerging blockchain networks to be about content we need standardized ways to address content. Our transactions might be payments, attributions, reputation, certification, licenses or entirely new kinds of value transfer. All this will happen much faster and easier if we, as a community, can agree on how to identify content in a decentralized environment.</em></p>
+<p>This is the higher level concept of an open proposal to the wider content community for a common content identifier. We would like to share our ideas and spark a conversation with journalists, news agencies, content creators, publishers, distributors, libraries, musicians, scientists, developers, lawyers, rights organizations and all the other participants of the content ecosystem.</p>
 <h2 id="introduction">Introduction<a class="headerlink" href="#introduction" title="Permanent link">#</a></h2>
 <p>There are many<a href="https://xkcd.com/927/"> existing standards</a> for media identifiers serving a wide array of use cases. For example book publishing uses the <strong>ISBN</strong>, magazines have the <strong>ISSN</strong>, music industry has <strong>ISRC</strong>, film has <strong>ISAN</strong> and science has <strong>DOI</strong> - each of them serving a set of specific purposes. These identifiers have important roles across many layers. The <strong>structure and management</strong> of these <strong>global identifiers</strong> strongly correlates with the grade of achievable <strong>automation</strong> and potential for <strong>innovation</strong> within and across different sectors of the media industries. Some communities, like online journalism, don't even have any global persistent identifiers for their content.</p>
 <p>Many of the established standards manage registration of identifiers in <strong>centralized </strong>or <strong>hierarchical systems</strong> involving manual and costly processes. Often the associated metadata is not easily or freely accessible for third parties (if available at all). The overhead, cost and general properties of these systems make them unsuitable for many innovative use cases. Existing and established standards have trouble keeping up with the fast evolving digital economy. For example nowadays major e-book retailers do not even require an <strong>ISBN</strong> and instead establish their own proprietary identifiers. Amazon has the <strong>ASIN</strong>, Apple has <strong>Apple-ID</strong> and Google has <strong>GKEY</strong>. The fast paced development of the digital media economy has led to an increasing fragmentation of identifiers and new barriers in interoperability. For many tasks current systems need to track and match all the different vendor specific IDs, which is an inefficient and error prone process.</p>
@@ -757,9 +772,21 @@
 <h3 id="a-meaningful-identifier">A “Meaningful” Identifier<a class="headerlink" href="#a-meaningful-identifier" title="Permanent link">#</a></h3>
 <p>In traditional database systems it is recommended practice to work with <strong>surrogate keys</strong> as identifiers. A surrogate key has no business meaning and is completely decoupled from the data it identifies. Uniqueness of such identifiers is guaranteed either via centralized incremental assignment by the database system or via random UUIDs which have a very low probability of collisions. While random UUIDs could be generated in a decentralized way, both approaches require some external authority that establishes or certifies the linkage between the identifier and the associated metadata and content. This is why we decided to go with a “meaningful” <strong>content and metadata derived identifier (CMDI)</strong>. Anyone will be able to verify that a specific identifier indeed belongs to a given digital content. Even better, anyone can “find” the identifier for a given content without the need to consult external data sources. This approach also captures essential information about the media in the identifier itself, which is very useful in scenarios of machine learning and data analytics.</p>
 <h3 id="a-decentralized-identifier">A Decentralized Identifier<a class="headerlink" href="#a-decentralized-identifier" title="Permanent link">#</a></h3>
-<p>We would like our identifier to be registry agnostic. This means that identifiers can be self-issued in a decentralized and parallel fashion without the need to ask for permission. Even if identifiers are not registered in a central database or on a public blockchain they are still useful in cases where multiple independent parties exchange information about content. The CMDI approach is helpful with common issues like data integrity, validation, de-duplication and disambiguation.</p>
+<p>We would like our identifier standard to be registry agnostic. This means that identifiers can be self-issued in a decentralized and parallel fashion without the need to ask for permission. Even if identifiers are not registered in a central database or on a public blockchain they are still useful in cases where multiple independent parties exchange information about content. The <strong>CMDI</strong> approach is helpful with common issues like data integrity, validation, de-duplication and disambiguation. Systems that process digital content can integrate ISCC support and benefit immediately. The integrator does not depend on all third-parties having to assign, track and deliver ISCC codes, because those can be generated from the content itself.</p>
+<h3 id="registration-services">Registration Services<a class="headerlink" href="#registration-services" title="Permanent link">#</a></h3>
+<p>The adoption of decentralized identifier standard does not mean that registration agencies and services will become obsolete. Registration services offer a plethora of valuable and indispensable benefits. Every industry has its special requirements. Ultimately the stakeholders from those industries will have to set the rules for data curation, metadata management and administrative control. A Blockchain is a low level backend infrastructure. And while blockchains might make access to identifiers and metadata fee of charge, there is still cost involved with storing data, running the infrastructure and providing middleware and frontends. Blockchains work as incentive based economic systems. <strong>Registrars will have plenty of opportunity</strong> to offer <strong>commercially viable</strong> value added services on top of the lower level blockchain networks. For example:</p>
+<ul>
+<li>Identity verification of registrants</li>
+<li>Certification of registry entries</li>
+<li>Data curation and indexing services</li>
+<li>Blockchain key-management services</li>
+<li>Custodial blockchain account management</li>
+<li>Middleware and frontend applications</li>
+<li>Infrastructure operations</li>
+<li>Participation in blockchain network governance</li>
+</ul>
 <h3 id="storage-considerations">Storage Considerations<a class="headerlink" href="#storage-considerations" title="Permanent link">#</a></h3>
-<p>On a typical public blockchain all data is <strong>fully replicated</strong> among participants. This allows for independent and autonomous validation of transactions. All blockchain data is highly available, tamper-proof and accessible for free. However, under high load the limited transaction capacity (storage space per unit of time) creates a transaction fee market. This leads to<strong> growing transaction costs</strong> and makes storage space a scarce and increasingly precious resource. So it is mandatory for our identifier and its eventual metadata schema to be very <strong>space efficient </strong>to maximize benefit at minimum cost. The basic metadata that will be required to generate and register identifiers must be:</p>
+<p>On a typical public blockchain all data is <strong>fully replicated</strong> among participants. This allows for independent and autonomous validation of transactions. All blockchain data is highly available, tamper-proof, timestamped and <strong>accessible for free</strong>. However, under high load the limited transaction capacity (storage space per unit of time) creates a transaction fee market. This leads to <strong>growing transaction costs</strong> and makes storage space a scarce and increasingly precious resource. So it is mandatory for our identifier and its eventual metadata schema to be very <strong>space efficient </strong>to maximize benefit at minimal cost. The basic metadata that will be required to generate and register identifiers must be:</p>
 <ul>
 <li>minimal in scope</li>
 <li>clearly specified</li>
