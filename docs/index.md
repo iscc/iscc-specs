@@ -4,17 +4,24 @@ authors: Titusz Pan
 
 # ISCC - Content Identifiers
 
-The ISCC (International Standard Content Code) is a modern, generic, and free content identifier:
+**The ISCC is a modern, generic, and open content identifier**
+
 
 ![iscc-sample](images/iscc-badge.svg)
 
 ## Motivation
 
-The media industry is still mostly relying on identifiers that were originally designed for physical products such as printed books and magazines. However, traditional content identifiers (like ISBN, ISSN or ISRC) are managed centrally and fall short of the requirements for digital trade.
+With the advent of blockchain technology the Internet is moving towards a network of peer-to-peer transactions. Increasing amounts of dynamic, short-lived and granular contents need to be managed and require new and innovative tools.
+ 
+A crucial prerequisite for content-related transactions to succeed in this new and demanding enviroment is the capability to easily address and identify content. Yet many industries that deal with digital content do not even have strandard identifiers. There is no existing solution for those industries that deal with short-lived or granular content such as journalism. There is also no widely adopted, generic identifier for digital images.
 
-Freely accessible **standard identifiers**, which are specifically designed to manage content in our digital century are a fundamental prerequisite for **blockchain** based transactions and sales activities in an increasingly heterogeneous media environment.
+The overhead and costs of manually assigning and tracking identifiers for such contents is prohibitive. But there is a solution to the problem: Auto-generated identifiers created algorithmically from the content itself.
 
-With better identifiers for digital content, the entire ecosystem becomes more efficient.
+In a multi-sided ecosystem **anybody** may have a legitimate interest to generate or lookup an identifier for some digital content.
+
+Open and accessible **standard identifiers**, that are specifically designed to manage digital content are fundamental for blockchain based transactions and sales activities in our increasingly heterogeneous media environment.
+
+By using standardized, decentralized, algorithmic identifiers for digital content,  all ecosystem participants can engage more efficiently in content-related transactions.
 
 ## Key Differentiators
 
@@ -29,9 +36,9 @@ With better identifiers for digital content, the entire ecosystem becomes more e
 
 ## How it works
 
-**ISCC** identifiers are generated algorithmically from a basic set of metadata and the content itself. The ISCC does not have to be carried explicitly with the content because the content itself is the authority of the **ISCC Code**.
+**ISCC** identifiers are generated algorithmically from a basic set of metadata and the content itself. The ISCC does not have to be manually assigned, neither does it have to be carried around or embedded within the content. The content itself is the source and authority of the **ISCC Code**.
 
-The **ISCC Code** is a unique, hierarchically structured composite identifier. It is built from a generic and balanced mix of content-derived, locality-sensitive and similarity-preserving hashes generated from metadata and content.
+The **ISCC Code** is a unique, hierarchically structured, composite identifier. It is built from a generic and balanced mix of content-derived, locality-sensitive and similarity-preserving hashes generated from metadata and content.
 
 ![iscc-sample](images/iscc-algo-design.svg)
 
