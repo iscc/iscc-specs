@@ -36,7 +36,7 @@ By using standardized, decentralized, algorithmic identifiers for digital conten
 
 ## How it works
 
-**ISCC** identifiers are generated algorithmically from a basic set of metadata and the content itself. The ISCC does not have to be manually assigned, neither does it have to be carried around or embedded within the content. The content itself is the source and authority of the **ISCC Code**.
+**ISCC** identifiers are generated algorithmically **from the content itself**. Content files are proccessed to build the identifier. The ISCC does not have to be manually assigned, neither does it have to be carried around or embedded within the content. The content itself is the source and authority of the **ISCC Code**.
 
 The **ISCC Code** is a unique, hierarchically structured, composite identifier. It is built from a generic and balanced mix of content-derived, locality-sensitive and similarity-preserving hashes generated from metadata and content.
 
