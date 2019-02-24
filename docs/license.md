@@ -2,7 +2,7 @@
 
 **TITLE**: ISCC - Content Identifiers
 
-**ISCC**: CCDFPFc87MhdT-CTfhYfFhFgyJA-CDGLS5mVHDg7g-CR2pahLM3oBXQ
+**ISCC**: CCDFPFc87MhdT-CTUzmNaW9p6A7-CDGLusAsasijG-CRbDgkXVWFary
 
 **CC BY-NC-SA 4.0 License**
 
