@@ -4,7 +4,7 @@ authors: Titusz Pan
 
 # ISCC - Features
 
-**The ISCC (International Standard Content Code) is a modern, generic, and free content identifier. It comes with a number of features built-in:** 
+**The ISCC comes with a number of built-in features:** 
 
 
 ## Content Identification
