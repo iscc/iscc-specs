@@ -1,6 +1,8 @@
 # ISCC - Concept
 
-*The internet is shifting towards a network of decentralized peer-to-peer transactions. If we want our transactions on the emerging blockchain networks to be about content we need standardized ways to address content. Our transactions might be payments, attributions, reputation, certification, licenses or entirely new kinds of value transfer. All this will happen much faster and easier if we, as a community, can agree on how to identify content in a decentralized environment. This is the first draft of an open proposal to the wider content community for a common content identifier. We would like to share our ideas and spark a conversation with journalists, news agencies, content creators, publishers, distributors, libraries, musicians, scientists, developers, lawyers, rights organizations and all the other participants of the content ecosystem.*
+*The internet is shifting towards a network of decentralized peer-to-peer transactions. If we want our transactions on the emerging blockchain networks to be about content we need standardized ways to address content. Our transactions might be payments, attributions, reputation, certification, licenses or entirely new kinds of value transfer. All this will happen much faster and easier if we, as a community, can agree on how to identify content in a decentralized environment.*
+
+This is the higher level concept of an open proposal to the wider content community for a common content identifier. We would like to share our ideas and spark a conversation with journalists, news agencies, content creators, publishers, distributors, libraries, musicians, scientists, developers, lawyers, rights organizations and all the other participants of the content ecosystem.
 
 ## Introduction
 
@@ -22,11 +24,24 @@ In traditional database systems it is recommended practice to work with **surrog
 
 ### A Decentralized Identifier
 
-We would like our identifier to be registry agnostic. This means that identifiers can be self-issued in a decentralized and parallel fashion without the need to ask for permission. Even if identifiers are not registered in a central database or on a public blockchain they are still useful in cases where multiple independent parties exchange information about content. The CMDI approach is helpful with common issues like data integrity, validation, de-duplication and disambiguation.
+We would like our identifier standard to be registry agnostic. This means that identifiers can be self-issued in a decentralized and parallel fashion without the need to ask for permission. Even if identifiers are not registered in a central database or on a public blockchain they are still useful in cases where multiple independent parties exchange information about content. The **CMDI** approach is helpful with common issues like data integrity, validation, de-duplication and disambiguation. Systems that process digital content can integrate ISCC support and benefit immediately. The integrator does not depend on all third-parties having to assign, track and deliver ISCC codes, because those can be generated from the content itself.
+
+### Registration Services
+
+The adoption of decentralized identifier standard does not mean that registration agencies and services will become obsolete. Registration services offer a plethora of valuable and indispensable benefits. Every industry has its special requirements. Ultimately the stakeholders from those industries will have to set the rules for data curation, metadata management and administrative control. A Blockchain is a low level backend infrastructure. And while blockchains might make access to identifiers and metadata fee of charge, there is still cost involved with storing data, running the infrastructure and providing middleware and frontends. Blockchains work as incentive based economic systems. **Registrars will have plenty of opportunity** to offer **commercially viable** value added services on top of the lower level blockchain networks. For example:
+
+- Identity verification of registrants
+- Certification of registry entries
+- Data curation and indexing services
+- Blockchain key-management services
+- Custodial blockchain account management
+- Middleware and frontend applications
+- Infrastructure operations
+- Participation in blockchain network governance
 
 ### Storage Considerations
 
-On a typical public blockchain all data is **fully replicated** among participants. This allows for independent and autonomous validation of transactions. All blockchain data is highly available, tamper-proof and accessible for free. However, under high load the limited transaction capacity (storage space per unit of time) creates a transaction fee market. This leads to** growing transaction costs** and makes storage space a scarce and increasingly precious resource. So it is mandatory for our identifier and its eventual metadata schema to be very **space efficient **to maximize benefit at minimum cost. The basic metadata that will be required to generate and register identifiers must be:
+On a typical public blockchain all data is **fully replicated** among participants. This allows for independent and autonomous validation of transactions. All blockchain data is highly available, tamper-proof, timestamped and **accessible for free**. However, under high load the limited transaction capacity (storage space per unit of time) creates a transaction fee market. This leads to **growing transaction costs** and makes storage space a scarce and increasingly precious resource. So it is mandatory for our identifier and its eventual metadata schema to be very **space efficient **to maximize benefit at minimal cost. The basic metadata that will be required to generate and register identifiers must be:
 
 - minimal in scope
 - clearly specified
