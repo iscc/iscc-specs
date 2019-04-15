@@ -33,7 +33,7 @@ The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "S
 ## Definitions
 
 Basic Metadata:
-: 	Minimal set of metadata about the content that is identified by an ISCC. This metadata may impact the derived Meta-ID Component
+: 	Minimal set of metadata about the content that is identified by an ISCC and bound to the algorithmic creation procedure. This metadata is utilized during generation of the Meta-ID. A change of this **bound metadata** may therefore impact the derived Meta-ID Component.
 
 Character:
 :    Throughout this specification a **character** is meant to be interpreted as one Unicode code point. This also means that due to the structure of Unicode a character is not necessarily a full glyph but might be a combining accent or similar.
@@ -130,16 +130,16 @@ The body section of each component is specific to the component and always 8-byt
 
 ### Meta-ID Component
 
-The Meta-ID component starts with a 1-byte header `00000000`. The first nibble `0000` indicates that this is a Meta-ID component type. The second nibble `0000` indicates that it belongs to an ISCC of version 1. All subsequent components are expected to follow the specification of a version 1 ISCC.
+The Meta-ID component starts with a 1-byte header `00000000`. The first nibble `0000` indicates that this is a Meta-ID component type. The second nibble `0000` indicates the ISCC of version starting with 0. All subsequent components are expected to follow the specification of the given ISCC version.
 
-The Meta-ID body is built from a 64-bit `similarity_hash` over 4-character n-grams of the basic metadata of the content to be identified.  The basic metadata supplied to the META-ID generating function is assumed to be UTF-8 encoded. Errors that occur during the decoding of such a bytestring input to a native Unicode MUST terminate the process and must not be silenced. An ISCC generating application MUST provide a `meta_id` function that accepts minimal and generic metadata and returns a [Base58-ISCC encoded](#base58-iscc) Meta-ID component and trimmed metadata.
+The Meta-ID body is built from a 64-bit `similarity_hash` over 4-character n-grams of the basic metadata of the content to be identified.  The basic metadata supplied to the Meta-ID generating function is assumed to be UTF-8 encoded. Errors that occur during the decoding of such a bytestring input to a native Unicode MUST terminate the process and must not be silenced. An ISCC generating application MUST provide a `meta_id` function that accepts minimal and generic metadata and returns a [Base58-ISCC encoded](#base58-iscc) Meta-ID component and trimmed metadata.
 
 #### Inputs to Meta-ID function
 
 | Name    | Type    | Required | Description                                                  |
 | :------ | :------ | :------- | :----------------------------------------------------------- |
 | title   | text    | Yes      | The title of an intangible creation.                         |
-| extra   | text    | No       | An optional short statement that distinguishes this intangible creation from another one for the purpose of Meta-ID uniqueness. (default: empty string) |
+| extra   | text    | No       | An optional short statement that distinguishes this intangible creation from another one for the purpose of forced Meta-ID uniqueness. (default: empty string) |
 | version | integer | No       | ISCC version number. (default: 0)                            |
 
 !!! note
