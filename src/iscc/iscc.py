@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 """ISCC Reference Implementation"""
-from array import array
 from binascii import hexlify
 from statistics import median
 import math
