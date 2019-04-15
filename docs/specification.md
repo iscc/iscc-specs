@@ -33,7 +33,13 @@ The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "S
 ## Definitions
 
 Basic Metadata:
-: 	Minimal set of metadata about the content that is identified by an ISCC and bound to the algorithmic creation procedure. This metadata is utilized during generation of the Meta-ID. A change of this **bound metadata** may therefore impact the derived Meta-ID Component.
+: 	Minimal set of ISCC-specific top-level metadata that SHOULD be supported by applications.
+
+Bound Metadata:
+:     Metadata that is utilized during generation of the ISCC. A change of this **bound metadata** may therefore impact the derived ISCC..
+
+Extended Metadata:
+:    Industry and application-specific metadata attached to an ISCC.
 
 Character:
 :    Throughout this specification a **character** is meant to be interpreted as one Unicode code point. This also means that due to the structure of Unicode a character is not necessarily a full glyph but might be a combining accent or similar.
@@ -144,7 +150,7 @@ The Meta-ID body is built from a 64-bit `similarity_hash` over 4-character n-gra
 
 !!! note
 
-    The basic metadata inputs are intentionally simple and generic. We abstain from more specific metadata for Meta-ID generation in favor of compatibility across industries. Imagine a *creators* input-field for metadata. Who would you list as the creators of a movie? The directors, writers the main actors? Would you list some of them or if not how do you decide whom you will list. All disambiguation of similar title data can be accomplished with the extra-field. Industry- and application-specific metadata requirements can be supplied as extended metadata with ISCC registration.
+    The basic metadata inputs are intentionally simple and generic. We abstain from more specific metadata for Meta-ID generation in favor of compatibility across industries. To support global clustering it is **RECOMMENDED** to **only supply the title field** for Meta-ID generation. Imagine a *creators* input-field for metadata. Who would you list as the creators of a movie? The directors, writers the main actors? Would you list some of them or if not how do you decide whom you will list. Global disambiguation of similar title data can be accomplished with the extra-field. Industry- and application-specific metadata requirements can be met by [extended metadata](#extended-metadata).
 
 #### Generate Meta-ID
 
@@ -327,16 +333,16 @@ As a generic content identifier the ISCC makes minimal assumptions about metadat
 
 Basic metadata for an ISCC is metadata that is explicitly defined by this specification. The following table enumerates basic metadata fields for use in the top-level of the JSON metadata object:
 
-| Name    | Type       | Required | Description                                                  |
-| ------- | ---------- | -------- | ------------------------------------------------------------ |
-| version | integer    | No       | Version of ISCC Specification. Assumed to be 1 if omitted.   |
-| title   | text       | Yes      | The title of an intangible creation identified by the ISCC. The normalized and trimmed UTF-8 encoded text MUST not exceed 128 Bytes. The result of processing `title` and `extra` data with the `meta_id` function MUST  match the Meta-ID component of the ISCC. |
-| extra   | text       | No       | An optional short statement that distinguishes this intangible creation from another one for the purpose of Meta-ID uniqueness. |
-| tophash | text (hex) | No       | The full hex-encoded tophash (merkle root) returned by the `instance_id`  function. |
-| meta    | array      | No       | A list of one or more **extended metadata** entries. Must include at least one entry if specified. |
+| Name    | Type       | Required | Bound | Description                                                  |
+| ------- | ---------- | -------- | ----- | ------------------------------------------------------------ |
+| version | integer    | No       | No    | Version of ISCC Specification. Assumed to be 1 if omitted.   |
+| title   | text       | Yes      | Yes   | The title of an intangible creation identified by the ISCC. The normalized and trimmed UTF-8 encoded text MUST not exceed 128 Bytes. The result of processing `title` and `extra` data with the `meta_id` function MUST  match the Meta-ID component of the ISCC. |
+| extra   | text       | No       | Yes   | An optional short statement that distinguishes this intangible creation from another one for the purpose of Meta-ID uniqueness. |
+| tophash | text (hex) | No       | No    | The full hex-encoded tophash (merkle root) returned by the `instance_id`  function. |
+| meta    | array      | No       | No    | A list of one or more **extended metadata** entries. Must include at least one entry if specified. |
 
 !!! attention
-    Depending on adoption and real world use, future versions of this specification may define new basic metadata fields. Applications MAY add custom fields at the top level of the JSON object but MUST prefix those fields with an underscore to avoid collisions with future extensions of this specification.
+    **Bound** metadata impacts the the ISCC Code (Meta-ID) and cannot be changed afterwards. Depending on adoption and real world use, future versions of this specification may define new basic metadata fields. Applications MAY add custom fields at the top level of the JSON object but MUST prefix those fields with an underscore to avoid collisions with future extensions of this specification.
 
 ### Extended Metadata
 
