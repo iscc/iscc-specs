@@ -1,6 +1,6 @@
 # ISCC - Concept
 
-**Last Updated: 2019-04-15**
+**Last revised on:** {{ git_revision_date }}
 
 *The internet is shifting towards a network of decentralized peer-to-peer transactions. If we want our transactions on the emerging blockchain networks to be about content we need standardized ways to address content. Our transactions might be payments, attributions, reputation, certification, licenses or entirely new kinds of value transfer. All this will happen much faster and easier if we, as a community, can agree on how to identify content in a decentralized environment.*
 

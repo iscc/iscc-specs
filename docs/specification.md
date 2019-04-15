@@ -4,6 +4,8 @@ authors: Titusz Pan
 
 # ISCC - Specification v1.x
 
+**Last revised on:** {{ git_revision_date }}
+
 ## Abstract
 
 The **International Standard Content Code (ISCC)**, is an open and decentralized digital media identifier. An ISCC can be created from digital content and its basic metadata by anybody who follows the procedures of the ISCC specification or by using open source software that supports ISCC creation [conforming to the ISCC specification](#conformance-testing).
