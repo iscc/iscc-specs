@@ -22,7 +22,7 @@ Public review, discussion and contributions are welcome.
 
 !!! note "Document Version"
 
-    This is the latest in-development version of the **ISCC Specification**. While there is already a [Version 1.0](https://github.com/iscc/iscc-specs/blob/version-1.0/docs/specification.md) spec, we are still expecting backward incompatible changes until **Version 2.0** is released. Parts of this specification may already be or become stable erlier and will be documented so during minor releases. Partners are encouraged to follow development and test, implement and give feedback based on the latest (this) version of the ISCC Specification.  
+    This is the latest in-development version of the **ISCC Specification**. While there is already a [Version 1.0](https://github.com/iscc/iscc-specs/blob/version-1.0/docs/specification.md) spec, we are still expecting backward incompatible changes until **Version 2.0** is released. Parts of this specification may already be or become stable earlier and will be documented so during minor releases. Partners are encouraged to follow development and test, implement and give feedback based on the latest (this) version of the ISCC Specification.  
 
 This document proposes an open and vendor neutral ISCC standard and describes the technical procedures to create and manage ISCC identifiers. The first version of this document was produced as a prototype by the [Content Blockchain Project](https://content-blockchain.org) and received funding from the [Google Digital News Initiative (DNI)](https://digitalnewsinitiative.com/dni-projects/content-blockchain-project/). The content of this document is determined by its authors in an open and public consensus process.
 
@@ -199,14 +199,14 @@ A Content-ID is generated in two broad steps. In the first step, we extract and 
 
 The  Content-ID type is signaled by the first 3 bits of the second nibble of the first byte of the Content-ID:
 
-| Conent-ID Type | Nibble 2 Bits 0-3 | Description                                        |
-| :------------- | :---------------- | -------------------------------------------------- |
-| text           | 000               | Generated from extracted and normalized plain-text |
-| image          | 001               | Generated from normalized grayscale pixel data     |
-| *audio*        | *010*             | To be defined in later version of specification    |
-| *video*        | *011*             | To be defined in later version of specification    |
-| mixed          | 100               | Generated from multiple Content-IDs                |
-|                | 101, 110, 111     | Reserved for future versions of specification      |
+| Content-ID Type | Nibble 2 Bits 0-3 | Description                                        |
+| :-------------- | :---------------- | -------------------------------------------------- |
+| text            | 000               | Generated from extracted and normalized plain-text |
+| image           | 001               | Generated from normalized grayscale pixel data     |
+| *audio*         | *010*             | To be defined in later version of specification    |
+| *video*         | *011*             | To be defined in later version of specification    |
+| mixed           | 100               | Generated from multiple Content-IDs                |
+|                 | 101, 110, 111     | Reserved for future versions of specification      |
 
 #### Content-ID-Text
 
@@ -282,7 +282,7 @@ The last bit of the header byte of the Content-ID is the "Partial Content Flag".
 
 ### Data-ID Component
 
-For the Data-ID that encodes data similarity we use a content defined chunking algorithm that provides some shift resistance and calculate the MinHash from those chunks. To accomodate for small files the first 100 chunks have a ~140-byte size target while the remaining chunks target ~ 6kb in size.
+For the Data-ID that encodes data similarity we use a content defined chunking algorithm that provides some shift resistance and calculate the MinHash from those chunks. To accommodate for small files the first 100 chunks have a ~140-byte size target while the remaining chunks target ~ 6kb in size.
 
 The Data-ID is built from the raw encoded data of the content to be identified. An ISCC generating application MUST provide a `data_id` function that accepts the raw encoded data as input.
 
@@ -303,7 +303,7 @@ See also: [Data-ID reference code](https://github.com/iscc/iscc-specs/blob/maste
 
 The Instance-ID is built from the raw data of the media object to be identified and serves as checksum for the media object. The raw data of the media object is split into 64-kB data-chunks. Then we build a hash-tree from those chunks and use the truncated tophash (merkle root) as component body of the Instance-ID.
 
-To guard against length-extension attacks and second pre-image attacks we use double sha256 for hashing. We also prefix the hash input data with a `0x00`-byte for the leaf nodes hashes and with a `0x01`-byte for the  internal node hashes. While the Instance-ID itself is a non-cryptographic checksum, the full tophash may be supplied in the extended metadata of an ISCC secure integrity verification is required.
+To guard against length-extension attacks and second preimage attacks we use double sha256 for hashing. We also prefix the hash input data with a `0x00`-byte for the leaf nodes hashes and with a `0x01`-byte for the  internal node hashes. While the Instance-ID itself is a non-cryptographic checksum, the full tophash may be supplied in the extended metadata of an ISCC secure integrity verification is required.
 
 ![iscc-creation-instance-id](images/iscc-creation-instance-id.svg)
 
@@ -319,7 +319,7 @@ An ISCC generating application MUST provide a `instance_id` function that accept
 6. Prepend the 1-byte component header (e.g. `0x30`).
 7. Encode resulting 9-byte sequence with [`encode`](#encode) to an Instance-ID Code
 8. Hex-Encode the tophash
-9. Return the Intance-ID and the hex-encoded tophash
+9. Return the Instance-ID and the hex-encoded tophash
 
 See also: [Instance-ID reference code](https://github.com/iscc/iscc-specs/blob/master/src/iscc/iscc.py#L162) 
 
@@ -379,7 +379,7 @@ Applications MAY embed ISCC codes that have side effects if they specify a proce
 
     We are able to embed the following combination of components from the [markdown version](https://github.com/iscc/iscc-specs/edit/master/docs/specification.md) of this document into the document itself because adding or removing them has no side effect:
     
-    **ISCC**: CCDbMYw6NfC8a-CThhWfJ7kCARM-CDhydHnBkcVUm
+    **ISCC**: CCDbMYw6NfC8a-CTWzdczHVbrgo-CDjefNiyPBXVs
 
 ## ISCC URI Scheme
 
@@ -544,7 +544,7 @@ An application that claims ISCC conformance MUST pass the ISCC conformance test 
 Outputs that are expected to be raw bytes are embedded as HEX encoded strings in JSON and prefixed with  `hex:` to support automated decoding during implementation testing.
 
 !!! example 
-    Byte outputs in JSON testdata:
+    Byte outputs in JSON test data:
 
         {
           "data_chunks": {
@@ -595,6 +595,5 @@ Copyright © 2016 - 2019 **Content Blockchain Project**
 
 *[tophash]: Root hash of an Instance-ID hash-tree
 
-[#Charikar2002]:  http://dx.doi.org/10.1145/509907.509965 "Charikar, M.S., 2002, May. Similarity estimation techniques from rounding algorithms. In Proceedings of the thiry-fourth annual ACM symposium on Theory of computing (pp. 380-388). ACM."
-
+[#Charikar2002]:  http://dx.doi.org/10.1145/509907.509965 "Charikar, M.S., 2002, May. Similarity estimation techniques from rounding algorithms. In Proceedings of the thirty-fourth annual ACM symposium on Theory of computing (pp. 380-388). ACM."
 [#WenXia2016]: http://dx.doi.org/10.1109/TC.2016.2595565 "Wen Xia, Yukun Zhou, Hong Jiang, Yu Hua, Yuchong Hu, Yucheng Zhang, Qing Liu, 2016. FastCDC: a Fast and Efficient Content-Defined Chunking Approach for Data Deduplication."
