@@ -194,7 +194,7 @@ def text_pre_normalize(text):
     if isinstance(text, bytes):
         text = text.decode('utf-8')
     text = unicodedata.normalize('NFKC', text).strip()
-
+    text = ' '.join(text.split())
     return text
 
 

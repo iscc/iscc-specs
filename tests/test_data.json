@@ -3807,7 +3807,7 @@
       ],
       "outputs": [
         "CCAKevDpE1eEL",
-        "Die unéndlíche,  Geschichte",
+        "Die unéndlíche, Geschichte",
         ""
       ]
     },
@@ -4038,13 +4038,19 @@
       "inputs": [
         "  Hello  World ?  "
       ],
-      "outputs": "Hello  World ?"
+      "outputs": "Hello World ?"
     },
     "test_005_nfkd": {
       "inputs": [
         "Ç 가 Ω ℍ ① ︷ i⁹ ¼ ǆ ⫝̸ ȴ ȷ ɂ ć"
       ],
       "outputs": "Ç 가 Ω H 1 { i9 1⁄4 dž ⫝̸ ȴ ȷ ɂ ć"
+    },
+    "test_006_line_breaks": {
+      "inputs": [
+        "Hello\\nWorld"
+      ],
+      "outputs": "Hello\\nWorld"
     }
   },
   "text_trim": {
