@@ -1,5 +1,7 @@
 # ISCC - Concept
 
+**Last revised on:** {{ git_revision_date }}
+
 *The internet is shifting towards a network of decentralized peer-to-peer transactions. If we want our transactions on the emerging blockchain networks to be about content we need standardized ways to address content. Our transactions might be payments, attributions, reputation, certification, licenses or entirely new kinds of value transfer. All this will happen much faster and easier if we, as a community, can agree on how to identify content in a decentralized environment.*
 
 This is the higher level concept of an open proposal to the wider content community for a common content identifier. We would like to share our ideas and spark a conversation with journalists, news agencies, content creators, publishers, distributors, libraries, musicians, scientists, developers, lawyers, rights organizations and all the other participants of the content ecosystem.
@@ -82,6 +84,22 @@ In the physical world we would call a specific book (one that you can take out o
 We could try to define an **individual digital copy** by its location and exact content on a specific physical storage medium (like a DVD, SSD ...). But this does not account for the fact that it is nearly impossible to stop someone from creating an exact replica of that data or at least a snapshot or recording of the presentation of that data on another storage location.
 
 And most importantly such a replica does not affect the original data and even less can make it magically disappear. In contrast, if you give your individual copy of your book to someone else, you won't **"have it"** anymore. It is clear, that with digital media this **cannot reliably be the case**. The only way would be to build a [tamper-proof physical device](https://opendime.com/) (secure element) that does not reveal the data itself, which would defeat the purpose by making the content itself unavailable. But there are ways to partially simulate such inherently physical properties in the digital world. Most notably with the emergence of blockchain technology it is now possible to have a **cryptographically secured** and publicly notarized tamper-proof **certificate of ownership. ** This can serve as a record of agreement about ownership of an “individual copy”. But is does not by itself enforce location or accessibility of the content, nor does it prove the authorization of the certifying party itself or the legal validity of the agreement.
+
+## Design Principles
+
+As a generic content identifier the **ISCC Standard** is a an initiative with a broad scope. These are the principles that should guide its design and adoption:
+
+- Target existing, unsolved, real-world problems
+- Provide a technological and automatable solution
+- Be generic and useful to a broad audience
+- Keep the standard pragmatic and simple to implement
+- Keep it extendable and forward compatible
+- Provide marketable user-facing sample applications
+- Provide machine readable test data for implementers
+- Provide developer tools in different programming languages
+- Promote implementations in different sectors
+- The specification should be open and public
+- Engage with other standards and interested parties
 
 ## Algorithmic Tools
 

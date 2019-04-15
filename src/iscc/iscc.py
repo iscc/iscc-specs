@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 """ISCC Reference Implementation"""
-from array import array
 from binascii import hexlify
 from statistics import median
 import math
@@ -195,7 +194,7 @@ def text_pre_normalize(text):
     if isinstance(text, bytes):
         text = text.decode('utf-8')
     text = unicodedata.normalize('NFKC', text).strip()
-
+    text = ' '.join(text.split())
     return text
 
 

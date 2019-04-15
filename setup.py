@@ -1,8 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-
 """The setup script."""
-
+import re
 from setuptools import setup, find_packages
 
 
@@ -11,9 +10,19 @@ def readme():
         return f.read()
 
 
+def version():
+    version_file = 'src/iscc/__init__.py'
+    with open(version_file) as f:
+        version_data = f.read()
+    m = re.search(r"^__version__ = ['\"]([^'\"]*)['\"]", version_data, re.M)
+    if m:
+        return m.group(1)
+    raise RuntimeError("Unable to find version string.")
+
+
 setup(
     name='iscc',
-    version='1.0.1',
+    version=version(),
     description="ISCC: Reference Implementation",
     long_description=readme(),
     author="Titusz Pan",

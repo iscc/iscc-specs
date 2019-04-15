@@ -4,13 +4,15 @@ authors: Titusz Pan
 
 # ISCC - Specification v1.x
 
+**Last revised on:** {{ git_revision_date }}
+
 ## Abstract
 
 The **International Standard Content Code (ISCC)**, is an open and decentralized digital media identifier. An ISCC can be created from digital content and its basic metadata by anybody who follows the procedures of the ISCC specification or by using open source software that supports ISCC creation [conforming to the ISCC specification](#conformance-testing).
 
 ## Note to Readers
 
-For public discussion of issues for this specification please use the Github issue tracker: <https://github.com//iscc-specs/issues>.
+For public discussion of issues for this specification please use the Github issue tracker: <https://github.com/iscc/iscc-specs/issues>.
 
 The latest published version of this specification can be found at <http://iscc.codes/specification/>. 
 
@@ -20,7 +22,7 @@ Public review, discussion and contributions are welcome.
 
 !!! note "Document Version"
 
-    This is the latest in-development version of the **ISCC Specification**. While there is already a [Version 1.0](https://github.com/iscc/iscc-specs/blob/version-1.0/docs/specification.md) spec, we are still expecting backward incompatible changes until **Version 2.0** is released. Parts of this specification may already be or become stable erlier and will be documented so during minor releases. Partners are encouraged to follow development and test, implement and give feedback based on the latest (this) version of the ISCC Specification.  
+    This is the latest in-development version of the **ISCC Specification**. While there is already a [Version 1.0](https://github.com/iscc/iscc-specs/blob/version-1.0/docs/specification.md) spec, we are still expecting backward incompatible changes until **Version 2.0** is released. Parts of this specification may already be or become stable earlier and will be documented so during minor releases. Partners are encouraged to follow development and test, implement and give feedback based on the latest (this) version of the ISCC Specification.  
 
 This document proposes an open and vendor neutral ISCC standard and describes the technical procedures to create and manage ISCC identifiers. The first version of this document was produced as a prototype by the [Content Blockchain Project](https://content-blockchain.org) and received funding from the [Google Digital News Initiative (DNI)](https://digitalnewsinitiative.com/dni-projects/content-blockchain-project/). The content of this document is determined by its authors in an open and public consensus process.
 
@@ -31,7 +33,13 @@ The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "S
 ## Definitions
 
 Basic Metadata:
-: 	Minimal set of metadata about the content that is identified by an ISCC. This metadata may impact the derived Meta-ID Component
+: 	Minimal set of ISCC-specific top-level metadata that SHOULD be supported by applications.
+
+Bound Metadata:
+:     Metadata that is utilized during generation of the ISCC. A change of this **bound metadata** may therefore impact the derived ISCC..
+
+Extended Metadata:
+:    Industry and application-specific metadata attached to an ISCC.
 
 Character:
 :    Throughout this specification a **character** is meant to be interpreted as one Unicode code point. This also means that due to the structure of Unicode a character is not necessarily a full glyph but might be a combining accent or similar.
@@ -69,12 +77,12 @@ A **Fully Qualified ISCC Digest** is a fixed size sequence of **36 bytes (288 bi
 The ISCC Digest is built from multiple self-describing 72-bit components:
 
 
-| Components:     | Meta-ID             | Content-ID         | Data-ID           | Instance-ID    |
-| :-------------- | :------------------ | :----------------- | :---------------- | :------------- |
-| **Context:**    | Intangible creation | Content similarity | Data similarity   | Data checksum  |
-| **Input:**      | Metadata            | Extracted  content | Raw data          | Raw data       |
-| **Algorithms:** | Similarity Hash     | Type specific      | CDC, Minimum Hash | CDC, Hash Tree |
-| **Size:**       | 72 bits             | 72 bits            | 72 bits           | 72 bits        |
+| Components:     | Meta-ID             | Content-ID         | Data-ID           | Instance-ID   |
+| :-------------- | :------------------ | :----------------- | :---------------- | :------------ |
+| **Context:**    | Intangible creation | Content similarity | Data similarity   | Data checksum |
+| **Input:**      | Metadata            | Extracted  content | Raw data          | Raw data      |
+| **Algorithms:** | Similarity Hash     | Type specific      | CDC, Minimum Hash | Hash Tree     |
+| **Size:**       | 72 bits             | 72 bits            | 72 bits           | 72 bits       |
 
 ISCC components MAY be used separately or in combination by applications for various purposes. Individual components MUST be presented as 13-character [base58-iscc](#base58-iscc) encoded strings to end users and MAY be prefixed with their component name.
 
@@ -128,21 +136,21 @@ The body section of each component is specific to the component and always 8-byt
 
 ### Meta-ID Component
 
-The Meta-ID component starts with a 1-byte header `00000000`. The first nibble `0000` indicates that this is a Meta-ID component type. The second nibble `0000` indicates that it belongs to an ISCC of version 1. All subsequent components are expected to follow the specification of a version 1 ISCC.
+The Meta-ID component starts with a 1-byte header `00000000`. The first nibble `0000` indicates that this is a Meta-ID component type. The second nibble `0000` indicates the ISCC of version starting with 0. All subsequent components are expected to follow the specification of the given ISCC version.
 
-The Meta-ID body is built from a 64-bit `similarity_hash` over 4-character n-grams of the basic metadata of the content to be identified.  The basic metadata supplied to the META-ID generating function is assumed to be UTF-8 encoded. Errors that occur during the decoding of such a bytestring input to a native Unicode MUST terminate the process and must not be silenced. An ISCC generating application MUST provide a `meta_id` function that accepts minimal and generic metadata and returns a [Base58-ISCC encoded](#base58-iscc) Meta-ID component and trimmed metadata.
+The Meta-ID body is built from a 64-bit `similarity_hash` over 4-character n-grams of the basic metadata of the content to be identified.  The basic metadata supplied to the Meta-ID generating function is assumed to be UTF-8 encoded. Errors that occur during the decoding of such a bytestring input to a native Unicode MUST terminate the process and must not be silenced. An ISCC generating application MUST provide a `meta_id` function that accepts minimal and generic metadata and returns a [Base58-ISCC encoded](#base58-iscc) Meta-ID component and trimmed metadata.
 
 #### Inputs to Meta-ID function
 
 | Name    | Type    | Required | Description                                                  |
 | :------ | :------ | :------- | :----------------------------------------------------------- |
 | title   | text    | Yes      | The title of an intangible creation.                         |
-| extra   | text    | No       | An optional short statement that distinguishes this intangible creation from another one for the purpose of Meta-ID uniqueness. (default: empty string) |
+| extra   | text    | No       | An optional short statement that distinguishes this intangible creation from another one for the purpose of forced Meta-ID uniqueness. (default: empty string) |
 | version | integer | No       | ISCC version number. (default: 0)                            |
 
 !!! note
 
-    The basic metadata inputs are intentionally simple and generic. We abstain from more specific metadata for Meta-ID generation in favor of compatibility across industries. Imagine a *creators* input-field for metadata. Who would you list as the creators of a movie? The directors, writers the main actors? Would you list some of them or if not how do you decide whom you will list. All disambiguation of similar title data can be accomplished with the extra-field. Industry- and application-specific metadata requirements can be supplied as extended metadata with ISCC registration.
+    The basic metadata inputs are intentionally simple and generic. We abstain from more specific metadata for Meta-ID generation in favor of compatibility across industries. To support global clustering it is **RECOMMENDED** to **only supply the title field** for Meta-ID generation. Imagine a *creators* input-field for metadata. Who would you list as the creators of a movie? The directors, writers the main actors? Would you list some of them or if not how do you decide whom you will list. Global disambiguation of similar title data can be accomplished with the extra-field. Industry- and application-specific metadata requirements can be met by [extended metadata](#extended-metadata).
 
 #### Generate Meta-ID
 
@@ -191,14 +199,14 @@ A Content-ID is generated in two broad steps. In the first step, we extract and 
 
 The  Content-ID type is signaled by the first 3 bits of the second nibble of the first byte of the Content-ID:
 
-| Conent-ID Type | Nibble 2 Bits 0-3 | Description                                        |
-| :------------- | :---------------- | -------------------------------------------------- |
-| text           | 000               | Generated from extracted and normalized plain-text |
-| image          | 001               | Generated from normalized grayscale pixel data     |
-| *audio*        | *010*             | To be defined in later version of specification    |
-| *video*        | *011*             | To be defined in later version of specification    |
-| mixed          | 100               | Generated from multiple Content-IDs                |
-|                | 101, 110, 111     | Reserved for future versions of specification      |
+| Content-ID Type | Nibble 2 Bits 0-3 | Description                                        |
+| :-------------- | :---------------- | -------------------------------------------------- |
+| text            | 000               | Generated from extracted and normalized plain-text |
+| image           | 001               | Generated from normalized grayscale pixel data     |
+| *audio*         | *010*             | To be defined in later version of specification    |
+| *video*         | *011*             | To be defined in later version of specification    |
+| mixed           | 100               | Generated from multiple Content-IDs                |
+|                 | 101, 110, 111     | Reserved for future versions of specification      |
 
 #### Content-ID-Text
 
@@ -274,7 +282,7 @@ The last bit of the header byte of the Content-ID is the "Partial Content Flag".
 
 ### Data-ID Component
 
-For the Data-ID that encodes data similarity we use a content defined chunking algorithm that provides some shift resistance and calculate the MinHash from those chunks. To accomodate for small files the first 100 chunks have a ~140-byte size target while the remaining chunks target ~ 6kb in size.
+For the Data-ID that encodes data similarity we use a content defined chunking algorithm that provides some shift resistance and calculate the MinHash from those chunks. To accommodate for small files the first 100 chunks have a ~140-byte size target while the remaining chunks target ~ 6kb in size.
 
 The Data-ID is built from the raw encoded data of the content to be identified. An ISCC generating application MUST provide a `data_id` function that accepts the raw encoded data as input.
 
@@ -295,7 +303,7 @@ See also: [Data-ID reference code](https://github.com/iscc/iscc-specs/blob/maste
 
 The Instance-ID is built from the raw data of the media object to be identified and serves as checksum for the media object. The raw data of the media object is split into 64-kB data-chunks. Then we build a hash-tree from those chunks and use the truncated tophash (merkle root) as component body of the Instance-ID.
 
-To guard against length-extension attacks and second pre-image attacks we use double sha256 for hashing. We also prefix the hash input data with a `0x00`-byte for the leaf nodes hashes and with a `0x01`-byte for the  internal node hashes. While the Instance-ID itself is a non-cryptographic checksum, the full tophash may be supplied in the extended metadata of an ISCC secure integrity verification is required.
+To guard against length-extension attacks and second preimage attacks we use double sha256 for hashing. We also prefix the hash input data with a `0x00`-byte for the leaf nodes hashes and with a `0x01`-byte for the  internal node hashes. While the Instance-ID itself is a non-cryptographic checksum, the full tophash may be supplied in the extended metadata of an ISCC secure integrity verification is required.
 
 ![iscc-creation-instance-id](images/iscc-creation-instance-id.svg)
 
@@ -311,7 +319,7 @@ An ISCC generating application MUST provide a `instance_id` function that accept
 6. Prepend the 1-byte component header (e.g. `0x30`).
 7. Encode resulting 9-byte sequence with [`encode`](#encode) to an Instance-ID Code
 8. Hex-Encode the tophash
-9. Return the Intance-ID and the hex-encoded tophash
+9. Return the Instance-ID and the hex-encoded tophash
 
 See also: [Instance-ID reference code](https://github.com/iscc/iscc-specs/blob/master/src/iscc/iscc.py#L162) 
 
@@ -325,16 +333,16 @@ As a generic content identifier the ISCC makes minimal assumptions about metadat
 
 Basic metadata for an ISCC is metadata that is explicitly defined by this specification. The following table enumerates basic metadata fields for use in the top-level of the JSON metadata object:
 
-| Name    | Type       | Required | Description                                                  |
-| ------- | ---------- | -------- | ------------------------------------------------------------ |
-| version | integer    | No       | Version of ISCC Specification. Assumed to be 1 if omitted.   |
-| title   | text       | Yes      | The title of an intangible creation identified by the ISCC. The normalized and trimmed UTF-8 encoded text MUST not exceed 128 Bytes. The result of processing `title` and `extra` data with the `meta_id` function MUST  match the Meta-ID component of the ISCC. |
-| extra   | text       | No       | An optional short statement that distinguishes this intangible creation from another one for the purpose of Meta-ID uniqueness. |
-| tophash | text (hex) | No       | The full hex-encoded tophash (merkle root) returned by the `instance_id`  function. |
-| meta    | array      | No       | A list of one or more **extended metadata** entries. Must include at least one entry if specified. |
+| Name    | Type       | Required | Bound | Description                                                  |
+| ------- | ---------- | -------- | ----- | ------------------------------------------------------------ |
+| version | integer    | No       | No    | Version of ISCC Specification. Assumed to be 1 if omitted.   |
+| title   | text       | Yes      | Yes   | The title of an intangible creation identified by the ISCC. The normalized and trimmed UTF-8 encoded text MUST not exceed 128 Bytes. The result of processing `title` and `extra` data with the `meta_id` function MUST  match the Meta-ID component of the ISCC. |
+| extra   | text       | No       | Yes   | An optional short statement that distinguishes this intangible creation from another one for the purpose of Meta-ID uniqueness. |
+| tophash | text (hex) | No       | No    | The full hex-encoded tophash (merkle root) returned by the `instance_id`  function. |
+| meta    | array      | No       | No    | A list of one or more **extended metadata** entries. Must include at least one entry if specified. |
 
 !!! attention
-    Depending on adoption and real world use, future versions of this specification may define new basic metadata fields. Applications MAY add custom fields at the top level of the JSON object but MUST prefix those fields with an underscore to avoid collisions with future extensions of this specification.
+    **Bound** metadata impacts the the ISCC Code (Meta-ID) and cannot be changed afterwards. Depending on adoption and real world use, future versions of this specification may define new basic metadata fields. Applications MAY add custom fields at the top level of the JSON object but MUST prefix those fields with an underscore to avoid collisions with future extensions of this specification.
 
 ### Extended Metadata
 
@@ -371,7 +379,7 @@ Applications MAY embed ISCC codes that have side effects if they specify a proce
 
     We are able to embed the following combination of components from the [markdown version](https://github.com/iscc/iscc-specs/edit/master/docs/specification.md) of this document into the document itself because adding or removing them has no side effect:
     
-    **ISCC**: CCDbMYw6NfC8a-CThhWfJ7kCARM-CDhydHnBkcVUm
+    **ISCC**: CCDbMYw6NfC8a-CTWzdczHVbrgo-CDjefNiyPBXVs
 
 ## ISCC URI Scheme
 
@@ -431,9 +439,9 @@ The ISCC standardizes some content normalization procedures to support reproduci
 
 Signature: `text_pre_normalize(text: str|bytes) -> str `
 
-Decodes raw plain-text data and applies Unicode [Normalization Form KC (NFKC)](http://www.unicode.org/reports/tr15/#Norm_Forms) . The plain-text data MUST be stripped of any markup beforehand. Text input is expected to be UTF-8 encoded plain-text data or a native type of the implementing programming language that supports Unicode. Text decoding errors MUST fail with an error.
+Decodes raw plain-text data, applies Unicode [Normalization Form KC (NFKC)](http://www.unicode.org/reports/tr15/#Norm_Forms) and removes leading, trailing and duplicate whitespace. The plain-text data MUST be stripped of any markup beforehand. Text input is expected to be UTF-8 encoded plain-text data or a native type of the implementing programming language that supports Unicode. Text decoding errors MUST fail with an error.
 
-See also: [Text pre-normalization reference code](https://github.com/iscc/iscc-specs/blob/master/src/iscc/iscc.py#L193)
+See also: [Text pre-normalization reference code](https://github.com/iscc/iscc-specs/blob/master/src/iscc/iscc.py#L192)
 
 #### text_trim
 
@@ -536,7 +544,7 @@ An application that claims ISCC conformance MUST pass the ISCC conformance test 
 Outputs that are expected to be raw bytes are embedded as HEX encoded strings in JSON and prefixed with  `hex:` to support automated decoding during implementation testing.
 
 !!! example 
-    Byte outputs in JSON testdata:
+    Byte outputs in JSON test data:
 
         {
           "data_chunks": {
@@ -587,6 +595,5 @@ Copyright © 2016 - 2019 **Content Blockchain Project**
 
 *[tophash]: Root hash of an Instance-ID hash-tree
 
-[#Charikar2002]:  http://dx.doi.org/10.1145/509907.509965 "Charikar, M.S., 2002, May. Similarity estimation techniques from rounding algorithms. In Proceedings of the thiry-fourth annual ACM symposium on Theory of computing (pp. 380-388). ACM."
-
+[#Charikar2002]:  http://dx.doi.org/10.1145/509907.509965 "Charikar, M.S., 2002, May. Similarity estimation techniques from rounding algorithms. In Proceedings of the thirty-fourth annual ACM symposium on Theory of computing (pp. 380-388). ACM."
 [#WenXia2016]: http://dx.doi.org/10.1109/TC.2016.2595565 "Wen Xia, Yukun Zhou, Hong Jiang, Yu Hua, Yuchong Hu, Yucheng Zhang, Qing Liu, 2016. FastCDC: a Fast and Efficient Content-Defined Chunking Approach for Data Deduplication."
