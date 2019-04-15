@@ -38,7 +38,7 @@
         <meta name="lang:search.tokenizer" content="[\s\-]+">
       
       <link rel="shortcut icon" href="../images/favicon.png">
-      <meta name="generator" content="mkdocs-1.0.4, mkdocs-material-4.0.1">
+      <meta name="generator" content="mkdocs-1.0.4, mkdocs-material-4.1.1">
     
     
       
@@ -46,7 +46,7 @@
       
     
     
-      <link rel="stylesheet" href="../assets/stylesheets/application.982221ab.css">
+      <link rel="stylesheet" href="../assets/stylesheets/application.3020aac5.css">
       
         <link rel="stylesheet" href="../assets/stylesheets/application-palette.224b79ff.css">
       
@@ -57,7 +57,7 @@
       
     
     
-      <script src="../assets/javascripts/modernizr.1f0bcf2b.js"></script>
+      <script src="../assets/javascripts/modernizr.01ccdecf.js"></script>
     
     
       
@@ -399,6 +399,13 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#design-principles" title="Design Principles" class="md-nav__link">
+    Design Principles
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#algorithmic-tools" title="Algorithmic Tools" class="md-nav__link">
     Algorithmic Tools
   </a>
@@ -679,6 +686,13 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#design-principles" title="Design Principles" class="md-nav__link">
+    Design Principles
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#algorithmic-tools" title="Algorithmic Tools" class="md-nav__link">
     Algorithmic Tools
   </a>
@@ -760,6 +774,7 @@
                 
                 
                 <h1 id="iscc-concept">ISCC - Concept<a class="headerlink" href="#iscc-concept" title="Permanent link">#</a></h1>
+<p><strong>Last revised on:</strong> 2019-04-15</p>
 <p><em>The internet is shifting towards a network of decentralized peer-to-peer transactions. If we want our transactions on the emerging blockchain networks to be about content we need standardized ways to address content. Our transactions might be payments, attributions, reputation, certification, licenses or entirely new kinds of value transfer. All this will happen much faster and easier if we, as a community, can agree on how to identify content in a decentralized environment.</em></p>
 <p>This is the higher level concept of an open proposal to the wider content community for a common content identifier. We would like to share our ideas and spark a conversation with journalists, news agencies, content creators, publishers, distributors, libraries, musicians, scientists, developers, lawyers, rights organizations and all the other participants of the content ecosystem.</p>
 <h2 id="introduction">Introduction<a class="headerlink" href="#introduction" title="Permanent link">#</a></h2>
@@ -811,6 +826,21 @@
 <p>In the physical world we would call a specific book (one that you can take out of your shelve) an <strong>individual copy</strong>. This implies a notion of <strong>locality </strong>and <strong>ownership</strong>. In the digital world the semantics of an individual copy are very different. An individual copy might be distinguished by a license you own or by a personalized watermark applied by the retailer at time of sale or some digital annotations you have added to your digital media file. While there can only ever be <strong>one exact</strong> individual copy of a <strong>physical object</strong>, there always can be <strong>endless replicas</strong> of an "individual copy" of a <strong>digital object</strong>. It is very important to keep this difference in mind. Ignoring this fact has caused countless misunderstandings and is the source of confusion throughout the media industry – especially in realm of copyright and license discussions.</p>
 <p>We could try to define an <strong>individual digital copy</strong> by its location and exact content on a specific physical storage medium (like a DVD, SSD ...). But this does not account for the fact that it is nearly impossible to stop someone from creating an exact replica of that data or at least a snapshot or recording of the presentation of that data on another storage location.</p>
 <p>And most importantly such a replica does not affect the original data and even less can make it magically disappear. In contrast, if you give your individual copy of your book to someone else, you won't <strong>"have it"</strong> anymore. It is clear, that with digital media this <strong>cannot reliably be the case</strong>. The only way would be to build a <a href="https://opendime.com/">tamper-proof physical device</a> (secure element) that does not reveal the data itself, which would defeat the purpose by making the content itself unavailable. But there are ways to partially simulate such inherently physical properties in the digital world. Most notably with the emergence of blockchain technology it is now possible to have a <strong>cryptographically secured</strong> and publicly notarized tamper-proof <strong>certificate of ownership. </strong> This can serve as a record of agreement about ownership of an “individual copy”. But is does not by itself enforce location or accessibility of the content, nor does it prove the authorization of the certifying party itself or the legal validity of the agreement.</p>
+<h2 id="design-principles">Design Principles<a class="headerlink" href="#design-principles" title="Permanent link">#</a></h2>
+<p>As a generic content identifier the <strong>ISCC Standard</strong> is a an initiative with a broad scope. These are the principles that should guide its design and adoption:</p>
+<ul>
+<li>Target existing, unsolved, real-world problems</li>
+<li>Provide a technological and automatable solution</li>
+<li>Be generic and useful to a broad audience</li>
+<li>Keep the standard pragmatic and simple to implement</li>
+<li>Keep it extendable and forward compatible</li>
+<li>Provide marketable user-facing sample applications</li>
+<li>Provide machine readable test data for implementers</li>
+<li>Provide developer tools in different programming languages</li>
+<li>Promote implementations in different sectors</li>
+<li>The specification should be open and public</li>
+<li>Engage with other standards and interested parties</li>
+</ul>
 <h2 id="algorithmic-tools">Algorithmic Tools<a class="headerlink" href="#algorithmic-tools" title="Permanent link">#</a></h2>
 <p>While many details about the ISCC are still up for discussion we are quite confident about some of the general algorithmic families that will make it into the final specification for the identifier. These will play an important role in how we generate the different components of the identifier:</p>
 <ul>
@@ -924,7 +954,7 @@
       
     </div>
     
-      <script src="../assets/javascripts/application.b806dc00.js"></script>
+      <script src="../assets/javascripts/application.dc02f8ce.js"></script>
       
       <script>app.initialize({version:"1.0.4",url:{base:".."}})</script>
       

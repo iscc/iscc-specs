@@ -38,7 +38,7 @@
         <meta name="lang:search.tokenizer" content="[\s\-]+">
       
       <link rel="shortcut icon" href="../images/favicon.png">
-      <meta name="generator" content="mkdocs-1.0.4, mkdocs-material-4.0.1">
+      <meta name="generator" content="mkdocs-1.0.4, mkdocs-material-4.1.1">
     
     
       
@@ -46,7 +46,7 @@
       
     
     
-      <link rel="stylesheet" href="../assets/stylesheets/application.982221ab.css">
+      <link rel="stylesheet" href="../assets/stylesheets/application.3020aac5.css">
       
         <link rel="stylesheet" href="../assets/stylesheets/application-palette.224b79ff.css">
       
@@ -57,7 +57,7 @@
       
     
     
-      <script src="../assets/javascripts/modernizr.1f0bcf2b.js"></script>
+      <script src="../assets/javascripts/modernizr.01ccdecf.js"></script>
     
     
       
@@ -1300,16 +1300,17 @@
                 
                 
                 <h1 id="iscc-specification-v1x"><abbr title="International Standard Content Code">ISCC</abbr> - Specification v1.x<a class="headerlink" href="#iscc-specification-v1x" title="Permanent link">#</a></h1>
+<p><strong>Last revised on:</strong> 2019-04-15</p>
 <h2 id="abstract">Abstract<a class="headerlink" href="#abstract" title="Permanent link">#</a></h2>
 <p>The <strong>International Standard Content Code (<abbr title="International Standard Content Code">ISCC</abbr>)</strong>, is an open and decentralized digital media identifier. An <abbr title="International Standard Content Code">ISCC</abbr> can be created from digital content and its basic metadata by anybody who follows the procedures of the <abbr title="International Standard Content Code">ISCC</abbr> specification or by using open source software that supports <abbr title="International Standard Content Code">ISCC</abbr> creation <a href="#conformance-testing">conforming to the <abbr title="International Standard Content Code">ISCC</abbr> specification</a>.</p>
 <h2 id="note-to-readers">Note to Readers<a class="headerlink" href="#note-to-readers" title="Permanent link">#</a></h2>
-<p>For public discussion of issues for this specification please use the Github issue tracker: <a href="https://github.com//iscc-specs/issues">https://github.com//iscc-specs/issues</a>.</p>
+<p>For public discussion of issues for this specification please use the Github issue tracker: <a href="https://github.com/iscc/iscc-specs/issues">https://github.com/iscc/iscc-specs/issues</a>.</p>
 <p>The latest published version of this specification can be found at <a href="http://iscc.codes/specification/">http://iscc.codes/specification/</a>. </p>
 <p>Public review, discussion and contributions are welcome.</p>
 <h2 id="about-this-document">About this Document<a class="headerlink" href="#about-this-document" title="Permanent link">#</a></h2>
 <div class="admonition note">
 <p class="admonition-title">Document Version</p>
-<p>This is the latest in-development version of the <strong><abbr title="International Standard Content Code">ISCC</abbr> Specification</strong>. While there is already a <a href="https://github.com/iscc/iscc-specs/blob/version-1.0/docs/specification.md">Version 1.0</a> spec, we are still expecting backward incompatible changes until <strong>Version 2.0</strong> is released. Parts of this specification may already be or become stable erlier and will be documented so during minor releases. Partners are encouraged to follow development and test, implement and give feedback based on the latest (this) version of the <abbr title="International Standard Content Code">ISCC</abbr> Specification.  </p>
+<p>This is the latest in-development version of the <strong><abbr title="International Standard Content Code">ISCC</abbr> Specification</strong>. While there is already a <a href="https://github.com/iscc/iscc-specs/blob/version-1.0/docs/specification.md">Version 1.0</a> spec, we are still expecting backward incompatible changes until <strong>Version 2.0</strong> is released. Parts of this specification may already be or become stable earlier and will be documented so during minor releases. Partners are encouraged to follow development and test, implement and give feedback based on the latest (this) version of the <abbr title="International Standard Content Code">ISCC</abbr> Specification.  </p>
 </div>
 <p>This document proposes an open and vendor neutral <abbr title="International Standard Content Code">ISCC</abbr> standard and describes the technical procedures to create and manage <abbr title="International Standard Content Code">ISCC</abbr> identifiers. The first version of this document was produced as a prototype by the <a href="https://content-blockchain.org">Content Blockchain Project</a> and received funding from the <a href="https://digitalnewsinitiative.com/dni-projects/content-blockchain-project/">Google Digital News Initiative (DNI)</a>. The content of this document is determined by its authors in an open and public consensus process.</p>
 <h2 id="conventions-and-terminology">Conventions and Terminology<a class="headerlink" href="#conventions-and-terminology" title="Permanent link">#</a></h2>
@@ -1317,7 +1318,11 @@
 <h2 id="definitions">Definitions<a class="headerlink" href="#definitions" title="Permanent link">#</a></h2>
 <dl>
 <dt>Basic Metadata:</dt>
-<dd>Minimal set of metadata about the content that is identified by an <abbr title="International Standard Content Code">ISCC</abbr>. This metadata may impact the derived Meta-ID Component</dd>
+<dd>Minimal set of <abbr title="International Standard Content Code">ISCC</abbr>-specific top-level metadata that SHOULD be supported by applications.</dd>
+<dt>Bound Metadata:</dt>
+<dd>Metadata that is utilized during generation of the <abbr title="International Standard Content Code">ISCC</abbr>. A change of this <strong>bound metadata</strong> may therefore impact the derived <abbr title="International Standard Content Code">ISCC</abbr>..</dd>
+<dt>Extended Metadata:</dt>
+<dd>Industry and application-specific metadata attached to an <abbr title="International Standard Content Code">ISCC</abbr>.</dd>
 <dt>Character:</dt>
 <dd>Throughout this specification a <strong><abbr title="A character is defined as one Unicode code point">character</abbr></strong> is meant to be interpreted as one Unicode code point. This also means that due to the structure of Unicode a <abbr title="A character is defined as one Unicode code point">character</abbr> is not necessarily a full glyph but might be a combining accent or similar.</dd>
 <dt>Digital Media Object:</dt>
@@ -1370,7 +1375,7 @@
 <td align="left">Similarity Hash</td>
 <td align="left">Type specific</td>
 <td align="left"><abbr title="Content defined chunking">CDC</abbr>, Minimum Hash</td>
-<td align="left"><abbr title="Content defined chunking">CDC</abbr>, Hash Tree</td>
+<td align="left">Hash Tree</td>
 </tr>
 <tr>
 <td align="left"><strong>Size:</strong></td>
@@ -1511,8 +1516,8 @@
 </table>
 <p>The body section of each component is specific to the component and always 8-bytes and can thus be fit into a 64-bit integer for efficient data processing. The following sections give an overview of how the different components work and how they are generated.</p>
 <h3 id="meta-id-component">Meta-ID Component<a class="headerlink" href="#meta-id-component" title="Permanent link">#</a></h3>
-<p>The Meta-ID component starts with a 1-byte header <code>00000000</code>. The first nibble <code>0000</code> indicates that this is a Meta-ID component type. The second nibble <code>0000</code> indicates that it belongs to an <abbr title="International Standard Content Code">ISCC</abbr> of version 1. All subsequent components are expected to follow the specification of a version 1 <abbr title="International Standard Content Code">ISCC</abbr>.</p>
-<p>The Meta-ID body is built from a 64-bit <code>similarity_hash</code> over 4-<abbr title="A character is defined as one Unicode code point">character</abbr> n-grams of the basic metadata of the content to be identified.  The basic metadata supplied to the META-ID generating function is assumed to be UTF-8 encoded. Errors that occur during the decoding of such a bytestring input to a native Unicode MUST terminate the process and must not be silenced. An <abbr title="International Standard Content Code">ISCC</abbr> generating application MUST provide a <code>meta_id</code> function that accepts minimal and generic metadata and returns a <a href="#base58-iscc">Base58-<abbr title="International Standard Content Code">ISCC</abbr> encoded</a> Meta-ID component and trimmed metadata.</p>
+<p>The Meta-ID component starts with a 1-byte header <code>00000000</code>. The first nibble <code>0000</code> indicates that this is a Meta-ID component type. The second nibble <code>0000</code> indicates the <abbr title="International Standard Content Code">ISCC</abbr> of version starting with 0. All subsequent components are expected to follow the specification of the given <abbr title="International Standard Content Code">ISCC</abbr> version.</p>
+<p>The Meta-ID body is built from a 64-bit <code>similarity_hash</code> over 4-<abbr title="A character is defined as one Unicode code point">character</abbr> n-grams of the basic metadata of the content to be identified.  The basic metadata supplied to the Meta-ID generating function is assumed to be UTF-8 encoded. Errors that occur during the decoding of such a bytestring input to a native Unicode MUST terminate the process and must not be silenced. An <abbr title="International Standard Content Code">ISCC</abbr> generating application MUST provide a <code>meta_id</code> function that accepts minimal and generic metadata and returns a <a href="#base58-iscc">Base58-<abbr title="International Standard Content Code">ISCC</abbr> encoded</a> Meta-ID component and trimmed metadata.</p>
 <h4 id="inputs-to-meta-id-function">Inputs to Meta-ID function<a class="headerlink" href="#inputs-to-meta-id-function" title="Permanent link">#</a></h4>
 <table>
 <thead>
@@ -1534,7 +1539,7 @@
 <td align="left">extra</td>
 <td align="left">text</td>
 <td align="left">No</td>
-<td align="left">An optional short statement that distinguishes this intangible creation from another one for the purpose of Meta-ID uniqueness. (default: empty string)</td>
+<td align="left">An optional short statement that distinguishes this intangible creation from another one for the purpose of forced Meta-ID uniqueness. (default: empty string)</td>
 </tr>
 <tr>
 <td align="left">version</td>
@@ -1546,7 +1551,7 @@
 </table>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>The basic metadata inputs are intentionally simple and generic. We abstain from more specific metadata for Meta-ID generation in favor of compatibility across industries. Imagine a <em>creators</em> input-field for metadata. Who would you list as the creators of a movie? The directors, writers the main actors? Would you list some of them or if not how do you decide whom you will list. All disambiguation of similar title data can be accomplished with the extra-field. Industry- and application-specific metadata requirements can be supplied as extended metadata with <abbr title="International Standard Content Code">ISCC</abbr> registration.</p>
+<p>The basic metadata inputs are intentionally simple and generic. We abstain from more specific metadata for Meta-ID generation in favor of compatibility across industries. To support global clustering it is <strong>RECOMMENDED</strong> to <strong>only supply the title field</strong> for Meta-ID generation. Imagine a <em>creators</em> input-field for metadata. Who would you list as the creators of a movie? The directors, writers the main actors? Would you list some of them or if not how do you decide whom you will list. Global disambiguation of similar title data can be accomplished with the extra-field. Industry- and application-specific metadata requirements can be met by <a href="#extended-metadata">extended metadata</a>.</p>
 </div>
 <h4 id="generate-meta-id">Generate Meta-ID<a class="headerlink" href="#generate-meta-id" title="Permanent link">#</a></h4>
 <p>An <abbr title="International Standard Content Code">ISCC</abbr> generating application must follow these steps in the given order to produce a stable Meta-ID:</p>
@@ -1586,7 +1591,7 @@
 <table>
 <thead>
 <tr>
-<th align="left">Conent-ID Type</th>
+<th align="left">Content-ID Type</th>
 <th align="left">Nibble 2 Bits 0-3</th>
 <th>Description</th>
 </tr>
@@ -1685,7 +1690,7 @@
 <p>This is just one example that illustrates the flexibility that the <abbr title="Partial Content Flag">PCF</abbr>-Flag provides in concert with a grouping Meta-ID. With great flexibility comes great danger of complexity. Applications SHOULD do careful planning before using the <abbr title="Partial Content Flag">PCF</abbr>-Flag with internally defined semantics.</p>
 </div>
 <h3 id="data-id-component">Data-ID Component<a class="headerlink" href="#data-id-component" title="Permanent link">#</a></h3>
-<p>For the Data-ID that encodes data similarity we use a content defined chunking algorithm that provides some shift resistance and calculate the MinHash from those chunks. To accomodate for small files the first 100 chunks have a ~140-byte size target while the remaining chunks target ~ 6kb in size.</p>
+<p>For the Data-ID that encodes data similarity we use a content defined chunking algorithm that provides some shift resistance and calculate the MinHash from those chunks. To accommodate for small files the first 100 chunks have a ~140-byte size target while the remaining chunks target ~ 6kb in size.</p>
 <p>The Data-ID is built from the raw encoded data of the content to be identified. An <abbr title="International Standard Content Code">ISCC</abbr> generating application MUST provide a <code>data_id</code> function that accepts the raw encoded data as input.</p>
 <h4 id="generate-data-id">Generate Data-ID<a class="headerlink" href="#generate-data-id" title="Permanent link">#</a></h4>
 <ol>
@@ -1701,7 +1706,7 @@
 <p>See also: <a href="https://github.com/iscc/iscc-specs/blob/master/src/iscc/iscc.py#L137">Data-ID reference code</a></p>
 <h3 id="instance-id-component">Instance-ID Component<a class="headerlink" href="#instance-id-component" title="Permanent link">#</a></h3>
 <p>The Instance-ID is built from the raw data of the media object to be identified and serves as checksum for the media object. The raw data of the media object is split into 64-kB data-chunks. Then we build a hash-tree from those chunks and use the truncated <abbr title="Root hash of an Instance-ID hash-tree">tophash</abbr> (merkle root) as component body of the Instance-ID.</p>
-<p>To guard against length-extension attacks and second pre-image attacks we use double sha256 for hashing. We also prefix the hash input data with a <code>0x00</code>-byte for the leaf nodes hashes and with a <code>0x01</code>-byte for the  internal node hashes. While the Instance-ID itself is a non-cryptographic checksum, the full <abbr title="Root hash of an Instance-ID hash-tree">tophash</abbr> may be supplied in the extended metadata of an <abbr title="International Standard Content Code">ISCC</abbr> secure integrity verification is required.</p>
+<p>To guard against length-extension attacks and second preimage attacks we use double sha256 for hashing. We also prefix the hash input data with a <code>0x00</code>-byte for the leaf nodes hashes and with a <code>0x01</code>-byte for the  internal node hashes. While the Instance-ID itself is a non-cryptographic checksum, the full <abbr title="Root hash of an Instance-ID hash-tree">tophash</abbr> may be supplied in the extended metadata of an <abbr title="International Standard Content Code">ISCC</abbr> secure integrity verification is required.</p>
 <p><img alt="iscc-creation-instance-id" src="../images/iscc-creation-instance-id.svg" /></p>
 <p>An <abbr title="International Standard Content Code">ISCC</abbr> generating application MUST provide a <code>instance_id</code> function that accepts the raw data file as input and returns an encoded Instance-ID and a full hex-encoded 256-bit <abbr title="Root hash of an Instance-ID hash-tree">tophash</abbr>. </p>
 <h4 id="generate-instance-id">Generate Instance-ID<a class="headerlink" href="#generate-instance-id" title="Permanent link">#</a></h4>
@@ -1714,7 +1719,7 @@
 <li>Prepend the 1-byte component header (e.g. <code>0x30</code>).</li>
 <li>Encode resulting 9-byte sequence with <a href="#encode"><code>encode</code></a> to an Instance-ID Code</li>
 <li>Hex-Encode the <abbr title="Root hash of an Instance-ID hash-tree">tophash</abbr></li>
-<li>Return the Intance-ID and the hex-encoded <abbr title="Root hash of an Instance-ID hash-tree">tophash</abbr></li>
+<li>Return the Instance-ID and the hex-encoded <abbr title="Root hash of an Instance-ID hash-tree">tophash</abbr></li>
 </ol>
 <p>See also: <a href="https://github.com/iscc/iscc-specs/blob/master/src/iscc/iscc.py#L162">Instance-ID reference code</a> </p>
 <p>Applications may carry, store, and process the leaf node hashes for advanced streaming data identification or partial data integrity verification.</p>
@@ -1728,6 +1733,7 @@
 <th>Name</th>
 <th>Type</th>
 <th>Required</th>
+<th>Bound</th>
 <th>Description</th>
 </tr>
 </thead>
@@ -1736,11 +1742,13 @@
 <td>version</td>
 <td>integer</td>
 <td>No</td>
+<td>No</td>
 <td>Version of <abbr title="International Standard Content Code">ISCC</abbr> Specification. Assumed to be 1 if omitted.</td>
 </tr>
 <tr>
 <td>title</td>
 <td>text</td>
+<td>Yes</td>
 <td>Yes</td>
 <td>The title of an intangible creation identified by the <abbr title="International Standard Content Code">ISCC</abbr>. The normalized and trimmed UTF-8 encoded text MUST not exceed 128 Bytes. The result of processing <code>title</code> and <code>extra</code> data with the <code>meta_id</code> function MUST  match the Meta-ID component of the <abbr title="International Standard Content Code">ISCC</abbr>.</td>
 </tr>
@@ -1748,11 +1756,13 @@
 <td>extra</td>
 <td>text</td>
 <td>No</td>
+<td>Yes</td>
 <td>An optional short statement that distinguishes this intangible creation from another one for the purpose of Meta-ID uniqueness.</td>
 </tr>
 <tr>
 <td><abbr title="Root hash of an Instance-ID hash-tree">tophash</abbr></td>
 <td>text (hex)</td>
+<td>No</td>
 <td>No</td>
 <td>The full hex-encoded <abbr title="Root hash of an Instance-ID hash-tree">tophash</abbr> (merkle root) returned by the <code>instance_id</code>  function.</td>
 </tr>
@@ -1760,13 +1770,14 @@
 <td>meta</td>
 <td>array</td>
 <td>No</td>
+<td>No</td>
 <td>A list of one or more <strong>extended metadata</strong> entries. Must include at least one entry if specified.</td>
 </tr>
 </tbody>
 </table>
 <div class="admonition attention">
 <p class="admonition-title">Attention</p>
-<p>Depending on adoption and real world use, future versions of this specification may define new basic metadata fields. Applications MAY add custom fields at the top level of the JSON object but MUST prefix those fields with an underscore to avoid collisions with future extensions of this specification.</p>
+<p><strong>Bound</strong> metadata impacts the the <abbr title="Base58-ISCC encoded string representation of an ISCC">ISCC Code</abbr> (Meta-ID) and cannot be changed afterwards. Depending on adoption and real world use, future versions of this specification may define new basic metadata fields. Applications MAY add custom fields at the top level of the JSON object but MUST prefix those fields with an underscore to avoid collisions with future extensions of this specification.</p>
 </div>
 <h3 id="extended-metadata">Extended Metadata<a class="headerlink" href="#extended-metadata" title="Permanent link">#</a></h3>
 <p>Extended metadata for an <abbr title="International Standard Content Code">ISCC</abbr> is metadata that is not explicitly defined by this specification. All such metadata SHOULD be supplied as JSON objects within the top-level <code>meta</code>array field. This allows for a flexible and extendable way to supply additional industry specific metadata about the identified content. </p>
@@ -1809,7 +1820,7 @@
 <div class="admonition example">
 <p class="admonition-title"><abbr title="International Standard Content Code">ISCC</abbr> Embedding</p>
 <p>We are able to embed the following combination of components from the <a href="https://github.com/iscc/iscc-specs/edit/master/docs/specification.md">markdown version</a> of this document into the document itself because adding or removing them has no side effect:</p>
-<p><strong><abbr title="International Standard Content Code">ISCC</abbr></strong>: CCDbMYw6NfC8a-CThhWfJ7kCARM-CDhydHnBkcVUm</p>
+<p><strong><abbr title="International Standard Content Code">ISCC</abbr></strong>: CCDbMYw6NfC8a-CTWzdczHVbrgo-CDjefNiyPBXVs</p>
 </div>
 <h2 id="iscc-uri-scheme"><abbr title="International Standard Content Code">ISCC</abbr> URI Scheme<a class="headerlink" href="#iscc-uri-scheme" title="Permanent link">#</a></h2>
 <p>The purpose of the <abbr title="International Standard Content Code">ISCC</abbr> URI scheme based on <a href="https://www.ietf.org/rfc/rfc3986.txt">RFC 3986</a> is to enable users to easily discover information like metadata or license offerings about a <abbr title="International Standard Content Code">ISCC</abbr> marked content by simply clicking a link on a webpage or by scanning a QR-Code. </p>
@@ -1846,8 +1857,8 @@
 <p>The <abbr title="International Standard Content Code">ISCC</abbr> standardizes some content normalization procedures to support reproducible and stable identifiers. Following the list of normalization functions that MUST be provided by a conforming implementation.</p>
 <h4 id="text_pre_normalize">text_pre_normalize<a class="headerlink" href="#text_pre_normalize" title="Permanent link">#</a></h4>
 <p>Signature: <code>text_pre_normalize(text: str|bytes) -&gt; str</code></p>
-<p>Decodes raw plain-text data and applies Unicode <a href="http://www.unicode.org/reports/tr15/#Norm_Forms">Normalization Form KC (NFKC)</a> . The plain-text data MUST be stripped of any markup beforehand. Text input is expected to be UTF-8 encoded plain-text data or a native type of the implementing programming language that supports Unicode. Text decoding errors MUST fail with an error.</p>
-<p>See also: <a href="https://github.com/iscc/iscc-specs/blob/master/src/iscc/iscc.py#L193">Text pre-normalization reference code</a></p>
+<p>Decodes raw plain-text data, applies Unicode <a href="http://www.unicode.org/reports/tr15/#Norm_Forms">Normalization Form KC (NFKC)</a> and removes leading, trailing and duplicate whitespace. The plain-text data MUST be stripped of any markup beforehand. Text input is expected to be UTF-8 encoded plain-text data or a native type of the implementing programming language that supports Unicode. Text decoding errors MUST fail with an error.</p>
+<p>See also: <a href="https://github.com/iscc/iscc-specs/blob/master/src/iscc/iscc.py#L192">Text pre-normalization reference code</a></p>
 <h4 id="text_trim">text_trim<a class="headerlink" href="#text_trim" title="Permanent link">#</a></h4>
 <p>Signature: <code>text_trim(text: str) -&gt; str</code></p>
 <p>Trim text such that its UTF-8 encoded byte representation does not exceed 128-bytes each.</p>
@@ -1878,7 +1889,7 @@
 <p>The <abbr title="International Standard Content Code">ISCC</abbr> standardizes various feature hashing algorithms that reduce content features to a binary vector used as the body of the various Content-ID components.</p>
 <h4 id="similarity_hash">similarity_hash<a class="headerlink" href="#similarity_hash" title="Permanent link">#</a></h4>
 <p>Signature: <code>similarity_hash(hash_digests: Sequence[ByteString]) -&gt; bytes</code></p>
-<p>The <code>similarity_hash</code> function takes a sequence of hash digests which represent a set of features. Each of the digests MUST be of equal size. The function returns a new hash digest (raw 8-bit bytes) of the same size. For each bit in the input hashes calculate the number of hashes with that bit set and subtract the the count of hashes where it is not set. For the output hash set the same bit position to <code>0</code> if the count is negative or <code>1</code> if it is zero or positive. The resulting hash digest will retain similarity for similar sets of input hashes. See also  <a href="http://dx.doi.org/10.1145/509907.509965" title="Charikar, M.S., 2002, May. Similarity estimation techniques from rounding algorithms. In Proceedings of the thiry-fourth annual ACM symposium on Theory of computing (pp. 380-388). ACM.">[Charikar2002]</a>.</p>
+<p>The <code>similarity_hash</code> function takes a sequence of hash digests which represent a set of features. Each of the digests MUST be of equal size. The function returns a new hash digest (raw 8-bit bytes) of the same size. For each bit in the input hashes calculate the number of hashes with that bit set and subtract the the count of hashes where it is not set. For the output hash set the same bit position to <code>0</code> if the count is negative or <code>1</code> if it is zero or positive. The resulting hash digest will retain similarity for similar sets of input hashes. See also  <a href="http://dx.doi.org/10.1145/509907.509965" title="Charikar, M.S., 2002, May. Similarity estimation techniques from rounding algorithms. In Proceedings of the thirty-fourth annual ACM symposium on Theory of computing (pp. 380-388). ACM.">[Charikar2002]</a>.</p>
 <p><img alt="iscc-similarity-hash" src="../images/iscc-similarity-hash.svg" /></p>
 <p>See also: <a href="https://github.com/iscc/iscc-specs/blob/master/src/iscc/iscc.py#L257">Similarity hash reference code</a></p>
 <h4 id="minimum_hash">minimum_hash<a class="headerlink" href="#minimum_hash" title="Permanent link">#</a></h4>
@@ -1918,7 +1929,7 @@
 <p>Outputs that are expected to be raw bytes are embedded as HEX encoded strings in JSON and prefixed with  <code>hex:</code> to support automated decoding during implementation testing.</p>
 <div class="admonition example">
 <p class="admonition-title">Example</p>
-<p>Byte outputs in JSON testdata:</p>
+<p>Byte outputs in JSON test data:</p>
 <div class="codehilite"><pre><span></span>{
   &quot;data_chunks&quot;: {
     &quot;test_001_cat_jpg&quot;: {
@@ -2018,7 +2029,7 @@
       
     </div>
     
-      <script src="../assets/javascripts/application.b806dc00.js"></script>
+      <script src="../assets/javascripts/application.dc02f8ce.js"></script>
       
       <script>app.initialize({version:"1.0.4",url:{base:".."}})</script>
       
