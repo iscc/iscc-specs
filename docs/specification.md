@@ -10,7 +10,7 @@ The **International Standard Content Code (ISCC)**, is an open and decentralized
 
 ## Note to Readers
 
-For public discussion of issues for this specification please use the Github issue tracker: <https://github.com//iscc-specs/issues>.
+For public discussion of issues for this specification please use the Github issue tracker: <https://github.com/iscc/iscc-specs/issues>.
 
 The latest published version of this specification can be found at <http://iscc.codes/specification/>. 
 
