@@ -71,12 +71,12 @@ A **Fully Qualified ISCC Digest** is a fixed size sequence of **36 bytes (288 bi
 The ISCC Digest is built from multiple self-describing 72-bit components:
 
 
-| Components:     | Meta-ID             | Content-ID         | Data-ID           | Instance-ID    |
-| :-------------- | :------------------ | :----------------- | :---------------- | :------------- |
-| **Context:**    | Intangible creation | Content similarity | Data similarity   | Data checksum  |
-| **Input:**      | Metadata            | Extracted  content | Raw data          | Raw data       |
-| **Algorithms:** | Similarity Hash     | Type specific      | CDC, Minimum Hash | CDC, Hash Tree |
-| **Size:**       | 72 bits             | 72 bits            | 72 bits           | 72 bits        |
+| Components:     | Meta-ID             | Content-ID         | Data-ID           | Instance-ID   |
+| :-------------- | :------------------ | :----------------- | :---------------- | :------------ |
+| **Context:**    | Intangible creation | Content similarity | Data similarity   | Data checksum |
+| **Input:**      | Metadata            | Extracted  content | Raw data          | Raw data      |
+| **Algorithms:** | Similarity Hash     | Type specific      | CDC, Minimum Hash | Hash Tree     |
+| **Size:**       | 72 bits             | 72 bits            | 72 bits           | 72 bits       |
 
 ISCC components MAY be used separately or in combination by applications for various purposes. Individual components MUST be presented as 13-character [base58-iscc](#base58-iscc) encoded strings to end users and MAY be prefixed with their component name.
 
