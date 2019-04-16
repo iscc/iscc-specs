@@ -2,7 +2,7 @@
 ISCC Specification
 ==================
 
-|status| |pypi| |license|
+|status| |pypi| |license| |downloads|
 
 .. |status| image:: https://travis-ci.org/iscc/iscc-specs.svg?branch=master
    :target: https://travis-ci.org/iscc/iscc-specs
