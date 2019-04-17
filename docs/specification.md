@@ -369,7 +369,7 @@ To properly address the questions of identifier uniqueness, ownership and authen
 
 **The assignment of a canonical blockchain is NOT YET part of this specification.**
 
-Because this decision is of such vital importance, we would like to wait for more community involvement before these questions are addressed either in an updated version of this specification or in a separate specification. 
+Because this decision is of such vital importance, we suggest to wait for further feedback and additional community involvement before these questions are addressed either in an updated version of this specification or in a separate specification.
 
 Our recommendation to the community is, to agree on a decentralized, open, and public blockchain, that has specific support for registry-services such as the upcoming [Content Blockchain](https://content-blockchain.org/). This would maximize the value for all participants of the ecosystem. Governance and protocol related questions are currently being worked on by the Content Blockchain Project, to come up with a mature proposal.
 
