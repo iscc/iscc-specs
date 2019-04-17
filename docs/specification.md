@@ -365,7 +365,15 @@ As an open system the ISCC allows any person or organization to offer ISCC regis
 
 ### Blockchain Registry
 
-A well known, decentralized, open, and public registry for canonical discoverability of ISCC identified content is of great value. For this reason it is RECOMMENDED to register ISCC identifiers on the open `iscc` data-stream of the [Content Blockchain](https://content-blockchain.org/). For details please refer to the [ISCC-Stream specification](https://coblo.github.io/cips/cip-0003-iscc/) of the Content Blockchain.
+To properly address the questions of identifier uniqueness, ownership and authentication within the ISCC Standard, the assignment of a canonical blockchain is a requirement. The distributed nature of blockchains are a perfect fit for long-term persistent identifier registration and resolver services.
+
+**The assignment of a canonical blockchain is NOT YET part of this specification.**
+
+Because this decision is of such vital importance, we would like to wait for more community involvement before these questions are addressed either in an updated version of this specification or in a separate specification. 
+
+Our recommendation to the community is, to agree on a decentralized, open, and public blockchain, that has specific support for registry-services such as the upcoming [Content Blockchain](https://content-blockchain.org/). This would maximize the value for all participants of the ecosystem. Governance and protocol related questions are currently being worked on by the Content Blockchain Project, to come up with a mature proposal.
+
+See also: [ISCC-Stream specification](https://coblo.github.io/cips/cip-0003-iscc/). 
 
 ## ISCC Embedding
 
@@ -382,6 +390,10 @@ Applications MAY embed ISCC codes that have side effects if they specify a proce
     **ISCC**: CCDbMYw6NfC8a-CTWzdczHVbrgo-CDjefNiyPBXVs
 
 ## ISCC URI Scheme
+
+!!! note "Provisional Section"
+
+    The ISCC URI Scheme and link-resolver details, ultimately depend on identifier registration, ownership, uniqueness and governance related decisions which are not yet part of this specification. See also: [Blockchain Registry](#blockchain-registry).
 
 The purpose of the ISCC URI scheme based on [RFC 3986](https://www.ietf.org/rfc/rfc3986.txt) is to enable users to easily discover information like metadata or license offerings about a ISCC marked content by simply clicking a link on a webpage or by scanning a QR-Code. 
 
