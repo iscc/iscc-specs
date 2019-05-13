@@ -48,7 +48,7 @@ All specification documents can be found in the `./docs` subfolder or the reposi
 
 ## Contribute
 
-Pull requests and other contributions are welcome. Use the [Github Issues](https://github.com/iscc/iscc-specs/issues) section of this project to ask questions or discuss ideas for the **ISCC Specification**.
+Pull requests and other contributions are welcome. Use the [Github Issues](https://github.com/iscc/iscc-specs/issues) section of this project to discuss ideas for the **ISCC Specification**. You may also want  join our developer chat on Telegram at <https://t.me/iscc_dev>.
 
 ## License
 
