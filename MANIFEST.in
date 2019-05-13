@@ -1,6 +1,6 @@
 graft src
 
 include LICENSE
-include README.rst
+include README.md
 
 global-exclude *.py[cod] __pycache__ *.so *.dylib

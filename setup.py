@@ -6,7 +6,7 @@ from setuptools import setup, find_packages
 
 
 def readme():
-    with open('README.rst') as f:
+    with open('README.md') as f:
         return f.read()
 
 
@@ -25,6 +25,7 @@ setup(
     version=version(),
     description="ISCC: Reference Implementation",
     long_description=readme(),
+    long_description_content_type="text/markdown",
     author="Titusz Pan",
     author_email='tp@py7.de',
     url='https://github.com/iscc/iscc-specs',
