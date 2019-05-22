@@ -16,7 +16,7 @@ from iscc.const import *
 ###############################################################################
 
 
-def meta_id(title, extra='', version=1):
+def meta_id(title, extra="", version=1):
 
     # 1. Verify version is supported
     assert version == 1, "Only version 1 supported"
@@ -30,7 +30,7 @@ def meta_id(title, extra='', version=1):
     extra = text_trim(extra)
 
     # 4. Concatenate
-    concat = '\u0020'.join((title, extra)).strip()
+    concat = "\u0020".join((title, extra)).strip()
 
     # 5. Normalization
     normalized = text_normalize(concat)
@@ -39,7 +39,7 @@ def meta_id(title, extra='', version=1):
     n_grams = sliding_window(normalized, width=WINDOW_SIZE_MID)
 
     # 7. Encode n-grams and create xxhash64-digest
-    hash_digests = [xxhash.xxh64(s.encode('utf-8')).digest() for s in n_grams]
+    hash_digests = [xxhash.xxh64(s.encode("utf-8")).digest() for s in n_grams]
 
     # 8. Apply similarity_hash
     simhash_digest = similarity_hash(hash_digests)
@@ -66,20 +66,20 @@ def content_id_text(text, partial=False):
     w = text.split()
 
     # 4. Create 5 word shingles
-    shingles = ('\u0020'.join(l) for l in sliding_window(w, WINDOW_SIZE_CID_T))
+    shingles = ("\u0020".join(l) for l in sliding_window(w, WINDOW_SIZE_CID_T))
 
     # 5. Create 32-bit features with xxHash32
-    features = (xxhash.xxh32(s.encode('utf-8')).intdigest() for s in shingles)
+    features = (xxhash.xxh32(s.encode("utf-8")).intdigest() for s in shingles)
 
     # 6. Apply minimum_hash
     minhash = minimum_hash(features)
 
     # 7. Collect least significant bits
-    lsb = ''.join([str(x & 1) for x in minhash])
+    lsb = "".join([str(x & 1) for x in minhash])
 
     # 8. Create two 64-bit digests
-    a = int(lsb[:64], 2).to_bytes(8, 'big', signed=False)
-    b = int(lsb[64:], 2).to_bytes(8, 'big', signed=False)
+    a = int(lsb[:64], 2).to_bytes(8, "big", signed=False)
+    b = int(lsb[64:], 2).to_bytes(8, "big", signed=False)
 
     # 9. Apply simhash to digests
     simhash_digest = similarity_hash((a, b))
@@ -142,11 +142,11 @@ def data_id(data):
     minhash = minimum_hash(features)
 
     # 4. Collect least significant bits
-    lsb = ''.join([str(x & 1) for x in minhash])
+    lsb = "".join([str(x & 1) for x in minhash])
 
     # 5. Create two 64-bit digests
-    a = int(lsb[:64], 2).to_bytes(8, 'big', signed=False)
-    b = int(lsb[64:], 2).to_bytes(8, 'big', signed=False)
+    a = int(lsb[:64], 2).to_bytes(8, "big", signed=False)
+    b = int(lsb[64:], 2).to_bytes(8, "big", signed=False)
 
     # 6. Apply simhash
     simhash_digest = similarity_hash((a, b))
@@ -161,9 +161,9 @@ def data_id(data):
 def instance_id(data):
 
     if isinstance(data, str):
-        data = open(data, 'rb')
+        data = open(data, "rb")
 
-    if not hasattr(data, 'read'):
+    if not hasattr(data, "read"):
         data = BytesIO(data)
 
     leaf_node_digests = []
@@ -171,7 +171,7 @@ def instance_id(data):
     while True:
         chunk = data.read(64000)
         if chunk:
-            leaf_node_digests.append(sha256d(b'\x00' + chunk))
+            leaf_node_digests.append(sha256d(b"\x00" + chunk))
         else:
             break
 
@@ -179,7 +179,7 @@ def instance_id(data):
     instance_id_digest = HEAD_IID + top_hash_digest[:8]
 
     code = encode(instance_id_digest)
-    hex_hash = hexlify(top_hash_digest).decode('ascii')
+    hex_hash = hexlify(top_hash_digest).decode("ascii")
 
     return [code, hex_hash]
 
@@ -192,38 +192,38 @@ def instance_id(data):
 def text_pre_normalize(text):
 
     if isinstance(text, bytes):
-        text = text.decode('utf-8')
-    text = unicodedata.normalize('NFKC', text).strip()
-    text = ' '.join(text.split())
+        text = text.decode("utf-8")
+    text = unicodedata.normalize("NFKC", text).strip()
+    text = " ".join(text.split())
     return text
 
 
 def text_trim(text):
 
-    return text.encode('utf-8')[:INPUT_TRIM].decode('utf-8', 'ignore')
+    return text.encode("utf-8")[:INPUT_TRIM].decode("utf-8", "ignore")
 
 
 def text_normalize(text):
 
     # 1. Decompose with NFD
-    decomposed = unicodedata.normalize('NFD', text)
+    decomposed = unicodedata.normalize("NFD", text)
 
     # 2. Filter and normalize
     chars = []
-    whitelist = 'LNS'
+    whitelist = "LNS"
     for c in decomposed:
         cat = unicodedata.category(c)
-        if cat.startswith('Z') or c in ('\n', '\r'):
-            if not chars or chars[-1] != '\u0020':
-                chars.append('\u0020')
+        if cat.startswith("Z") or c in ("\n", "\r"):
+            if not chars or chars[-1] != "\u0020":
+                chars.append("\u0020")
         elif cat[0] in whitelist:
             chars.append(c.lower())
 
     # 3. Remove leading/trailing whitespace
-    filtered_text = ''.join(chars).strip()
+    filtered_text = "".join(chars).strip()
 
     # 4. Re-Compose with NFC
-    recomposed = unicodedata.normalize('NFC', filtered_text)
+    recomposed = unicodedata.normalize("NFC", filtered_text)
 
     return recomposed
 
@@ -240,10 +240,7 @@ def image_normalize(img):
     img = img.resize((32, 32), Image.BICUBIC)
 
     # 3. Create two dimensional array
-    pixels = [
-        [list(img.getdata())[32 * i + j] for j in range(32)]
-        for i in range(32)
-    ]
+    pixels = [[list(img.getdata())[32 * i + j] for j in range(32)] for i in range(32)]
 
     return pixels
 
@@ -256,25 +253,25 @@ def image_normalize(img):
 def similarity_hash(hash_digests):
 
     n_bytes = len(hash_digests[0])
-    n_bits = (n_bytes * 8)
+    n_bits = n_bytes * 8
     vector = [0] * n_bits
 
     for digest in hash_digests:
 
         assert len(digest) == n_bytes
-        h = int.from_bytes(digest, 'big', signed=False)
+        h = int.from_bytes(digest, "big", signed=False)
 
         for i in range(n_bits):
             vector[i] += h & 1
             h >>= 1
 
-    minfeatures = len(hash_digests) * 1. / 2
+    minfeatures = len(hash_digests) * 1.0 / 2
     shash = 0
 
     for i in range(n_bits):
         shash |= int(vector[i] >= minfeatures) << i
 
-    return shash.to_bytes(n_bytes, 'big', signed=False)
+    return shash.to_bytes(n_bytes, "big", signed=False)
 
 
 def minimum_hash(features):
@@ -318,13 +315,13 @@ def image_hash(pixels):
     med = median(flat_list)
 
     # 5. Create 64-bit digest by comparing to median
-    bitstring = ''
+    bitstring = ""
     for value in flat_list:
         if value > med:
-            bitstring += '1'
+            bitstring += "1"
         else:
-            bitstring += '0'
-    hash_digest = int(bitstring, 2).to_bytes(8, 'big', signed=False)
+            bitstring += "0"
+    hash_digest = int(bitstring, 2).to_bytes(8, "big", signed=False)
 
     return hash_digest
 
@@ -353,15 +350,15 @@ def sha256d(data):
 
 def hash_inner_nodes(a, b):
 
-    return sha256d(b'\x01' + a + b)
+    return sha256d(b"\x01" + a + b)
 
 
 def data_chunks(data):
 
     if isinstance(data, str):
-        data = open(data, 'rb')
+        data = open(data, "rb")
 
-    if not hasattr(data, 'read'):
+    if not hasattr(data, "read"):
         data = BytesIO(data)
 
     section = data.read(GEAR1_MAX)
@@ -373,12 +370,7 @@ def data_chunks(data):
             if len(section) == 0:
                 break
             boundary = chunk_length(
-                section,
-                GEAR1_NORM,
-                GEAR1_MIN,
-                GEAR1_MAX,
-                GEAR1_MASK1,
-                GEAR1_MASK2,
+                section, GEAR1_NORM, GEAR1_MIN, GEAR1_MAX, GEAR1_MASK1, GEAR1_MASK2
             )
         else:
             if len(section) < GEAR2_MAX:
@@ -386,12 +378,7 @@ def data_chunks(data):
             if len(section) == 0:
                 break
             boundary = chunk_length(
-                section,
-                GEAR2_NORM,
-                GEAR2_MIN,
-                GEAR2_MAX,
-                GEAR2_MASK1,
-                GEAR2_MASK2,
+                section, GEAR2_NORM, GEAR2_MIN, GEAR2_MAX, GEAR2_MASK1, GEAR2_MASK2
             )
 
         yield section[:boundary]
@@ -428,7 +415,7 @@ def sliding_window(seq, width):
 
     assert width >= 2, "Sliding window width must be 2 or bigger."
     idx = range(max(len(seq) - width + 1, 1))
-    return (seq[i:i + width] for i in idx)
+    return (seq[i : i + width] for i in idx)
 
 
 def dct(values_list):
@@ -445,9 +432,11 @@ def dct(values_list):
     else:
         half = n // 2
         alpha = [(values_list[i] + values_list[-(i + 1)]) for i in range(half)]
-        beta = [(values_list[i] - values_list[-(i + 1)]) / (
-                math.cos((i + 0.5) * math.pi / n) * 2.0)
-                for i in range(half)]
+        beta = [
+            (values_list[i] - values_list[-(i + 1)])
+            / (math.cos((i + 0.5) * math.pi / n) * 2.0)
+            for i in range(half)
+        ]
         alpha = dct(alpha)
         beta = dct(beta)
         result = []
@@ -466,10 +455,10 @@ def distance(a, b):
         b = decode(b)[1:]
 
     if isinstance(a, bytes) and isinstance(b, bytes):
-        a = int.from_bytes(a, 'big', signed=False)
-        b = int.from_bytes(b, 'big', signed=False)
+        a = int.from_bytes(a, "big", signed=False)
+        b = int.from_bytes(b, "big", signed=False)
 
-    return bin(a ^ b).count('1')
+    return bin(a ^ b).count("1")
 
 
 def encode(digest):
@@ -489,7 +478,7 @@ def encode(digest):
         chars.append(value % 58)
         value //= 58
         numvalues //= 58
-    return str.translate(''.join([chr(c) for c in reversed(chars)]), V2CTABLE)
+    return str.translate("".join([chr(c) for c in reversed(chars)]), V2CTABLE)
 
 
 def decode(code):
@@ -502,7 +491,7 @@ def decode(code):
     elif n == 11:
         bit_length = 64
     else:
-        raise ValueError('Code must be 2, 11 or 13 chars. Not %s' % n)
+        raise ValueError("Code must be 2, 11 or 13 chars. Not %s" % n)
     code = reversed(str.translate(code, C2VTABLE))
     value = 0
     numvalues = 1
