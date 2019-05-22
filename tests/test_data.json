@@ -4008,11 +4008,11 @@
       ],
       "outputs": "c 가 ω ℍ ① i⁹ ¼ ǆ ⫝ ȴ ȷ ɂ c"
     },
-    "test_002_triky": {
+    "test_002_tricky": {
       "inputs": [
-        "Iñtërnâtiônàlizætiøn☃ and string escaping are ticky &#160; things"
+        "  Iñtërnâtiôn\nàlizætiøn☃💩 –  is a tric\t ky   thing!\r"
       ],
-      "outputs": "internationalizætiøn☃ and string escaping are ticky 160 things"
+      "outputs": "internation alizætiøn☃💩 is a tric ky thing"
     }
   },
   "text_pre_normalize": {
