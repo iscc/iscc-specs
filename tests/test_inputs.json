@@ -223,6 +223,12 @@
       "inputs": [
         "  Iñtërnâtiôn\nàlizætiøn☃💩 –  is a tric\t ky \u00A0 thing!\r"
       ]
+    },
+    "test_002_tricky_ws": {
+      "inputs": [
+        "  Iñtërnâtiôn\nàlizætiøn☃💩 –  is a tric\t ky \u00A0 thing!\r",
+        true
+      ]
     }
   },
   "text_pre_normalize": {

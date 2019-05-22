@@ -4013,6 +4013,13 @@
         "  Iñtërnâtiôn\nàlizætiøn☃💩 –  is a tric\t ky   thing!\r"
       ],
       "outputs": "internationalizætiøn☃💩isatrickything"
+    },
+    "test_002_tricky_ws": {
+      "inputs": [
+        "  Iñtërnâtiôn\nàlizætiøn☃💩 –  is a tric\t ky   thing!\r",
+        true
+      ],
+      "outputs": "internationalizætiøn☃💩 is a tric ky thing"
     }
   },
   "text_pre_normalize": {
