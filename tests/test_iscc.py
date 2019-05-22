@@ -81,14 +81,14 @@ def test_decode():
 def test_content_id_text():
     cid_t_np = iscc.content_id_text('')
     assert len(cid_t_np) == 13
-    assert "CTiesaXaMqbbU" == cid_t_np
+    assert cid_t_np =="CT9LNrqVFxZgm"
     cid_t_p = iscc.content_id_text('', partial=True)
-    assert "CtiesaXaMqbbU" == cid_t_p
+    assert cid_t_p == "Ct9LNrqVFxZgm"
     assert 0 == iscc.distance(cid_t_p, cid_t_np)
 
     cid_t_a = iscc.content_id_text(TEXT_A)
     cid_t_b = iscc.content_id_text(TEXT_B)
-    assert 1 == iscc.distance(cid_t_a, cid_t_b)
+    assert iscc.distance(cid_t_a, cid_t_b) == 2
 
 
 def test_text_normalize():
@@ -191,14 +191,14 @@ def test_content_id_mixed():
     cid_t_2 = iscc.content_id_text('Another Text')
 
     cid_m = iscc.content_id_mixed([cid_t_1])
-    assert cid_m == "CM3oME4TtXogc"
+    assert cid_m == "CM3gtBVnFtjoK"
 
     cid_m = iscc.content_id_mixed([cid_t_1, cid_t_2])
-    assert cid_m == "CM3RQtGc98nXg"
+    assert cid_m == "CM3SUCYGcsZnW"
 
     cid_i = iscc.content_id_image('lenna.jpg')
     cid_m = iscc.content_id_mixed([cid_t_1, cid_t_2, cid_i])
-    assert cid_m == "CM3ovx7zUEy38"
+    assert cid_m == "CM3SVFdEooZNR"
 
 
 def test_data_id():

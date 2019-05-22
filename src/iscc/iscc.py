@@ -56,41 +56,35 @@ def meta_id(title, extra="", version=1):
 
 def content_id_text(text, partial=False):
 
-    # 1. Pre-normalize
-    text = text_pre_normalize(text)
+    # 1. Convert bytes to str
+    if isinstance(text, bytes):
+        text = text.decode("utf-8")
 
-    # 2. Normalize
-    text = text_normalize(text, keep_ws=True)
+    # 2. Normalize (drop whitespace)
+    text = text_normalize(text, keep_ws=False)
 
-    # 3. Split to words
-    w = text.split()
-
-    # 4. Create 5 word shingles
-    shingles = ("\u0020".join(l) for l in sliding_window(w, WINDOW_SIZE_CID_T))
+    # 4. Create 13 character n-grams
+    ngrams = ("\u0020".join(l) for l in sliding_window(text, WINDOW_SIZE_CID_T))
 
     # 5. Create 32-bit features with xxHash32
-    features = (xxhash.xxh32(s.encode("utf-8")).intdigest() for s in shingles)
+    features = (xxhash.xxh32(s.encode("utf-8")).intdigest() for s in ngrams)
 
     # 6. Apply minimum_hash
     minhash = minimum_hash(features)
 
-    # 7. Collect least significant bits
-    lsb = "".join([str(x & 1) for x in minhash])
+    # 7. Collect least significant bits of first 64 minhash signatures
+    lsb = "".join([str(x & 1) for x in minhash[:64]])
 
-    # 8. Create two 64-bit digests
-    a = int(lsb[:64], 2).to_bytes(8, "big", signed=False)
-    b = int(lsb[64:], 2).to_bytes(8, "big", signed=False)
+    # 8. Create 64-bit digests
+    digest = int(lsb, 2).to_bytes(8, "big", signed=False)
 
-    # 9. Apply simhash to digests
-    simhash_digest = similarity_hash((a, b))
-
-    # 10. Prepend component header
+    # 9. Prepend component header
     if partial:
-        content_id_text_digest = HEAD_CID_T_PCF + simhash_digest
+        content_id_text_digest = HEAD_CID_T_PCF + digest
     else:
-        content_id_text_digest = HEAD_CID_T + simhash_digest
+        content_id_text_digest = HEAD_CID_T + digest
 
-    # 11. Encode and return
+    # 10. Encode and return
     return encode(content_id_text_digest)
 
 
