@@ -17,6 +17,28 @@ HEAD_DID = b"\x20"
 HEAD_IID = b"\x30"
 
 # Algorithm Constants
+
+# Unicode categories to remove during text normalization
+UNICODE_FILTER = frozenset(
+    {
+        "Cc",
+        "Cf",
+        "Cn",
+        "Co",
+        "Cs",
+        "Mc",
+        "Me",
+        "Mn",
+        "Pc",
+        "Pd",
+        "Pe",
+        "Pf",
+        "Pi",
+        "Po",
+        "Ps",
+    }
+)
+
 SYMBOLS = "C23456789rB1ZEFGTtYiAaVvMmHUPWXKDNbcdefghLjkSnopRqsJuQwxyz"
 VALUES = "".join([chr(i) for i in range(58)])
 C2VTABLE = str.maketrans(SYMBOLS, VALUES)

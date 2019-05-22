@@ -33,7 +33,7 @@ def meta_id(title, extra="", version=1):
     concat = "\u0020".join((title, extra)).strip()
 
     # 5. Normalization
-    normalized = text_normalize(concat)
+    normalized = text_normalize(concat, keep_ws=True)
 
     # 6. Create a list of n-grams
     n_grams = sliding_window(normalized, width=WINDOW_SIZE_MID)
@@ -60,7 +60,7 @@ def content_id_text(text, partial=False):
     text = text_pre_normalize(text)
 
     # 2. Normalize
-    text = text_normalize(text)
+    text = text_normalize(text, keep_ws=True)
 
     # 3. Split to words
     w = text.split()
@@ -203,29 +203,32 @@ def text_trim(text):
     return text.encode("utf-8")[:INPUT_TRIM].decode("utf-8", "ignore")
 
 
-def text_normalize(text):
+def text_normalize(text, keep_ws=False):
 
-    # 1. Decompose with NFD
+    # 1. Remove leading/trailing whitespace
+    text = text.strip()
+
+    # 2. Lower case
+    text = text.lower()
+
+    # 3. Decompose with NFD
     decomposed = unicodedata.normalize("NFD", text)
 
-    # 2. Filter and normalize
+    # 4. Filter
     chars = []
-    whitelist = "LNS"
     for c in decomposed:
         cat = unicodedata.category(c)
-        if cat.startswith("Z") or c in ("\n", "\r"):
-            if not chars or chars[-1] != "\u0020":
-                chars.append("\u0020")
-        elif cat[0] in whitelist:
-            chars.append(c.lower())
+        if cat not in UNICODE_FILTER:
+            chars.append(c)
+    filtered_text = "".join(chars)
 
-    # 3. Remove leading/trailing whitespace
-    filtered_text = "".join(chars).strip()
+    # Keep or remove whitespace (remove duplicate whitespace)
+    if keep_ws:
+        text = " ".join(filtered_text.split())
+    else:
+        text = "".join(filtered_text.split())
 
-    # 4. Re-Compose with NFC
-    recomposed = unicodedata.normalize("NFC", filtered_text)
-
-    return recomposed
+    return text
 
 
 def image_normalize(img):

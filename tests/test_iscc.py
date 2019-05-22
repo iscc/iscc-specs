@@ -92,13 +92,16 @@ def test_content_id_text():
 
 
 def test_text_normalize():
-    text = 'Iñtërnâtiônàlizætiøn☃💩 is a ticky \u00A0 thing'
-    normalized = iscc.text_normalize(text)
-    assert normalized == 'internationalizætiøn☃💩 is a ticky thing'
+    text = '  Iñtërnâtiôn\nàlizætiøn☃💩 –  is a tric\t ky \u00A0 thing!\r'
+    normalized = iscc.text_normalize(text, keep_ws=False)
+    assert normalized == 'internationalizætiøn☃💩isatrickything'
+
+    normalized = iscc.text_normalize(text, keep_ws=True)
+    assert normalized == 'internationalizætiøn☃💩 is a tric ky thing'
 
     assert iscc.text_normalize(' ') == ''
-    assert iscc.text_normalize('  Hello  World ? ') == 'hello world'
-    assert iscc.text_normalize('Hello\nWorld') == 'hello world'
+    assert iscc.text_normalize('  Hello  World ? ', keep_ws=True) == 'hello world'
+    assert iscc.text_normalize('Hello\nWorld', keep_ws=True) == 'helloworld'
 
 
 def test_trim_text():
