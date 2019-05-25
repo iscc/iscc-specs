@@ -205,7 +205,7 @@ def test_data_id():
     random.seed(1)
     data = bytearray([random.getrandbits(8) for _ in range(1000000)])  # 1 mb
     did_a = iscc.data_id(data)
-    assert did_a == 'CDjPCoxV16Ppq'
+    assert did_a == 'CDgoPMRA5zQU4'
     data.insert(500000, 1)
     data.insert(500001, 2)
     data.insert(500002, 3)
@@ -214,7 +214,7 @@ def test_data_id():
     for x in range(100):  # insert 100 bytes random noise
         data.insert(random.randint(0, 1000000), random.randint(0, 255))
     did_c = iscc.data_id(data)
-    assert iscc.distance(did_a, did_c) == 7
+    assert iscc.distance(did_a, did_c) == 8
 
 
 def test_instance_id():

@@ -424,19 +424,19 @@
       "inputs": [
         "cat.jpg"
       ],
-      "outputs": "CDh996KkRgC34"
+      "outputs": "CDf6SP1KoPDSL"
     },
     "test_002_cat_png": {
       "inputs": [
         "cat.png"
       ],
-      "outputs": "CDAgZjqpbP6Rj"
+      "outputs": "CDrxNj7FwGiPD"
     },
     "test_003_cat_gif": {
       "inputs": [
         "cat.gif"
       ],
-      "outputs": "CDjpaaXM6Virr"
+      "outputs": "CDBmDvXDqnXCG"
     }
   },
   "image_normalize": {

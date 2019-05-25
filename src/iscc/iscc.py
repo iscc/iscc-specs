@@ -136,19 +136,15 @@ def data_id(data):
     minhash = minimum_hash(features)
 
     # 4. Collect least significant bits
-    lsb = "".join([str(x & 1) for x in minhash])
+    lsb = "".join([str(x & 1) for x in minhash[:64]])
 
-    # 5. Create two 64-bit digests
-    a = int(lsb[:64], 2).to_bytes(8, "big", signed=False)
-    b = int(lsb[64:], 2).to_bytes(8, "big", signed=False)
+    # 5. Create 64-bit digests
+    digest = int(lsb, 2).to_bytes(8, "big", signed=False)
 
-    # 6. Apply simhash
-    simhash_digest = similarity_hash((a, b))
+    # 6. Prepend the 1-byte header
+    data_id_digest = HEAD_DID + digest
 
-    # 7. Prepend the 1-byte header
-    data_id_digest = HEAD_DID + simhash_digest
-
-    # 8. Encode and return
+    # 7. Encode and return
     return encode(data_id_digest)
 
 
