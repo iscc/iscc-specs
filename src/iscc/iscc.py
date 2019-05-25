@@ -196,29 +196,32 @@ def text_trim(text):
 def text_normalize(text, keep_ws=False):
 
     # 1. Remove leading/trailing whitespace
-    text = text.strip()
+    text_stripped = text.strip()
 
     # 2. Lower case
-    text = text.lower()
+    text_lower = text_stripped.lower()
 
     # 3. Decompose with NFD
-    decomposed = unicodedata.normalize("NFD", text)
+    text_decomposed = unicodedata.normalize("NFD", text_lower)
 
     # 4. Filter
     chars = []
-    for c in decomposed:
+    for c in text_decomposed:
         cat = unicodedata.category(c)
         if cat not in UNICODE_FILTER:
             chars.append(c)
-    filtered_text = "".join(chars)
+    text_filtered = "".join(chars)
 
-    # Keep or remove whitespace (remove duplicate whitespace)
+    # 5. Keep or remove whitespace (remove duplicate whitespace)
     if keep_ws:
-        text = " ".join(filtered_text.split())
+        wsproc_text = " ".join(text_filtered.split())
     else:
-        text = "".join(filtered_text.split())
+        wsproc_text = "".join(text_filtered.split())
 
-    return text
+    # Recombine
+    recombined = unicodedata.normalize("NFKC", wsproc_text)
+
+    return recombined
 
 
 def image_normalize(img):
