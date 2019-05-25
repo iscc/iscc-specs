@@ -22,8 +22,8 @@ def meta_id(title, extra="", version=1):
     assert version == 1, "Only version 1 supported"
 
     # 2. Pre-Normalization
-    title = text_pre_normalize(title)
-    extra = text_pre_normalize(extra)
+    title = text_normalize(title, keep_ws=True)
+    extra = text_normalize(extra, keep_ws=True)
 
     # 3. Trimming
     title = text_trim(title)
@@ -32,11 +32,8 @@ def meta_id(title, extra="", version=1):
     # 4. Concatenate
     concat = "\u0020".join((title, extra)).strip()
 
-    # 5. Normalization
-    normalized = text_normalize(concat, keep_ws=True)
-
-    # 6. Create a list of n-grams
-    n_grams = sliding_window(normalized, width=WINDOW_SIZE_MID)
+    # 5. Create a list of n-grams
+    n_grams = sliding_window(concat, width=WINDOW_SIZE_MID)
 
     # 7. Encode n-grams and create xxhash64-digest
     hash_digests = [xxhash.xxh64(s.encode("utf-8")).digest() for s in n_grams]
@@ -56,35 +53,31 @@ def meta_id(title, extra="", version=1):
 
 def content_id_text(text, partial=False):
 
-    # 1. Convert bytes to str
-    if isinstance(text, bytes):
-        text = text.decode("utf-8")
-
-    # 2. Normalize (drop whitespace)
+    # 1. Normalize (drop whitespace)
     text = text_normalize(text, keep_ws=False)
 
-    # 4. Create 13 character n-grams
+    # 2. Create 13 character n-grams
     ngrams = ("\u0020".join(l) for l in sliding_window(text, WINDOW_SIZE_CID_T))
 
-    # 5. Create 32-bit features with xxHash32
+    # 3. Create 32-bit features with xxHash32
     features = (xxhash.xxh32(s.encode("utf-8")).intdigest() for s in ngrams)
 
-    # 6. Apply minimum_hash
+    # 4. Apply minimum_hash
     minhash = minimum_hash(features)
 
-    # 7. Collect least significant bits of first 64 minhash signatures
+    # 5. Collect least significant bits of first 64 minhash signatures
     lsb = "".join([str(x & 1) for x in minhash[:64]])
 
-    # 8. Create 64-bit digests
+    # 6. Create 64-bit digests
     digest = int(lsb, 2).to_bytes(8, "big", signed=False)
 
-    # 9. Prepend component header
+    # 7. Prepend component header
     if partial:
         content_id_text_digest = HEAD_CID_T_PCF + digest
     else:
         content_id_text_digest = HEAD_CID_T + digest
 
-    # 10. Encode and return
+    # 8. Encode and return
     return encode(content_id_text_digest)
 
 
@@ -179,15 +172,6 @@ def instance_id(data):
 ###############################################################################
 
 
-def text_pre_normalize(text):
-
-    if isinstance(text, bytes):
-        text = text.decode("utf-8")
-    text = unicodedata.normalize("NFKC", text).strip()
-    text = " ".join(text.split())
-    return text
-
-
 def text_trim(text):
 
     return text.encode("utf-8")[:INPUT_TRIM].decode("utf-8", "ignore")
@@ -195,16 +179,20 @@ def text_trim(text):
 
 def text_normalize(text, keep_ws=False):
 
-    # 1. Remove leading/trailing whitespace
+    # 1. Convert bytes to str
+    if isinstance(text, bytes):
+        text = text.decode("utf-8")
+
+    # 2. Remove leading/trailing whitespace
     text_stripped = text.strip()
 
-    # 2. Lower case
+    # 3. Lower case
     text_lower = text_stripped.lower()
 
-    # 3. Decompose with NFD
+    # 4. Decompose with NFD
     text_decomposed = unicodedata.normalize("NFD", text_lower)
 
-    # 4. Filter
+    # 5. Filter
     chars = []
     for c in text_decomposed:
         cat = unicodedata.category(c)
@@ -212,13 +200,13 @@ def text_normalize(text, keep_ws=False):
             chars.append(c)
     text_filtered = "".join(chars)
 
-    # 5. Keep or remove whitespace (remove duplicate whitespace)
+    # 6. Keep or remove whitespace (remove duplicate whitespace)
     if keep_ws:
         wsproc_text = " ".join(text_filtered.split())
     else:
         wsproc_text = "".join(text_filtered.split())
 
-    # Recombine
+    # 7. Recombine
     recombined = unicodedata.normalize("NFKC", wsproc_text)
 
     return recombined

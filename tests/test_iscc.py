@@ -54,7 +54,7 @@ def test_meta_id():
 
     mid1, title, extra = iscc.meta_id('Die Unendliche Geschichte')
     assert mid1 == "CCAKevDpE1eEL"
-    assert title == 'Die Unendliche Geschichte'
+    assert title == 'die unendliche geschichte'
     assert extra == ''
     mid2 = iscc.meta_id(' Die unéndlíche,  Geschichte ')[0]
     assert mid1 == mid2

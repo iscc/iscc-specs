@@ -3774,7 +3774,7 @@
       ],
       "outputs": [
         "CCAKevDpE1eEL",
-        "Die Unendliche Geschichte",
+        "die unendliche geschichte",
         ""
       ]
     },
@@ -3785,7 +3785,7 @@
       ],
       "outputs": [
         "CCAKevDpE1eEL",
-        "Die Unendliche, Geschichte",
+        "die unendliche geschichte",
         ""
       ]
     },
@@ -3796,7 +3796,7 @@
       ],
       "outputs": [
         "CCAKevDpE1eEL",
-        "Die Unendliche, Geschichte",
+        "die unendliche geschichte",
         ""
       ]
     },
@@ -3807,7 +3807,7 @@
       ],
       "outputs": [
         "CCAKevDpE1eEL",
-        "Die unéndlíche, Geschichte",
+        "die unendliche geschichte",
         ""
       ]
     },
@@ -3817,7 +3817,7 @@
       ],
       "outputs": [
         "CCj3TQrYcgaox",
-        "Iñtërnâtiônàlizætiøn☃",
+        "internationalizætiøn☃",
         ""
       ]
     },
@@ -3828,8 +3828,8 @@
       ],
       "outputs": [
         "CCaZR5BTJDK1k",
-        "Die unendliche Geschichte",
-        "The Movie"
+        "die unendliche geschichte",
+        "the movie"
       ]
     },
     "test_008_long": {
@@ -3838,7 +3838,7 @@
       ],
       "outputs": [
         "CC6jkK4L1FK52",
-        "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquy",
+        "lorem ipsum dolor sit amet consetetur sadipscing elitr sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam",
         ""
       ]
     },
@@ -3847,8 +3847,8 @@
         "Iñtërnâtiônàlizætiøn☃ Iñtërnâtiônàlizætiøn☃ Iñtërnâtiônàlizætiøn☃ Iñtërnâtiônàlizætiøn☃ Iñtërnâtiônàlizætiøn☃ Iñtërnâtiônàlizætiøn☃"
       ],
       "outputs": [
-        "CCj4Pgfus9MxL",
-        "Iñtërnâtiônàlizætiøn☃ Iñtërnâtiônàlizætiøn☃ Iñtërnâtiônàlizætiøn☃ Iñtërnâtiônàlizætiøn☃ Iñt",
+        "CCj3TioBiBzui",
+        "internationalizætiøn☃ internationalizætiøn☃ internationalizætiøn☃ internationalizætiøn☃ internationalizætiøn",
         ""
       ]
     }
@@ -4020,44 +4020,6 @@
         true
       ],
       "outputs": "internationalizætiøn☃💩 is a tric ky thing"
-    }
-  },
-  "text_pre_normalize": {
-    "test_001_empty": {
-      "inputs": [
-        ""
-      ],
-      "outputs": ""
-    },
-    "test_002_nbsp": {
-      "inputs": [
-        " "
-      ],
-      "outputs": ""
-    },
-    "test_003_four_per_em": {
-      "inputs": [
-        " "
-      ],
-      "outputs": ""
-    },
-    "test_004_pre_post_whitespace": {
-      "inputs": [
-        "  Hello  World ?  "
-      ],
-      "outputs": "Hello World ?"
-    },
-    "test_005_nfkd": {
-      "inputs": [
-        "Ç 가 Ω ℍ ① ︷ i⁹ ¼ ǆ ⫝̸ ȴ ȷ ɂ ć"
-      ],
-      "outputs": "Ç 가 Ω H 1 { i9 1⁄4 dž ⫝̸ ȴ ȷ ɂ ć"
-    },
-    "test_006_line_breaks": {
-      "inputs": [
-        "Hello\\nWorld"
-      ],
-      "outputs": "Hello\\nWorld"
     }
   },
   "text_trim": {

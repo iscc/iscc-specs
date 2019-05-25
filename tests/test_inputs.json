@@ -231,38 +231,6 @@
       ]
     }
   },
-  "text_pre_normalize": {
-    "test_001_empty": {
-      "inputs": [
-        ""
-      ]
-    },
-    "test_002_nbsp": {
-      "inputs": [
-        " "
-      ]
-    },
-    "test_003_four_per_em": {
-      "inputs": [
-        " "
-      ]
-    },
-    "test_004_pre_post_whitespace": {
-      "inputs": [
-        "  Hello  World ?  "
-      ]
-    },
-    "test_005_nfkd": {
-      "inputs": [
-        "Ç 가 Ω ℍ ① ︷ i⁹ ¼ ǆ ⫝̸ ȴ ȷ ɂ ć"
-      ]
-    },
-    "test_006_line_breaks": {
-      "inputs": [
-        "Hello\\nWorld"
-      ]
-    }
-  },
   "text_trim": {
     "test_001_empty": {
       "inputs": [
