@@ -237,7 +237,7 @@ An ISCC generating application MUST provide a `content_id_image(image, partial=F
 9. Prepend the 1-byte component header (`0x12` full content or `0x13` partial content) to results of step 2.
 4. Encode and return the resulting 9-byte sequence with [`encode`](#encode)
 
-See also: [Content-ID-Image reference code](https://github.com/iscc/iscc-specs/blob/master/src/iscc/iscc.py#L98)
+See also: [Content-ID-Image reference code](https://github.com/iscc/iscc-specs/blob/master/src/iscc/iscc.py#L84)
 
 !!! note "Image Data Input"
     The `content_id_image` function may optionally accept the raw byte data of an encoded image or an internal native image object as input for convenience.
@@ -257,7 +257,7 @@ Signature: `conent_id_mixed(cids: List[str], partial: bool=False) -> str`
 4. Prepend the 1-byte component header(`0x18` full content or `0x19` partial content)
 5. Apply [`encode`](#encode) to the result of step 5 and return the result.
 
-See also: [Content-ID-Mixed reference code](https://github.com/iscc/iscc-specs/blob/master/src/iscc/iscc.py#L116)
+See also: [Content-ID-Mixed reference code](https://github.com/iscc/iscc-specs/blob/master/src/iscc/iscc.py#L102)
 
 #### Partial Content Flag (PCF)
 
@@ -288,14 +288,13 @@ The Data-ID is built from the raw encoded data of the content to be identified. 
 
 1. Apply [`data_chunks`](#data_chunks) to the raw encoded content data.
 2. For each chunk calculate the xxHash32 integer hash.
-3. Apply [`minimum_hash`](#minimum_hash) to the resulting list of 32-bit unsigned integers.
-4. Collect the least significant bits from the 128 MinHash features.
-5. Create two 64-bit digests from the first and second half of the collected bits.
-6. Apply [`similarity_hash`](#similarity_hash) to the results of step 5.
+3. Apply [`minimum_hash`](#minimum_hash) to the resulting list of 32-bit unsigned integers with n=64.
+4. Collect the least significant bits from the 64 MinHash features.
+5. Create a 64-bit digest from the collected bits.
 7. Prepend the 1-byte component header (e.g. 0x20).
-8. Apply [`encode`](#encode) to the result of step 5 and return the result.
+8. Apply [`encode`](#encode) to the result of step 6 and return the result.
 
-See also: [Data-ID reference code](https://github.com/iscc/iscc-specs/blob/master/src/iscc/iscc.py#L137)
+See also: [Data-ID reference code](https://github.com/iscc/iscc-specs/blob/master/src/iscc/iscc.py#L123)
 
 ### Instance-ID Component
 
