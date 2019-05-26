@@ -63,10 +63,10 @@ def content_id_text(text, partial=False):
     features = (xxhash.xxh32(s.encode("utf-8")).intdigest() for s in ngrams)
 
     # 4. Apply minimum_hash
-    minhash = minimum_hash(features)
+    minhash = minimum_hash(features, n=64)
 
     # 5. Collect least significant bits of first 64 minhash signatures
-    lsb = "".join([str(x & 1) for x in minhash[:64]])
+    lsb = "".join([str(x & 1) for x in minhash])
 
     # 6. Create 64-bit digests
     digest = int(lsb, 2).to_bytes(8, "big", signed=False)
@@ -126,10 +126,10 @@ def data_id(data):
     features = (xxhash.xxh32(chunk).intdigest() for chunk in data_chunks(data))
 
     # 3. Apply minimum_hash
-    minhash = minimum_hash(features)
+    minhash = minimum_hash(features, n=64)
 
     # 4. Collect least significant bits
-    lsb = "".join([str(x & 1) for x in minhash[:64]])
+    lsb = "".join([str(x & 1) for x in minhash])
 
     # 5. Create 64-bit digests
     digest = int(lsb, 2).to_bytes(8, "big", signed=False)
@@ -258,23 +258,15 @@ def similarity_hash(hash_digests):
     return shash.to_bytes(n_bytes, "big", signed=False)
 
 
-def minimum_hash(features):
-
+def minimum_hash(features, n=64):
+    features = list(features)
     max_int64 = (1 << 64) - 1
     mersenne_prime = (1 << 61) - 1
     max_hash = (1 << 32) - 1
-    hashvalues = [max_hash] * 128
-
-    a, b = MINHASH_PERMUTATIONS
-
-    for hv in features:
-        nhs = []
-        for x in range(128):
-            nh = (((a[x] * hv + b[x]) & max_int64) % mersenne_prime) & max_hash
-            nhs.append(min(nh, hashvalues[x]))
-        hashvalues = nhs
-
-    return hashvalues
+    return [
+        min((((a * f + b) & max_int64) % mersenne_prime) & max_hash for f in features)
+        for a, b in MINHASH_PERMUTATIONS[:n]
+    ]
 
 
 def image_hash(pixels):
