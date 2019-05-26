@@ -448,9 +448,9 @@ The ISCC standardizes some content normalization procedures to support reproduci
 
 Signature: `text_trim(text: str) -> str`
 
-Trim text such that its UTF-8 encoded byte representation does not exceed 128-bytes each.
+Trim text such that its UTF-8 encoded byte representation does not exceed 128-bytes each. Remove leading and trailing whitespace.
 
-See also: [Text trimming reference code](https://github.com/iscc/iscc-specs/blob/master/src/iscc/iscc.py#L202)
+See also: [Text trimming reference code](https://github.com/iscc/iscc-specs/blob/master/src/iscc/iscc.py#L175)
 
 #### text_normalize
 
