@@ -159,10 +159,9 @@ The Meta-ID body is built from a 64-bit `similarity_hash` over 4-character n-gra
 An ISCC generating application must follow these steps in the given order to produce a stable Meta-ID:
 
 1. Verify the requested ISCC version is supported by your implementation.
-2. Apply [`text_pre_normalize`](#text_pre_normalize) separately to the  `title` and `extra` inputs.
-2. Apply [`text_trim`](#text_trim) to the results of step 1. *The results of this step MUST be supplied as basic metadata for ISCC registration.*
-3. Concatenate trimmed `title` and `extra` from using a space ( `\u0020`) as a seperator.
-4. Apply [`text_normalize`](#text_normalize) to the results of step 3.
+2. Apply [`text_normalize`](#text_normalize) separately to the  `title` and `extra` inputs while keeping white space.
+2. Apply [`text_trim`](#text_trim) to the results of step 2. *The results of this step MUST be supplied as basic metadata for ISCC registration.*
+4. Concatenate trimmed `title` and `extra` from using a space ( `\u0020`) as a separator.
 5. Create a list of 4 character [n-grams](https://en.wikipedia.org/wiki/N-gram) by sliding character-wise through the result of step 4.
 6. Encode each n-gram from step 5 to an UTF-8 bytestring and calculate its [xxHash64](http://cyan4973.github.io/xxHash/) digest.
 7. Apply [`similarity_hash`](#similarity_hash) to the list of digests from step 6.
@@ -171,7 +170,7 @@ An ISCC generating application must follow these steps in the given order to pro
 10. Return encoded Meta-ID, trimmed `title` and trimmed `extra` data.
 
 
-See also: [Meta-ID reference code](https://github.com/iscc/iscc-specs/blob/master/src/iscc/iscc.py#L20)
+See also: [Meta-ID reference code](https://github.com/iscc/iscc-specs/blob/master/src/iscc/iscc.py#L19)
 
 !!! warning "Text trimming"
     When trimming text be sure to trim the byte-length of the UTF-8 encoded version and not the number of characters. The trim point MUST be such, that it does not cut into multibyte characters. Characters might have different UTF-8 byte-length. For example `ü` is 2-bytes, `驩` is 3-bytes and `𠜎` is 4-bytes. So the trimmed version of a string with 128 `驩`-characters will result in a 42-character string with a 126-byte UTF-8 encoded length. This is necessary because the results of this operation will be stored as basic metadata with strict byte size limits on the blockchain. 

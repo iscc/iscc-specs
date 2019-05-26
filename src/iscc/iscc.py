@@ -21,34 +21,34 @@ def meta_id(title, extra="", version=1):
     # 1. Verify version is supported
     assert version == 1, "Only version 1 supported"
 
-    # 2. Pre-Normalization
-    title = text_normalize(title, keep_ws=True)
-    extra = text_normalize(extra, keep_ws=True)
+    # 2. Normalization
+    title_norm = text_normalize(title, keep_ws=True)
+    extra_norm = text_normalize(extra, keep_ws=True)
 
     # 3. Trimming
-    title = text_trim(title)
-    extra = text_trim(extra)
+    title_trimmed = text_trim(title_norm)
+    extra_trimmed = text_trim(extra_norm)
 
     # 4. Concatenate
-    concat = "\u0020".join((title, extra)).strip()
+    concat = "\u0020".join((title_trimmed, extra_trimmed))
 
     # 5. Create a list of n-grams
     n_grams = sliding_window(concat, width=WINDOW_SIZE_MID)
 
-    # 7. Encode n-grams and create xxhash64-digest
+    # 6. Encode n-grams and create xxhash64-digest
     hash_digests = [xxhash.xxh64(s.encode("utf-8")).digest() for s in n_grams]
 
-    # 8. Apply similarity_hash
+    # 7. Apply similarity_hash
     simhash_digest = similarity_hash(hash_digests)
 
-    # 9. Prepend header-byte
+    # 8. Prepend header-byte
     meta_id_digest = HEAD_MID + simhash_digest
 
-    # 10. Encode with base58_iscc
+    # 9. Encode with base58_iscc
     meta_id = encode(meta_id_digest)
 
-    # 11. Return encoded Meta-ID, trimmed `title` and trimmed `extra` data.
-    return [meta_id, title, extra]
+    # 10. Return encoded Meta-ID, trimmed `title` and trimmed `extra` data.
+    return [meta_id, title_trimmed, extra_trimmed]
 
 
 def content_id_text(text, partial=False):
@@ -174,7 +174,7 @@ def instance_id(data):
 
 def text_trim(text):
 
-    return text.encode("utf-8")[:INPUT_TRIM].decode("utf-8", "ignore")
+    return text.encode("utf-8")[:INPUT_TRIM].decode("utf-8", "ignore").strip()
 
 
 def text_normalize(text, keep_ws=False):
