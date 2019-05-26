@@ -211,23 +211,20 @@ The  Content-ID type is signaled by the first 3 bits of the second nibble of the
 
 #### Content-ID-Text
 
-The Content-ID-Text is built from the extracted plain-text content of an encoded media object. To build a stable Content-ID-Text the plain-text content must first be extracted from the digital media object. It should be extracted in a way that is reproducible. There are many different text document formats out in the wilde and extracting plain-text from all of them is anything but a trivial task. While text-extraction is out of scope for this specification it is RECOMMENDED, that plain-text content SHOULD be extracted with the open-source [Apache Tika v1.17](https://tika.apache.org/) toolkit, if a generic reproducibility of the Content-ID-Text component is desired. 
+The Content-ID-Text is built from the extracted plain-text content of an encoded media object. To build a stable Content-ID-Text the plain-text content must first be extracted from the digital media object. It should be extracted in a way that is reproducible. There are many different text document formats out in the wilde and extracting plain-text from all of them is anything but a trivial task. While text-extraction is out of scope for this specification it is RECOMMENDED, that plain-text content SHOULD be extracted with the open-source [Apache Tika v1.21](https://tika.apache.org/) toolkit, if a generic reproducibility of the Content-ID-Text component is desired. 
 
 An ISCC generating application MUST provide a `content_id(text, partial=False)` function that accepts UTF-8 encoded plain text and a boolean indicating the [partial content flag](#partial-content-flag-pcf) as input and returns a Content-ID with GMT type `text`. The procedure to create a Content-ID-Text is as follows:
 
-1. Apply [`text_pre_normalize`](#text_pre_normalize).
-2. Apply [`text_normalize`](#text_normalize) to the text input.
-3. Split the normalized text into a list of words at whitespace boundaries.
-4. Create a list of 5 word shingles by sliding word-wise through the list of words.
-5. Create  a list of 32-bit unsigned integer features by applying [xxHash32](http://cyan4973.github.io/xxHash/) to results of step 4.
-6. Apply [`minimum_hash`](#minimum_hash) to the list of features from step 5.
-7. Collect the least significant bits from the 128 MinHash features from step 6.
-8. Create two 64-bit digests from the first and second half of the collected bits.
-9. Apply [`similarity_hash`](#similarity_hash) to the digests returned from step 8.
+2. Apply [`text_normalize`](#text_normalize) to the text input while removing whitespace.
+2. Create character-wise n-grams of length 13 from the normalized text.
+5. Create  a list of 32-bit unsigned integer features by applying [xxHash32](http://cyan4973.github.io/xxHash/) to results of step 2.
+6. Apply [`minimum_hash`](#minimum_hash) to the list of features from step 3 with n=64.
+7. Collect the least significant bits from the 64 MinHash features from step 4.
+6. Create a 64-bit digest from the collected bits.
 10. Prepend the 1-byte component header (`0x10` full content or `0x11` partial content).
 11. Encode and return the resulting 9-byte sequence with [`encode`](#encode).
 
-See also: [Content-ID-Text reference code](https://github.com/iscc/iscc-specs/blob/master/src/iscc/iscc.py#L58)
+See also: [Content-ID-Text reference code](https://github.com/iscc/iscc-specs/blob/master/src/iscc/iscc.py#L54)
 
 #### Content-ID-Image
 
