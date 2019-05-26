@@ -318,7 +318,7 @@ An ISCC generating application MUST provide a `instance_id` function that accept
 8. Hex-Encode the tophash
 9. Return the Instance-ID and the hex-encoded tophash
 
-See also: [Instance-ID reference code](https://github.com/iscc/iscc-specs/blob/master/src/iscc/iscc.py#L162) 
+See also: [Instance-ID reference code](https://github.com/iscc/iscc-specs/blob/master/src/iscc/iscc.py#L144) 
 
 Applications may carry, store, and process the leaf node hashes for advanced streaming data identification or partial data integrity verification.
 
@@ -443,14 +443,6 @@ See also: [Base-ISCC Decoding reference code](https://github.com/iscc/iscc-specs
 ### Content Normalization
 
 The ISCC standardizes some content normalization procedures to support reproducible and stable identifiers. Following the list of normalization functions that MUST be provided by a conforming implementation.
-
-#### text_pre_normalize
-
-Signature: `text_pre_normalize(text: str|bytes) -> str `
-
-Decodes raw plain-text data, applies Unicode [Normalization Form KC (NFKC)](http://www.unicode.org/reports/tr15/#Norm_Forms) and removes leading, trailing and duplicate whitespace. The plain-text data MUST be stripped of any markup beforehand. Text input is expected to be UTF-8 encoded plain-text data or a native type of the implementing programming language that supports Unicode. Text decoding errors MUST fail with an error.
-
-See also: [Text pre-normalization reference code](https://github.com/iscc/iscc-specs/blob/master/src/iscc/iscc.py#L192)
 
 #### text_trim
 
