@@ -159,10 +159,9 @@ The Meta-ID body is built from a 64-bit `similarity_hash` over 4-character n-gra
 An ISCC generating application must follow these steps in the given order to produce a stable Meta-ID:
 
 1. Verify the requested ISCC version is supported by your implementation.
-2. Apply [`text_pre_normalize`](#text_pre_normalize) separately to the  `title` and `extra` inputs.
-2. Apply [`text_trim`](#text_trim) to the results of step 1. *The results of this step MUST be supplied as basic metadata for ISCC registration.*
-3. Concatenate trimmed `title` and `extra` from using a space ( `\u0020`) as a seperator.
-4. Apply [`text_normalize`](#text_normalize) to the results of step 3.
+2. Apply [`text_normalize`](#text_normalize) separately to the  `title` and `extra` inputs while keeping white space.
+2. Apply [`text_trim`](#text_trim) to the results of step 2. *The results of this step MUST be supplied as basic metadata for ISCC registration.*
+4. Concatenate trimmed `title` and `extra` from using a space ( `\u0020`) as a separator.
 5. Create a list of 4 character [n-grams](https://en.wikipedia.org/wiki/N-gram) by sliding character-wise through the result of step 4.
 6. Encode each n-gram from step 5 to an UTF-8 bytestring and calculate its [xxHash64](http://cyan4973.github.io/xxHash/) digest.
 7. Apply [`similarity_hash`](#similarity_hash) to the list of digests from step 6.
@@ -171,7 +170,7 @@ An ISCC generating application must follow these steps in the given order to pro
 10. Return encoded Meta-ID, trimmed `title` and trimmed `extra` data.
 
 
-See also: [Meta-ID reference code](https://github.com/iscc/iscc-specs/blob/master/src/iscc/iscc.py#L20)
+See also: [Meta-ID reference code](https://github.com/iscc/iscc-specs/blob/master/src/iscc/iscc.py#L19)
 
 !!! warning "Text trimming"
     When trimming text be sure to trim the byte-length of the UTF-8 encoded version and not the number of characters. The trim point MUST be such, that it does not cut into multibyte characters. Characters might have different UTF-8 byte-length. For example `ü` is 2-bytes, `驩` is 3-bytes and `𠜎` is 4-bytes. So the trimmed version of a string with 128 `驩`-characters will result in a 42-character string with a 126-byte UTF-8 encoded length. This is necessary because the results of this operation will be stored as basic metadata with strict byte size limits on the blockchain. 
@@ -212,23 +211,20 @@ The  Content-ID type is signaled by the first 3 bits of the second nibble of the
 
 #### Content-ID-Text
 
-The Content-ID-Text is built from the extracted plain-text content of an encoded media object. To build a stable Content-ID-Text the plain-text content must first be extracted from the digital media object. It should be extracted in a way that is reproducible. There are many different text document formats out in the wilde and extracting plain-text from all of them is anything but a trivial task. While text-extraction is out of scope for this specification it is RECOMMENDED, that plain-text content SHOULD be extracted with the open-source [Apache Tika v1.17](https://tika.apache.org/) toolkit, if a generic reproducibility of the Content-ID-Text component is desired. 
+The Content-ID-Text is built from the extracted plain-text content of an encoded media object. To build a stable Content-ID-Text the plain-text content must first be extracted from the digital media object. It should be extracted in a way that is reproducible. There are many different text document formats out in the wilde and extracting plain-text from all of them is anything but a trivial task. While text-extraction is out of scope for this specification it is RECOMMENDED, that plain-text content SHOULD be extracted with the open-source [Apache Tika v1.21](https://tika.apache.org/) toolkit, if a generic reproducibility of the Content-ID-Text component is desired. 
 
 An ISCC generating application MUST provide a `content_id(text, partial=False)` function that accepts UTF-8 encoded plain text and a boolean indicating the [partial content flag](#partial-content-flag-pcf) as input and returns a Content-ID with GMT type `text`. The procedure to create a Content-ID-Text is as follows:
 
-1. Apply [`text_pre_normalize`](#text_pre_normalize).
-2. Apply [`text_normalize`](#text_normalize) to the text input.
-3. Split the normalized text into a list of words at whitespace boundaries.
-4. Create a list of 5 word shingles by sliding word-wise through the list of words.
-5. Create  a list of 32-bit unsigned integer features by applying [xxHash32](http://cyan4973.github.io/xxHash/) to results of step 4.
-6. Apply [`minimum_hash`](#minimum_hash) to the list of features from step 5.
-7. Collect the least significant bits from the 128 MinHash features from step 6.
-8. Create two 64-bit digests from the first and second half of the collected bits.
-9. Apply [`similarity_hash`](#similarity_hash) to the digests returned from step 8.
+2. Apply [`text_normalize`](#text_normalize) to the text input while removing whitespace.
+2. Create character-wise n-grams of length 13 from the normalized text.
+5. Create  a list of 32-bit unsigned integer features by applying [xxHash32](http://cyan4973.github.io/xxHash/) to results of step 2.
+6. Apply [`minimum_hash`](#minimum_hash) to the list of features from step 3 with n=64.
+7. Collect the least significant bits from the 64 MinHash features from step 4.
+6. Create a 64-bit digest from the collected bits.
 10. Prepend the 1-byte component header (`0x10` full content or `0x11` partial content).
 11. Encode and return the resulting 9-byte sequence with [`encode`](#encode).
 
-See also: [Content-ID-Text reference code](https://github.com/iscc/iscc-specs/blob/master/src/iscc/iscc.py#L58)
+See also: [Content-ID-Text reference code](https://github.com/iscc/iscc-specs/blob/master/src/iscc/iscc.py#L54)
 
 #### Content-ID-Image
 
@@ -241,7 +237,7 @@ An ISCC generating application MUST provide a `content_id_image(image, partial=F
 9. Prepend the 1-byte component header (`0x12` full content or `0x13` partial content) to results of step 2.
 4. Encode and return the resulting 9-byte sequence with [`encode`](#encode)
 
-See also: [Content-ID-Image reference code](https://github.com/iscc/iscc-specs/blob/master/src/iscc/iscc.py#L98)
+See also: [Content-ID-Image reference code](https://github.com/iscc/iscc-specs/blob/master/src/iscc/iscc.py#L84)
 
 !!! note "Image Data Input"
     The `content_id_image` function may optionally accept the raw byte data of an encoded image or an internal native image object as input for convenience.
@@ -261,7 +257,7 @@ Signature: `conent_id_mixed(cids: List[str], partial: bool=False) -> str`
 4. Prepend the 1-byte component header(`0x18` full content or `0x19` partial content)
 5. Apply [`encode`](#encode) to the result of step 5 and return the result.
 
-See also: [Content-ID-Mixed reference code](https://github.com/iscc/iscc-specs/blob/master/src/iscc/iscc.py#L116)
+See also: [Content-ID-Mixed reference code](https://github.com/iscc/iscc-specs/blob/master/src/iscc/iscc.py#L102)
 
 #### Partial Content Flag (PCF)
 
@@ -292,14 +288,13 @@ The Data-ID is built from the raw encoded data of the content to be identified. 
 
 1. Apply [`data_chunks`](#data_chunks) to the raw encoded content data.
 2. For each chunk calculate the xxHash32 integer hash.
-3. Apply [`minimum_hash`](#minimum_hash) to the resulting list of 32-bit unsigned integers.
-4. Collect the least significant bits from the 128 MinHash features.
-5. Create two 64-bit digests from the first and second half of the collected bits.
-6. Apply [`similarity_hash`](#similarity_hash) to the results of step 5.
+3. Apply [`minimum_hash`](#minimum_hash) to the resulting list of 32-bit unsigned integers with n=64.
+4. Collect the least significant bits from the 64 MinHash features.
+5. Create a 64-bit digest from the collected bits.
 7. Prepend the 1-byte component header (e.g. 0x20).
-8. Apply [`encode`](#encode) to the result of step 5 and return the result.
+8. Apply [`encode`](#encode) to the result of step 6 and return the result.
 
-See also: [Data-ID reference code](https://github.com/iscc/iscc-specs/blob/master/src/iscc/iscc.py#L137)
+See also: [Data-ID reference code](https://github.com/iscc/iscc-specs/blob/master/src/iscc/iscc.py#L123)
 
 ### Instance-ID Component
 
@@ -323,7 +318,7 @@ An ISCC generating application MUST provide a `instance_id` function that accept
 8. Hex-Encode the tophash
 9. Return the Instance-ID and the hex-encoded tophash
 
-See also: [Instance-ID reference code](https://github.com/iscc/iscc-specs/blob/master/src/iscc/iscc.py#L162) 
+See also: [Instance-ID reference code](https://github.com/iscc/iscc-specs/blob/master/src/iscc/iscc.py#L144) 
 
 Applications may carry, store, and process the leaf node hashes for advanced streaming data identification or partial data integrity verification.
 
@@ -389,7 +384,7 @@ Applications MAY embed ISCC codes that have side effects if they specify a proce
 
     We are able to embed the following combination of components from the [markdown version](https://github.com/iscc/iscc-specs/edit/master/docs/specification.md) of this document into the document itself because adding or removing them has no side effect:
     
-    **ISCC**: CCDbMYw6NfC8a-CTWzdczHVbrgo-CDjefNiyPBXVs
+    **ISCC**: CCb6jwtPH7aYi-CTtW9UPnzoDZk-CDF8RRn9fS5jM
 
 ## ISCC URI Scheme
 
@@ -449,37 +444,29 @@ See also: [Base-ISCC Decoding reference code](https://github.com/iscc/iscc-specs
 
 The ISCC standardizes some content normalization procedures to support reproducible and stable identifiers. Following the list of normalization functions that MUST be provided by a conforming implementation.
 
-#### text_pre_normalize
-
-Signature: `text_pre_normalize(text: str|bytes) -> str `
-
-Decodes raw plain-text data, applies Unicode [Normalization Form KC (NFKC)](http://www.unicode.org/reports/tr15/#Norm_Forms) and removes leading, trailing and duplicate whitespace. The plain-text data MUST be stripped of any markup beforehand. Text input is expected to be UTF-8 encoded plain-text data or a native type of the implementing programming language that supports Unicode. Text decoding errors MUST fail with an error.
-
-See also: [Text pre-normalization reference code](https://github.com/iscc/iscc-specs/blob/master/src/iscc/iscc.py#L192)
-
 #### text_trim
 
 Signature: `text_trim(text: str) -> str`
 
-Trim text such that its UTF-8 encoded byte representation does not exceed 128-bytes each.
+Trim text such that its UTF-8 encoded byte representation does not exceed 128-bytes each. Remove leading and trailing whitespace.
 
-See also: [Text trimming reference code](https://github.com/iscc/iscc-specs/blob/master/src/iscc/iscc.py#L202)
+See also: [Text trimming reference code](https://github.com/iscc/iscc-specs/blob/master/src/iscc/iscc.py#L175)
 
 #### text_normalize
 
-Signature: `text_normalize(text: str) -> str`
+Signature: `text_normalize(text: str, keep_ws: bool = False) -> str`
 
-We define a text normalization function that is specific to our application. It takes unicode text as an input and returns *normalized* Unicode text for further algorithmic processing. The `text_normalize` function performs the following operations in the given order while each step works with the results of the previous operation:
+We define a text normalization function that is specific to our application. It takes text and an optional boolean `keep_ws` parameter as an input and returns *normalized* Unicode text for further algorithmic processing. The `text_normalize` function performs the following operations in the given order while each step works with the results of the previous operation:
 
-1. Decompose the input text by applying [Unicode Normalization Form D (NFD)](http://www.unicode.org/reports/tr15/#Norm_Forms).
-2. Filter and normalize text by iterating over unicode characters while:
-   - replacing groups of one or more consecutive `Separator` characters ([Unicode categories](https://en.wikipedia.org/wiki/Unicode_character_property) Zs, Zl and Zp) with exactly one Unicode `SPACE` character (`U+0020`) .
-   - removing characters that are not in one of the Unicode categories `Separator` , `Letter`, `Number` or `Symbol`.
-   - converting characters to lowercase.
-3. Remove any leading or trailing `Separator` characters.
-4. Re-Compose the text by applying `Unicode Normalization Form C (NFC)`.
+1. Decode to native Unicode if text is a byte string
+2. Remove leading and trailing whitespace
+3. Transform text to lower case
+4. Decompose the lower case text by applying [Unicode Normalization Form D (NFD)](http://www.unicode.org/reports/tr15/#Norm_Forms).
+5. Filter out all characters that fall into the Unicode categories listed in the constant `UNICODE_FILTER`.
+6. Keep or remove whitespace depending on `keep_ws` parameter
+7. Re-Combine the text by applying `Unicode Normalization Form KC (NFKC)`.
 
-See also: [Text normalization reference code](https://github.com/iscc/iscc-specs/blob/master/src/iscc/iscc.py#L207)
+See also: [Text normalization reference code](https://github.com/iscc/iscc-specs/blob/master/src/iscc/iscc.py#L180)
 
 #### image_normalize
 
@@ -491,7 +478,7 @@ Accepts a file path, byte-stream or raw binary image data and MUST at least supp
 2. Resize the image to 32x32 pixels using [bicubic interpolation](https://en.wikipedia.org/wiki/Bicubic_interpolation)
 3. Create a 32x32 two-dimensional array of 8-bit grayscale values from the image data
 
-See also: [Image normalization reference code](https://github.com/iscc/iscc-specs/blob/master/src/iscc/iscc.py#L232)
+See also: [Image normalization reference code](https://github.com/iscc/iscc-specs/blob/master/src/iscc/iscc.py#L215)
 
 ### Feature Hashing
 
@@ -505,15 +492,15 @@ The `similarity_hash` function takes a sequence of hash digests which represent 
 
 ![iscc-similarity-hash](images/iscc-similarity-hash.svg)
 
-See also: [Similarity hash reference code](https://github.com/iscc/iscc-specs/blob/master/src/iscc/iscc.py#L257)
+See also: [Similarity hash reference code](https://github.com/iscc/iscc-specs/blob/master/src/iscc/iscc.py#L237)
 
 #### minimum_hash
 
-Signature: `minimum_hash(features: Iterable[int]) -> List[int]`
+Signature: `minimum_hash(features: Iterable[int], n: int = 64) -> List[int]`
 
-The `minimum_hash` function takes an arbitrary sized set of 32-bit integer features and reduces it to a fixed size vector of 128 features such that it preserves similarity with other sets. It is based on the MinHash implementation of the [datasketch](https://ekzhu.github.io/datasketch/) library by [Eric Zhu](https://github.com/ekzhu).
+The `minimum_hash` function takes an arbitrary sized set of 32-bit integer features and reduces it to a fixed size vector of `n` features such that it preserves similarity with other sets. It is based on the MinHash implementation of the [datasketch](https://ekzhu.github.io/datasketch/) library by [Eric Zhu](https://github.com/ekzhu).
 
-See also: [Minimum hash reference code](https://github.com/iscc/iscc-specs/blob/master/src/iscc/iscc.py#L281)
+See also: [Minimum hash reference code](https://github.com/iscc/iscc-specs/blob/master/src/iscc/iscc.py#L261)
 
 #### image_hash
 
@@ -526,7 +513,7 @@ Signature: `image_hash(pixels: List[List[int]]) -> bytes`
 5. Create a 64-bit digest by iterating over the values of step 5 and setting a  `1`- for values above median and `0` for values below or equal to median.
 6. Return results from step 5.
 
-See also: [Image hash reference code](https://github.com/iscc/iscc-specs/blob/master/src/iscc/iscc.py#L300)
+See also: [Image hash reference code](https://github.com/iscc/iscc-specs/blob/master/src/iscc/iscc.py#L272)
 
 ### Content Defined Chunking
 
@@ -538,7 +525,7 @@ Signature: `data_chunks(data: stream) -> Iterator[bytes]`
 
 The `data_chunks` function accepts a byte-stream and returns variable sized chunks. Chunk boundaries are determined by a gear based chunking algorithm based on [[WenXia2016]][#WenXia2016].
 
-See also: [CDC reference code](https://github.com/iscc/iscc-specs/blob/master/src/iscc/iscc.py#L360)
+See also: [CDC reference code](https://github.com/iscc/iscc-specs/blob/master/src/iscc/iscc.py#L332)
 
 ## Conformance Testing
 

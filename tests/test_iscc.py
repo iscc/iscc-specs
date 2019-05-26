@@ -2,6 +2,7 @@
 import json
 import random
 from io import BytesIO
+import pytest
 from PIL import Image, ImageFilter, ImageEnhance
 import iscc
 
@@ -50,20 +51,26 @@ def test_test_data():
 
 def test_meta_id():
     mid1, _, _ = iscc.meta_id('ISCC Content Identifiers')
-    assert mid1 == 'CCDFPFc87MhdT'
+    assert mid1 == 'CCDGhLx6tREif'
+
+    mid1, _, _ = iscc.meta_id(b'ISCC Content Identifiers')
+    assert mid1 == 'CCDGhLx6tREif'
 
     mid1, title, extra = iscc.meta_id('Die Unendliche Geschichte')
-    assert mid1 == "CCAKevDpE1eEL"
-    assert title == 'Die Unendliche Geschichte'
+    assert mid1 == "CCAZF4K1bBv8i"
+    assert title == 'die unendliche geschichte'
     assert extra == ''
     mid2 = iscc.meta_id(' Die unéndlíche,  Geschichte ')[0]
     assert mid1 == mid2
 
     mid3 = iscc.meta_id('Die Unentliche Geschichte')[0]
-    assert 8 == iscc.distance(mid1, mid3)
+    assert iscc.distance(mid1, mid3) == 12
 
     mid4 = iscc.meta_id('Geschichte, Die Unendliche')[0]
-    assert 9 == iscc.distance(mid1, mid4)
+    assert iscc.distance(mid1, mid4) == 7
+
+    with pytest.raises(UnicodeDecodeError):
+        iscc.meta_id(b"\xc3\x28")
 
 
 def test_encode():
@@ -81,24 +88,27 @@ def test_decode():
 def test_content_id_text():
     cid_t_np = iscc.content_id_text('')
     assert len(cid_t_np) == 13
-    assert "CTiesaXaMqbbU" == cid_t_np
+    assert cid_t_np =="CT7A4zpmccuEv"
     cid_t_p = iscc.content_id_text('', partial=True)
-    assert "CtiesaXaMqbbU" == cid_t_p
+    assert cid_t_p == "Ct7A4zpmccuEv"
     assert 0 == iscc.distance(cid_t_p, cid_t_np)
 
     cid_t_a = iscc.content_id_text(TEXT_A)
     cid_t_b = iscc.content_id_text(TEXT_B)
-    assert 1 == iscc.distance(cid_t_a, cid_t_b)
+    assert iscc.distance(cid_t_a, cid_t_b) == 2
 
 
 def test_text_normalize():
-    text = 'Iñtërnâtiônàlizætiøn☃💩 is a ticky \u00A0 thing'
-    normalized = iscc.text_normalize(text)
-    assert normalized == 'internationalizætiøn☃💩 is a ticky thing'
+    text = '  Iñtërnâtiôn\nàlizætiøn☃💩 –  is a tric\t ky \u00A0 thing!\r'
+    normalized = iscc.text_normalize(text, keep_ws=False)
+    assert normalized == 'internationalizætiøn☃💩isatrickything'
+
+    normalized = iscc.text_normalize(text, keep_ws=True)
+    assert normalized == 'internationalizætiøn☃💩 is a tric ky thing'
 
     assert iscc.text_normalize(' ') == ''
-    assert iscc.text_normalize('  Hello  World ? ') == 'hello world'
-    assert iscc.text_normalize('Hello\nWorld') == 'hello world'
+    assert iscc.text_normalize('  Hello  World ? ', keep_ws=True) == 'hello world'
+    assert iscc.text_normalize('Hello\nWorld', keep_ws=True) == 'helloworld'
 
 
 def test_trim_text():
@@ -180,7 +190,7 @@ def test_hamming_distance():
 
     # Totaly different
     mid2 = iscc.meta_id('Now for something different')[0]
-    assert iscc.distance(mid1, mid2) >= 25
+    assert iscc.distance(mid1, mid2) >= 24
 
 
 def test_content_id_mixed():
@@ -188,21 +198,21 @@ def test_content_id_mixed():
     cid_t_2 = iscc.content_id_text('Another Text')
 
     cid_m = iscc.content_id_mixed([cid_t_1])
-    assert cid_m == "CM3oME4TtXogc"
+    assert cid_m == "CM3k9pp7JS7nP"
 
     cid_m = iscc.content_id_mixed([cid_t_1, cid_t_2])
-    assert cid_m == "CM3RQtGc98nXg"
+    assert cid_m == "CM3kHkNRGvnhB"
 
     cid_i = iscc.content_id_image('lenna.jpg')
     cid_m = iscc.content_id_mixed([cid_t_1, cid_t_2, cid_i])
-    assert cid_m == "CM3ovx7zUEy38"
+    assert cid_m == "CM3hswzATv9d3"
 
 
 def test_data_id():
     random.seed(1)
     data = bytearray([random.getrandbits(8) for _ in range(1000000)])  # 1 mb
     did_a = iscc.data_id(data)
-    assert did_a == 'CDjPCoxV16Ppq'
+    assert did_a == 'CDK2KdVAz5XTs'
     data.insert(500000, 1)
     data.insert(500001, 2)
     data.insert(500002, 3)
@@ -211,7 +221,7 @@ def test_data_id():
     for x in range(100):  # insert 100 bytes random noise
         data.insert(random.randint(0, 1000000), random.randint(0, 255))
     did_c = iscc.data_id(data)
-    assert iscc.distance(did_a, did_c) == 7
+    assert iscc.distance(did_a, did_c) == 17
 
 
 def test_instance_id():
