@@ -454,19 +454,19 @@ See also: [Text trimming reference code](https://github.com/iscc/iscc-specs/blob
 
 #### text_normalize
 
-Signature: `text_normalize(text: str) -> str`
+Signature: `text_normalize(text: str, keep_ws: bool = False) -> str`
 
-We define a text normalization function that is specific to our application. It takes unicode text as an input and returns *normalized* Unicode text for further algorithmic processing. The `text_normalize` function performs the following operations in the given order while each step works with the results of the previous operation:
+We define a text normalization function that is specific to our application. It takes text and an optional boolean `keep_ws` parameter as an input and returns *normalized* Unicode text for further algorithmic processing. The `text_normalize` function performs the following operations in the given order while each step works with the results of the previous operation:
 
-1. Decompose the input text by applying [Unicode Normalization Form D (NFD)](http://www.unicode.org/reports/tr15/#Norm_Forms).
-2. Filter and normalize text by iterating over unicode characters while:
-   - replacing groups of one or more consecutive `Separator` characters ([Unicode categories](https://en.wikipedia.org/wiki/Unicode_character_property) Zs, Zl and Zp) with exactly one Unicode `SPACE` character (`U+0020`) .
-   - removing characters that are not in one of the Unicode categories `Separator` , `Letter`, `Number` or `Symbol`.
-   - converting characters to lowercase.
-3. Remove any leading or trailing `Separator` characters.
-4. Re-Compose the text by applying `Unicode Normalization Form C (NFC)`.
+1. Decode to native Unicode if text is a byte string
+2. Remove leading and trailing whitespace
+3. Transform text to lower case
+4. Decompose the lower case text by applying [Unicode Normalization Form D (NFD)](http://www.unicode.org/reports/tr15/#Norm_Forms).
+5. Filter out all characters that fall into the Unicode categories listed in the constant `UNICODE_FILTER`.
+6. Keep or remove whitespace depending on `keep_ws` parameter
+7. Re-Combine the text by applying `Unicode Normalization Form KC (NFKC)`.
 
-See also: [Text normalization reference code](https://github.com/iscc/iscc-specs/blob/master/src/iscc/iscc.py#L207)
+See also: [Text normalization reference code](https://github.com/iscc/iscc-specs/blob/master/src/iscc/iscc.py#L180)
 
 #### image_normalize
 
@@ -478,7 +478,7 @@ Accepts a file path, byte-stream or raw binary image data and MUST at least supp
 2. Resize the image to 32x32 pixels using [bicubic interpolation](https://en.wikipedia.org/wiki/Bicubic_interpolation)
 3. Create a 32x32 two-dimensional array of 8-bit grayscale values from the image data
 
-See also: [Image normalization reference code](https://github.com/iscc/iscc-specs/blob/master/src/iscc/iscc.py#L232)
+See also: [Image normalization reference code](https://github.com/iscc/iscc-specs/blob/master/src/iscc/iscc.py#L215)
 
 ### Feature Hashing
 
@@ -492,15 +492,15 @@ The `similarity_hash` function takes a sequence of hash digests which represent 
 
 ![iscc-similarity-hash](images/iscc-similarity-hash.svg)
 
-See also: [Similarity hash reference code](https://github.com/iscc/iscc-specs/blob/master/src/iscc/iscc.py#L257)
+See also: [Similarity hash reference code](https://github.com/iscc/iscc-specs/blob/master/src/iscc/iscc.py#L237)
 
 #### minimum_hash
 
-Signature: `minimum_hash(features: Iterable[int]) -> List[int]`
+Signature: `minimum_hash(features: Iterable[int], n: int = 64) -> List[int]`
 
-The `minimum_hash` function takes an arbitrary sized set of 32-bit integer features and reduces it to a fixed size vector of 128 features such that it preserves similarity with other sets. It is based on the MinHash implementation of the [datasketch](https://ekzhu.github.io/datasketch/) library by [Eric Zhu](https://github.com/ekzhu).
+The `minimum_hash` function takes an arbitrary sized set of 32-bit integer features and reduces it to a fixed size vector of `n` features such that it preserves similarity with other sets. It is based on the MinHash implementation of the [datasketch](https://ekzhu.github.io/datasketch/) library by [Eric Zhu](https://github.com/ekzhu).
 
-See also: [Minimum hash reference code](https://github.com/iscc/iscc-specs/blob/master/src/iscc/iscc.py#L281)
+See also: [Minimum hash reference code](https://github.com/iscc/iscc-specs/blob/master/src/iscc/iscc.py#L261)
 
 #### image_hash
 
@@ -513,7 +513,7 @@ Signature: `image_hash(pixels: List[List[int]]) -> bytes`
 5. Create a 64-bit digest by iterating over the values of step 5 and setting a  `1`- for values above median and `0` for values below or equal to median.
 6. Return results from step 5.
 
-See also: [Image hash reference code](https://github.com/iscc/iscc-specs/blob/master/src/iscc/iscc.py#L300)
+See also: [Image hash reference code](https://github.com/iscc/iscc-specs/blob/master/src/iscc/iscc.py#L272)
 
 ### Content Defined Chunking
 
@@ -525,7 +525,7 @@ Signature: `data_chunks(data: stream) -> Iterator[bytes]`
 
 The `data_chunks` function accepts a byte-stream and returns variable sized chunks. Chunk boundaries are determined by a gear based chunking algorithm based on [[WenXia2016]][#WenXia2016].
 
-See also: [CDC reference code](https://github.com/iscc/iscc-specs/blob/master/src/iscc/iscc.py#L360)
+See also: [CDC reference code](https://github.com/iscc/iscc-specs/blob/master/src/iscc/iscc.py#L332)
 
 ## Conformance Testing
 
