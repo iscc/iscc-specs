@@ -2,6 +2,7 @@
 import json
 import random
 from io import BytesIO
+import pytest
 from PIL import Image, ImageFilter, ImageEnhance
 import iscc
 
@@ -52,6 +53,9 @@ def test_meta_id():
     mid1, _, _ = iscc.meta_id('ISCC Content Identifiers')
     assert mid1 == 'CCDFPFc87MhdT'
 
+    mid1, _, _ = iscc.meta_id(b'ISCC Content Identifiers')
+    assert mid1 == 'CCDFPFc87MhdT'
+
     mid1, title, extra = iscc.meta_id('Die Unendliche Geschichte')
     assert mid1 == "CCAKevDpE1eEL"
     assert title == 'die unendliche geschichte'
@@ -64,6 +68,9 @@ def test_meta_id():
 
     mid4 = iscc.meta_id('Geschichte, Die Unendliche')[0]
     assert 9 == iscc.distance(mid1, mid4)
+
+    with pytest.raises(UnicodeDecodeError):
+        iscc.meta_id(b"\xc3\x28")
 
 
 def test_encode():
