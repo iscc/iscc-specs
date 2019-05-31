@@ -198,6 +198,8 @@ def text_normalize(text, keep_ws=False):
         cat = unicodedata.category(c)
         if cat not in UNICODE_FILTER:
             chars.append(c)
+        elif c in CC_WHITESPACE:
+            chars.append(c)
     text_filtered = "".join(chars)
 
     # 6. Keep or remove whitespace (remove duplicate whitespace)

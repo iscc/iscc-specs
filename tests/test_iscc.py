@@ -104,11 +104,11 @@ def test_text_normalize():
     assert normalized == 'internationalizætiøn☃💩isatrickything'
 
     normalized = iscc.text_normalize(text, keep_ws=True)
-    assert normalized == 'internationalizætiøn☃💩 is a tric ky thing'
+    assert normalized == 'internation alizætiøn☃💩 is a tric ky thing'
 
     assert iscc.text_normalize(' ') == ''
     assert iscc.text_normalize('  Hello  World ? ', keep_ws=True) == 'hello world'
-    assert iscc.text_normalize('Hello\nWorld', keep_ws=True) == 'helloworld'
+    assert iscc.text_normalize('Hello\nWorld', keep_ws=True) == 'hello world'
 
 
 def test_trim_text():

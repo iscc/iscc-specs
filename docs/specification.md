@@ -384,7 +384,7 @@ Applications MAY embed ISCC codes that have side effects if they specify a proce
 
     We are able to embed the following combination of components from the [markdown version](https://github.com/iscc/iscc-specs/edit/master/docs/specification.md) of this document into the document itself because adding or removing them has no side effect:
     
-    **ISCC**: CCb6jwtPH7aYi-CTtW9UPnzoDZk-CDF8RRn9fS5jM
+    **ISCC**: CCb6jwtPH7aYi-CTtW9UPnzoDZk-CDXGDX572SA1o
 
 ## ISCC URI Scheme
 
@@ -462,7 +462,10 @@ We define a text normalization function that is specific to our application. It 
 2. Remove leading and trailing whitespace
 3. Transform text to lower case
 4. Decompose the lower case text by applying [Unicode Normalization Form D (NFD)](http://www.unicode.org/reports/tr15/#Norm_Forms).
-5. Filter out all characters that fall into the Unicode categories listed in the constant `UNICODE_FILTER`.
+5. Filter out all characters that fall into the Unicode categories listed in the constant `UNICODE_FILTER`. Keep these control characters (Cc) that are commonly considered whitespace:
+    - `\u0009`,  # Horizontal Tab (TAB)
+    - `\u000A`,  # Linefeed (LF)
+    - `\u000D`,  # Carriage Return (CR)
 6. Keep or remove whitespace depending on `keep_ws` parameter
 7. Re-Combine the text by applying `Unicode Normalization Form KC (NFKC)`.
 
@@ -478,7 +481,7 @@ Accepts a file path, byte-stream or raw binary image data and MUST at least supp
 2. Resize the image to 32x32 pixels using [bicubic interpolation](https://en.wikipedia.org/wiki/Bicubic_interpolation)
 3. Create a 32x32 two-dimensional array of 8-bit grayscale values from the image data
 
-See also: [Image normalization reference code](https://github.com/iscc/iscc-specs/blob/master/src/iscc/iscc.py#L215)
+See also: [Image normalization reference code](https://github.com/iscc/iscc-specs/blob/master/src/iscc/iscc.py#L217)
 
 ### Feature Hashing
 
@@ -492,7 +495,7 @@ The `similarity_hash` function takes a sequence of hash digests which represent 
 
 ![iscc-similarity-hash](images/iscc-similarity-hash.svg)
 
-See also: [Similarity hash reference code](https://github.com/iscc/iscc-specs/blob/master/src/iscc/iscc.py#L237)
+See also: [Similarity hash reference code](https://github.com/iscc/iscc-specs/blob/master/src/iscc/iscc.py#L239)
 
 #### minimum_hash
 
@@ -500,7 +503,7 @@ Signature: `minimum_hash(features: Iterable[int], n: int = 64) -> List[int]`
 
 The `minimum_hash` function takes an arbitrary sized set of 32-bit integer features and reduces it to a fixed size vector of `n` features such that it preserves similarity with other sets. It is based on the MinHash implementation of the [datasketch](https://ekzhu.github.io/datasketch/) library by [Eric Zhu](https://github.com/ekzhu).
 
-See also: [Minimum hash reference code](https://github.com/iscc/iscc-specs/blob/master/src/iscc/iscc.py#L261)
+See also: [Minimum hash reference code](https://github.com/iscc/iscc-specs/blob/master/src/iscc/iscc.py#L263)
 
 #### image_hash
 
@@ -513,7 +516,7 @@ Signature: `image_hash(pixels: List[List[int]]) -> bytes`
 5. Create a 64-bit digest by iterating over the values of step 5 and setting a  `1`- for values above median and `0` for values below or equal to median.
 6. Return results from step 5.
 
-See also: [Image hash reference code](https://github.com/iscc/iscc-specs/blob/master/src/iscc/iscc.py#L272)
+See also: [Image hash reference code](https://github.com/iscc/iscc-specs/blob/master/src/iscc/iscc.py#L274)
 
 ### Content Defined Chunking
 
@@ -525,7 +528,7 @@ Signature: `data_chunks(data: stream) -> Iterator[bytes]`
 
 The `data_chunks` function accepts a byte-stream and returns variable sized chunks. Chunk boundaries are determined by a gear based chunking algorithm based on [[WenXia2016]][#WenXia2016].
 
-See also: [CDC reference code](https://github.com/iscc/iscc-specs/blob/master/src/iscc/iscc.py#L332)
+See also: [CDC reference code](https://github.com/iscc/iscc-specs/blob/master/src/iscc/iscc.py#L334)
 
 ## Conformance Testing
 
