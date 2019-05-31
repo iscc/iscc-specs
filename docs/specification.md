@@ -384,7 +384,7 @@ Applications MAY embed ISCC codes that have side effects if they specify a proce
 
     We are able to embed the following combination of components from the [markdown version](https://github.com/iscc/iscc-specs/edit/master/docs/specification.md) of this document into the document itself because adding or removing them has no side effect:
     
-    **ISCC**: CCb6jwtPH7aYi-CTtW9UPnzoDZk-CDF8RRn9fS5jM
+    **ISCC**: CCb6jwtPH7aYi-CTtW9UPnzoDZk-CDXGDX572SA1o
 
 ## ISCC URI Scheme
 
