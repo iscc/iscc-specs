@@ -39,6 +39,13 @@ UNICODE_FILTER = frozenset(
     }
 )
 
+# Common Control Characters considered whitespace
+CC_WHITESPACE = (
+    "\u0009",   # Horizontal Tab (TAB)
+    "\u000A",   # Linefeed (LF)
+    "\u000D",   # Carriage Return (CR)
+)
+
 SYMBOLS = "C23456789rB1ZEFGTtYiAaVvMmHUPWXKDNbcdefghLjkSnopRqsJuQwxyz"
 VALUES = "".join([chr(i) for i in range(58)])
 C2VTABLE = str.maketrans(SYMBOLS, VALUES)

@@ -3955,7 +3955,7 @@
         "  Iñtërnâtiôn\nàlizætiøn☃💩 –  is a tric\t ky   thing!\r",
         true
       ],
-      "outputs": "internationalizætiøn☃💩 is a tric ky thing"
+      "outputs": "internation alizætiøn☃💩 is a tric ky thing"
     }
   },
   "text_trim": {
