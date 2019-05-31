@@ -41,9 +41,9 @@ UNICODE_FILTER = frozenset(
 
 # Common Control Characters considered whitespace
 CC_WHITESPACE = (
-    "\u0009",   # Horizontal Tab (TAB)
-    "\u000A",   # Linefeed (LF)
-    "\u000D",   # Carriage Return (CR)
+    "\u0009",  # Horizontal Tab (TAB)
+    "\u000A",  # Linefeed (LF)
+    "\u000D",  # Carriage Return (CR)
 )
 
 SYMBOLS = "C23456789rB1ZEFGTtYiAaVvMmHUPWXKDNbcdefghLjkSnopRqsJuQwxyz"
