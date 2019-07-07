@@ -256,6 +256,11 @@
       "inputs": [
         "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquy"
       ]
+    },
+    "test_004_empty": {
+      "inputs": [
+        "  leading and trailing spaces  "
+      ]
     }
   }
 }
