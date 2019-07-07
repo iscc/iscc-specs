@@ -2,37 +2,43 @@
   "content_id_image": {
     "test_001_pixel_png_transp": {
       "inputs": [
-        "pixel_png_transp.png"
+        "pixel_png_transp.png",
+        false
       ],
       "outputs": "CYCCCCCCCCCCC"
     },
     "test_002_pixel_png_white": {
       "inputs": [
-        "pixel_png_white.png"
+        "pixel_png_white.png",
+        false
       ],
       "outputs": "CYavS6nYp8RFZ"
     },
     "test_003_pixel_png_black": {
       "inputs": [
-        "pixel_png_black.png"
+        "pixel_png_black.png",
+        false
       ],
       "outputs": "CYCCCCCCCCCCC"
     },
     "test_004_cat_jpg": {
       "inputs": [
-        "cat.jpg"
+        "cat.jpg",
+        false
       ],
       "outputs": "CYDfTq7Qc7Fre"
     },
     "test_005_cat_png": {
       "inputs": [
-        "cat.png"
+        "cat.png",
+        false
       ],
       "outputs": "CYDfTq7Qc7Fre"
     },
     "test_006_cat_gif": {
       "inputs": [
-        "cat.gif"
+        "cat.gif",
+        false
       ],
       "outputs": "CYDfTq7Qc7Fre"
     }
@@ -42,7 +48,8 @@
       "inputs": [
         [
           "1HUg6wnerR9jP"
-        ]
+        ],
+        false
       ],
       "outputs": "CMmXqurbPbdw1"
     },
@@ -61,7 +68,8 @@
         [
           "1HUg6wnerR9jP",
           "1KSiorBqgP32u"
-        ]
+        ],
+        false
       ],
       "outputs": "CMHafQ4eR8a7K"
     }
@@ -69,21 +77,31 @@
   "content_id_text": {
     "test_001_empty": {
       "inputs": [
-        ""
+        "",
+        false
       ],
       "outputs": "CT7A4zpmccuEv"
     },
     "test_002_short": {
       "inputs": [
-        "Some short text"
+        "Some short text",
+        false
       ],
       "outputs": "CTtuZwbXemZkr"
     },
     "test_003_long": {
       "inputs": [
-        "Their most significant and usefull property of similarity-preserving fingerprints gets lost in the fragmentation of individual, propietary and use case specific implementations. The real benefit lies in similarity preservation beyond your local data archive on a global scale accross vendors."
+        "Their most significant and usefull property of similarity-preserving fingerprints gets lost in the fragmentation of individual, propietary and use case specific implementations. The real benefit lies in similarity preservation beyond your local data archive on a global scale accross vendors.",
+        false
       ],
       "outputs": "CTeRw9PWZDbBV"
+    },
+    "test_004_partial": {
+      "inputs": [
+        "Some text for partial content id text",
+        true
+      ],
+      "outputs": "CtBhxPvgNFWKh"
     }
   },
   "data_chunks": {
@@ -3813,7 +3831,8 @@
     },
     "test_006_i18n": {
       "inputs": [
-        "Iñtërnâtiônàlizætiøn☃"
+        "Iñtërnâtiônàlizætiøn☃",
+        ""
       ],
       "outputs": [
         "CCdgqVLHSeBDp",
@@ -3834,7 +3853,8 @@
     },
     "test_008_long": {
       "inputs": [
-        "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed"
+        "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed",
+        ""
       ],
       "outputs": [
         "CC6jnjKNg6o9e",
@@ -3844,7 +3864,8 @@
     },
     "test_009_long_i18n": {
       "inputs": [
-        "Iñtërnâtiônàlizætiøn☃ Iñtërnâtiônàlizætiøn☃ Iñtërnâtiônàlizætiøn☃ Iñtërnâtiônàlizætiøn☃ Iñtërnâtiônàlizætiøn☃ Iñtërnâtiônàlizætiøn☃"
+        "Iñtërnâtiônàlizætiøn☃ Iñtërnâtiônàlizætiøn☃ Iñtërnâtiônàlizætiøn☃ Iñtërnâtiônàlizætiøn☃ Iñtërnâtiônàlizætiøn☃ Iñtërnâtiônàlizætiøn☃",
+        ""
       ],
       "outputs": [
         "CCj3TAt4WL2BK",
@@ -3940,13 +3961,15 @@
   "text_normalize": {
     "test_001_decompose": {
       "inputs": [
-        "Ç 가 Ω ℍ ① ︷ i⁹ ¼ ǆ ⫝̸ ȴ ȷ ɂ ć"
+        "Ç 가 Ω ℍ ① ︷ i⁹ ¼ ǆ ⫝̸ ȴ ȷ ɂ ć",
+        false
       ],
       "outputs": "c가ωH1i91⁄4dž⫝ȴȷɂc"
     },
     "test_002_tricky": {
       "inputs": [
-        "  Iñtërnâtiôn\nàlizætiøn☃💩 –  is a tric\t ky   thing!\r"
+        "  Iñtërnâtiôn\nàlizætiøn☃💩 –  is a tric\t ky   thing!\r",
+        false
       ],
       "outputs": "internationalizætiøn☃💩isatrickything"
     },
