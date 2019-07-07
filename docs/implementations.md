@@ -11,6 +11,7 @@ authors: Titusz Pan
 | Python3     | Patricia Schinke, [Titusz Pan](https://github.com/titusz) | https://pypi.python.org/pypi/iscc    |
 | Go (golang) | Patricia Schinke, Marvin Schmies                          | https://github.com/coblo/iscc-golang |
 | C# .Net     | [Jason Madden](https://github.com/dirric)                 | https://github.com/iscc/iscc-dotnet  |
+| Rust        | [Alexander-N](https://github.com/Alexander-N)             | https://github.com/iscc/iscc-rs  |
 
 If you are missing an implementation in your favorite programming language, please feel free to port it over. The reference implementation is a [single python module](https://github.com/coblo/iscc-specs/blob/master/src/iscc/iscc.py) and we have language independent [test data in JSON](https://github.com/coblo/iscc-specs/blob/master/tests/test_data.json).
 
