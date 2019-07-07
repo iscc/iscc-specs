@@ -148,7 +148,6 @@ The Meta-ID body is built from a 64-bit `similarity_hash` over 4-character n-gra
 | :------ | :------ | :------- | :----------------------------------------------------------- |
 | title   | text    | Yes      | The title of an intangible creation.                         |
 | extra   | text    | No       | An optional short statement that distinguishes this intangible creation from another one for the purpose of forced Meta-ID uniqueness. (default: empty string) |
-| version | integer | No       | ISCC version number. (default: 0)                            |
 
 !!! note
 
