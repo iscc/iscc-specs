@@ -32,7 +32,7 @@ setup(
     packages=find_packages("src"),
     package_dir={"": "src"},
     include_package_data=True,
-    install_requires=["xxhash==1.3.0", "Pillow==6.0.0"],
+    install_requires=["xxhash==1.3.0", "Pillow==6.1.0"],
     license="BSD 2-clause",
     zip_safe=False,
     keywords="iscc identifier media content hash blockchain similarity",
