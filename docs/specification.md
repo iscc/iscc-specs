@@ -120,7 +120,7 @@ The header only needs to be carried in the encoded representation. As similarity
 
 | Component                | Nibble-1 | Nibble-2                        | Byte | Code |
 | :----------------------- | :------- | :------------------------------ | :--- | ---- |
-| **Meta-ID**              | 0000     | 0000 - ISCC version 1           | 0x00 | CC   |
+| **Meta-ID**              | 0000     | 0000 - Reserved                 | 0x00 | CC   |
 | **Content-ID-Text**      | 0001     | 0000 - Content Type Text        | 0x10 | CT   |
 | **Content-ID-Text PCF**  | 0001     | 0001 - Content Type Text  + PCF | 0x11 | Ct   |
 | **Content-ID-Image**     | 0001     | 0010 - Content Type Image       | 0x12 | CY   |
@@ -138,7 +138,7 @@ The body section of each component is specific to the component and always 8-byt
 
 ### Meta-ID Component
 
-The Meta-ID component starts with a 1-byte header `00000000`. The first nibble `0000` indicates that this is a Meta-ID component type. The second nibble `0000` indicates the ISCC of version starting with 0. All subsequent components are expected to follow the specification of the given ISCC version.
+The Meta-ID component starts with a 1-byte header `00000000`. The first nibble `0000` indicates that this is a Meta-ID component type. The second nibble is reserved for future extended features of the Meta-ID.
 
 The Meta-ID body is built from a 64-bit `similarity_hash` over 4-character n-grams of the basic metadata of the content to be identified.  The basic metadata supplied to the Meta-ID generating function is assumed to be UTF-8 encoded. Errors that occur during the decoding of such a bytestring input to a native Unicode MUST terminate the process and must not be silenced. An ISCC generating application MUST provide a `meta_id` function that accepts minimal and generic metadata and returns a [Base58-ISCC encoded](#base58-iscc) Meta-ID component and trimmed metadata.
 
@@ -158,16 +158,15 @@ The Meta-ID body is built from a 64-bit `similarity_hash` over 4-character n-gra
 
 An ISCC generating application must follow these steps in the given order to produce a stable Meta-ID:
 
-1. Verify the requested ISCC version is supported by your implementation.
-2. Apply [`text_normalize`](#text_normalize) separately to the  `title` and `extra` inputs while keeping white space.
-2. Apply [`text_trim`](#text_trim) to the results of step 2. *The results of this step MUST be supplied as basic metadata for ISCC registration.*
-4. Concatenate trimmed `title` and `extra` from using a space ( `\u0020`) as a separator.
-5. Create a list of 4 character [n-grams](https://en.wikipedia.org/wiki/N-gram) by sliding character-wise through the result of step 4.
-6. Encode each n-gram from step 5 to an UTF-8 bytestring and calculate its [xxHash64](http://cyan4973.github.io/xxHash/) digest.
-7. Apply [`similarity_hash`](#similarity_hash) to the list of digests from step 6.
-8. Prepend the 1-byte component header according to component type and ISCC version (e.g. `0x00`) to the results of step 7.
-9. Encode the resulting 9 byte sequence with [`encode`](#encode)
-10. Return encoded Meta-ID, trimmed `title` and trimmed `extra` data.
+1. Apply [`text_normalize`](#text_normalize) separately to the  `title` and `extra` inputs while keeping white space.
+2. Apply [`text_trim`](#text_trim) to the results of the previous step. *The results of this step MUST be supplied as basic metadata for ISCC registration.*
+3. Concatenate trimmed `title` and `extra` from using a space ( `\u0020`) as a separator.
+4. Create a list of 4 character [n-grams](https://en.wikipedia.org/wiki/N-gram) by sliding character-wise through the result of the previous step.
+5. Encode each n-gram from the previous step to an UTF-8 bytestring and calculate its [xxHash64](http://cyan4973.github.io/xxHash/) digest.
+6. Apply [`similarity_hash`](#similarity_hash) to the list of digests from the previous step.
+7. Prepend the 1-byte component header (`0x00`) to the results of the previous step.
+8. Encode the resulting 9 byte sequence with [`encode`](#encode)
+9. Return encoded Meta-ID, trimmed `title` and trimmed `extra` data.
 
 
 See also: [Meta-ID reference code](https://github.com/iscc/iscc-specs/blob/master/src/iscc/iscc.py#L19)

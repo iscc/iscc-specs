@@ -16,38 +16,35 @@ from iscc.const import *
 ###############################################################################
 
 
-def meta_id(title, extra="", version=1):
+def meta_id(title, extra=""):
 
-    # 1. Verify version is supported
-    assert version == 1, "Only version 1 supported"
-
-    # 2. Normalization
+    # 1. Normalization
     title_norm = text_normalize(title, keep_ws=True)
     extra_norm = text_normalize(extra, keep_ws=True)
 
-    # 3. Trimming
+    # 2. Trimming
     title_trimmed = text_trim(title_norm)
     extra_trimmed = text_trim(extra_norm)
 
-    # 4. Concatenate
+    # 3. Concatenate
     concat = "\u0020".join((title_trimmed, extra_trimmed))
 
-    # 5. Create a list of n-grams
+    # 4. Create a list of n-grams
     n_grams = sliding_window(concat, width=WINDOW_SIZE_MID)
 
-    # 6. Encode n-grams and create xxhash64-digest
+    # 5. Encode n-grams and create xxhash64-digest
     hash_digests = [xxhash.xxh64(s.encode("utf-8")).digest() for s in n_grams]
 
-    # 7. Apply similarity_hash
+    # 6. Apply similarity_hash
     simhash_digest = similarity_hash(hash_digests)
 
-    # 8. Prepend header-byte
+    # 7. Prepend header-byte
     meta_id_digest = HEAD_MID + simhash_digest
 
-    # 9. Encode with base58_iscc
+    # 8. Encode with base58_iscc
     meta_id = encode(meta_id_digest)
 
-    # 10. Return encoded Meta-ID, trimmed `title` and trimmed `extra` data.
+    # 9. Return encoded Meta-ID, trimmed `title` and trimmed `extra` data.
     return [meta_id, title_trimmed, extra_trimmed]
 
 
