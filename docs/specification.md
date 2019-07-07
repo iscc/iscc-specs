@@ -530,11 +530,12 @@ See also: [CDC reference code](https://github.com/iscc/iscc-specs/blob/master/sr
 
 ## Conformance Testing
 
-An application that claims ISCC conformance MUST pass the ISCC conformance test suite. The test suite is available as json data in our [Github Repository](https://raw.githubusercontent.com/iscc/iscc-specs/master/tests/test_data.json). Test Data is structured as follows:
+An application that claims ISCC conformance MUST pass all required functions from the ISCC conformance test suite. The test suite is available as json data in our [Github Repository](https://raw.githubusercontent.com/iscc/iscc-specs/master/tests/test_data.json). Test Data is structured as follows:
 
 ```json
 {
     "<function_name>": {
+        "required": true,
         "<test_name>": {
             "inputs": ["<value1>", "<value2>"],
             "outputs": ["value1>", "<value2>"]
@@ -542,6 +543,8 @@ An application that claims ISCC conformance MUST pass the ISCC conformance test 
     }
 }
 ```
+
+The test suite also contains data for functions that are considered implementation detail and MAY be skipped by other implementations. Optional tests are marked as `"required": false`.
 
 Outputs that are expected to be raw bytes are embedded as HEX encoded strings in JSON and prefixed with  `hex:` to support automated decoding during implementation testing.
 

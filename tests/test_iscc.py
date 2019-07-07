@@ -34,6 +34,8 @@ def test_test_data():
         assert type(data) == dict
         for funcname, tests in data.items():
             for testname, testdata in tests.items():
+                if not testname.startswith("test_"):
+                    continue
                 func = getattr(iscc, funcname)
                 args = testdata["inputs"]
                 if funcname in ["data_chunks"]:

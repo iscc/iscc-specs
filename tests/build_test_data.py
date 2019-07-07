@@ -3,6 +3,16 @@ import json
 import iscc
 
 
+REQUIRED = (
+    "meta_id",
+    "content_id_text",
+    "content_id_image",
+    "content_id_mixed",
+    "data_id",
+    "instance_id",
+)
+
+
 def main():
     data = json.load(open("test_inputs.json", "r", encoding="utf-8"))
 
@@ -14,6 +24,7 @@ def main():
             if funcname in ["data_chunks"]:
                 result = ["hex:" + data.hex() for data in result]
             testdata["outputs"] = result
+        data[funcname]["required"] = funcname in REQUIRED
     with open("test_data.json", "w", encoding="utf-8") as outf:
         json.dump(data, outf, indent=2, sort_keys=True, ensure_ascii=False)
 
