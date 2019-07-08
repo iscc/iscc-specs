@@ -5,7 +5,7 @@
 [![License](https://img.shields.io/pypi/l/iscc.svg)](https://pypi.python.org/pypi/iscc/)
 [![Downloads](https://pepy.tech/badge/iscc)](https://pepi.tech/project/iscc)
 
-The **International Standard Content Code** is a proposal for an [open standard](https://en.wikipedia.org/wiki/Open_standard) for decentralized content identification. This repository contains the specification of the proposed **ISCC Standard** and a reference implementation in Python3. The latest published version of the specification can be found at [iscc.codes](http://iscc.codes>)
+The **International Standard Content Code** is a proposal for an [open standard](https://en.wikipedia.org/wiki/Open_standard) for decentralized content identification. This repository contains the specification of the proposed **ISCC Standard** and a reference implementation in Python3. The latest published version of the specification can be found at [iscc.codes](https://iscc.codes)
 
 | NOTE: This is a low level reference implementation. For easy generation of ISCC codes see: [iscc-cli](https://github.com/iscc/iscc-cli) |
 | --- |
