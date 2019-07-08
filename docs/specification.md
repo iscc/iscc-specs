@@ -544,7 +544,7 @@ An application that claims ISCC conformance MUST pass all required functions fro
 }
 ```
 
-The test suite also contains data for functions that are considered implementation detail and MAY be skipped by other implementations. Optional tests are marked as `"required": false`.
+The test suite also contains data for functions that are considered implementation details and MAY be skipped by other implementations. Optional tests are marked as `"required": false`.
 
 Outputs that are expected to be raw bytes are embedded as HEX encoded strings in JSON and prefixed with  `hex:` to support automated decoding during implementation testing.
 
