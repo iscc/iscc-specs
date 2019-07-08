@@ -6,12 +6,12 @@ from setuptools import setup, find_packages
 
 
 def readme():
-    with open('README.md') as f:
+    with open("README.md") as f:
         return f.read()
 
 
 def version():
-    version_file = 'src/iscc/__init__.py'
+    version_file = "src/iscc/__init__.py"
     with open(version_file) as f:
         version_data = f.read()
     m = re.search(r"^__version__ = ['\"]([^'\"]*)['\"]", version_data, re.M)
@@ -21,28 +21,28 @@ def version():
 
 
 setup(
-    name='iscc',
+    name="iscc",
     version=version(),
     description="ISCC: Reference Implementation",
     long_description=readme(),
     long_description_content_type="text/markdown",
     author="Titusz Pan",
-    author_email='tp@py7.de',
-    url='https://github.com/iscc/iscc-specs',
-    packages=find_packages('src'),
-    package_dir={'': 'src'},
+    author_email="tp@py7.de",
+    url="https://github.com/iscc/iscc-specs",
+    packages=find_packages("src"),
+    package_dir={"": "src"},
     include_package_data=True,
-    install_requires=['xxhash==1.3.0', 'Pillow==6.0.0'],
-    license='BSD 2-clause',
+    install_requires=["xxhash==1.3.0", "Pillow==6.1.0"],
+    license="BSD 2-clause",
     zip_safe=False,
-    keywords='iscc identifier media content hash blockchain similarity',
+    keywords="iscc identifier media content hash blockchain similarity",
     classifiers=[
-        'Development Status :: 4 - Beta',
-        'Intended Audience :: Developers',
-        'License :: OSI Approved :: BSD License',
-        'Natural Language :: English',
-        'Programming Language :: Python :: 3.5',
-        'Programming Language :: Python :: 3.6',
-        'Programming Language :: Python :: 3.7',
+        "Development Status :: 4 - Beta",
+        "Intended Audience :: Developers",
+        "License :: OSI Approved :: BSD License",
+        "Natural Language :: English",
+        "Programming Language :: Python :: 3.5",
+        "Programming Language :: Python :: 3.6",
+        "Programming Language :: Python :: 3.7",
     ],
 )
