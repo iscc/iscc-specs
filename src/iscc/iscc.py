@@ -27,7 +27,7 @@ def meta_id(title, extra=""):
     extra_trimmed = text_trim(extra_norm)
 
     # 3. Concatenate
-    concat = "\u0020".join((title_trimmed, extra_trimmed))
+    concat = "\u0020".join((title_trimmed, extra_trimmed)).strip()
 
     # 4. Create a list of n-grams
     n_grams = sliding_window(concat, width=WINDOW_SIZE_MID)

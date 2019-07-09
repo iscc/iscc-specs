@@ -109,7 +109,7 @@
     "test_001_cid_t_one": {
       "inputs": [
         [
-          "1HUg6wnerR9jP"
+          "CTZYQRgV5eCQp"
         ],
         false
       ]
@@ -117,8 +117,8 @@
     "test_002_cid_t_two_partial": {
       "inputs": [
         [
-          "1HUg6wnerR9jP",
-          "1HWMGKt9TCwFG"
+          "CTZYQRgV5eCQp",
+          "CTDVyoiMYHq6F"
         ],
         true
       ]
@@ -126,8 +126,8 @@
     "test_003_cid_t_and_i": {
       "inputs": [
         [
-          "1HUg6wnerR9jP",
-          "1KSiorBqgP32u"
+          "CTZYQRgV5eCQp",
+          "CYDfTq7Qc7Fre"
         ],
         false
       ]
