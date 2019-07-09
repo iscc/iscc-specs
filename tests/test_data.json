@@ -49,31 +49,31 @@
     "test_001_cid_t_one": {
       "inputs": [
         [
-          "1HUg6wnerR9jP"
+          "CTZYQRgV5eCQp"
         ],
         false
       ],
-      "outputs": "CMmXqurbPbdw1"
+      "outputs": "CM3jCjpxgmbAD"
     },
     "test_002_cid_t_two_partial": {
       "inputs": [
         [
-          "1HUg6wnerR9jP",
-          "1HWMGKt9TCwFG"
+          "CTZYQRgV5eCQp",
+          "CTDVyoiMYHq6F"
         ],
         true
       ],
-      "outputs": "CmmKFyLEKgaxW"
+      "outputs": "Cm3os1aU6noGv"
     },
     "test_003_cid_t_and_i": {
       "inputs": [
         [
-          "1HUg6wnerR9jP",
-          "1KSiorBqgP32u"
+          "CTZYQRgV5eCQp",
+          "CYDfTq7Qc7Fre"
         ],
         false
       ],
-      "outputs": "CMHafQ4eR8a7K"
+      "outputs": "CM49AVTm99gzh"
     }
   },
   "content_id_text": {
