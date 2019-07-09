@@ -159,7 +159,7 @@ An ISCC generating application must follow these steps in the given order to pro
 
 1. Apply [`text_normalize`](#text_normalize) separately to the  `title` and `extra` inputs while keeping white space.
 2. Apply [`text_trim`](#text_trim) to the results of the previous step. *The results of this step MUST be supplied as basic metadata for ISCC registration.*
-3. Concatenate trimmed `title` and `extra` from using a space ( `\u0020`) as a separator.
+3. Concatenate trimmed `title` and `extra` from using a space ( `\u0020`) as a separator. Remove leading/trailing whitespace.
 4. Create a list of 4 character [n-grams](https://en.wikipedia.org/wiki/N-gram) by sliding character-wise through the result of the previous step.
 5. Encode each n-gram from the previous step to an UTF-8 bytestring and calculate its [xxHash64](http://cyan4973.github.io/xxHash/) digest.
 6. Apply [`similarity_hash`](#similarity_hash) to the list of digests from the previous step.

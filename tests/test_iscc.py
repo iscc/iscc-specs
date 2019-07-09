@@ -52,23 +52,23 @@ def test_test_data():
 
 def test_meta_id():
     mid1, _, _ = iscc.meta_id("ISCC Content Identifiers")
-    assert mid1 == "CCDGhLx6tREif"
+    assert mid1 == "CCDFPFc87MhdT"
 
     mid1, _, _ = iscc.meta_id(b"ISCC Content Identifiers")
-    assert mid1 == "CCDGhLx6tREif"
+    assert mid1 == "CCDFPFc87MhdT"
 
     mid1, title, extra = iscc.meta_id("Die Unendliche Geschichte")
-    assert mid1 == "CCAZF4K1bBv8i"
+    assert mid1 == "CCAKevDpE1eEL"
     assert title == "die unendliche geschichte"
     assert extra == ""
     mid2 = iscc.meta_id(" Die unéndlíche,  Geschichte ")[0]
     assert mid1 == mid2
 
     mid3 = iscc.meta_id("Die Unentliche Geschichte")[0]
-    assert iscc.distance(mid1, mid3) == 12
+    assert iscc.distance(mid1, mid3) == 8
 
     mid4 = iscc.meta_id("Geschichte, Die Unendliche")[0]
-    assert iscc.distance(mid1, mid4) == 7
+    assert iscc.distance(mid1, mid4) == 9
 
     with pytest.raises(UnicodeDecodeError):
         iscc.meta_id(b"\xc3\x28")
