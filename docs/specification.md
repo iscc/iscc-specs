@@ -114,7 +114,7 @@ Each component has the same basic structure of a **1-byte header** and a **8-byt
 
 The 1-byte header of each component is subdivided into 2 nibbles (4 bits). The first nibble specifies the component type while the second nibble is component specific.
 
-The header only needs to be carried in the encoded representation. As similarity searches across different components are of little use, the type information contained in the header of each component can be safely ignored after an ISCC has been decomposed and internally typed by an application. 
+The header only needs to be carried in the encoded representation. As similarity searches across different components are of little use, the type-information contained in the header of each component can be safely ignored after an ISCC has been decomposed and internally typed by an application. 
 
 #### List of Component Headers
 
@@ -198,14 +198,14 @@ A Content-ID is generated in two broad steps. In the first step, we extract and 
 
 The  Content-ID type is signaled by the first 3 bits of the second nibble of the first byte of the Content-ID:
 
-| Content-ID Type | Nibble 2 Bits 0-3 | Description                                        |
-| :-------------- | :---------------- | -------------------------------------------------- |
-| text            | 000               | Generated from extracted and normalized plain-text |
-| image           | 001               | Generated from normalized grayscale pixel data     |
-| *audio*         | *010*             | To be defined in later version of specification    |
-| *video*         | *011*             | To be defined in later version of specification    |
-| mixed           | 100               | Generated from multiple Content-IDs                |
-|                 | 101, 110, 111     | Reserved for future versions of specification      |
+| Content-ID Type | Nibble 2 Bits 0-3 | Description                                           |
+| :-------------- | :---------------- | ----------------------------------------------------- |
+| text            | 000               | Generated from extracted and normalized plain-text    |
+| image           | 001               | Generated from normalized grayscale pixel data        |
+| *audio*         | *010*             | To be defined in a later version of the specification |
+| *video*         | *011*             | To be defined in a later version of the specification |
+| mixed           | 100               | Generated from multiple Content-IDs                   |
+|                 | 101, 110, 111     | Reserved for future versions of specification         |
 
 #### Content-ID-Text
 
@@ -213,14 +213,14 @@ The Content-ID-Text is built from the extracted plain-text content of an encoded
 
 An ISCC generating application MUST provide a `content_id(text, partial=False)` function that accepts UTF-8 encoded plain text and a boolean indicating the [partial content flag](#partial-content-flag-pcf) as input and returns a Content-ID with GMT type `text`. The procedure to create a Content-ID-Text is as follows:
 
-2. Apply [`text_normalize`](#text_normalize) to the text input while removing whitespace.
+1. Apply [`text_normalize`](#text_normalize) to the text input while removing whitespace.
 2. Create character-wise n-grams of length 13 from the normalized text.
-5. Create  a list of 32-bit unsigned integer features by applying [xxHash32](http://cyan4973.github.io/xxHash/) to results of step 2.
-6. Apply [`minimum_hash`](#minimum_hash) to the list of features from step 3 with n=64.
-7. Collect the least significant bits from the 64 MinHash features from step 4.
+3. Create  a list of 32-bit unsigned integer features by applying [xxHash32](http://cyan4973.github.io/xxHash/) to results of the previous step.
+4. Apply [`minimum_hash`](#minimum_hash) to the list of features from the previous step with n=64.
+5. Collect the least significant bits from the 64 MinHash features from the previous step.
 6. Create a 64-bit digest from the collected bits.
-10. Prepend the 1-byte component header (`0x10` full content or `0x11` partial content).
-11. Encode and return the resulting 9-byte sequence with [`encode`](#encode).
+7. Prepend the 1-byte component header (`0x10` full content or `0x11` partial content).
+8. Encode and return the resulting 9-byte sequence with [`encode`](#encode).
 
 See also: [Content-ID-Text reference code](https://github.com/iscc/iscc-specs/blob/master/src/iscc/iscc.py#L54)
 
@@ -231,15 +231,15 @@ For the Content-ID-Image we are opting for a DCT-based perceptual image hash ins
 An ISCC generating application MUST provide a `content_id_image(image, partial=False)` function that accepts a local file path to an image and returns a Content-ID with GMT type `image`. The procedure to create a Content-ID-Image is as follows:
 
 1. Apply [`image_normalize`](#image_normalize) to receive a two-dimensional array of grayscale pixel data.
-2. Apply [`image_hash`](#image_hash) to the results of step 1.
-9. Prepend the 1-byte component header (`0x12` full content or `0x13` partial content) to results of step 2.
+2. Apply [`image_hash`](#image_hash) to the results of the previous step.
+3. Prepend the 1-byte component header (`0x12` full content or `0x13` partial content) to results of the previous step.
 4. Encode and return the resulting 9-byte sequence with [`encode`](#encode)
 
-See also: [Content-ID-Image reference code](https://github.com/iscc/iscc-specs/blob/master/src/iscc/iscc.py#L84)
+See also: [Content-ID-Image reference code](https://github.com/iscc/iscc-specs/blob/master/src/iscc/iscc.py#L81)
 
 !!! note "Image Data Input"
     The `content_id_image` function may optionally accept the raw byte data of an encoded image or an internal native image object as input for convenience.
-    
+
 !!! warning "JPEG Decoding"
     Decoding of JPEG images is non-deterministic. Different image processing libraries may yield diverging pixel data and result in different Image-IDs. The reference implementation currently uses the builtin decoder of the [Python Pillow](https://github.com/python-pillow/Pillow) imaging library. Future versions of the ISCC specification may define a custom deterministic JPEG decoding procedure.
 
@@ -251,7 +251,7 @@ Signature: `conent_id_mixed(cids: List[str], partial: bool=False) -> str`
 
 1. Decode the list of Content-IDs.
 2. Extract the **first 8-bytes** from each digest (**Note**: this includes the header part of the Content-IDs).
-4. Apply [`similarity_hash`](#similarity_hash) to the list of digests from step 2.
+3. Apply [`similarity_hash`](#similarity_hash) to the list of digests from step 2.
 4. Prepend the 1-byte component header(`0x18` full content or `0x19` partial content)
 5. Apply [`encode`](#encode) to the result of step 5 and return the result.
 
@@ -266,14 +266,14 @@ The last bit of the header byte of the Content-ID is the "Partial Content Flag".
 !!! example "PCF Linking Example"
 
     Let's assume we have a single newspaper issue "The Times - 03 Jan 2009". You would generate one Meta-ID component with title "The Times" and extra "03 Jan 2009". The resulting Meta-ID component will be the grouping prefix in this szenario.
-    
+
     We use a Content-ID-Mixed with PCF `0` (not partial) for the ISCC of the newspaper issue. We generate Data-ID and Instance-ID from the print PDF of the newspaper issue.
-    
+
     To create an ISCC for a single extracted image that should convey context with the newspaper issue we reuse the Meta-ID of the newspaper issue and create a Content-ID-Image with PCF `1` (partial to the newspaper issue). For the Data-ID or Instance-ID of the image we are free to choose if we reuse those of the newspaper issue or create separate ones. The former would express strong specialization of the image to the newspaper issue (not likely to be useful out of context). The latter would create a stronger link to an eventual standalone ISCC of the image. Note that in any case the ISCC of the individual image retains links in both ways:
-    
+
     - Image is linked to the newspaper issue by identical Meta-ID component
     - Image is linked to the standalone version of the image by identical Content-ID-Image body 
-    
+
     This is just one example that illustrates the flexibility that the PCF-Flag provides in concert with a grouping Meta-ID. With great flexibility comes great danger of complexity. Applications SHOULD do careful planning before using the PCF-Flag with internally defined semantics.
 
 ### Data-ID Component
@@ -289,14 +289,14 @@ The Data-ID is built from the raw encoded data of the content to be identified. 
 3. Apply [`minimum_hash`](#minimum_hash) to the resulting list of 32-bit unsigned integers with n=64.
 4. Collect the least significant bits from the 64 MinHash features.
 5. Create a 64-bit digest from the collected bits.
-7. Prepend the 1-byte component header (e.g. 0x20).
+7. Prepend the 1-byte component header (eg. 0x20).
 8. Apply [`encode`](#encode) to the result of step 6 and return the result.
 
 See also: [Data-ID reference code](https://github.com/iscc/iscc-specs/blob/master/src/iscc/iscc.py#L123)
 
 ### Instance-ID Component
 
-The Instance-ID is built from the raw data of the media object to be identified and serves as checksum for the media object. The raw data of the media object is split into 64-kB data-chunks. Then we build a hash-tree from those chunks and use the truncated tophash (merkle root) as component body of the Instance-ID.
+The Instance-ID is built from the raw data of the media object to be identified and serves as checksum for the media object. The raw data of the media object is split into 64-kB data-chunks. Then we build a hash-tree from those chunks and use the truncated tophash (Merkle root) as component body of the Instance-ID.
 
 To guard against length-extension attacks and second preimage attacks we use double sha256 for hashing. We also prefix the hash input data with a `0x00`-byte for the leaf nodes hashes and with a `0x01`-byte for the  internal node hashes. While the Instance-ID itself is a non-cryptographic checksum, the full tophash may be supplied in the extended metadata of an ISCC secure integrity verification is required.
 
@@ -309,7 +309,7 @@ An ISCC generating application MUST provide a `instance_id` function that accept
 1. Split the raw bytes of the encoded media object into 64-kB chunks.
 2. For each chunk calculate the sha256d of the concatenation of a `0x00`-byte and the chunk bytes. We call the resulting values *leaf node hashes* (LNH).
 3. Calculate the next level of the hash tree by applying sha256d to the concatenation of a `0x01`-byte and adjacent pairs of LNH values. If the length of the list of LNH values is uneven concatenate the last LNH value with itself. We call the resulting values *internal node hashes* (INH).
-4. Recursively apply `0x01`-prefixed pairwise hashing to the results of  step 3 until the process yields only one hash value. We call this value the tophash.
+4. Recursively apply `0x01`-prefixed pairwise hashing to the results of the last step until the process yields only one hash value. We call this value the tophash.
 5. Trim the resulting tophash to the first 8 bytes.
 6. Prepend the 1-byte component header (e.g. `0x30`).
 7. Encode resulting 9-byte sequence with [`encode`](#encode) to an Instance-ID Code
@@ -333,11 +333,11 @@ Basic metadata for an ISCC is metadata that is explicitly defined by this specif
 | version | integer    | No       | No    | Version of ISCC Specification. Assumed to be 1 if omitted.   |
 | title   | text       | Yes      | Yes   | The title of an intangible creation identified by the ISCC. The normalized and trimmed UTF-8 encoded text MUST not exceed 128 Bytes. The result of processing `title` and `extra` data with the `meta_id` function MUST  match the Meta-ID component of the ISCC. |
 | extra   | text       | No       | Yes   | An optional short statement that distinguishes this intangible creation from another one for the purpose of Meta-ID uniqueness. |
-| tophash | text (hex) | No       | No    | The full hex-encoded tophash (merkle root) returned by the `instance_id`  function. |
+| tophash | text (hex) | No       | No    | The full hex-encoded tophash (Merkle root) returned by the `instance_id`  function. |
 | meta    | array      | No       | No    | A list of one or more **extended metadata** entries. Must include at least one entry if specified. |
 
 !!! attention
-    **Bound** metadata impacts the the ISCC Code (Meta-ID) and cannot be changed afterwards. Depending on adoption and real world use, future versions of this specification may define new basic metadata fields. Applications MAY add custom fields at the top level of the JSON object but MUST prefix those fields with an underscore to avoid collisions with future extensions of this specification.
+    **Bound** metadata impacts the ISCC Code (Meta-ID) and cannot be changed afterwards. Depending on adoption and real world use, future versions of this specification may define new basic metadata fields. Applications MAY add custom fields at the top level of the JSON object but MUST prefix those fields with an underscore to avoid collisions with future extensions of this specification.
 
 ### Extended Metadata
 
@@ -374,7 +374,7 @@ See also: [ISCC-Stream specification](https://coblo.github.io/cips/cip-0003-iscc
 
 Embedding ISCC codes into content is only RECOMMENDED if it does not create a side effect. We call it a side effect if embedding an ISCC code modifies the content to such an extent, that it yields a different ISCC code.
 
-Side effects will depend on the combination of ISCC components that are to be embedded. A Meta-ID can always be embedded without side effect because it does not depend on the content itself. Content-ID and Data-ID may not change if embedded in larger media objects. Instance-IDs cannot easily be embedded as they will inevitably have a side effect on the post-embedding Instance-ID without special processing.
+Side effects will depend on the combination of ISCC components that are to be embedded. A Meta-ID can always be embedded without side effects because it does not depend on the content itself. Content-ID and Data-ID may not change if embedded in larger media objects. Instance-IDs cannot easily be embedded as they will inevitably have a side effect on the post-embedding Instance-ID without special processing.
 
 Applications MAY embed ISCC codes that have side effects if they specify a procedure by which the embedded ISCC codes can be stripped in such a way that the stripped content will yield the original embedded ISCC codes.
 
@@ -458,7 +458,7 @@ We define a text normalization function that is specific to our application. It 
 
 1. Decode to native Unicode if text is a byte string
 2. Remove leading and trailing whitespace
-3. Transform text to lower case
+3. Transform text to lowercase
 4. Decompose the lower case text by applying [Unicode Normalization Form D (NFD)](http://www.unicode.org/reports/tr15/#Norm_Forms).
 5. Filter out all characters that fall into the Unicode categories listed in the constant `UNICODE_FILTER`. Keep these control characters (Cc) that are commonly considered whitespace:
     - `\u0009`,  # Horizontal Tab (TAB)
@@ -511,7 +511,7 @@ Signature: `image_hash(pixels: List[List[int]]) -> bytes`
 2. Perform a discrete cosine transform per column on the resulting matrix from step 2.
 3. Extract upper left 8x8 corner of array from step 2 as a flat list.
 4. Calculate the median of the results from step 3.
-5. Create a 64-bit digest by iterating over the values of step 5 and setting a  `1`- for values above median and `0` for values below or equal to median.
+5. Create a 64-bit digest by iterating over the values of step 5 and setting a  `1`- for values above median and `0` for values below or equal to the median.
 6. Return results from step 5.
 
 See also: [Image hash reference code](https://github.com/iscc/iscc-specs/blob/master/src/iscc/iscc.py#L274)
