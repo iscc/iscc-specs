@@ -22,7 +22,7 @@ If you are missing an implementation in your favorite programming language, plea
 ## Early Prototypes
 
 !!! warning
-    These a are early prototype demos. Please be aware that they do not represent the current state. Many things have changed since those prototypes where build.
+    These are early prototype demos. Please be aware that they do not represent the current state. Many things have changed since those prototypes where build.
 
 - Blockchain wallet demo: https://github.com/coblo/gui-demo
 - Smart License demo: https://github.com/coblo/smartlicense

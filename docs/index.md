@@ -11,32 +11,30 @@ authors: Titusz Pan
 
 ## Motivation
 
-With the advent of blockchain technology the Internet is moving towards a network of peer-to-peer transactions. Increasing amounts of dynamic, short-lived and granular contents need to be managed and require new and innovative tools.
- 
-A crucial prerequisite for content-related transactions to succeed in this new and demanding enviroment is the capability to easily address and identify content. Yet many industries that deal with digital content do not even have strandard identifiers. There is no existing solution for those industries that deal with short-lived or granular content such as journalism. There is also no widely adopted, generic identifier for digital images.
+Increasing amounts of dynamic, short-lived and granular content needs to be managed and requires new and innovative tools.
 
-The overhead and costs of manually assigning and tracking identifiers for such contents is prohibitive. But there is a solution to the problem: Auto-generated identifiers created algorithmically from the content itself.
+A crucial prerequisite for content-related transactions to succeed in this new and demanding environment is the capability to easily address and identify content. Yet many industries that deal with digital content do not even have standard identifiers. There is no existing solution for those industries that deal with short-lived or granular content such as journalism. There is also no widely adopted, standardized identifier for digital images.
 
-In a multi-sided ecosystem **anybody** may have a legitimate interest to generate or lookup an identifier for some digital content.
+The overhead and costs of manually assigning and tracking identifiers for such content is prohibitive. But there is a solution to the problem: Auto-generated identifiers created algorithmically from the content itself.
 
-Open and accessible **standard identifiers**, that are specifically designed to manage digital content are fundamental for blockchain based transactions and sales activities in our increasingly heterogeneous media environment.
+With the advent of blockchain technology the Internet is moving towards a network of peer-to-peer transactions. In a multi-sided ecosystem **anybody** may have a legitimate interest to generate or lookup an identifier for some digital content – whether they own the content or not.
+
+Open and accessible **standard identifiers**, that are specifically designed to manage small and sometimes transient pieces of digital content are fundamental for transactions and sales activities in our increasingly heterogeneous media environment.
 
 By using standardized, decentralized, algorithmic identifiers for digital content,  all ecosystem participants can engage more efficiently in content-related transactions.
 
-## Key Differentiators
+## Key Features and Differentiators
 
-| Existing Media Identifiers           | **ISCC** Content Identifier               |
-| ------------------------------------ | ----------------------------------------- |
-| Centralized issuance                 | Decentralized issuance                    |
-| Industry specific overspecialization | Generic content identifier                |
-| None or human curated semantics      | Algorithmic similarity & deduplication    |  
-| High management costs                | Low management costs                      |
-| High barrier of entry                | Low barrier of entry                      |
-| Not designed for blockchain storage  | Designed for and registered on blockchain |
+- Decentralized issuance through algorithmic creation
+- Generic content identification (text, images, audio, video)
+- Algorithmic similarity detection and deduplication
+- Low management costs
+- Low barrier of entry
+- Designed for blockchain based registration
 
 ## How it works
 
-**ISCC** identifiers are generated algorithmically **from the content itself**. Content files are proccessed to build the identifier. The ISCC does not have to be manually assigned, neither does it have to be carried around or embedded within the content. The content itself is the source and authority of the **ISCC Code**.
+**ISCC** identifiers are generated algorithmically **from the content itself**. Content files are processed to build the identifier. The ISCC does not have to be manually assigned, neither does it have to be carried around or embedded within the content. The content itself is the source and authority of the **ISCC Code**.
 
 The **ISCC Code** is a unique, hierarchically structured, composite identifier. It is built from a generic and balanced mix of content-derived, locality-sensitive and similarity-preserving hashes generated from metadata and content.
 
