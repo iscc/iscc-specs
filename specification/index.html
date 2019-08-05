@@ -1271,7 +1271,7 @@
                 
                 
                 <h1 id="iscc-specification-v1x"><abbr title="International Standard Content Code">ISCC</abbr> - Specification v1.x<a class="headerlink" href="#iscc-specification-v1x" title="Permanent link">#</a></h1>
-<p><strong>Last revised on:</strong> 2019-07-08</p>
+<p><strong>Last revised on:</strong> 2019-07-29</p>
 <h2 id="abstract">Abstract<a class="headerlink" href="#abstract" title="Permanent link">#</a></h2>
 <p>The <strong>International Standard Content Code (<abbr title="International Standard Content Code">ISCC</abbr>)</strong>, is an open and decentralized digital media identifier. An <abbr title="International Standard Content Code">ISCC</abbr> can be created from digital content and its basic metadata by anybody who follows the procedures of the <abbr title="International Standard Content Code">ISCC</abbr> specification or by using open source software that supports <abbr title="International Standard Content Code">ISCC</abbr> creation <a href="#conformance-testing">conforming to the <abbr title="International Standard Content Code">ISCC</abbr> specification</a>.</p>
 <h2 id="note-to-readers">Note to Readers<a class="headerlink" href="#note-to-readers" title="Permanent link">#</a></h2>
@@ -1380,7 +1380,7 @@
 <h3 id="component-types">Component Types<a class="headerlink" href="#component-types" title="Permanent link">#</a></h3>
 <p>Each component has the same basic structure of a <strong>1-byte header</strong> and a <strong>8-byte body</strong> section. </p>
 <p>The 1-byte header of each component is subdivided into 2 nibbles (4 bits). The first nibble specifies the component type while the second nibble is component specific.</p>
-<p>The header only needs to be carried in the encoded representation. As similarity searches across different components are of little use, the type information contained in the header of each component can be safely ignored after an <abbr title="International Standard Content Code">ISCC</abbr> has been decomposed and internally typed by an application. </p>
+<p>The header only needs to be carried in the encoded representation. As similarity searches across different components are of little use, the type-information contained in the header of each component can be safely ignored after an <abbr title="International Standard Content Code">ISCC</abbr> has been decomposed and internally typed by an application. </p>
 <h4 id="list-of-component-headers">List of Component Headers<a class="headerlink" href="#list-of-component-headers" title="Permanent link">#</a></h4>
 <table>
 <thead>
@@ -1524,7 +1524,7 @@
 <ol>
 <li>Apply <a href="#text_normalize"><code>text_normalize</code></a> separately to the  <code>title</code> and <code>extra</code> inputs while keeping white space.</li>
 <li>Apply <a href="#text_trim"><code>text_trim</code></a> to the results of the previous step. <em>The results of this step MUST be supplied as basic metadata for <abbr title="International Standard Content Code">ISCC</abbr> registration.</em></li>
-<li>Concatenate trimmed <code>title</code> and <code>extra</code> from using a space ( <code>\u0020</code>) as a separator.</li>
+<li>Concatenate trimmed <code>title</code> and <code>extra</code> from using a space ( <code>\u0020</code>) as a separator. Remove leading/trailing whitespace.</li>
 <li>Create a list of 4 <abbr title="A character is defined as one Unicode code point">character</abbr> <a href="https://en.wikipedia.org/wiki/N-gram">n-grams</a> by sliding <abbr title="A character is defined as one Unicode code point">character</abbr>-wise through the result of the previous step.</li>
 <li>Encode each n-gram from the previous step to an UTF-8 bytestring and calculate its <a href="http://cyan4973.github.io/xxHash/">xxHash64</a> digest.</li>
 <li>Apply <a href="#similarity_hash"><code>similarity_hash</code></a> to the list of digests from the previous step.</li>
@@ -1574,12 +1574,12 @@
 <tr>
 <td align="left"><em>audio</em></td>
 <td align="left"><em>010</em></td>
-<td>To be defined in later version of specification</td>
+<td>To be defined in a later version of the specification</td>
 </tr>
 <tr>
 <td align="left"><em>video</em></td>
 <td align="left"><em>011</em></td>
-<td>To be defined in later version of specification</td>
+<td>To be defined in a later version of the specification</td>
 </tr>
 <tr>
 <td align="left">mixed</td>
@@ -1599,9 +1599,9 @@
 <ol>
 <li>Apply <a href="#text_normalize"><code>text_normalize</code></a> to the text input while removing whitespace.</li>
 <li>Create <abbr title="A character is defined as one Unicode code point">character</abbr>-wise n-grams of length 13 from the normalized text.</li>
-<li>Create  a list of 32-bit unsigned integer features by applying <a href="http://cyan4973.github.io/xxHash/">xxHash32</a> to results of step 2.</li>
-<li>Apply <a href="#minimum_hash"><code>minimum_hash</code></a> to the list of features from step 3 with n=64.</li>
-<li>Collect the least significant bits from the 64 MinHash features from step 4.</li>
+<li>Create  a list of 32-bit unsigned integer features by applying <a href="http://cyan4973.github.io/xxHash/">xxHash32</a> to results of the previous step.</li>
+<li>Apply <a href="#minimum_hash"><code>minimum_hash</code></a> to the list of features from the previous step with n=64.</li>
+<li>Collect the least significant bits from the 64 MinHash features from the previous step.</li>
 <li>Create a 64-bit digest from the collected bits.</li>
 <li>Prepend the 1-byte component header (<code>0x10</code> full content or <code>0x11</code> partial content).</li>
 <li>Encode and return the resulting 9-byte sequence with <a href="#encode"><code>encode</code></a>.</li>
@@ -1612,11 +1612,11 @@
 <p>An <abbr title="International Standard Content Code">ISCC</abbr> generating application MUST provide a <code>content_id_image(image, partial=False)</code> function that accepts a local file path to an image and returns a Content-ID with <abbr title="Generic Media Type">GMT</abbr> type <code>image</code>. The procedure to create a Content-ID-Image is as follows:</p>
 <ol>
 <li>Apply <a href="#image_normalize"><code>image_normalize</code></a> to receive a two-dimensional array of grayscale pixel data.</li>
-<li>Apply <a href="#image_hash"><code>image_hash</code></a> to the results of step 1.</li>
-<li>Prepend the 1-byte component header (<code>0x12</code> full content or <code>0x13</code> partial content) to results of step 2.</li>
+<li>Apply <a href="#image_hash"><code>image_hash</code></a> to the results of the previous step.</li>
+<li>Prepend the 1-byte component header (<code>0x12</code> full content or <code>0x13</code> partial content) to results of the previous step.</li>
 <li>Encode and return the resulting 9-byte sequence with <a href="#encode"><code>encode</code></a></li>
 </ol>
-<p>See also: <a href="https://github.com/iscc/iscc-specs/blob/master/src/iscc/iscc.py#L84">Content-ID-Image reference code</a></p>
+<p>See also: <a href="https://github.com/iscc/iscc-specs/blob/master/src/iscc/iscc.py#L81">Content-ID-Image reference code</a></p>
 <div class="admonition note">
 <p class="admonition-title">Image Data Input</p>
 <p>The <code>content_id_image</code> function may optionally accept the raw byte data of an encoded image or an internal native image object as input for convenience.</p>
@@ -1660,12 +1660,12 @@
 <li>Apply <a href="#minimum_hash"><code>minimum_hash</code></a> to the resulting list of 32-bit unsigned integers with n=64.</li>
 <li>Collect the least significant bits from the 64 MinHash features.</li>
 <li>Create a 64-bit digest from the collected bits.</li>
-<li>Prepend the 1-byte component header (e.g. 0x20).</li>
+<li>Prepend the 1-byte component header (eg. 0x20).</li>
 <li>Apply <a href="#encode"><code>encode</code></a> to the result of step 6 and return the result.</li>
 </ol>
 <p>See also: <a href="https://github.com/iscc/iscc-specs/blob/master/src/iscc/iscc.py#L123">Data-ID reference code</a></p>
 <h3 id="instance-id-component">Instance-ID Component<a class="headerlink" href="#instance-id-component" title="Permanent link">#</a></h3>
-<p>The Instance-ID is built from the raw data of the media object to be identified and serves as checksum for the media object. The raw data of the media object is split into 64-kB data-chunks. Then we build a hash-tree from those chunks and use the truncated <abbr title="Root hash of an Instance-ID hash-tree">tophash</abbr> (merkle root) as component body of the Instance-ID.</p>
+<p>The Instance-ID is built from the raw data of the media object to be identified and serves as checksum for the media object. The raw data of the media object is split into 64-kB data-chunks. Then we build a hash-tree from those chunks and use the truncated <abbr title="Root hash of an Instance-ID hash-tree">tophash</abbr> (Merkle root) as component body of the Instance-ID.</p>
 <p>To guard against length-extension attacks and second preimage attacks we use double sha256 for hashing. We also prefix the hash input data with a <code>0x00</code>-byte for the leaf nodes hashes and with a <code>0x01</code>-byte for the  internal node hashes. While the Instance-ID itself is a non-cryptographic checksum, the full <abbr title="Root hash of an Instance-ID hash-tree">tophash</abbr> may be supplied in the extended metadata of an <abbr title="International Standard Content Code">ISCC</abbr> secure integrity verification is required.</p>
 <p><img alt="iscc-creation-instance-id" src="../images/iscc-creation-instance-id.svg" /></p>
 <p>An <abbr title="International Standard Content Code">ISCC</abbr> generating application MUST provide a <code>instance_id</code> function that accepts the raw data file as input and returns an encoded Instance-ID and a full hex-encoded 256-bit <abbr title="Root hash of an Instance-ID hash-tree">tophash</abbr>. </p>
@@ -1674,7 +1674,7 @@
 <li>Split the raw bytes of the encoded media object into 64-kB chunks.</li>
 <li>For each chunk calculate the <abbr title="Double SHA256">sha256d</abbr> of the concatenation of a <code>0x00</code>-byte and the chunk bytes. We call the resulting values <em>leaf node hashes</em> (<abbr title="Leaf Node Hash - A hash of a data-chunk.">LNH</abbr>).</li>
 <li>Calculate the next level of the hash tree by applying <abbr title="Double SHA256">sha256d</abbr> to the concatenation of a <code>0x01</code>-byte and adjacent pairs of <abbr title="Leaf Node Hash - A hash of a data-chunk.">LNH</abbr> values. If the length of the list of <abbr title="Leaf Node Hash - A hash of a data-chunk.">LNH</abbr> values is uneven concatenate the last <abbr title="Leaf Node Hash - A hash of a data-chunk.">LNH</abbr> value with itself. We call the resulting values <em>internal node hashes</em> (<abbr title="Internal Node Hash - A hash of concatenated hashes in a hash-tree.">INH</abbr>).</li>
-<li>Recursively apply <code>0x01</code>-prefixed pairwise hashing to the results of  step 3 until the process yields only one hash value. We call this value the <abbr title="Root hash of an Instance-ID hash-tree">tophash</abbr>.</li>
+<li>Recursively apply <code>0x01</code>-prefixed pairwise hashing to the results of the last step until the process yields only one hash value. We call this value the <abbr title="Root hash of an Instance-ID hash-tree">tophash</abbr>.</li>
 <li>Trim the resulting <abbr title="Root hash of an Instance-ID hash-tree">tophash</abbr> to the first 8 bytes.</li>
 <li>Prepend the 1-byte component header (e.g. <code>0x30</code>).</li>
 <li>Encode resulting 9-byte sequence with <a href="#encode"><code>encode</code></a> to an Instance-ID Code</li>
@@ -1724,7 +1724,7 @@
 <td>text (hex)</td>
 <td>No</td>
 <td>No</td>
-<td>The full hex-encoded <abbr title="Root hash of an Instance-ID hash-tree">tophash</abbr> (merkle root) returned by the <code>instance_id</code>  function.</td>
+<td>The full hex-encoded <abbr title="Root hash of an Instance-ID hash-tree">tophash</abbr> (Merkle root) returned by the <code>instance_id</code>  function.</td>
 </tr>
 <tr>
 <td>meta</td>
@@ -1737,7 +1737,7 @@
 </table>
 <div class="admonition attention">
 <p class="admonition-title">Attention</p>
-<p><strong>Bound</strong> metadata impacts the the <abbr title="Base58-ISCC encoded string representation of an ISCC">ISCC Code</abbr> (Meta-ID) and cannot be changed afterwards. Depending on adoption and real world use, future versions of this specification may define new basic metadata fields. Applications MAY add custom fields at the top level of the JSON object but MUST prefix those fields with an underscore to avoid collisions with future extensions of this specification.</p>
+<p><strong>Bound</strong> metadata impacts the <abbr title="Base58-ISCC encoded string representation of an ISCC">ISCC Code</abbr> (Meta-ID) and cannot be changed afterwards. Depending on adoption and real world use, future versions of this specification may define new basic metadata fields. Applications MAY add custom fields at the top level of the JSON object but MUST prefix those fields with an underscore to avoid collisions with future extensions of this specification.</p>
 </div>
 <h3 id="extended-metadata">Extended Metadata<a class="headerlink" href="#extended-metadata" title="Permanent link">#</a></h3>
 <p>Extended metadata for an <abbr title="International Standard Content Code">ISCC</abbr> is metadata that is not explicitly defined by this specification. All such metadata SHOULD be supplied as JSON objects within the top-level <code>meta</code>array field. This allows for a flexible and extendable way to supply additional industry specific metadata about the identified content. </p>
@@ -1779,12 +1779,12 @@
 <p>See also: <a href="https://coblo.github.io/cips/cip-0003-iscc/"><abbr title="International Standard Content Code">ISCC</abbr>-Stream specification</a>. </p>
 <h2 id="iscc-embedding"><abbr title="International Standard Content Code">ISCC</abbr> Embedding<a class="headerlink" href="#iscc-embedding" title="Permanent link">#</a></h2>
 <p>Embedding <abbr title="International Standard Content Code">ISCC</abbr> codes into content is only RECOMMENDED if it does not create a side effect. We call it a side effect if embedding an <abbr title="International Standard Content Code">ISCC</abbr> code modifies the content to such an extent, that it yields a different <abbr title="International Standard Content Code">ISCC</abbr> code.</p>
-<p>Side effects will depend on the combination of <abbr title="International Standard Content Code">ISCC</abbr> components that are to be embedded. A Meta-ID can always be embedded without side effect because it does not depend on the content itself. Content-ID and Data-ID may not change if embedded in larger media objects. Instance-IDs cannot easily be embedded as they will inevitably have a side effect on the post-embedding Instance-ID without special processing.</p>
+<p>Side effects will depend on the combination of <abbr title="International Standard Content Code">ISCC</abbr> components that are to be embedded. A Meta-ID can always be embedded without side effects because it does not depend on the content itself. Content-ID and Data-ID may not change if embedded in larger media objects. Instance-IDs cannot easily be embedded as they will inevitably have a side effect on the post-embedding Instance-ID without special processing.</p>
 <p>Applications MAY embed <abbr title="International Standard Content Code">ISCC</abbr> codes that have side effects if they specify a procedure by which the embedded <abbr title="International Standard Content Code">ISCC</abbr> codes can be stripped in such a way that the stripped content will yield the original embedded <abbr title="International Standard Content Code">ISCC</abbr> codes.</p>
 <div class="admonition example">
 <p class="admonition-title"><abbr title="International Standard Content Code">ISCC</abbr> Embedding</p>
 <p>We are able to embed the following combination of components from the <a href="https://github.com/iscc/iscc-specs/edit/master/docs/specification.md">markdown version</a> of this document into the document itself because adding or removing them has no side effect:</p>
-<p><strong><abbr title="International Standard Content Code">ISCC</abbr></strong>: CCb6jwtPH7aYi-CTtW9UFoNJdXK-CDXGDXimy4EcY</p>
+<p><strong><abbr title="International Standard Content Code">ISCC</abbr></strong>: CCDbMYw6NfC8a-CTtW9UFoNJdXK-CDKcrxge9WHQH</p>
 </div>
 <h2 id="iscc-uri-scheme"><abbr title="International Standard Content Code">ISCC</abbr> URI Scheme<a class="headerlink" href="#iscc-uri-scheme" title="Permanent link">#</a></h2>
 <div class="admonition note">
@@ -1833,7 +1833,7 @@
 <ol>
 <li>Decode to native Unicode if text is a byte string</li>
 <li>Remove leading and trailing whitespace</li>
-<li>Transform text to lower case</li>
+<li>Transform text to lowercase</li>
 <li>Decompose the lower case text by applying <a href="http://www.unicode.org/reports/tr15/#Norm_Forms">Unicode Normalization Form D (NFD)</a>.</li>
 <li>Filter out all characters that fall into the Unicode categories listed in the constant <code>UNICODE_FILTER</code>. Keep these control characters (Cc) that are commonly considered whitespace:<ul>
 <li><code>\u0009</code>,  # Horizontal Tab (TAB)</li>
@@ -1872,7 +1872,7 @@
 <li>Perform a discrete cosine transform per column on the resulting matrix from step 2.</li>
 <li>Extract upper left 8x8 corner of array from step 2 as a flat list.</li>
 <li>Calculate the median of the results from step 3.</li>
-<li>Create a 64-bit digest by iterating over the values of step 5 and setting a  <code>1</code>- for values above median and <code>0</code> for values below or equal to median.</li>
+<li>Create a 64-bit digest by iterating over the values of step 5 and setting a  <code>1</code>- for values above median and <code>0</code> for values below or equal to the median.</li>
 <li>Return results from step 5.</li>
 </ol>
 <p>See also: <a href="https://github.com/iscc/iscc-specs/blob/master/src/iscc/iscc.py#L274">Image hash reference code</a></p>
