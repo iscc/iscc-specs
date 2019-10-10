@@ -4,7 +4,7 @@
 
 **ISCC**: CCDFPFc87MhdT-CTg5dAueURYan-CDdZGuHykJG87
 
-**CC BY-NC-SA 4.0 License**
+**CC BY-SA 4.0 License**
 
 Copyright &copy; 2016 - 2019 **Content Blockchain Project**
 
