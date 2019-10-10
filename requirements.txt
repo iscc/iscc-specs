@@ -2,8 +2,8 @@
 # see: https://pip.pypa.io/en/stable/user_guide/#requirements-files
 
 mkdocs==1.0.4
-mkdocs-material==4.4.2
+mkdocs-material==4.4.3
 mkdocs-git-revision-date-plugin==0.1.5
-pytest==5.1.2
+pytest==5.2.1
 Pillow==6.1.0
 xxhash==1.4.1
