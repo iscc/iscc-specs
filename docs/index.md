@@ -1,5 +1,5 @@
 title: ISCC - Content Identifiers
-description: The intelligent digital media identifier. 
+description: The intelligent digital media identifier.
 authors: Titusz Pan
 
 # ISCC - Content Identifiers
@@ -9,11 +9,6 @@ authors: Titusz Pan
 
 ![iscc-sample](images/iscc-badge.svg)
 
-!!! info "Status quo"
-
-    "The German Institute for Standardization [DIN](https://www.din.de/) accepted the standardization proposal for the ISCC in January 2019 within working group [NA 009-00-09 AA](https://www.din.de/en/getting-involved/standards-committees/nid/national-committees/wdc-grem:din21:54776667?destinationLanguage=&sourceLanguage=) (DIN Standards Committee Information and Documentation). 
-
-    In May 2019, the International Organization for Standardization [ISO](https://www.iso.org/) created a new working group for the ISCC ([ISO/TC 46/SC 9/WG 18](https://www.iso.org/committee/48836.html) - Digital-Content-Based Identification) to advance the ISCC into a global standard for digital content identification together with experts from various countries and all media sectors (music industry, film studios, academic and trade publishers, etc.)." [Read the full press release](https://iscc.foundation/news/2019-05-23/).
 
 ## Motivation
 
