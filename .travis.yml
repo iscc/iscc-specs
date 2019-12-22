@@ -1,22 +1,24 @@
 # Travis-CI Configuration
 language: python
 
+cache:
+  pip: true
+  directories:
+    - "$HOME/.cache/pypoetry"
+
 matrix:
   include:
     - python: "3.5"
-      dist: precise
     - python: "3.6"
-      dist: trusty
     - python: "3.7"
       dist: xenial
     - python: "3.8"
       dist: bionic
 
 install:
-  - pip install -r requirements.txt
-  - pip install -e .
+  - curl -sSL https://raw.githubusercontent.com/sdispater/poetry/master/get-poetry.py -o get-poetry.py
+  - python get-poetry.py --yes
+  - source $HOME/.poetry/env
+  - poetry install
 
-before_script: cd tests
-
-script:
-  - pytest
+script: pytest -q tests/

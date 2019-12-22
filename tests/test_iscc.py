@@ -1,10 +1,16 @@
 # -*- coding: utf-8 -*-
+import os
 import json
 import random
 from io import BytesIO
 import pytest
 from PIL import Image, ImageFilter, ImageEnhance
 import iscc
+
+
+TESTS_PATH = os.path.dirname(os.path.realpath(__file__))
+os.chdir(TESTS_PATH)
+
 
 TEXT_A = u"""
     Their most significant and usefull property of similarity-preserving
@@ -204,7 +210,7 @@ def test_content_id_mixed():
     cid_m = iscc.content_id_mixed([cid_t_1, cid_t_2])
     assert cid_m == "CM3kHkNRGvnhB"
 
-    cid_i = iscc.content_id_image("lenna.jpg")
+    cid_i = iscc.content_id_image("file_image_lenna.jpg")
     cid_m = iscc.content_id_mixed([cid_t_1, cid_t_2, cid_i])
     assert cid_m == "CM3hswzATv9d3"
 
@@ -241,7 +247,7 @@ def test_instance_id():
 
 
 def test_data_chunks():
-    with open("lenna.jpg", "rb") as infile:
+    with open("file_image_lenna.jpg", "rb") as infile:
         chunks1 = list(iscc.data_chunks(infile))
         infile.seek(0)
         chunks2 = list(iscc.data_chunks(infile.read()))
@@ -254,16 +260,16 @@ def test_data_chunks():
 
 
 def test_content_id_image():
-    cid_i = iscc.content_id_image("lenna.jpg")
+    cid_i = iscc.content_id_image("file_image_lenna.jpg")
     assert len(cid_i) == 13
     assert cid_i == "CYmLoqBRgV32u"
 
-    data = BytesIO(open("lenna.jpg", "rb").read())
+    data = BytesIO(open("file_image_lenna.jpg", "rb").read())
     cid_i = iscc.content_id_image(data, partial=True)
     assert len(cid_i) == 13
     assert cid_i == "CimLoqBRgV32u"
 
-    img1 = Image.open("lenna.jpg")
+    img1 = Image.open("file_image_lenna.jpg")
     img2 = img1.filter(ImageFilter.GaussianBlur(10))
     img3 = ImageEnhance.Brightness(img1).enhance(1.4)
     img4 = ImageEnhance.Contrast(img1).enhance(1.2)
@@ -286,7 +292,7 @@ def test_pi():
 
 
 def test_image_normalize():
-    assert iscc.image_normalize("cat.jpg") == [
+    assert iscc.image_normalize("file_image_cat.jpg") == [
         [
             25,
             18,
