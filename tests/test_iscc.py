@@ -1,10 +1,16 @@
 # -*- coding: utf-8 -*-
+import os
 import json
 import random
 from io import BytesIO
 import pytest
 from PIL import Image, ImageFilter, ImageEnhance
 import iscc
+
+
+TESTS_PATH = os.path.dirname(os.path.realpath(__file__))
+os.chdir(TESTS_PATH)
+
 
 TEXT_A = u"""
     Their most significant and usefull property of similarity-preserving
