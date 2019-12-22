@@ -16,7 +16,7 @@ For public discussion of issues for this specification please use the Github iss
 
 If you want to chat with developers join us on Telegram at <https://t.me/iscc_dev>.
 
-The latest published version of this specification can be found at <http://iscc.codes/specification/>. 
+The latest published version of this specification can be found at <http://iscc.codes/specification/>.
 
 Public review, discussion and contributions are welcome.
 
@@ -24,7 +24,7 @@ Public review, discussion and contributions are welcome.
 
 !!! note "Document Version"
 
-    This is the latest in-development version of the **ISCC Specification**. While there is already a [Version 1.0](https://github.com/iscc/iscc-specs/blob/version-1.0/docs/specification.md) spec, we are still expecting backward incompatible changes until **Version 2.0** is released. Parts of this specification may already be or become stable earlier and will be documented so during minor releases. Partners are encouraged to follow development and test, implement and give feedback based on the latest (this) version of the ISCC Specification.  
+    This is the latest in-development version of the **ISCC Specification**. While there is already a [Version 1.0](https://github.com/iscc/iscc-specs/blob/version-1.0/docs/specification.md) spec, we are still expecting backward incompatible changes until **Version 2.0** is released. Parts of this specification may already be or become stable earlier and will be documented so during minor releases. Partners are encouraged to follow development and test, implement and give feedback based on the latest (this) version of the ISCC Specification.
 
 This document proposes an open and vendor neutral ISCC standard and describes the technical procedures to create and manage ISCC identifiers. The first version of this document was produced as a prototype by the [Content Blockchain Project](https://content-blockchain.org) and received funding from the [Google Digital News Initiative (DNI)](https://digitalnewsinitiative.com/dni-projects/content-blockchain-project/). The content of this document is determined by its authors in an open and public consensus process.
 
@@ -110,11 +110,11 @@ A **Fully Qualified ISCC Code** is an ordered sequence of Meta-ID, Content-ID, D
 
 ### Component Types
 
-Each component has the same basic structure of a **1-byte header** and a **8-byte body** section. 
+Each component has the same basic structure of a **1-byte header** and a **8-byte body** section.
 
 The 1-byte header of each component is subdivided into 2 nibbles (4 bits). The first nibble specifies the component type while the second nibble is component specific.
 
-The header only needs to be carried in the encoded representation. As similarity searches across different components are of little use, the type-information contained in the header of each component can be safely ignored after an ISCC has been decomposed and internally typed by an application. 
+The header only needs to be carried in the encoded representation. As similarity searches across different components are of little use, the type-information contained in the header of each component can be safely ignored after an ISCC has been decomposed and internally typed by an application.
 
 #### List of Component Headers
 
@@ -171,18 +171,18 @@ An ISCC generating application must follow these steps in the given order to pro
 See also: [Meta-ID reference code](https://github.com/iscc/iscc-specs/blob/master/src/iscc/iscc.py#L19)
 
 !!! warning "Text trimming"
-    When trimming text be sure to trim the byte-length of the UTF-8 encoded version and not the number of characters. The trim point MUST be such, that it does not cut into multibyte characters. Characters might have different UTF-8 byte-length. For example `ü` is 2-bytes, `驩` is 3-bytes and `𠜎` is 4-bytes. So the trimmed version of a string with 128 `驩`-characters will result in a 42-character string with a 126-byte UTF-8 encoded length. This is necessary because the results of this operation will be stored as basic metadata with strict byte size limits on the blockchain. 
+    When trimming text be sure to trim the byte-length of the UTF-8 encoded version and not the number of characters. The trim point MUST be such, that it does not cut into multibyte characters. Characters might have different UTF-8 byte-length. For example `ü` is 2-bytes, `驩` is 3-bytes and `𠜎` is 4-bytes. So the trimmed version of a string with 128 `驩`-characters will result in a 42-character string with a 126-byte UTF-8 encoded length. This is necessary because the results of this operation will be stored as basic metadata with strict byte size limits on the blockchain.
 
 !!! note "Automated Data-Ingestion"
-    Applications that perform automated data-ingestion SHOULD apply a customized preliminary normalization to title data tailored to the dataset. Depending on catalog data removing pairs of brackets [], (), {}, and text in between them or cutting all text after the first occurence of a semicolon (;) or colon (:) can vastly improve deduplication. 
+    Applications that perform automated data-ingestion SHOULD apply a customized preliminary normalization to title data tailored to the dataset. Depending on catalog data removing pairs of brackets [], (), {}, and text in between them or cutting all text after the first occurence of a semicolon (;) or colon (:) can vastly improve deduplication.
 
 #### Dealing with Meta-ID collisions
 
-Ideally we want multiple ISCCs that identify different manifestations of the *same intangible creation* to be automatically grouped by an identical leading Meta-ID component. We call such a natural grouping an **intended component collision**. Metadata, captured and edited by humans, is notoriously unreliable. By using normalization and a similarity hash on the metadata we account for some of this variation while keeping the Meta-ID component somewhat stable. 
+Ideally we want multiple ISCCs that identify different manifestations of the *same intangible creation* to be automatically grouped by an identical leading Meta-ID component. We call such a natural grouping an **intended component collision**. Metadata, captured and edited by humans, is notoriously unreliable. By using normalization and a similarity hash on the metadata we account for some of this variation while keeping the Meta-ID component somewhat stable.
 
 Auto-generated Meta-IDs components are **expected** to miss some intended collisions. An application SHOULD check for such **missed intended component collisions** before registering a new Meta-ID with the *canonical registry* of ISCCs by conducting a similarity search and asking for user feedback.
 
-But what about **unintended component collisions**? Such collisions might happen because two *different intangible creations* have very similar or even identical metadata. But they might also happen simply by chance. With 2^56 possibile Meta-ID components the probability of random collisions rises in an S-curved shape with the number of deployed ISCCs (see: [Hash Collision Probabilities](http://preshing.com/20110504/hash-collision-probabilities/)).  We should keep in mind that, the Meta-ID component is only one part of a fully qualified ISCC Code. Unintended collisions of the Meta-ID component are generally deemed as **acceptable and expected**. 
+But what about **unintended component collisions**? Such collisions might happen because two *different intangible creations* have very similar or even identical metadata. But they might also happen simply by chance. With 2^56 possibile Meta-ID components the probability of random collisions rises in an S-curved shape with the number of deployed ISCCs (see: [Hash Collision Probabilities](http://preshing.com/20110504/hash-collision-probabilities/)).  We should keep in mind that, the Meta-ID component is only one part of a fully qualified ISCC Code. Unintended collisions of the Meta-ID component are generally deemed as **acceptable and expected**.
 
 If for any reason an application wants to avoid unintended collisions with pre-existing Meta-ID components it may utilize the `extra`-field. An application MUST first generate a Meta-ID without asking the user for input to the `extra`-field and then first check for collisions with the *canonical registry* of ISCCs. After it finds a collision with a pre-existing Meta-ID it may display the metadata of the colliding entry and interact with the user to determine if it indeed is an unintended collision. Only if the user indicates an unintended collision, may the application ask for a disambiguation that is then added as an amendment to the metadata via the `extra`-field to create a different Meta-ID component. The application may repeat the pre-existence check until it finds no collision or a user intended collision. The application MUST NOT supply auto-generated input to the `extra`-field.
 
@@ -192,7 +192,7 @@ It is our opinion that the concept of **intended collisions** of Meta-ID compone
 
 The Content-ID component has multiple subtypes. The subtypes correspond with the **Generic Media Types (GMT)**. A fully qualified ISCC can only have one Content-ID component of one specific GMT, but there may be multiple ISCCs with different Content-ID types per digital media object.
 
-A Content-ID is generated in two broad steps. In the first step, we extract and convert content from a rich media type to a normalized GMT. In the second step, we use a GMT-specific process to generate the Content-ID component of an ISCC. 
+A Content-ID is generated in two broad steps. In the first step, we extract and convert content from a rich media type to a normalized GMT. In the second step, we use a GMT-specific process to generate the Content-ID component of an ISCC.
 
 #### Generic Media Types
 
@@ -209,7 +209,7 @@ The  Content-ID type is signaled by the first 3 bits of the second nibble of the
 
 #### Content-ID-Text
 
-The Content-ID-Text is built from the extracted plain-text content of an encoded media object. To build a stable Content-ID-Text the plain-text content must first be extracted from the digital media object. It should be extracted in a way that is reproducible. There are many different text document formats out in the wilde and extracting plain-text from all of them is anything but a trivial task. While text-extraction is out of scope for this specification it is RECOMMENDED, that plain-text content SHOULD be extracted with the open-source [Apache Tika v1.21](https://tika.apache.org/) toolkit, if a generic reproducibility of the Content-ID-Text component is desired. 
+The Content-ID-Text is built from the extracted plain-text content of an encoded media object. To build a stable Content-ID-Text the plain-text content must first be extracted from the digital media object. It should be extracted in a way that is reproducible. There are many different text document formats out in the wilde and extracting plain-text from all of them is anything but a trivial task. While text-extraction is out of scope for this specification it is RECOMMENDED, that plain-text content SHOULD be extracted with the open-source [Apache Tika v1.21](https://tika.apache.org/) toolkit, if a generic reproducibility of the Content-ID-Text component is desired.
 
 An ISCC generating application MUST provide a `content_id(text, partial=False)` function that accepts UTF-8 encoded plain text and a boolean indicating the [partial content flag](#partial-content-flag-pcf) as input and returns a Content-ID with GMT type `text`. The procedure to create a Content-ID-Text is as follows:
 
@@ -226,7 +226,7 @@ See also: [Content-ID-Text reference code](https://github.com/iscc/iscc-specs/bl
 
 #### Content-ID-Image
 
-For the Content-ID-Image we are opting for a DCT-based perceptual image hash instead of a more sophisticated keypoint detection based method. In view of the generic deployability of the ISCC we chose an algorithm that has moderate computation requirements and is easy to implement while still being robust against common image manipulations. 
+For the Content-ID-Image we are opting for a DCT-based perceptual image hash instead of a more sophisticated keypoint detection based method. In view of the generic deployability of the ISCC we chose an algorithm that has moderate computation requirements and is easy to implement while still being robust against common image manipulations.
 
 An ISCC generating application MUST provide a `content_id_image(image, partial=False)` function that accepts a local file path to an image and returns a Content-ID with GMT type `image`. The procedure to create a Content-ID-Image is as follows:
 
@@ -272,7 +272,7 @@ The last bit of the header byte of the Content-ID is the "Partial Content Flag".
     To create an ISCC for a single extracted image that should convey context with the newspaper issue we reuse the Meta-ID of the newspaper issue and create a Content-ID-Image with PCF `1` (partial to the newspaper issue). For the Data-ID or Instance-ID of the image we are free to choose if we reuse those of the newspaper issue or create separate ones. The former would express strong specialization of the image to the newspaper issue (not likely to be useful out of context). The latter would create a stronger link to an eventual standalone ISCC of the image. Note that in any case the ISCC of the individual image retains links in both ways:
 
     - Image is linked to the newspaper issue by identical Meta-ID component
-    - Image is linked to the standalone version of the image by identical Content-ID-Image body 
+    - Image is linked to the standalone version of the image by identical Content-ID-Image body
 
     This is just one example that illustrates the flexibility that the PCF-Flag provides in concert with a grouping Meta-ID. With great flexibility comes great danger of complexity. Applications SHOULD do careful planning before using the PCF-Flag with internally defined semantics.
 
@@ -302,7 +302,7 @@ To guard against length-extension attacks and second preimage attacks we use dou
 
 ![iscc-creation-instance-id](images/iscc-creation-instance-id.svg)
 
-An ISCC generating application MUST provide a `instance_id` function that accepts the raw data file as input and returns an encoded Instance-ID and a full hex-encoded 256-bit tophash. 
+An ISCC generating application MUST provide a `instance_id` function that accepts the raw data file as input and returns an encoded Instance-ID and a full hex-encoded 256-bit tophash.
 
 #### Generate Instance-ID
 
@@ -316,7 +316,7 @@ An ISCC generating application MUST provide a `instance_id` function that accept
 8. Hex-Encode the tophash
 9. Return the Instance-ID and the hex-encoded tophash
 
-See also: [Instance-ID reference code](https://github.com/iscc/iscc-specs/blob/master/src/iscc/iscc.py#L144) 
+See also: [Instance-ID reference code](https://github.com/iscc/iscc-specs/blob/master/src/iscc/iscc.py#L144)
 
 Applications may carry, store, and process the leaf node hashes for advanced streaming data identification or partial data integrity verification.
 
@@ -341,7 +341,7 @@ Basic metadata for an ISCC is metadata that is explicitly defined by this specif
 
 ### Extended Metadata
 
-Extended metadata for an ISCC is metadata that is not explicitly defined by this specification. All such metadata SHOULD be supplied as JSON objects within the top-level `meta`array field. This allows for a flexible and extendable way to supply additional industry specific metadata about the identified content. 
+Extended metadata for an ISCC is metadata that is not explicitly defined by this specification. All such metadata SHOULD be supplied as JSON objects within the top-level `meta`array field. This allows for a flexible and extendable way to supply additional industry specific metadata about the identified content.
 
 Extended metadata entries MUST be wrapped in JSON object of the following structure:
 
@@ -368,7 +368,7 @@ Because this decision is of such vital importance, we suggest to wait for furthe
 
 Our recommendation to the community is, to agree on a decentralized, open, and public blockchain, that has specific support for registry-services such as the upcoming [Content Blockchain](https://content-blockchain.org/). This would maximize the value for all participants of the ecosystem. Governance and protocol related questions are currently being worked on by the Content Blockchain Project, to come up with a mature proposal.
 
-See also: [ISCC-Stream specification](https://coblo.github.io/cips/cip-0003-iscc/). 
+See also: [ISCC-Stream specification](https://coblo.github.io/cips/cip-0003-iscc/).
 
 ## ISCC Embedding
 
@@ -381,8 +381,8 @@ Applications MAY embed ISCC codes that have side effects if they specify a proce
 !!! example "ISCC Embedding"
 
     We are able to embed the following combination of components from the [markdown version](https://github.com/iscc/iscc-specs/edit/master/docs/specification.md) of this document into the document itself because adding or removing them has no side effect:
-    
-    **ISCC**: CCDbMYw6NfC8a-CTtW9UFoNJdXK-CDKcrxge9WHQH
+
+    **ISCC**: CCDbMYw6NfC8a-CTtW9UFoNJdXK-CDXwa1dH8fadC
 
 ## ISCC URI Scheme
 
@@ -390,7 +390,7 @@ Applications MAY embed ISCC codes that have side effects if they specify a proce
 
     The ISCC URI Scheme and link-resolver details, ultimately depend on identifier registration, ownership, uniqueness and governance related decisions which are not yet part of this specification. See also: [Blockchain Registry](#blockchain-registry).
 
-The purpose of the ISCC URI scheme based on [RFC 3986](https://www.ietf.org/rfc/rfc3986.txt) is to enable users to easily discover information like metadata or license offerings about a ISCC marked content by simply clicking a link on a webpage or by scanning a QR-Code. 
+The purpose of the ISCC URI scheme based on [RFC 3986](https://www.ietf.org/rfc/rfc3986.txt) is to enable users to easily discover information like metadata or license offerings about a ISCC marked content by simply clicking a link on a webpage or by scanning a QR-Code.
 
 The scheme name is `iscc`. The path component MUST be a fully qualified ISCC Code without hyphens. An optional `stream` query key MAY indicate the blockchain stream information source. If the `stream` query key is omitted applications SHOULD return information from the open [ISCC Stream](https://coblo.github.io/cips/cip-0003-iscc/).
 
@@ -548,7 +548,7 @@ The test suite also contains data for functions that are considered implementati
 
 Outputs that are expected to be raw bytes are embedded as HEX encoded strings in JSON and prefixed with  `hex:` to support automated decoding during implementation testing.
 
-!!! example 
+!!! example
     Byte outputs in JSON test data:
 
         {
