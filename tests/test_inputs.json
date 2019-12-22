@@ -1,266 +1,283 @@
 {
     "meta_id": {
-    "test_001_empty": {
-      "inputs": [
-        "",
-        ""
-      ]
+        "test_001_empty": {
+            "inputs": [
+                "",
+                ""
+            ]
+        },
+        "test_002_basic": {
+            "inputs": [
+                "Die Unendliche Geschichte",
+                ""
+            ]
+        },
+        "test_003_punctuation": {
+            "inputs": [
+                "Die Unendliche, Geschichte",
+                ""
+            ]
+        },
+        "test_004_white_space": {
+            "inputs": [
+                " Die Unendliche, Geschichte  ",
+                ""
+            ]
+        },
+        "test_005_non_ascii": {
+            "inputs": [
+                "Die unéndlíche,  Geschichte",
+                ""
+            ]
+        },
+        "test_006_i18n": {
+            "inputs": [
+                "Iñtërnâtiônàlizætiøn☃",
+                ""
+            ]
+        },
+        "test_007_extra": {
+            "inputs": [
+                "Die unendliche Geschichte",
+                "The Movie"
+            ]
+        },
+        "test_008_long": {
+            "inputs": [
+                "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed",
+                ""
+            ]
+        },
+        "test_009_long_i18n": {
+            "inputs": [
+                "Iñtërnâtiônàlizætiøn☃ Iñtërnâtiônàlizætiøn☃ Iñtërnâtiônàlizætiøn☃ Iñtërnâtiônàlizætiøn☃ Iñtërnâtiônàlizætiøn☃ Iñtërnâtiônàlizætiøn☃",
+                ""
+            ]
+        }
     },
-    "test_002_basic": {
-      "inputs": [
-        "Die Unendliche Geschichte",
-        ""
-      ]
-    },
-    "test_003_punctuation": {
-      "inputs": [
-        "Die Unendliche, Geschichte",
-        ""
-      ]
-    },
-    "test_004_white_space": {
-      "inputs": [
-        " Die Unendliche, Geschichte  ",
-        ""
-      ]
-    },
-    "test_005_non_ascii": {
-      "inputs": [
-        "Die unéndlíche,  Geschichte",
-        ""
-      ]
-    },
-    "test_006_i18n": {
-      "inputs": [
-        "Iñtërnâtiônàlizætiøn☃", ""
-      ]
-    },
-    "test_007_extra": {
-      "inputs": [
-        "Die unendliche Geschichte", "The Movie"
-      ]
-    },
-    "test_008_long": {
-      "inputs": [
-        "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed", ""
-      ]
-    },
-    "test_009_long_i18n": {
-      "inputs": [
-        "Iñtërnâtiônàlizætiøn☃ Iñtërnâtiônàlizætiøn☃ Iñtërnâtiônàlizætiøn☃ Iñtërnâtiônàlizætiøn☃ Iñtërnâtiônàlizætiøn☃ Iñtërnâtiônàlizætiøn☃", ""
-      ]
-    }
-  },
     "content_id_text": {
-    "test_001_empty": {
-      "inputs": [
-        "", false
-      ]
+        "test_001_empty": {
+            "inputs": [
+                "",
+                false
+            ]
+        },
+        "test_002_short": {
+            "inputs": [
+                "Some short text",
+                false
+            ]
+        },
+        "test_003_long": {
+            "inputs": [
+                "Their most significant and usefull property of similarity-preserving fingerprints gets lost in the fragmentation of individual, propietary and use case specific implementations. The real benefit lies in similarity preservation beyond your local data archive on a global scale accross vendors.",
+                false
+            ]
+        },
+        "test_004_partial": {
+            "inputs": [
+                "Some text for partial content id text",
+                true
+            ]
+        }
     },
-    "test_002_short": {
-      "inputs": [
-        "Some short text", false
-      ]
+    "content_id_image": {
+        "test_001_file_image_pixel_png_transp_png": {
+            "inputs": [
+                "file_image_pixel_png_transp.png",
+                false
+            ]
+        },
+        "test_002_file_image_pixel_png_white_png": {
+            "inputs": [
+                "file_image_pixel_png_white.png",
+                false
+            ]
+        },
+        "test_003_file_image_pixel_png_black_png": {
+            "inputs": [
+                "file_image_pixel_png_black.png",
+                false
+            ]
+        },
+        "test_004_file_image_cat_jpg": {
+            "inputs": [
+                "file_image_cat.jpg",
+                false
+            ]
+        },
+        "test_005_file_image_cat_png": {
+            "inputs": [
+                "file_image_cat.png",
+                false
+            ]
+        },
+        "test_006_file_image_cat_gif": {
+            "inputs": [
+                "file_image_cat.gif",
+                false
+            ]
+        }
     },
-    "test_003_long": {
-      "inputs": [
-        "Their most significant and usefull property of similarity-preserving fingerprints gets lost in the fragmentation of individual, propietary and use case specific implementations. The real benefit lies in similarity preservation beyond your local data archive on a global scale accross vendors.", false
-      ]
+    "content_id_mixed": {
+        "test_001_cid_t_one": {
+            "inputs": [
+                [
+                    "CTZYQRgV5eCQp"
+                ],
+                false
+            ]
+        },
+        "test_002_cid_t_two_partial": {
+            "inputs": [
+                [
+                    "CTZYQRgV5eCQp",
+                    "CTDVyoiMYHq6F"
+                ],
+                true
+            ]
+        },
+        "test_003_cid_t_and_i": {
+            "inputs": [
+                [
+                    "CTZYQRgV5eCQp",
+                    "CYDfTq7Qc7Fre"
+                ],
+                false
+            ]
+        }
     },
-    "test_004_partial": {
-      "inputs": [
-        "Some text for partial content id text", true
-      ]
+    "data_chunks": {
+        "test_001_file_image_cat_jpg": {
+            "inputs": [
+                "file_image_cat.jpg"
+            ]
+        },
+        "test_002_file_image_cat_png": {
+            "inputs": [
+                "file_image_cat.png"
+            ]
+        },
+        "test_003_file_image_cat_gif": {
+            "inputs": [
+                "file_image_cat.gif"
+            ]
+        }
+    },
+    "data_id": {
+        "test_001_file_image_cat_jpg": {
+            "inputs": [
+                "file_image_cat.jpg"
+            ]
+        },
+        "test_002_file_image_cat_png": {
+            "inputs": [
+                "file_image_cat.png"
+            ]
+        },
+        "test_003_file_image_cat_gif": {
+            "inputs": [
+                "file_image_cat.gif"
+            ]
+        }
+    },
+    "image_normalize": {
+        "test_001_file_image_cat_jpg": {
+            "inputs": [
+                "file_image_cat.jpg"
+            ]
+        },
+        "test_002_file_image_cat_png": {
+            "inputs": [
+                "file_image_cat.png"
+            ]
+        },
+        "test_003_file_image_cat_gif": {
+            "inputs": [
+                "file_image_cat.gif"
+            ]
+        }
+    },
+    "instance_id": {
+        "test_001_file_image_cat_jpg": {
+            "inputs": [
+                "file_image_cat.jpg"
+            ]
+        },
+        "test_002_file_image_cat_png": {
+            "inputs": [
+                "file_image_cat.png"
+            ]
+        },
+        "test_003_file_image_cat_gif": {
+            "inputs": [
+                "file_image_cat.gif"
+            ]
+        }
+    },
+    "minimum_hash": {
+        "test_001_simple": {
+            "inputs": [
+                [
+                    2307709831,
+                    4057803343,
+                    1189896175,
+                    998490104,
+                    1957593182,
+                    985638384,
+                    1499267049,
+                    3716940741,
+                    3418313233,
+                    2481613561
+                ]
+            ]
+        }
+    },
+    "text_normalize": {
+        "test_001_decompose": {
+            "inputs": [
+                "Ç 가 Ω ℍ ① ︷ i⁹ ¼ ǆ ⫝̸ ȴ ȷ ɂ ć",
+                false
+            ]
+        },
+        "test_002_tricky": {
+            "inputs": [
+                "  Iñtërnâtiôn\nàlizætiøn☃💩 –  is a tric\t ky \u00A0 thing!\r",
+                false
+            ]
+        },
+        "test_002_tricky_ws": {
+            "inputs": [
+                "  Iñtërnâtiôn\nàlizætiøn☃💩 –  is a tric\t ky \u00A0 thing!\r",
+                true
+            ]
+        }
+    },
+    "text_trim": {
+        "test_001_empty": {
+            "inputs": [
+                ""
+            ]
+        },
+        "test_002_long": {
+            "inputs": [
+                "Ç가Ωℍ①︷i⁹¼ǆ⫝̸ȴȷɂćÇ가Ωℍ①︷i⁹¼ǆ⫝̸ȴȷɂć küßî ЌύБЇ ¡¢£¤ ƀƁƂƃƄƅƆƇ ɐɑɒɓɔ ʰʱʲʳʴʵʶʷʸ"
+            ]
+        },
+        "test_002_nbsp": {
+            "inputs": [
+                " "
+            ]
+        },
+        "test_003_full": {
+            "inputs": [
+                "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquy"
+            ]
+        },
+        "test_004_empty": {
+            "inputs": [
+                "  leading and trailing spaces  "
+            ]
+        }
     }
-    },
-  "content_id_image": {
-    "test_001_pixel_png_transp": {
-      "inputs": [
-        "pixel_png_transp.png", false
-      ]
-    },
-    "test_002_pixel_png_white": {
-      "inputs": [
-        "pixel_png_white.png", false
-      ]
-    },
-    "test_003_pixel_png_black": {
-      "inputs": [
-        "pixel_png_black.png", false
-      ]
-    },
-    "test_004_cat_jpg": {
-      "inputs": [
-        "cat.jpg", false
-      ]
-    },
-    "test_005_cat_png": {
-      "inputs": [
-        "cat.png", false
-      ]
-    },
-    "test_006_cat_gif": {
-      "inputs": [
-        "cat.gif", false
-      ]
-    }
-  },
-  "content_id_mixed": {
-    "test_001_cid_t_one": {
-      "inputs": [
-        [
-          "CTZYQRgV5eCQp"
-        ],
-        false
-      ]
-    },
-    "test_002_cid_t_two_partial": {
-      "inputs": [
-        [
-          "CTZYQRgV5eCQp",
-          "CTDVyoiMYHq6F"
-        ],
-        true
-      ]
-    },
-    "test_003_cid_t_and_i": {
-      "inputs": [
-        [
-          "CTZYQRgV5eCQp",
-          "CYDfTq7Qc7Fre"
-        ],
-        false
-      ]
-    }
-  },
-  "data_chunks": {
-    "test_001_cat_jpg": {
-      "inputs": [
-        "cat.jpg"
-      ]
-    },
-    "test_002_cat_png": {
-      "inputs": [
-        "cat.png"
-      ]
-    },
-    "test_003_cat_gif": {
-      "inputs": [
-        "cat.gif"
-      ]
-    }
-  },
-  "data_id": {
-    "test_001_cat_jpg": {
-      "inputs": [
-        "cat.jpg"
-      ]
-    },
-    "test_002_cat_png": {
-      "inputs": [
-        "cat.png"
-      ]
-    },
-    "test_003_cat_gif": {
-      "inputs": [
-        "cat.gif"
-      ]
-    }
-  },
-  "image_normalize": {
-    "test_001_cat_jpg": {
-      "inputs": [
-        "cat.jpg"
-      ]
-    },
-    "test_002_cat_png": {
-      "inputs": [
-        "cat.png"
-      ]
-    },
-    "test_003_cat_gif": {
-      "inputs": [
-        "cat.gif"
-      ]
-    }
-  },
-  "instance_id": {
-    "test_001_cat_jpg": {
-      "inputs": [
-        "cat.jpg"
-      ]
-    },
-    "test_002_cat_png": {
-      "inputs": [
-        "cat.png"
-      ]
-    },
-    "test_003_cat_gif": {
-      "inputs": [
-        "cat.gif"
-      ]
-    }
-  },
-  "minimum_hash": {
-    "test_001_simple": {
-      "inputs": [
-        [
-          2307709831,
-          4057803343,
-          1189896175,
-          998490104,
-          1957593182,
-          985638384,
-          1499267049,
-          3716940741,
-          3418313233,
-          2481613561
-        ]
-      ]
-    }
-  },
-  "text_normalize": {
-    "test_001_decompose": {
-      "inputs": [
-        "Ç 가 Ω ℍ ① ︷ i⁹ ¼ ǆ ⫝̸ ȴ ȷ ɂ ć", false
-      ]
-    },
-    "test_002_tricky": {
-      "inputs": [
-        "  Iñtërnâtiôn\nàlizætiøn☃💩 –  is a tric\t ky \u00A0 thing!\r", false
-      ]
-    },
-    "test_002_tricky_ws": {
-      "inputs": [
-        "  Iñtërnâtiôn\nàlizætiøn☃💩 –  is a tric\t ky \u00A0 thing!\r", true
-      ]
-    }
-  },
-  "text_trim": {
-    "test_001_empty": {
-      "inputs": [
-        ""
-      ]
-    },
-    "test_002_long": {
-      "inputs": [
-        "Ç가Ωℍ①︷i⁹¼ǆ⫝̸ȴȷɂćÇ가Ωℍ①︷i⁹¼ǆ⫝̸ȴȷɂć küßî ЌύБЇ ¡¢£¤ ƀƁƂƃƄƅƆƇ ɐɑɒɓɔ ʰʱʲʳʴʵʶʷʸ"
-      ]
-    },
-    "test_002_nbsp": {
-      "inputs": [
-        " "
-      ]
-    },
-    "test_003_full": {
-      "inputs": [
-        "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquy"
-      ]
-    },
-    "test_004_empty": {
-      "inputs": [
-        "  leading and trailing spaces  "
-      ]
-    }
-  }
 }
