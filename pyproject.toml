@@ -1,0 +1,34 @@
+[tool.poetry]
+name = "iscc"
+version = "1.0.5"
+description = "ISCC: Reference Implementation"
+authors = ["Titusz Pan <tp@py7.de>"]
+license="BSD 2-clause"
+readme = "README.md"
+homepage = "https://iscc.codes/"
+repository = "https://github.com/iscc/iscc-specs"
+keywords=["iscc", "identifier", "media", "content", "hash", "blockchain", "similarity"]
+classifiers=[
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: BSD License",
+    "Natural Language :: English",
+    "Programming Language :: Python :: 3.5",
+    "Programming Language :: Python :: 3.6",
+    "Programming Language :: Python :: 3.7",
+]
+
+[tool.poetry.dependencies]
+python = "^3.5"
+xxhash = "^1"
+Pillow = "^6"
+
+[tool.poetry.dev-dependencies]
+pytest = "^5"
+mkdocs = "^1"
+mkdocs-material = "^4"
+mkdocs-git-revision-date-plugin = "^0"
+
+[build-system]
+requires = ["poetry>=1.0"]
+build-backend = "poetry.masonry.api"
