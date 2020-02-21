@@ -10,7 +10,7 @@ If you find something that is missing from this collection of resources for the 
 
 ### [ISCC - CLI](https://github.com/iscc/iscc-cli)
 
-An open-source command-line tool that can be used on **Windows**, **Linux**, and **Mac** systems by developers and computer savvy persons to create ISCC codes from media files and URLs. The tool is based on the [reference implementation](https://github.com/iscc/iscc-specs) but also includes **new and experimental features** (e.g., Audio-Codess, Video-Codes) that are not yet part of the [public specification](https://iscc.codes/specification/).
+An open-source command-line tool that can be used on **Windows**, **Linux**, and **Mac** systems by developers and computer savvy persons to create ISCC codes from media files and URLs. The tool is based on the [reference implementation](https://github.com/iscc/iscc-specs) but also includes **new and experimental features** (e.g., Audio-Codes, Video-Codes) that are not yet part of the [public specification](https://iscc.codes/specification/).
 
 ### [ISCC - Web Service](https://github.com/iscc/iscc-service)
 
