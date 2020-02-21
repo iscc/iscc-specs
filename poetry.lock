@@ -22,7 +22,7 @@ docs = ["sphinx", "zope.interface"]
 tests = ["coverage", "hypothesis", "pympler", "pytest (>=4.3.0)", "six", "zope.interface"]
 
 [[package]]
-category = "dev"
+category = "main"
 description = "Composable command line interface toolkit"
 name = "click"
 optional = false
@@ -77,7 +77,7 @@ docs = ["sphinx", "rst.linker"]
 testing = ["packaging", "importlib-resources"]
 
 [[package]]
-category = "dev"
+category = "main"
 description = "A very fast and expressive template engine."
 name = "jinja2"
 optional = false
@@ -91,7 +91,7 @@ MarkupSafe = ">=0.23"
 i18n = ["Babel (>=0.8)"]
 
 [[package]]
-category = "dev"
+category = "main"
 description = "Python LiveReload is an awesome tool for web developers"
 name = "livereload"
 optional = false
@@ -103,7 +103,7 @@ six = "*"
 tornado = "*"
 
 [[package]]
-category = "dev"
+category = "main"
 description = "Python implementation of Markdown."
 name = "markdown"
 optional = false
@@ -117,7 +117,7 @@ setuptools = ">=36"
 testing = ["coverage", "pyyaml"]
 
 [[package]]
-category = "dev"
+category = "main"
 description = "Safely add untrusted strings to HTML/XML markup."
 name = "markupsafe"
 optional = false
@@ -125,7 +125,7 @@ python-versions = ">=2.7,!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*"
 version = "1.1.1"
 
 [[package]]
-category = "dev"
+category = "main"
 description = "Project documentation with Markdown."
 name = "mkdocs"
 optional = false
@@ -166,6 +166,20 @@ Pygments = ">=2.4"
 markdown = ">=3.2"
 mkdocs = ">=1.0"
 pymdown-extensions = ">=6.3"
+
+[[package]]
+category = "main"
+description = "A MkDocs plugin for dynamic page redirects to prevent broken links."
+name = "mkdocs-redirects"
+optional = false
+python-versions = ">=2.7"
+version = "1.0.0"
+
+[package.dependencies]
+mkdocs = ">=1.0.4"
+
+[package.extras]
+release = ["twine (1.13.0)"]
 
 [[package]]
 category = "dev"
@@ -289,7 +303,7 @@ checkqa-mypy = ["mypy (v0.761)"]
 testing = ["argcomplete", "hypothesis (>=3.56)", "mock", "nose", "requests", "xmlschema"]
 
 [[package]]
-category = "dev"
+category = "main"
 description = "YAML parser and emitter for Python"
 name = "pyyaml"
 optional = false
@@ -297,7 +311,7 @@ python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*"
 version = "5.3"
 
 [[package]]
-category = "dev"
+category = "main"
 description = "Python 2 and 3 compatibility utilities"
 name = "six"
 optional = false
@@ -313,7 +327,7 @@ python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
 version = "2.0.5"
 
 [[package]]
-category = "dev"
+category = "main"
 description = "Tornado is a Python web framework and asynchronous networking library, originally developed at FriendFeed."
 name = "tornado"
 optional = false
@@ -350,7 +364,7 @@ docs = ["sphinx", "jaraco.packaging (>=3.2)", "rst.linker (>=1.9)"]
 testing = ["pathlib2", "unittest2", "jaraco.itertools", "func-timeout"]
 
 [metadata]
-content-hash = "c93e2d3005af58a65984fc53a988ca87c7703a785b360b98e2cb36b3f28148b6"
+content-hash = "693b01bb60df7055c966f4e7c1b5963acd14e6521a8e5df7097fc6fc4e190f77"
 python-versions = "^3.5"
 
 [metadata.files]
@@ -435,6 +449,9 @@ mkdocs-git-revision-date-plugin = [
 mkdocs-material = [
     {file = "mkdocs-material-4.6.3.tar.gz", hash = "sha256:1d486635b03f5a2ec87325842f7b10c7ae7daa0eef76b185572eece6a6ea212c"},
     {file = "mkdocs_material-4.6.3-py2.py3-none-any.whl", hash = "sha256:7f3afa0a09c07d0b89a6a9755fdb00513aee8f0cec3538bb903325c80f66f444"},
+]
+mkdocs-redirects = [
+    {file = "mkdocs-redirects-1.0.0.tar.gz", hash = "sha256:a1831fc7ea474668bad2611fb70d5d079390203d1dcd6a02cbd4d0838676ff30"},
 ]
 more-itertools = [
     {file = "more-itertools-8.2.0.tar.gz", hash = "sha256:b1ddb932186d8a6ac451e1d95844b382f55e12686d51ca0c68b6f61f2ab7a507"},

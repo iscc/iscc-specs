@@ -36,7 +36,7 @@ nav:
     - Features: 'features.md'
     - Concept: 'concept.md'
     - Specification: 'specification.md'
-    - Implementations: 'implementations.md'
+    - Resources: 'resources.md'
     - Versions:
           - Version 1.x: 'specification.md'
           - Version 1.0: 'https://github.com/iscc/iscc-specs/blob/version-1.0/docs/specification.md'
@@ -72,3 +72,7 @@ markdown_extensions:
 plugins:
     - search
     - git-revision-date
+    - redirects:
+          redirect_maps:
+              'implementations.md': 'resources.md'
+
