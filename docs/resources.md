@@ -40,17 +40,24 @@ C# .Net Core implementation of the ISCC protocol.
 
 ## ISCC - Technical Demos & Integrations
 
-### [ISCC - Web Demo](https://iscc.coblo.net/)
+### [Web Demo](https://iscc.coblo.net/)
 
-A demo web application that can generate and lookup **ISCC codes** from files or URLs and visualizes differences between ISCC Codes. The [source code](https://github.com/coblo/iscc-demo) is also available.
+A demo web application that can generate and lookup ISCC codes from files or URLs and visualizes differences between ISCC Codes. The [source code](https://github.com/coblo/iscc-demo) is also available.
 
-### [ISCC - Data Streams](https://explorer.coblo.net/streams/)
+### [Data Streams](https://explorer.coblo.net/streams/)
 
 The Content Blockchain Testnet is running a public data-stream of ISCC codes for testing and demonstration purposes. The web demo uses the [ISCC data-stream](https://explorer.coblo.net/stream/iscc) for lookups.
 
 ### [Clink.ID](https://clink.id/)
 
-[CLink.ID](https://clink.id/) is an interoperable registry, capable of implementing and recognizing any public content or handle-generated ID. CLink.ID is operated by [CLink Media , Inc.](https://clink.media/) and has integrated [ISCC code support in its registry](https://clink.id/#objects/20.500.12200.100/5d8e3c3f9d6c6a759261).
+[CLink.ID](https://clink.id/) is an interoperable registry, architected to recognize identifiers and meta-data regardless of whether they are Handle- or content-based and/or block-chain inspired. CLink.ID is operated by [CLink Media , Inc.](https://clink.media/) and has integrated [ISCC in its registry](https://clink.id/%22%20%5Cl%20%22objects/20.500.12200.100/5d8e3c3f9d6c6a759261).
+
+### [Smart License Demo](https://smartlicense.coblo.net/)
+
+Prototype demo of a smart licensing framework that uses ISCC codes for content identification. [Source code](https://github.com/coblo/smartlicense) is also available.
+
+### [Blockchain Wallet Demo](https://github.com/coblo/gui-demo)
+An early prototype demo of a blockchain wallet that uses ISCC codes for license tokenization.
 
 ## ISCC - Presentations & Articles
 
