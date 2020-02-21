@@ -38,7 +38,7 @@
         <meta name="lang:search.tokenizer" content="[\s\-]+">
       
       <link rel="shortcut icon" href="images/favicon.png">
-      <meta name="generator" content="mkdocs-1.0.4, mkdocs-material-4.6.0">
+      <meta name="generator" content="mkdocs-1.0.4, mkdocs-material-4.6.3">
     
     
       
@@ -46,7 +46,7 @@
       
     
     
-      <link rel="stylesheet" href="assets/stylesheets/application.1b62728e.css">
+      <link rel="stylesheet" href="assets/stylesheets/application.adb8469c.css">
       
         <link rel="stylesheet" href="assets/stylesheets/application-palette.a8b3c06d.css">
       
@@ -57,7 +57,7 @@
       
     
     
-      <script src="assets/javascripts/modernizr.268332fc.js"></script>
+      <script src="assets/javascripts/modernizr.86422ebf.js"></script>
     
     
       
@@ -93,7 +93,7 @@
     <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
     <label class="md-overlay" data-md-component="overlay" for="__drawer"></label>
     
-      <a href="#iscc-content-identifiers" tabindex="1" class="md-skip">
+      <a href="#iscc-content-identifiers" tabindex="0" class="md-skip">
         Skip to content
       </a>
     
@@ -102,9 +102,9 @@
   <nav class="md-header-nav md-grid">
     <div class="md-flex">
       <div class="md-flex__cell md-flex__cell--shrink">
-        <a href="http://iscc.codes" title="ISCC - Content Identifiers" class="md-header-nav__button md-logo">
+        <a href="http://iscc.codes" title="ISCC - Content Identifiers" aria-label="ISCC - Content Identifiers" class="md-header-nav__button md-logo">
           
-            <img src="images/logo-white.svg" width="24" height="24">
+            <img alt="logo" src="images/logo-white.svg" width="24" height="24">
           
         </a>
       </div>
@@ -133,7 +133,7 @@
   <label class="md-search__overlay" for="__search"></label>
   <div class="md-search__inner" role="search">
     <form class="md-search__form" name="search">
-      <input type="text" class="md-search__input" name="query" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="query" data-md-state="active">
+      <input type="text" class="md-search__input" aria-label="search" name="query" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="query" data-md-state="active">
       <label class="md-icon md-search__icon" for="__search"></label>
       <button type="reset" class="md-icon md-search__icon" data-md-component="reset" tabindex="-1">
         &#xE5CD;
@@ -196,7 +196,7 @@
   <label class="md-nav__title md-nav__title--site" for="__drawer">
     <a href="http://iscc.codes" title="ISCC - Content Identifiers" class="md-nav__button md-logo">
       
-        <img src="images/logo-white.svg" width="48" height="48">
+        <img alt="logo" src="images/logo-white.svg" width="48" height="48">
       
     </a>
     ISCC - Content Identifiers
@@ -255,6 +255,20 @@
   
     <label class="md-nav__title" for="__toc">Table of contents</label>
     <ul class="md-nav__list" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#a-proposal-for-a-modern-and-open-content-based-identifier" class="md-nav__link">
+    A Proposal for a Modern and Open Content-Based Identifier
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#the-iscc-is" class="md-nav__link">
+    The ISCC is...
+  </a>
+  
+</li>
       
         <li class="md-nav__item">
   <a href="#motivation" class="md-nav__link">
@@ -330,8 +344,8 @@
 
 
   <li class="md-nav__item">
-    <a href="implementations/" title="Implementations" class="md-nav__link">
-      Implementations
+    <a href="resources/" title="Resources" class="md-nav__link">
+      Resources
     </a>
   </li>
 
@@ -417,6 +431,20 @@
     <ul class="md-nav__list" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#a-proposal-for-a-modern-and-open-content-based-identifier" class="md-nav__link">
+    A Proposal for a Modern and Open Content-Based Identifier
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#the-iscc-is" class="md-nav__link">
+    The ISCC is...
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#motivation" class="md-nav__link">
     Motivation
   </a>
@@ -457,15 +485,27 @@
                 
                 
                 <h1 id="iscc-content-identifiers">ISCC - Content Identifiers<a class="headerlink" href="#iscc-content-identifiers" title="Permanent link">#</a></h1>
-<p><strong>The ISCC is a modern, generic, and open content identifier</strong></p>
-<p><img alt="iscc-sample" src="images/iscc-badge.svg" /></p>
+<h2 id="a-proposal-for-a-modern-and-open-content-based-identifier">A Proposal for a Modern and Open Content-Based Identifier<a class="headerlink" href="#a-proposal-for-a-modern-and-open-content-based-identifier" title="Permanent link">#</a></h2>
+<p><img alt="iscc-sample" src="images/iscc-algo-design2.svg" /></p>
+<h2 id="the-iscc-is">The ISCC is...<a class="headerlink" href="#the-iscc-is" title="Permanent link">#</a></h2>
+<ul>
+<li>a universal identifier for multiple generic media-types (text, image, audio, video)</li>
+<li>a lightweight and similarity-preserving fingerprint designed for digital content</li>
+<li>designed for cross-sector applicability (journalism, books, music, film, etc.)</li>
+<li>designed to identify content in decentralized and networked environments</li>
+<li>and most importantly it is free, open-source and transparent</li>
+</ul>
+<p><strong>You want to try it instantly?</strong> Head over to our demo at <a href="https://iscc.coblo.net">https://iscc.coblo.net</a></p>
 <h2 id="motivation">Motivation<a class="headerlink" href="#motivation" title="Permanent link">#</a></h2>
-<p>Increasing amounts of dynamic, short-lived and granular content needs to be managed and requires new and innovative tools.</p>
-<p>A crucial prerequisite for content-related transactions to succeed in this new and demanding environment is the capability to easily address and identify content. Yet many industries that deal with digital content do not even have standard identifiers. There is no existing solution for those industries that deal with short-lived or granular content such as journalism. There is also no widely adopted, standardized identifier for digital images.</p>
-<p>The overhead and costs of manually assigning and tracking identifiers for such content is prohibitive. But there is a solution to the problem: Auto-generated identifiers created algorithmically from the content itself.</p>
-<p>With the advent of blockchain technology the Internet is moving towards a network of peer-to-peer transactions. In a multi-sided ecosystem <strong>anybody</strong> may have a legitimate interest to generate or lookup an identifier for some digital content – whether they own the content or not.</p>
-<p>Open and accessible <strong>standard identifiers</strong>, that are specifically designed to manage small and sometimes transient pieces of digital content are fundamental for transactions and sales activities in our increasingly heterogeneous media environment.</p>
-<p>By using standardized, decentralized, algorithmic identifiers for digital content,  all ecosystem participants can engage more efficiently in content-related transactions.</p>
+<p>Increasing amounts of dynamic, short-lived, and granular content need to be managed and require new and innovative tools.</p>
+<p>A crucial prerequisite for content-related transactions to succeed in this new and demanding environment is the capability to address and identify content efficiently. Yet many industries that deal with digital content do not even have standard identifiers. There is no existing solution for those industries that deal with short-lived or granular content such as journalism. There is also no widely adopted standardized identifier for digital images.</p>
+<p>The overhead and cost of manually assigning and tracking identifiers for such content are prohibitive. But there is a solution to the problem: <strong>auto-generated identifiers</strong> created algorithmically from the content itself.</p>
+<p>With the advent of blockchain technology, the Internet is moving towards a network of peer-to-peer transactions.</p>
+<p>In a multi-sided ecosystem, <strong>anybody</strong> may have a legitimate interest to generate, lookup, or register an identifier for some digital content – whether they own the content or not.</p>
+<p>Authorship or copyright is <strong>not</strong> a requirement to create or use an identifier. But <strong>an identifier is a requirement</strong> to communicate and agree on authorship, origin, copyright, and other information.</p>
+<p>Technology allows us to authoritatively map <strong>identifiers to digital content</strong> using open, standardized fingerprinting algorithms.</p>
+<p>Open and accessible <strong>standard identifiers,</strong> designed to manage small and sometimes transient pieces of digital content are fundamental for transactions and sales activities in our increasingly heterogeneous media environment.</p>
+<p>By using standardized, decentralized, algorithmic identifiers for digital content, all ecosystem participants can engage more efficiently in content-related transactions.</p>
 <h2 id="key-features-and-differentiators">Key Features and Differentiators<a class="headerlink" href="#key-features-and-differentiators" title="Permanent link">#</a></h2>
 <ul>
 <li>Decentralized issuance through algorithmic creation</li>
@@ -478,7 +518,6 @@
 <h2 id="how-it-works">How it works<a class="headerlink" href="#how-it-works" title="Permanent link">#</a></h2>
 <p><strong>ISCC</strong> identifiers are generated algorithmically <strong>from the content itself</strong>. Content files are processed to build the identifier. The ISCC does not have to be manually assigned, neither does it have to be carried around or embedded within the content. The content itself is the source and authority of the <strong>ISCC Code</strong>.</p>
 <p>The <strong>ISCC Code</strong> is a unique, hierarchically structured, composite identifier. It is built from a generic and balanced mix of content-derived, locality-sensitive and similarity-preserving hashes generated from metadata and content.</p>
-<p><img alt="iscc-sample" src="images/iscc-algo-design.svg" /></p>
 <p>The latest version of these pages can be found at <a href="http://iscc.codes">iscc.codes</a></p>
                 
                   
@@ -489,7 +528,7 @@
                   <div class="md-source-date">
                     <small>
                       
-                        Last update: 2019-12-12
+                        Last update: 2020-02-21
                       
                     </small>
                   </div>
@@ -538,20 +577,20 @@
           </div>
         
         powered by
-        <a href="https://www.mkdocs.org">MkDocs</a>
+        <a href="https://www.mkdocs.org" target="_blank" rel="noopener">MkDocs</a>
         and
-        <a href="https://squidfunk.github.io/mkdocs-material/">
+        <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
           Material for MkDocs</a>
       </div>
       
   <div class="md-footer-social">
     <link rel="stylesheet" href="assets/fonts/font-awesome.css">
     
-      <a href="https://iscc.codes" class="md-footer-social__link fa fa-home"></a>
+      <a href="https://iscc.codes" target="_blank" rel="noopener" title="home" class="md-footer-social__link fa fa-home"></a>
     
-      <a href="https://github.com/iscc" class="md-footer-social__link fa fa-github"></a>
+      <a href="https://github.com/iscc" target="_blank" rel="noopener" title="github" class="md-footer-social__link fa fa-github"></a>
     
-      <a href="https://t.me/iscc_dev" class="md-footer-social__link fa fa-telegram"></a>
+      <a href="https://t.me/iscc_dev" target="_blank" rel="noopener" title="telegram" class="md-footer-social__link fa fa-telegram"></a>
     
   </div>
 
@@ -561,7 +600,7 @@
       
     </div>
     
-      <script src="assets/javascripts/application.808e90bb.js"></script>
+      <script src="assets/javascripts/application.c33a9706.js"></script>
       
       <script>app.initialize({version:"1.0.4",url:{base:"."}})</script>
       
