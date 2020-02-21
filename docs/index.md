@@ -11,7 +11,7 @@ authors: Titusz Pan
 ## The ISCC is...
 
 - a universal identifier for multiple generic media-types (text, image, audio, video)
-- a lightweight, multi-faceted, short fingerprint designed for digital content
+- a lightweight and similarity-preserving fingerprint designed for digital content
 - designed for cross-sector applicability (journalism, books, music, film, etc.)
 - designed to identify content in decentralized and networked environments
 - and most importantly it is free, open-source and transparent
