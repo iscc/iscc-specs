@@ -1,18 +1,16 @@
 # ISCC - Concept
 
-**Last revised on:** {{ git_revision_date }}
-
 *The internet is shifting towards a network of decentralized peer-to-peer transactions. If we want our transactions on the emerging blockchain networks to be about content we need standardized ways to address content. Our transactions might be payments, attributions, reputation, certification, licenses or entirely new kinds of value transfer. All this will happen much faster and easier if we, as a community, can agree on how to identify content in a decentralized environment.*
 
 This is the higher level concept of an open proposal to the wider content community for a common content identifier. We would like to share our ideas and spark a conversation with journalists, news agencies, content creators, publishers, distributors, libraries, musicians, scientists, developers, lawyers, rights organizations and all the other participants of the content ecosystem.
 
 ## Introduction
 
-The **structure and management** of **global identifiers** strongly correlates with the grade of achievable **automation** and the potential for **innovation** within and across different sectors of the media industries. 
+The **structure and management** of **global identifiers** strongly correlates with the grade of achievable **automation** and the potential for **innovation** within and across different sectors of the media industries.
 
 There are many [existing standards](https://xkcd.com/927/) for media identifiers serving a wide array of use cases. Book publishing uses the [**ISBN**](https://www.isbn-international.org/), magazines and journals have the [**ISSN**](https://www.issn.org/), music industry has [**ISRC**](https://isrc.ifpi.org/) and [**ISWC**](http://www.iswc.org/) and film has [**ISAN**](http://www.isan.org/) and [**EIDR**](https://eidr.org/) – each of them serving a set of specific purposes. On the other side of the spectrum there are also generic identifiers standards such as the [**DOI**](https://www.doi.org/), [**ITU HANDLE**](http://www.itu.int/osg/csd/emerging_trends/handle_system/index.html), [**URN**](https://tools.ietf.org/html/rfc8141), [**ARK**](https://tools.ietf.org/html/draft-kunze-ark-18). The DOI, for example, can be used to identify any digital, physical or abstract *object*. All these identifiers have important and distinct roles across different industries and use cases.
 
-The most substantial differentiator of the **ISCC** is the fact that it is **algorithmically bound to the digital content** it identifies. Other standards require human intervention to assign and track the mapping between identifier and object (binding). Many of those standards focus on how to resolve an identifier to some network location where metadata or the object itself can be found. The **ISCC inverts this principle**. It gives an answer to the question: "Given some digital content, how can I find its identifier to reference the content in a transaction?". This means that the **ISCC** for any digital content can be *found* (generated) from the content itself, without the need to involve any third-party. 
+The most substantial differentiator of the **ISCC** is the fact that it is **algorithmically bound to the digital content** it identifies. Other standards require human intervention to assign and track the mapping between identifier and object (binding). Many of those standards focus on how to resolve an identifier to some network location where metadata or the object itself can be found. The **ISCC inverts this principle**. It gives an answer to the question: "Given some digital content, how can I find its identifier to reference the content in a transaction?". This means that the **ISCC** for any digital content can be *found* (generated) from the content itself, without the need to involve any third-party.
 
 As such the **ISCC** fulfills a distinct role and is **not a replacement for established identifiers**. Rather it is designed as an umbrella standard to augment established identifiers with enhanced algorithmic features. It can be used in the metadata of existing standards or support discoverability (reverse lookup).
 
@@ -20,7 +18,7 @@ Many of the established systems are based on centralized or hierarchical registr
 
 The fast paced development of the digital media economy has led to an increasing fragmentation of identifiers and new barriers in interoperability. For example major e-book retailers do not require an **ISBN** and instead established their own proprietary identifiers. Amazon has the **ASIN**, Apple has **Apple-ID** and Google has **GKEY**. For many tasks current systems need to track and match all the different vendor specific IDs, which is an inefficient and error prone process.
 
-Resolving an **ISCC** to a network location, metadata or the content itself can be accomplished with neutral and decentralized blockchain-based registries that don't require a centralized or hierarchical system to manage, track and store unique identifiers, ownership assignments, associated metadata and other information. 
+Resolving an **ISCC** to a network location, metadata or the content itself can be accomplished with neutral and decentralized blockchain-based registries that don't require a centralized or hierarchical system to manage, track and store unique identifiers, ownership assignments, associated metadata and other information.
 
 Advances in data structures, algorithms, machine learning and the emergence of crypto economics allows us to invent **new** kinds of **media identifiers** and **re-imagine existing identifiers** with innovative use cases in mind. Blockchains and Smart Contracts offer great opportunities in solving many of the challenges of identifier registration, like centralized management, data duplication and disambiguation, vendor lock-in and long term data retention.
 
@@ -40,17 +38,17 @@ The **ISCC** is designed to be registry agnostic. This means that content identi
 
 ISCC registration becomes **necessary** when an ISCC code needs to be **globally unique, publicly discoverable, resolvable, owned** or **authenticated**. While these features inevitably require some kind of registry, not all of them require a centralized institutional registry.
 
-In a centralized system the central authority is in control of the issuance of identifiers and safeguards various requirements like identifier uniqueness or ownership. In a decentralized system where everybody can register an identifier we need a different approach. 
+In a centralized system the central authority is in control of the issuance of identifiers and safeguards various requirements like identifier uniqueness or ownership. In a decentralized system where everybody can register an identifier we need a different approach.
 
 The **ISCC** will specify the necessary protocols to implement the aforementioned features in a decentralized, federated environment and across multiple public blockchains.  **Given a registered ISCC code, an application can unambiguously determine on what blockchain (if any), by which account, and at what time an ISCC has been registered. **
 
-Registered ISCC codes have to indicate an authoritative public blockchain network. This indicator is part of the ISCC Code itself, such that codes registered on different networks cannot collide. This guarantees uniqueness of ISCC codes across multiple blockchains. 
+Registered ISCC codes have to indicate an authoritative public blockchain network. This indicator is part of the ISCC Code itself, such that codes registered on different networks cannot collide. This guarantees uniqueness of ISCC codes across multiple blockchains.
 
-**Ownership** of ISCC codes (not the identified content) is granted to the signatory of the first transaction for a given ISCC code on the corresponding blockchain. 
+**Ownership** of ISCC codes (not the identified content) is granted to the signatory of the first transaction for a given ISCC code on the corresponding blockchain.
 
-**Global uniqueness** of ISCC codes is accomplished by the blockchain indicator in combination with a client side counter. Registration clients first check for a prior registration of a given ISCC code on a given blockchain. If the ISCC code is already registered by another account the client may simply increments a suffix of the code before registration. 
+**Global uniqueness** of ISCC codes is accomplished by the blockchain indicator in combination with a client side counter. Registration clients first check for a prior registration of a given ISCC code on a given blockchain. If the ISCC code is already registered by another account the client may simply increments a suffix of the code before registration.
 
-Applications are instructed to ignore duplicate registrations of identical codes that occur on a blockchain after an initial registration. 
+Applications are instructed to ignore duplicate registrations of identical codes that occur on a blockchain after an initial registration.
 
 This approach retains global clustering and de-duplication features while at the same time offering **owned**, **authenticated** and **globally unique** ISCC codes. The model also allows for verifiable transfers of ISCC ownership. Given an appropriate protocol it is even possible to switch the authoritative blockchain for an ISCC after initial registration without changing the ISCC code itself.
 

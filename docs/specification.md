@@ -4,7 +4,7 @@ authors: Titusz Pan
 
 # ISCC - Specification v1.x
 
-**Last revised on:** {{ git_revision_date }}
+**Last revised:** {{ git_revision_date_localized }}
 
 ## Abstract
 
@@ -382,7 +382,7 @@ Applications MAY embed ISCC codes that have side effects if they specify a proce
 
     We can embed the following combination of components from the [markdown version](https://github.com/iscc/iscc-specs/edit/master/docs/specification.md) of this document into the document itself because adding or removing them has no side effect:
 
-    **ISCC**: CCDbMYw6NfC8a-CTtW9UFozcmBJ-CDYJsRdvHDfR5
+    **ISCC**: CCDbMYw6NfC8a-CTtW9UFozcmBJ-CDYJsRdBNAERM
 
 ## ISCC URI Scheme
 
@@ -577,14 +577,6 @@ Copyright © 2016 - 2020 The Authors, Content Blockchain Project
 *[ISCC ID]: Integer representation of an ISCC
 
 *[ISCC]: International Standard Content Code
-
-*[M-ID]: Meta-ID Component
-
-*[C-ID]: Content-ID Component
-
-*[D-ID]: Data-ID Component
-
-*[I-ID]: Instance-ID Component
 
 *[GMT]: Generic Media Type
 

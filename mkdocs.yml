@@ -71,7 +71,10 @@ markdown_extensions:
 
 plugins:
     - search
-    - git-revision-date
+    - git-revision-date-localized:
+        type: iso_datetime
+    - minify:
+        minify_html: true
     - redirects:
           redirect_maps:
               'implementations.md': 'resources.md'

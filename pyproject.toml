@@ -28,7 +28,8 @@ mkdocs-redirects = "^1.0.0"
 pytest = "^5"
 mkdocs = "^1"
 mkdocs-material = "^4"
-mkdocs-git-revision-date-plugin = "^0"
+mkdocs-minify-plugin = "^0"
+mkdocs-git-revision-date-localized-plugin = "^0"
 
 [build-system]
 requires = ["poetry>=1.0"]
