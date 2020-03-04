@@ -22,12 +22,12 @@ classifiers=[
 python = "^3.5"
 xxhash = "^1"
 Pillow = "^6"
-mkdocs-redirects = "^1.0.0"
 
 [tool.poetry.dev-dependencies]
 pytest = "^5"
 mkdocs = "^1"
 mkdocs-material = "^4"
+mkdocs-redirects = "^1.0.0"
 mkdocs-minify-plugin = "^0"
 mkdocs-git-revision-date-localized-plugin = "^0"
 
