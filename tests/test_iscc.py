@@ -216,6 +216,8 @@ def test_content_id_mixed():
 
 
 def test_data_id():
+    did_a = iscc.data_id(b"\x00")
+    assert did_a == "CDiQ3FUzdCbz9"
     random.seed(1)
     data = bytearray([random.getrandbits(8) for _ in range(1000000)])  # 1 mb
     did_a = iscc.data_id(data)
