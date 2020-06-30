@@ -1,5 +1,9 @@
 # -*- coding: utf-8 -*-
-"""Constants"""
+"""Configuration Prameters and Constants"""
+
+# Bytes to read per blake3 hash update.
+IID_READ_SIZE = 524288
+
 
 # Component Headers
 HEAD_MID = b"\x00"

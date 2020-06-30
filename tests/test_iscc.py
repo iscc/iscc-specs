@@ -236,16 +236,17 @@ def test_data_id():
 def test_instance_id():
     zero_bytes_even = b"\x00" * 16
     iid, h = iscc.instance_id(zero_bytes_even)
-    assert iid == "CR8UZLfpaCm1d"
-    assert h == "2ca7f098709d37d6f6a1a7e0670f49734c735500894aab4dc14d2c13f042dddd"
+    assert iid == "CRfawXPpg9YBp"
+    assert isinstance(h, str)
+    assert h == "e572dff82304700b856a555ac3a4558d0df3646a3727816500270a93c66aac1e"
     ff_bytes_uneven = b"\xff" * 17
     iid, h = iscc.instance_id(ff_bytes_uneven)
-    assert iid == "CR6Nh6fvCxHj9"
-    assert h == "215dadbbb627072c15b2235b521db9896e74d7ef379fdafa731efa52a67d5b7d"
+    assert iid == "CRD4vp2iBonAV"
+    assert h == "bfaac425c5d6dd620fb602a27ddea841cf426184094497f59d881be9d8b1601c"
     more_bytes = b"\xcc" * 66000
     iid, h = iscc.instance_id(more_bytes)
-    assert h == "db5f55fc6741664fda4ebb364f2cad99f6ac166aedc7551ab0768c6c67218f71"
-    assert iid == "CRdhBqWwY7u7i"
+    assert h == "3e4a7a06ee567c101c67de35d12bea6c5e70b424ede1502d54a848f9319a4c27"
+    assert iid == "CRBMtvBsphc8X"
 
 
 def test_data_chunks():

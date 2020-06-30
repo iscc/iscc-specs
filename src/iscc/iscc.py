@@ -8,6 +8,7 @@ from hashlib import sha256
 import unicodedata
 from PIL import Image
 import xxhash
+from blake3 import blake3
 from iscc.params import *
 
 
@@ -146,20 +147,19 @@ def instance_id(data):
     if not hasattr(data, "read"):
         data = BytesIO(data)
 
-    leaf_node_digests = []
+    b3 = blake3()
 
     while True:
-        chunk = data.read(64000)
-        if chunk:
-            leaf_node_digests.append(sha256d(b"\x00" + chunk))
-        else:
+        d = data.read(IID_READ_SIZE)
+        if not d:
             break
+        b3.update(d)
 
-    top_hash_digest = top_hash(leaf_node_digests)
+    top_hash_digest = b3.digest()
     instance_id_digest = HEAD_IID + top_hash_digest[:8]
 
     code = encode(instance_id_digest)
-    hex_hash = hexlify(top_hash_digest).decode("ascii")
+    hex_hash = b3.hexdigest()
 
     return [code, hex_hash]
 
@@ -299,33 +299,6 @@ def image_hash(pixels):
     hash_digest = int(bitstring, 2).to_bytes(8, "big", signed=False)
 
     return hash_digest
-
-
-def top_hash(hashes):
-
-    size = len(hashes)
-    if size == 1:
-        return hashes[0]
-
-    pairwise_hashed = []
-
-    for i in range(0, len(hashes) - 1, 2):
-        pairwise_hashed.append(hash_inner_nodes(hashes[i], hashes[i + 1]))
-
-    if size % 2 == 1:
-        pairwise_hashed.append(hash_inner_nodes(hashes[-1], hashes[-1]))
-
-    return top_hash(pairwise_hashed)
-
-
-def sha256d(data):
-
-    return sha256(sha256(data).digest()).digest()
-
-
-def hash_inner_nodes(a, b):
-
-    return sha256d(b"\x01" + a + b)
 
 
 def data_chunks(data):
