@@ -33,6 +33,14 @@ version = "2.8.0"
 pytz = ">=2015.7"
 
 [[package]]
+category = "main"
+description = "Python bindings for the Rust blake3 crate"
+name = "blake3"
+optional = false
+python-versions = "*"
+version = "0.1.5"
+
+[[package]]
 category = "dev"
 description = "Composable command line interface toolkit"
 name = "click"
@@ -503,7 +511,7 @@ docs = ["sphinx", "jaraco.packaging (>=3.2)", "rst.linker (>=1.9)"]
 testing = ["pathlib2", "unittest2", "jaraco.itertools", "func-timeout"]
 
 [metadata]
-content-hash = "9fb6cccb11848b7726a5cb5b0afdc81b9ce3ec00be2768ab9a2b43a7a1ed786c"
+content-hash = "e8c30591e59974cc216c9c1721a69c8593f02c70e7fc27f61ec7325d8e6e2ec0"
 python-versions = "^3.5"
 
 [metadata.files]
@@ -518,6 +526,25 @@ attrs = [
 babel = [
     {file = "Babel-2.8.0-py2.py3-none-any.whl", hash = "sha256:d670ea0b10f8b723672d3a6abeb87b565b244da220d76b4dba1b66269ec152d4"},
     {file = "Babel-2.8.0.tar.gz", hash = "sha256:1aac2ae2d0d8ea368fa90906567f5c08463d98ade155c0c4bfedd6a0f7160e38"},
+]
+blake3 = [
+    {file = "blake3-0.1.5-cp35-cp35m-macosx_10_7_x86_64.whl", hash = "sha256:b061e9b33a36cab40daf10b8642bec9b4a152c7cff70b15a4493d69a43a6797a"},
+    {file = "blake3-0.1.5-cp35-cp35m-manylinux1_x86_64.whl", hash = "sha256:2f3858542c45e6e81e526337cdd31931833e245cd7769f9309489f32b6d5e7ad"},
+    {file = "blake3-0.1.5-cp35-none-win32.whl", hash = "sha256:781cadf11ec7872be0939f5821955d1f70f3fb7856bf9bf2d8df2994ca089442"},
+    {file = "blake3-0.1.5-cp35-none-win_amd64.whl", hash = "sha256:eb9fbc11c8b378cb63060688fe1f22e23242f7ef66ccae6295314f76b1dcbabe"},
+    {file = "blake3-0.1.5-cp36-cp36m-macosx_10_7_x86_64.whl", hash = "sha256:8ab795d7c4281ba5fdc8f25cbb74abdece063a00bda6b9cf7f8040d45311a8eb"},
+    {file = "blake3-0.1.5-cp36-cp36m-manylinux1_x86_64.whl", hash = "sha256:b3d167f755cf9846ffc9ba538ebd7306726e2298a5200eb9358262a87f1eb6ce"},
+    {file = "blake3-0.1.5-cp36-none-win32.whl", hash = "sha256:093951d45c7d51e62b823b97ea146519bec358ec98b6ded64ecfeb319b4cf19d"},
+    {file = "blake3-0.1.5-cp36-none-win_amd64.whl", hash = "sha256:784c55104f11c9fae0c093b6bde604647335eeddad5e2c0a275d4532538d963f"},
+    {file = "blake3-0.1.5-cp37-cp37m-macosx_10_7_x86_64.whl", hash = "sha256:ebf320aac1d0d24c0b23ecfdeac274c61439c4d08972cbb7a8d97c8656676373"},
+    {file = "blake3-0.1.5-cp37-cp37m-manylinux1_x86_64.whl", hash = "sha256:59b8da7d40709fdadc786738e52dae17badfdcd0ad0a3a0d1492b175eb13a99d"},
+    {file = "blake3-0.1.5-cp37-none-win32.whl", hash = "sha256:9dbc37cd7f76392b58a93b9aac13e75c87b9098d6efa0185a0f8b99006919cb7"},
+    {file = "blake3-0.1.5-cp37-none-win_amd64.whl", hash = "sha256:9d5bfbe50882ee69540f562d447c53fc5afd182a78c18041388a699ed8a847ee"},
+    {file = "blake3-0.1.5-cp38-cp38-macosx_10_7_x86_64.whl", hash = "sha256:f392e95f5697263aa2fb3754ae90ea8d25f1c6d01bb086633177864e2f30c830"},
+    {file = "blake3-0.1.5-cp38-cp38-manylinux1_x86_64.whl", hash = "sha256:beb254263af3f9139cbc149c7c141b2746110ba24e8ed9abf7ab1e0d9984711e"},
+    {file = "blake3-0.1.5-cp38-none-win32.whl", hash = "sha256:512a2e33226f148c586860b6dfa7cb9a0977c913b5e7c5e210265faec4ad1c2b"},
+    {file = "blake3-0.1.5-cp38-none-win_amd64.whl", hash = "sha256:4dce593182c1e15dd3752bb1d27e5acb2a7e7311f096fe159c726538d659076f"},
+    {file = "blake3-0.1.5.tar.gz", hash = "sha256:44ad76f52025ab2206715c5f968d13323cbc803c06dfe9bfc82546d6ecf63f51"},
 ]
 click = [
     {file = "click-7.1.2-py2.py3-none-any.whl", hash = "sha256:dacca89f4bfadd5de3d7489b7c8a566eee0d3676333fbb50030263894c38c0dc"},
