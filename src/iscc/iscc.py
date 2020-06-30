@@ -1,10 +1,8 @@
 # -*- coding: utf-8 -*-
 """ISCC Reference Implementation"""
-from binascii import hexlify
 from statistics import median
 import math
 from io import BytesIO
-from hashlib import sha256
 import unicodedata
 from PIL import Image
 import xxhash
