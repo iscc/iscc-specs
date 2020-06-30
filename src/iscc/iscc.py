@@ -8,7 +8,7 @@ from hashlib import sha256
 import unicodedata
 from PIL import Image
 import xxhash
-from iscc.const import *
+from iscc.params import *
 
 
 ###############################################################################
