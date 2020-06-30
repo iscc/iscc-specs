@@ -19,7 +19,7 @@ classifiers=[
 ]
 
 [tool.poetry.dependencies]
-python = "^3.5"
+python = "^3.6"
 xxhash = "^1"
 Pillow = "^6"
 blake3 = "^0.1.5"
@@ -31,6 +31,7 @@ mkdocs-material = "^4"
 mkdocs-redirects = "^1.0.0"
 mkdocs-minify-plugin = "^0"
 mkdocs-git-revision-date-localized-plugin = "^0"
+black = "^19.10b0"
 
 [build-system]
 requires = ["poetry>=1.0"]
