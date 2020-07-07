@@ -3758,7 +3758,8 @@
       ],
       "outputs": [
         "CRVcT6cQ7UhuX",
-        "872a7193e58a097e2252702af4350ea7e1bd3c7f103b57a5280d0a186523bc8b"
+        "872a7193e58a097e2252702af4350ea7e1bd3c7f103b57a5280d0a186523bc8b",
+        12963
       ]
     },
     "test_002_file_image_cat_png": {
@@ -3767,7 +3768,8 @@
       ],
       "outputs": [
         "CRXLxa2ieGdXV",
-        "b7aed497d2d6023aeb2f3680723a68d6e2b1f286137a76e0319b2d6e898b003b"
+        "b7aed497d2d6023aeb2f3680723a68d6e2b1f286137a76e0319b2d6e898b003b",
+        53759
       ]
     },
     "test_003_file_image_cat_gif": {
@@ -3776,7 +3778,8 @@
       ],
       "outputs": [
         "CRNeJyu4DYxpk",
-        "c9334f82794ca13dc96e41b83d61bba27a2580d94a890999a8ccc99e0be55ada"
+        "c9334f82794ca13dc96e41b83d61bba27a2580d94a890999a8ccc99e0be55ada",
+        18535
       ]
     }
   },

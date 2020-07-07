@@ -145,6 +145,7 @@ def instance_id(data):
     if not hasattr(data, "read"):
         data = BytesIO(data)
 
+    size = 0
     b3 = blake3()
 
     while True:
@@ -152,6 +153,7 @@ def instance_id(data):
         if not d:
             break
         b3.update(d)
+        size += len(d)
 
     top_hash_digest = b3.digest()
     instance_id_digest = HEAD_IID + top_hash_digest[:8]
@@ -159,7 +161,7 @@ def instance_id(data):
     code = encode(instance_id_digest)
     hex_hash = b3.hexdigest()
 
-    return [code, hex_hash]
+    return [code, hex_hash, size]
 
 
 ###############################################################################
