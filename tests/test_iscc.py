@@ -84,7 +84,7 @@ def test_meta_id():
 
 def test_encode():
     digest = bytes.fromhex("f7d3a5b201dc92f7a7")
-    code = iscc.encode(digest)
+    code = iscc.encode(digest[:1]) + iscc.encode(digest[1:])
     assert code == "5GcvF7s13LK2L"
 
 

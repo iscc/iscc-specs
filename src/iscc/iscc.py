@@ -67,14 +67,14 @@ def content_id_text(text, partial=False):
     # 6. Create 64-bit digests
     digest = int(lsb, 2).to_bytes(8, "big", signed=False)
 
-    # 7. Prepend component header
+    # 7. Encode digest with matching header
     if partial:
-        content_id_text_digest = HEAD_CID_T_PCF + digest
+        code = encode(HEAD_CID_T_PCF) + encode(digest)
     else:
-        content_id_text_digest = HEAD_CID_T + digest
+        code = encode(HEAD_CID_T) + encode(digest)
 
-    # 8. Encode and return
-    return encode(content_id_text_digest)
+    # 8. Return code
+    return code
 
 
 def content_id_image(img, partial=False):
@@ -85,14 +85,14 @@ def content_id_image(img, partial=False):
     # 2. Calculate image hash
     hash_digest = image_hash(pixels)
 
-    # 3. Prepend the 1-byte component header
+    # 3. Encode with component header
     if partial:
-        content_id_image_digest = HEAD_CID_I_PCF + hash_digest
+        code = encode(HEAD_CID_I_PCF) + encode(hash_digest)
     else:
-        content_id_image_digest = HEAD_CID_I + hash_digest
+        code = encode(HEAD_CID_I) + encode(hash_digest)
 
-    # 4. Encode and return
-    return encode(content_id_image_digest)
+    # 4. Return
+    return code
 
 
 def content_id_mixed(cids, partial=False):
@@ -106,14 +106,14 @@ def content_id_mixed(cids, partial=False):
     # 3. Apply Similarity hash
     simhash_digest = similarity_hash(truncated)
 
-    # 4. Prepend component header
+    # 4. Encode with prepended component header
     if partial:
-        content_id_mixed_digest = HEAD_CID_M_PCF + simhash_digest
+        code = encode(HEAD_CID_M_PCF) + encode(simhash_digest)
     else:
-        content_id_mixed_digest = HEAD_CID_M + simhash_digest
+        code = encode(HEAD_CID_M) + encode(simhash_digest)
 
-    # 5. Encode and return
-    return encode(content_id_mixed_digest)
+    # 5. Return Code
+    return code
 
 
 def data_id(data):
@@ -130,11 +130,11 @@ def data_id(data):
     # 5. Create 64-bit digests
     digest = int(lsb, 2).to_bytes(8, "big", signed=False)
 
-    # 6. Prepend the 1-byte header
-    data_id_digest = HEAD_DID + digest
+    # 6. Encode and prepend the 1-byte header
+    code = encode(HEAD_DID) + encode(digest)
 
-    # 7. Encode and return
-    return encode(data_id_digest)
+    # 7. return
+    return code
 
 
 def instance_id(data):
@@ -157,11 +157,8 @@ def instance_id(data):
 
     top_hash_digest = b3.digest()
 
-    instance_id_digest = HEAD_IID + top_hash_digest[:8]
-    instance_id_tail = top_hash_digest[8:]
-
-    code = encode(instance_id_digest)
-    tail = encode(instance_id_tail)
+    code = encode(HEAD_IID) + encode(top_hash_digest[:8])
+    tail = encode(top_hash_digest[8:])
 
     return [code, tail, size]
 
@@ -412,10 +409,6 @@ def distance(a, b):
 
 
 def encode(digest):
-
-    # TODO remove magic handling of specific digest sizes
-    if len(digest) == 9:
-        return encode(digest[:1]) + encode(digest[1:])
 
     digest = reversed(digest)
     value = 0
