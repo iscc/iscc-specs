@@ -413,7 +413,7 @@ def encode(digest):
 
     if len(digest) == 9:
         return encode(digest[:1]) + encode(digest[1:])
-    assert len(digest) in (1, 8), "Digest must be 1, 8 or 9 bytes long"
+
     digest = reversed(digest)
     value = 0
     numvalues = 1
@@ -431,27 +431,27 @@ def encode(digest):
 
 def decode(code):
 
+    bit_length = math.floor(math.log(58 ** len(code), 256)) * 8
     n = len(code)
+
     if n == 13:
         return decode(code[:2]) + decode(code[2:])
-    if n == 2:
-        bit_length = 8
-    elif n == 11:
-        bit_length = 64
-    else:
-        raise ValueError("Code must be 2, 11 or 13 chars. Not %s" % n)
+
     code = reversed(str.translate(code, C2VTABLE))
     value = 0
     numvalues = 1
+
     for c in code:
         c = ord(c)
         c *= numvalues
         value += c
         numvalues *= 58
     numvalues = 2 ** bit_length
+
     data = []
     while numvalues > 1:
         data.append(value % 256)
         value //= 256
         numvalues //= 256
+
     return bytes(reversed(data))
