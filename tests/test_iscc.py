@@ -5,6 +5,8 @@ import random
 from io import BytesIO
 import pytest
 from PIL import Image, ImageFilter, ImageEnhance
+from blake3 import blake3
+
 import iscc
 
 
@@ -236,23 +238,27 @@ def test_data_id():
 def test_instance_id():
 
     zero_bytes_even = b"\x00" * 16
-    iid, h, size = iscc.instance_id(zero_bytes_even)
+    iid, tail, size = iscc.instance_id(zero_bytes_even)
     assert iid == "CRfawXPpg9YBp"
-    assert isinstance(h, str)
-    assert h == "e572dff82304700b856a555ac3a4558d0df3646a3727816500270a93c66aac1e"
+    assert isinstance(tail, str)
+    assert tail == "ZrmFgwsJob8e42xhRJaqTUhnCfYaCboWd"
     assert size == len(zero_bytes_even)
 
     ff_bytes_uneven = b"\xff" * 17
-    iid, h, size = iscc.instance_id(ff_bytes_uneven)
+    iid, tail, size = iscc.instance_id(ff_bytes_uneven)
     assert iid == "CRD4vp2iBonAV"
-    assert h == "bfaac425c5d6dd620fb602a27ddea841cf426184094497f59d881be9d8b1601c"
+    assert tail == "2m5BB7r4iEbsikGfcgrVEqCKQqAVbR4X5"
     assert size == len(ff_bytes_uneven)
 
     more_bytes = b"\xcc" * 66000
-    iid, h, size = iscc.instance_id(more_bytes)
-    assert h == "3e4a7a06ee567c101c67de35d12bea6c5e70b424ede1502d54a848f9319a4c27"
+    iid, tail, size = iscc.instance_id(more_bytes)
+    assert tail == "3b1AFYxfRDyAjAyPNMTxnnXteFe6QgZfi"
     assert iid == "CRBMtvBsphc8X"
     assert size == len(more_bytes)
+
+    digest = iscc.decode(iid)[1:] + iscc.decode(tail)
+    b3sum = blake3(more_bytes).digest()
+    assert digest == b3sum
 
 
 def test_data_chunks():

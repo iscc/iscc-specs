@@ -156,12 +156,14 @@ def instance_id(data):
         size += len(d)
 
     top_hash_digest = b3.digest()
+
     instance_id_digest = HEAD_IID + top_hash_digest[:8]
+    instance_id_tail = top_hash_digest[8:]
 
     code = encode(instance_id_digest)
-    hex_hash = b3.hexdigest()
+    tail = encode(instance_id_tail)
 
-    return [code, hex_hash, size]
+    return [code, tail, size]
 
 
 ###############################################################################
