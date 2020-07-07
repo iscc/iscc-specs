@@ -413,6 +413,7 @@ def distance(a, b):
 
 def encode(digest):
 
+    # TODO remove magic handling of specific digest sizes
     if len(digest) == 9:
         return encode(digest[:1]) + encode(digest[1:])
 
@@ -436,6 +437,7 @@ def decode(code):
     bit_length = math.floor(math.log(58 ** len(code), 256)) * 8
     n = len(code)
 
+    # TODO remove magic handling of specific code sizes
     if n == 13:
         return decode(code[:2]) + decode(code[2:])
 
