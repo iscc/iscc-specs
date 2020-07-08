@@ -8,6 +8,7 @@ from PIL import Image
 import xxhash
 from blake3 import blake3
 from iscc.params import *
+from iscc.cdc import data_chunks
 
 
 ###############################################################################
@@ -298,64 +299,6 @@ def image_hash(pixels):
     hash_digest = int(bitstring, 2).to_bytes(8, "big", signed=False)
 
     return hash_digest
-
-
-def data_chunks(data):
-
-    if isinstance(data, str):
-        data = open(data, "rb")
-
-    if not hasattr(data, "read"):
-        data = BytesIO(data)
-
-    section = data.read(GEAR1_MAX)
-    counter = 0
-    while True:
-        if counter < 100:
-            if len(section) < GEAR1_MAX:
-                section += data.read(GEAR1_MAX)
-            if len(section) == 0:
-                break
-            boundary = chunk_length(
-                section, GEAR1_NORM, GEAR1_MIN, GEAR1_MAX, GEAR1_MASK1, GEAR1_MASK2
-            )
-        else:
-            if len(section) < GEAR2_MAX:
-                section += data.read(GEAR2_MAX)
-            if len(section) == 0:
-                break
-            boundary = chunk_length(
-                section, GEAR2_NORM, GEAR2_MIN, GEAR2_MAX, GEAR2_MASK1, GEAR2_MASK2
-            )
-
-        yield section[:boundary]
-        section = section[boundary:]
-        counter += 1
-
-
-def chunk_length(data, norm_size, min_size, max_size, mask_1, mask_2):
-
-    data_length = len(data)
-    i = min_size
-    pattern = 0
-
-    if data_length <= min_size:
-        return data_length
-
-    barrier = min(norm_size, data_length)
-    while i < barrier:
-        pattern = ((pattern << 1) + CHUNKING_GEAR[data[i]]) & MAX_INT64
-        if not pattern & mask_1:
-            return i
-        i = i + 1
-
-    barrier = min(max_size, data_length)
-    while i < barrier:
-        pattern = ((pattern << 1) + CHUNKING_GEAR[data[i]]) & MAX_INT64
-        if not pattern & mask_2:
-            return i
-        i = i + 1
-    return i
 
 
 def sliding_window(seq, width):

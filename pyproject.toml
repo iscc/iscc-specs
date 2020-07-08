@@ -1,6 +1,7 @@
 [tool.poetry]
 name = "iscc"
 version = "1.0.5"
+build = "build.py"
 description = "ISCC: Reference Implementation"
 authors = ["Titusz Pan <tp@py7.de>"]
 license="BSD 2-clause"
@@ -23,6 +24,10 @@ python = "^3.6"
 xxhash = "^1"
 Pillow = "^6"
 blake3 = "^0.1.5"
+cython = { version = "^0.29", optional = true }
+
+[tool.poetry.extras]
+cython = ["cython"]
 
 [tool.poetry.dev-dependencies]
 pytest = "^5"
@@ -34,5 +39,5 @@ mkdocs-git-revision-date-localized-plugin = "^0"
 black = "^19.10b0"
 
 [build-system]
-requires = ["poetry>=1.0"]
+requires = ["poetry>=1.0", "wheel"]
 build-backend = "poetry.masonry.api"

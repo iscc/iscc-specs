@@ -223,7 +223,7 @@ def test_data_id():
     random.seed(1)
     data = bytearray([random.getrandbits(8) for _ in range(1000000)])  # 1 mb
     did_a = iscc.data_id(data)
-    assert did_a == "CDK2KdVAz5XTs"
+    assert did_a == "CDgxemKsy77Zj"
     data.insert(500000, 1)
     data.insert(500001, 2)
     data.insert(500002, 3)
@@ -232,7 +232,7 @@ def test_data_id():
     for x in range(100):  # insert 100 bytes random noise
         data.insert(random.randint(0, 1000000), random.randint(0, 255))
     did_c = iscc.data_id(data)
-    assert iscc.distance(did_a, did_c) == 17
+    assert iscc.distance(did_a, did_c) == 1
 
 
 def test_instance_id():
@@ -266,12 +266,12 @@ def test_data_chunks():
         chunks1 = list(iscc.data_chunks(infile))
         infile.seek(0)
         chunks2 = list(iscc.data_chunks(infile.read()))
-    assert len(chunks1) == 112
-    assert len(chunks1[0]) == 38
-    assert len(chunks1[-1]) == 2840
-    assert len(chunks2) == 112
-    assert len(chunks2[0]) == 38
-    assert len(chunks2[-1]) == 2840
+    assert len(chunks1) == 85
+    assert len(chunks1[0]) == 438
+    assert len(chunks1[-1]) == 255
+    assert len(chunks2) == 85
+    assert len(chunks2[0]) == 438
+    assert len(chunks2[-1]) == 255
 
 
 def test_content_id_image():

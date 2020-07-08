@@ -28,3 +28,9 @@ jobs:
 
     - name: Run pytest
       run: poetry run pytest -q tests
+
+    - name: Install dependencies with extras
+      run: poetry install --extras cython
+
+    - name: Run pytest
+      run: poetry run pytest -q tests
