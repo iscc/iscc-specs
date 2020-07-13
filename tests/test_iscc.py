@@ -5,9 +5,8 @@ import random
 from io import BytesIO
 import pytest
 from PIL import Image, ImageFilter, ImageEnhance
-from blake3 import blake3
-
 import iscc
+from iscc.merkle import tophash_size
 
 
 TESTS_PATH = os.path.dirname(os.path.realpath(__file__))
@@ -104,7 +103,7 @@ def test_content_id_text():
 
     cid_t_a = iscc.content_id_text(TEXT_A)
     cid_t_b = iscc.content_id_text(TEXT_B)
-    assert iscc.distance(cid_t_a, cid_t_b) == 2
+    assert iscc.distance(cid_t_a, cid_t_b) == 1
 
 
 def test_text_normalize():
@@ -207,14 +206,14 @@ def test_content_id_mixed():
     cid_t_2 = iscc.content_id_text("Another Text")
 
     cid_m = iscc.content_id_mixed([cid_t_1])
-    assert cid_m == "CM3k9pp7JS7nP"
+    assert cid_m == "CM3hmCp88AZZr"
 
     cid_m = iscc.content_id_mixed([cid_t_1, cid_t_2])
-    assert cid_m == "CM3kHkNRGvnhB"
+    assert cid_m == "CM3pL2R324Lgi"
 
     cid_i = iscc.content_id_image("file_image_lenna.jpg")
     cid_m = iscc.content_id_mixed([cid_t_1, cid_t_2, cid_i])
-    assert cid_m == "CM3hswzATv9d3"
+    assert cid_m == "CM3n42M2qyWoq"
 
 
 def test_data_id():
@@ -237,28 +236,35 @@ def test_data_id():
 
 def test_instance_id():
 
+    empty = b""
+    iid, tail, size = iscc.instance_id(empty)
+    assert iid == "CRWTH7TBxg6Qh"
+    assert tail == "Fci9dzWk4tBUmB5mrQGog2g4XSWeaCNRo"
+    assert size == 0
+
     zero_bytes_even = b"\x00" * 16
     iid, tail, size = iscc.instance_id(zero_bytes_even)
-    assert iid == "CRfawXPpg9YBp"
+    assert iid == "CR4dVfEhVueAC"
     assert isinstance(tail, str)
-    assert tail == "ZrmFgwsJob8e42xhRJaqTUhnCfYaCboWd"
+    assert tail == "42oz8gwmuKNwQdDvxVs4gxB8AhqfK3pK8"
     assert size == len(zero_bytes_even)
 
     ff_bytes_uneven = b"\xff" * 17
     iid, tail, size = iscc.instance_id(ff_bytes_uneven)
-    assert iid == "CRD4vp2iBonAV"
-    assert tail == "2m5BB7r4iEbsikGfcgrVEqCKQqAVbR4X5"
+    assert iid == "CRD2Jq2bVVajv"
+    assert tail == "8YP4maSRAeBocUF2xJQRz7mHBGajkhwUh"
     assert size == len(ff_bytes_uneven)
 
     more_bytes = b"\xcc" * 66000
     iid, tail, size = iscc.instance_id(more_bytes)
-    assert tail == "3b1AFYxfRDyAjAyPNMTxnnXteFe6QgZfi"
-    assert iid == "CRBMtvBsphc8X"
+    assert tail == "FDg1Ru44ep8tUeQz4j2DYaLPCRvJcFKpQ"
+    assert iid == "CREC1QXDi95n1"
     assert size == len(more_bytes)
 
     digest = iscc.decode(iid)[1:] + iscc.decode(tail)
-    b3sum = blake3(more_bytes).digest()
-    assert digest == b3sum
+    thash, size = tophash_size(more_bytes)
+    assert digest == thash
+    assert size == len(more_bytes)
 
 
 def test_data_chunks():

@@ -2,11 +2,11 @@
 """ISCC Reference Implementation"""
 from statistics import median
 import math
-from io import BytesIO
 import unicodedata
 from PIL import Image
 import xxhash
 from blake3 import blake3
+from iscc.merkle import tophash_size
 from iscc.params import *
 from iscc.cdc import data_chunks
 
@@ -54,10 +54,10 @@ def content_id_text(text, partial=False):
     text = text_normalize(text, keep_ws=False)
 
     # 2. Create 13 character n-grams
-    ngrams = ("\u0020".join(l) for l in sliding_window(text, WINDOW_SIZE_CID_T))
+    ngrams = ("".join(l) for l in sliding_window(text, WINDOW_SIZE_CID_T))
 
     # 3. Create 32-bit features with xxHash32
-    features = (xxhash.xxh32(s.encode("utf-8")).intdigest() for s in ngrams)
+    features = (xxhash.xxh32_intdigest(s.encode("utf-8")) for s in ngrams)
 
     # 4. Apply minimum_hash
     minhash = minimum_hash(features, n=64)
@@ -140,23 +140,10 @@ def data_id(data):
 
 def instance_id(data):
 
-    if isinstance(data, str):
-        data = open(data, "rb")
-
-    if not hasattr(data, "read"):
-        data = BytesIO(data)
-
-    size = 0
-    b3 = blake3()
-
-    while True:
-        d = data.read(IID_READ_SIZE)
-        if not d:
-            break
-        b3.update(d)
-        size += len(d)
-
-    top_hash_digest = b3.digest()
+    if not data:
+        top_hash_digest, size = blake3(b"").digest(), 0
+    else:
+        top_hash_digest, size = tophash_size(data)
 
     code = encode(HEAD_IID) + encode(top_hash_digest[:8])
     tail = encode(top_hash_digest[8:])
