@@ -118,7 +118,7 @@ description = "Python Git Library"
 name = "gitpython"
 optional = false
 python-versions = ">=3.4"
-version = "3.1.5"
+version = "3.1.7"
 
 [package.dependencies]
 gitdb = ">=4.0.1,<5"
@@ -650,8 +650,8 @@ gitdb = [
     {file = "gitdb-4.0.5.tar.gz", hash = "sha256:c9e1f2d0db7ddb9a704c2a0217be31214e91a4fe1dea1efad19ae42ba0c285c9"},
 ]
 gitpython = [
-    {file = "GitPython-3.1.5-py3-none-any.whl", hash = "sha256:39ae158ee8c360ee5a872fc411705430d4875cbe894654edbe39e246e38e4d64"},
-    {file = "GitPython-3.1.5.tar.gz", hash = "sha256:90400ecfa87bac36ac75dfa7b62e83a02017b51759f6eef4494e4de775b2b4be"},
+    {file = "GitPython-3.1.7-py3-none-any.whl", hash = "sha256:fa3b92da728a457dd75d62bb5f3eb2816d99a7fe6c67398e260637a40e3fafb5"},
+    {file = "GitPython-3.1.7.tar.gz", hash = "sha256:2db287d71a284e22e5c2846042d0602465c7434d910406990d5b74df4afb0858"},
 ]
 htmlmin = [
     {file = "htmlmin-0.1.12.tar.gz", hash = "sha256:50c1ef4630374a5d723900096a961cff426dff46b48f34d194a81bbe14eca178"},
