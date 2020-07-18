@@ -119,22 +119,12 @@ def content_id_mixed(cids, partial=False):
 
 def data_id(data):
 
-    # 1. & 2. XxHash32 over CDC-Chunks
-    features = (xxhash.xxh32(chunk).intdigest() for chunk in data_chunks(data))
+    if not data:
+        data = b""
 
-    # 3. Apply minimum_hash
-    minhash = minimum_hash(features, n=64)
-
-    # 4. Collect least significant bits
-    lsb = "".join([str(x & 1) for x in minhash])
-
-    # 5. Create 64-bit digests
-    digest = int(lsb, 2).to_bytes(8, "big", signed=False)
-
-    # 6. Encode and prepend the 1-byte header
-    code = encode(HEAD_DID) + encode(digest)
-
-    # 7. return
+    hash_digests = [blake3(chunk).digest() for chunk in data_chunks(data)]
+    digest = similarity_hash(hash_digests)
+    code = encode(HEAD_DID) + encode(digest[:8])
     return code
 
 

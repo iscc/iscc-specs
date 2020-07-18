@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 import os
 import json
-import random
 from io import BytesIO
 import pytest
 from PIL import Image, ImageFilter, ImageEnhance
@@ -213,65 +212,6 @@ def test_content_id_mixed():
     cid_i = iscc.content_id_image("file_image_lenna.jpg")
     cid_m = iscc.content_id_mixed([cid_t_1, cid_t_2, cid_i])
     assert cid_m == "CM3n42M2qyWoq"
-
-
-def test_data_id():
-    did_a = iscc.data_id(b"\x00")
-    assert did_a == "CDiQ3FUzdCbz9"
-    random.seed(1)
-    data = bytearray([random.getrandbits(8) for _ in range(1000000)])  # 1 mb
-    did_a = iscc.data_id(data)
-    assert did_a == "CDgxemKsy77Zj"
-    data.insert(500000, 1)
-    data.insert(500001, 2)
-    data.insert(500002, 3)
-    did_b = iscc.data_id(data)
-    assert did_b == did_b
-    for x in range(100):  # insert 100 bytes random noise
-        data.insert(random.randint(0, 1000000), random.randint(0, 255))
-    did_c = iscc.data_id(data)
-    assert iscc.distance(did_a, did_c) == 1
-
-
-def test_instance_id():
-
-    empty = b""
-    iid, tail, size = iscc.instance_id(empty)
-    assert iid == "CRWTH7TBxg6Qh"
-    assert tail == "Fci9dzWk4tBUmB5mrQGog2g4XSWeaCNRo"
-    assert size == 0
-
-    zero_bytes_even = b"\x00" * 16
-    iid, tail, size = iscc.instance_id(zero_bytes_even)
-    assert iid == "CRfawXPpg9YBp"
-    assert isinstance(tail, str)
-    assert tail == "ZrmFgwsJob8e42xhRJaqTUhnCfYaCboWd"
-    assert size == len(zero_bytes_even)
-
-    ff_bytes_uneven = b"\xff" * 17
-    iid, tail, size = iscc.instance_id(ff_bytes_uneven)
-    assert iid == "CRD4vp2iBonAV"
-    assert tail == "2m5BB7r4iEbsikGfcgrVEqCKQqAVbR4X5"
-    assert size == len(ff_bytes_uneven)
-
-    more_bytes = b"\xcc" * 66000
-    iid, tail, size = iscc.instance_id(more_bytes)
-    assert tail == "3b1AFYxfRDyAjAyPNMTxnnXteFe6QgZfi"
-    assert iid == "CRBMtvBsphc8X"
-    assert size == len(more_bytes)
-
-
-def test_data_chunks():
-    with open("file_image_lenna.jpg", "rb") as infile:
-        chunks1 = list(iscc.data_chunks(infile))
-        infile.seek(0)
-        chunks2 = list(iscc.data_chunks(infile.read()))
-    assert len(chunks1) == 85
-    assert len(chunks1[0]) == 438
-    assert len(chunks1[-1]) == 255
-    assert len(chunks2) == 85
-    assert len(chunks2[0]) == 438
-    assert len(chunks2[-1]) == 255
 
 
 def test_content_id_image():

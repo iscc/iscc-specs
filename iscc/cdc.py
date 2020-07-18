@@ -22,7 +22,11 @@ def data_chunks(data):
     else:
         stream = data
 
-    buffer = memoryview(stream.read(READ_SIZE))
+    buffer = stream.read(READ_SIZE)
+    if not buffer:
+        yield b""
+
+    buffer = memoryview(buffer)
     while buffer:
         if len(buffer) <= MAX:
             buffer = memoryview(bytes(buffer) + stream.read(READ_SIZE))

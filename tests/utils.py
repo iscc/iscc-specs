@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-import io
+from io import BytesIO
 
 
 def static_bytes(n: int, block_size: int = 4) -> bytes:
@@ -12,7 +12,7 @@ def static_bytes(n: int, block_size: int = 4) -> bytes:
     :param int block_size: Block size in bytes (blocks begin with a counter)
     :return bytes: deterministic bytestring
     """
-    data = io.BytesIO()
+    data = BytesIO()
     i = 1
     while n > 0:
         ibytes = i.to_bytes(block_size, "little")

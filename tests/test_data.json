@@ -226,19 +226,19 @@
       "inputs": [
         "file_image_cat.jpg"
       ],
-      "outputs": "CDNf7JiKLTRuE"
+      "outputs": "CDUR6arkLezfe"
     },
     "test_002_file_image_cat_png": {
       "inputs": [
         "file_image_cat.png"
       ],
-      "outputs": "CD4XC3iFganbH"
+      "outputs": "CD8kRZ7Xp9qsE"
     },
     "test_003_file_image_cat_gif": {
       "inputs": [
         "file_image_cat.gif"
       ],
-      "outputs": "CDMnicYuSsTUn"
+      "outputs": "CDMBeNt8jCjZd"
     }
   },
   "image_normalize": {
