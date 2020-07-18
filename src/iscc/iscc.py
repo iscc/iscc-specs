@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
 """ISCC Reference Implementation"""
+import io
 from statistics import median
 import math
 import unicodedata
 from PIL import Image
 import xxhash
 from blake3 import blake3
-from iscc.merkle import tophash_size
 from iscc.params import *
 from iscc.cdc import data_chunks
 
@@ -140,10 +140,24 @@ def data_id(data):
 
 def instance_id(data):
 
-    if not data:
-        top_hash_digest, size = blake3(b"").digest(), 0
+    # Ensure we have a readable stream
+    if isinstance(data, str):
+        stream = open(data, "rb")
+    elif not hasattr(data, "read"):
+        stream = io.BytesIO(data)
     else:
-        top_hash_digest, size = tophash_size(data)
+        stream = data
+
+    size = 0
+    b3 = blake3()
+    while True:
+        d = stream.read(IID_READ_SIZE)
+        if not d:
+            break
+        b3.update(d)
+        size += len(d)
+
+    top_hash_digest = b3.digest()
 
     code = encode(HEAD_IID) + encode(top_hash_digest[:8])
     tail = encode(top_hash_digest[8:])

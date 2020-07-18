@@ -6,7 +6,6 @@ from io import BytesIO
 import pytest
 from PIL import Image, ImageFilter, ImageEnhance
 import iscc
-from iscc.merkle import tophash_size
 
 
 TESTS_PATH = os.path.dirname(os.path.realpath(__file__))
@@ -244,26 +243,21 @@ def test_instance_id():
 
     zero_bytes_even = b"\x00" * 16
     iid, tail, size = iscc.instance_id(zero_bytes_even)
-    assert iid == "CR4dVfEhVueAC"
+    assert iid == "CRfawXPpg9YBp"
     assert isinstance(tail, str)
-    assert tail == "42oz8gwmuKNwQdDvxVs4gxB8AhqfK3pK8"
+    assert tail == "ZrmFgwsJob8e42xhRJaqTUhnCfYaCboWd"
     assert size == len(zero_bytes_even)
 
     ff_bytes_uneven = b"\xff" * 17
     iid, tail, size = iscc.instance_id(ff_bytes_uneven)
-    assert iid == "CRD2Jq2bVVajv"
-    assert tail == "8YP4maSRAeBocUF2xJQRz7mHBGajkhwUh"
+    assert iid == "CRD4vp2iBonAV"
+    assert tail == "2m5BB7r4iEbsikGfcgrVEqCKQqAVbR4X5"
     assert size == len(ff_bytes_uneven)
 
     more_bytes = b"\xcc" * 66000
     iid, tail, size = iscc.instance_id(more_bytes)
-    assert tail == "FDg1Ru44ep8tUeQz4j2DYaLPCRvJcFKpQ"
-    assert iid == "CREC1QXDi95n1"
-    assert size == len(more_bytes)
-
-    digest = iscc.decode(iid)[1:] + iscc.decode(tail)
-    thash, size = tophash_size(more_bytes)
-    assert digest == thash
+    assert tail == "3b1AFYxfRDyAjAyPNMTxnnXteFe6QgZfi"
+    assert iid == "CRBMtvBsphc8X"
     assert size == len(more_bytes)
 
 

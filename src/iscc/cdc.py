@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
 """
 Content Defined Chunking
+
+Simple CDC implementation.
+Compatible with https://pypi.org/project/fastcdc/ v1.3.0
 """
 import io
 

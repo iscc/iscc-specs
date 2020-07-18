@@ -19,6 +19,9 @@ HEAD_IID = b"\x30"
 
 # Algorithm Constants
 
+# Instance-ID - Bytes to read per blake3 hash update.
+IID_READ_SIZE = 524288
+
 # Unicode categories to remove during text normalization
 UNICODE_FILTER = frozenset(
     {
