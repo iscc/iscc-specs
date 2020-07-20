@@ -226,19 +226,19 @@
       "inputs": [
         "file_image_cat.jpg"
       ],
-      "outputs": "CDUR6arkLezfe"
+      "outputs": "CDNf7JiKLTRuE"
     },
     "test_002_file_image_cat_png": {
       "inputs": [
         "file_image_cat.png"
       ],
-      "outputs": "CD8kRZ7Xp9qsE"
+      "outputs": "CD4XC3iFganbH"
     },
     "test_003_file_image_cat_gif": {
       "inputs": [
         "file_image_cat.gif"
       ],
-      "outputs": "CDMBeNt8jCjZd"
+      "outputs": "CDMnicYuSsTUn"
     }
   },
   "image_normalize": {
@@ -3664,7 +3664,7 @@
       ]
     }
   },
-  "minimum_hash": {
+  "minhash": {
     "required": false,
     "test_001_simple": {
       "inputs": [

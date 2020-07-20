@@ -7,6 +7,7 @@ import unicodedata
 from PIL import Image
 import xxhash
 from blake3 import blake3
+from iscc.minhash import minhash
 from iscc.params import *
 from iscc.cdc import data_chunks
 
@@ -57,13 +58,13 @@ def content_id_text(text, partial=False):
     ngrams = ("".join(l) for l in sliding_window(text, WINDOW_SIZE_CID_T))
 
     # 3. Create 32-bit features with xxHash32
-    features = (xxhash.xxh32_intdigest(s.encode("utf-8")) for s in ngrams)
+    features = [xxhash.xxh32_intdigest(s.encode("utf-8")) for s in ngrams]
 
     # 4. Apply minimum_hash
-    minhash = minimum_hash(features, n=64)
+    minimum_hash = minhash(features)
 
     # 5. Collect least significant bits of first 64 minhash signatures
-    lsb = "".join([str(x & 1) for x in minhash])
+    lsb = "".join([str(x & 1) for x in minimum_hash])
 
     # 6. Create 64-bit digests
     digest = int(lsb, 2).to_bytes(8, "big", signed=False)
@@ -119,11 +120,18 @@ def content_id_mixed(cids, partial=False):
 
 def data_id(data):
 
-    if not data:
-        data = b""
+    # 1. & 2. XxHash32 over CDC-Chunks
+    features = [xxhash.xxh32_intdigest(chunk) for chunk in data_chunks(data)]
 
-    hash_digests = [blake3(chunk).digest() for chunk in data_chunks(data)]
-    digest = similarity_hash(hash_digests)
+    # 3. Apply minimum_hash
+    minimum_hash = minhash(features)
+
+    # 4. Collect least significant bits
+    lsb = "".join([str(x & 1) for x in minimum_hash])
+
+    # 5. Create 64-bit digests
+    digest = int(lsb, 2).to_bytes(8, "big", signed=False)
+
     code = encode(HEAD_DID) + encode(digest[:8])
     return code
 
@@ -231,8 +239,6 @@ def similarity_hash(hash_digests):
     vector = [0] * n_bits
 
     for digest in hash_digests:
-
-        assert len(digest) == n_bytes
         h = int.from_bytes(digest, "big", signed=False)
 
         for i in range(n_bits):
@@ -246,17 +252,6 @@ def similarity_hash(hash_digests):
         shash |= int(vector[i] >= minfeatures) << i
 
     return shash.to_bytes(n_bytes, "big", signed=False)
-
-
-def minimum_hash(features, n=64):
-    features = list(features)
-    max_int64 = (1 << 64) - 1
-    mersenne_prime = (1 << 61) - 1
-    max_hash = (1 << 32) - 1
-    return [
-        min((((a * f + b) & max_int64) % mersenne_prime) & max_hash for f in features)
-        for a, b in MINHASH_PERMUTATIONS[:n]
-    ]
 
 
 def image_hash(pixels):

@@ -37,6 +37,8 @@ mkdocs-redirects = "^1.0.0"
 mkdocs-minify-plugin = "^0"
 mkdocs-git-revision-date-localized-plugin = "^0"
 black = "^19.10b0"
+codetiming = "^1.2.0"
+humanize = "^2.5.0"
 
 [build-system]
 requires = ["poetry>=1.0", "wheel"]

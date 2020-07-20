@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-import iscc
 from iscc import cdc
 from blake3 import blake3
 from tests.utils import static_bytes

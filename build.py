@@ -2,6 +2,7 @@
 """
 The shared library can also be built manually using the command:
 $ cythonize -X language_level=3 -a -i ./iscc/cdc.py
+$ cythonize -X language_level=3 -a -i ./iscc/minhash.py
 """
 from distutils.command.build_ext import build_ext
 
@@ -36,7 +37,7 @@ def build(setup_kwargs):
 
         setup_kwargs.update(
             dict(
-                ext_modules=cythonize(["./iscc/cdc.py"]),
+                ext_modules=cythonize(["./iscc/cdc.py", "./iscc/minhash.py"]),
                 cmdclass=dict(build_ext=BuildExt),
             )
         )

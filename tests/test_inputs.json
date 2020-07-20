@@ -215,7 +215,7 @@
             ]
         }
     },
-    "minimum_hash": {
+    "minhash": {
         "test_001_simple": {
             "inputs": [
                 [
