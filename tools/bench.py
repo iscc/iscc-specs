@@ -3,21 +3,31 @@ import os
 from codetiming import Timer
 from humanize import naturalsize
 import iscc
+from fauxfactory.factories.strings import gen_utf8
 
 
 GB1 = os.urandom(1048576 * 1000)
+TXT = gen_utf8(500_000)
 
 
 def benchmark(func, data):
     t = Timer(logger=None)
     num_bytes = len(data)
     t.start()
-    result = list(func(data))
+    _ = list(func(data))
     t.stop()
     throughput = naturalsize(num_bytes / t.last)
-    print("{}: {}/s".format(func.__name__, throughput))
+    print(
+        "{:<18} {:>8}/s ({} for {})".format(
+            func.__name__ + ":",
+            throughput,
+            t.text.format(t.last),
+            naturalsize(num_bytes),
+        )
+    )
 
 
 benchmark(iscc.instance_id, GB1)
 benchmark(iscc.data_chunks, GB1)
 benchmark(iscc.data_id, GB1)
+benchmark(iscc.content_id_text, TXT)
