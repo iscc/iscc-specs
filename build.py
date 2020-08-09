@@ -4,41 +4,16 @@ The shared library can also be built manually using the command:
 $ cythonize -X language_level=3 -a -i ./iscc/cdc.py
 $ cythonize -X language_level=3 -a -i ./iscc/minhash.py
 """
-from distutils.command.build_ext import build_ext
-
-
-class BuildExt(build_ext):
-    def run(self):
-        try:
-            print("Trying to compile C accelerator module")
-            build_ext.run(self)
-            print("Successfully comiled C accelerator module")
-        except Exception as e:
-            print(e)
-            print("************************************************************")
-            print("Cannot compile C accelerator module, use pure python version")
-            print("************************************************************")
-
-    def build_extensions(self):
-        try:
-            print("Trying to compile C accelerator module")
-            super().build_extensions()
-            print("Successfully comiled C accelerator module")
-        except Exception as e:
-            print(e)
-            print("************************************************************")
-            print("Cannot compile C accelerator module, use pure python version")
-            print("************************************************************")
 
 
 def build(setup_kwargs):
     try:
-        from Cython.Build import cythonize
+        from Cython.Build import cythonize, build_ext
 
         setup_kwargs.update(
             dict(
                 ext_modules=cythonize(["./iscc/cdc.py", "./iscc/minhash.py"]),
-                cmdclass=dict(build_ext=BuildExt),
+                cmdclass=dict(build_ext=build_ext),
             )
         )
     except Exception as e:
