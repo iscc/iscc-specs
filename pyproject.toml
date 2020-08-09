@@ -39,7 +39,8 @@ mkdocs-git-revision-date-localized-plugin = "^0"
 black = "^19.10b0"
 codetiming = "^1.2.0"
 humanize = "^2.5.0"
+fauxfactory = "^3.0.6"
 
 [build-system]
-requires = ["poetry>=1.0", "wheel"]
+requires = ["poetry>=1.0", "setuptools", "wheel", "cython"]
 build-backend = "poetry.masonry.api"
