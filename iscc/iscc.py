@@ -24,20 +24,20 @@ def meta_id(title, extra=""):
     extra_norm = text_normalize(extra)
 
     # 2. Trimming
-    title_trimmed = text_trim(title_norm)
-    extra_trimmed = text_trim(extra_norm)
+    title_trimmed = text_trim(title_norm, TITLE_TRIM)
+    extra_trimmed = text_trim(extra_norm, META_TRIM)
 
-    # 3. Concatenate
-    concat = "\u0020".join((title_trimmed, extra_trimmed)).strip()
+    title_n_grams = sliding_window(title_trimmed, width=WINDOW_SIZE_MID)
+    title_hash_digests = [blake3(s.encode("utf-8")).digest() for s in title_n_grams]
+    title_simhash_digest = similarity_hash(title_hash_digests)
 
-    # 4. Create a list of n-grams
-    n_grams = sliding_window(concat, width=WINDOW_SIZE_MID)
+    simhash_digest = title_simhash_digest[:8]
 
-    # 5. Encode n-grams and create xxhash64-digest
-    hash_digests = [xxhash.xxh64(s.encode("utf-8")).digest() for s in n_grams]
-
-    # 6. Apply similarity_hash
-    simhash_digest = similarity_hash(hash_digests)
+    if extra_trimmed:
+        extra_n_grams = sliding_window(extra_trimmed, width=WINDOW_SIZE_MID)
+        extra_hash_digests = [blake3(s.encode("utf-8")).digest() for s in extra_n_grams]
+        extra_simhash_digest = similarity_hash(extra_hash_digests)
+        simhash_digest = title_simhash_digest[:4] + extra_simhash_digest[:4]
 
     # 7. Prepend header-byte
     meta_id_digest = HEAD_MID + simhash_digest
@@ -168,9 +168,8 @@ def instance_id(data):
 ###############################################################################
 
 
-def text_trim(text):
-
-    return text.encode("utf-8")[:INPUT_TRIM].decode("utf-8", "ignore").strip()
+def text_trim(text, nbytes):
+    return text.encode("utf-8")[:nbytes].decode("utf-8", "ignore").strip()
 
 
 def text_normalize(text):

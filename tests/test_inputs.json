@@ -247,27 +247,27 @@
     "text_trim": {
         "test_001_empty": {
             "inputs": [
-                ""
+                "", 128
             ]
         },
         "test_002_long": {
             "inputs": [
-                "Ç가Ωℍ①︷i⁹¼ǆ⫝̸ȴȷɂćÇ가Ωℍ①︷i⁹¼ǆ⫝̸ȴȷɂć küßî ЌύБЇ ¡¢£¤ ƀƁƂƃƄƅƆƇ ɐɑɒɓɔ ʰʱʲʳʴʵʶʷʸ"
+                "Ç가Ωℍ①︷i⁹¼ǆ⫝̸ȴȷɂćÇ가Ωℍ①︷i⁹¼ǆ⫝̸ȴȷɂć küßî ЌύБЇ ¡¢£¤ ƀƁƂƃƄƅƆƇ ɐɑɒɓɔ ʰʱʲʳʴʵʶʷʸ", 128
             ]
         },
         "test_002_nbsp": {
             "inputs": [
-                " "
+                " ", 128
             ]
         },
         "test_003_full": {
             "inputs": [
-                "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquy"
+                "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquy", 128
             ]
         },
         "test_004_empty": {
             "inputs": [
-                "  leading and trailing spaces  "
+                "  leading and trailing spaces  ", 128
             ]
         }
     }

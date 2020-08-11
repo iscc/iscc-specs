@@ -3570,7 +3570,7 @@
         ""
       ],
       "outputs": [
-        "CCh2TW8YiFhSN",
+        "CCWTH7TBxg6Qh",
         "",
         ""
       ]
@@ -3581,7 +3581,7 @@
         ""
       ],
       "outputs": [
-        "CCAKevDpE1eEL",
+        "CCWkuc9ZnPtRt",
         "die unendliche geschichte",
         ""
       ]
@@ -3592,7 +3592,7 @@
         ""
       ],
       "outputs": [
-        "CCLKM919weGjo",
+        "CCK6WsKjraLtG",
         "die unendliche, geschichte",
         ""
       ]
@@ -3603,7 +3603,7 @@
         ""
       ],
       "outputs": [
-        "CCLKM919weGjo",
+        "CCK6WsKjraLtG",
         "die unendliche, geschichte",
         ""
       ]
@@ -3614,7 +3614,7 @@
         ""
       ],
       "outputs": [
-        "CCLKM919weGjo",
+        "CCK6WsKjraLtG",
         "die unendliche, geschichte",
         ""
       ]
@@ -3625,7 +3625,7 @@
         ""
       ],
       "outputs": [
-        "CCj3TQrYcgaox",
+        "CC2t3eMHJnS7r",
         "internationalizætiøn☃",
         ""
       ]
@@ -3636,7 +3636,7 @@
         "The Movie"
       ],
       "outputs": [
-        "CCaZR5BTJDK1k",
+        "CCWkuc9BuMxXW",
         "die unendliche geschichte",
         "the movie"
       ]
@@ -3647,7 +3647,7 @@
         ""
       ],
       "outputs": [
-        "CCU9WiMVCRBst",
+        "CC9CqDnR2f8HK",
         "lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquy",
         ""
       ]
@@ -3658,7 +3658,7 @@
         ""
       ],
       "outputs": [
-        "CCj3TioBiBzui",
+        "CC2t83G3iZBsT",
         "internationalizætiøn☃ internationalizætiøn☃ internationalizætiøn☃ internationalizætiøn☃ internationalizætiøn",
         ""
       ]
@@ -3774,31 +3774,36 @@
     "required": false,
     "test_001_empty": {
       "inputs": [
-        ""
+        "",
+        128
       ],
       "outputs": ""
     },
     "test_002_long": {
       "inputs": [
-        "Ç가Ωℍ①︷i⁹¼ǆ⫝̸ȴȷɂćÇ가Ωℍ①︷i⁹¼ǆ⫝̸ȴȷɂć küßî ЌύБЇ ¡¢£¤ ƀƁƂƃƄƅƆƇ ɐɑɒɓɔ ʰʱʲʳʴʵʶʷʸ"
+        "Ç가Ωℍ①︷i⁹¼ǆ⫝̸ȴȷɂćÇ가Ωℍ①︷i⁹¼ǆ⫝̸ȴȷɂć küßî ЌύБЇ ¡¢£¤ ƀƁƂƃƄƅƆƇ ɐɑɒɓɔ ʰʱʲʳʴʵʶʷʸ",
+        128
       ],
       "outputs": "Ç가Ωℍ①︷i⁹¼ǆ⫝̸ȴȷɂćÇ가Ωℍ①︷i⁹¼ǆ⫝̸ȴȷɂć küßî ЌύБЇ ¡¢£¤ ƀƁƂƃƄƅƆƇ ɐɑɒɓɔ ʰ"
     },
     "test_002_nbsp": {
       "inputs": [
-        " "
+        " ",
+        128
       ],
       "outputs": ""
     },
     "test_003_full": {
       "inputs": [
-        "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquy"
+        "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquy",
+        128
       ],
       "outputs": "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquy"
     },
     "test_004_empty": {
       "inputs": [
-        "  leading and trailing spaces  "
+        "  leading and trailing spaces  ",
+        128
       ],
       "outputs": "leading and trailing spaces"
     }

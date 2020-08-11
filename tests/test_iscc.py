@@ -57,26 +57,33 @@ def test_test_data():
 
 def test_meta_id():
     mid1, _, _ = iscc.meta_id("ISCC Content Identifiers")
-    assert mid1 == "CCDFPFc87MhdT"
+    assert mid1 == "CCbSJTQquHMj8"
 
     mid1, _, _ = iscc.meta_id(b"ISCC Content Identifiers")
-    assert mid1 == "CCDFPFc87MhdT"
+    assert mid1 == "CCbSJTQquHMj8"
 
     mid1, title, extra = iscc.meta_id("Die Unendliche Geschichte")
-    assert mid1 == "CCAKevDpE1eEL"
+    assert mid1 == "CCWkuc9ZnPtRt"
     assert title == "die unendliche geschichte"
     assert extra == ""
     mid2 = iscc.meta_id(" Die unéndlíche,  Geschichte ")[0]
     assert mid1 != mid2
 
     mid3 = iscc.meta_id("Die Unentliche Geschichte")[0]
-    assert iscc.distance(mid1, mid3) == 8
+    assert iscc.distance(mid1, mid3) == 11
 
     mid4 = iscc.meta_id("Geschichte, Die Unendliche")[0]
-    assert iscc.distance(mid1, mid4) == 9
+    assert iscc.distance(mid1, mid4) == 11
 
     with pytest.raises(UnicodeDecodeError):
         iscc.meta_id(b"\xc3\x28")
+
+
+def test_meta_id_composite():
+    mid1, _, _ = iscc.meta_id("This is some Title", "")
+    mid2, _, _ = iscc.meta_id("This is some Title", "And some extra metadata")
+    assert iscc.decode(mid1)[:5] == iscc.decode(mid2)[:5]
+    assert iscc.decode(mid1)[5:] != iscc.decode(mid2)[5:]
 
 
 def test_encode():
@@ -117,17 +124,17 @@ def test_text_normalize():
 
 def test_trim_text():
     multibyte_2 = "ü" * 128
-    trimmed = iscc.text_trim(multibyte_2)
+    trimmed = iscc.text_trim(multibyte_2, 128)
     assert 64 == len(trimmed)
     assert 128 == len(trimmed.encode("utf-8"))
 
     multibyte_3 = "驩" * 128
-    trimmed = iscc.text_trim(multibyte_3)
+    trimmed = iscc.text_trim(multibyte_3, 128)
     assert 42 == len(trimmed)
     assert 126 == len(trimmed.encode("utf-8"))
 
     mixed = "Iñtërnâtiônàlizætiøn☃💩" * 6
-    trimmed = iscc.text_trim(mixed)
+    trimmed = iscc.text_trim(mixed, 128)
     assert 85 == len(trimmed)
     assert 128 == len(trimmed.encode("utf-8"))
 
