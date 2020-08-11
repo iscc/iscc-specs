@@ -55,6 +55,6 @@ Pull requests and other contributions are welcome. Use the [Github Issues](https
 
 ## License
 
-All of documentation is licensed under the [CC-BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/).
+All of documentation is licensed under the [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/).
 
 Reference code is licensed under BSD-2-Clause.
