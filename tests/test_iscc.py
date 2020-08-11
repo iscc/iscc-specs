@@ -67,7 +67,7 @@ def test_meta_id():
     assert title == "die unendliche geschichte"
     assert extra == ""
     mid2 = iscc.meta_id(" Die unéndlíche,  Geschichte ")[0]
-    assert mid1 == mid2
+    assert mid1 != mid2
 
     mid3 = iscc.meta_id("Die Unentliche Geschichte")[0]
     assert iscc.distance(mid1, mid3) == 8
@@ -101,20 +101,18 @@ def test_content_id_text():
 
     cid_t_a = iscc.content_id_text(TEXT_A)
     cid_t_b = iscc.content_id_text(TEXT_B)
-    assert iscc.distance(cid_t_a, cid_t_b) == 1
+    assert iscc.distance(cid_t_a, cid_t_b) == 2
 
 
 def test_text_normalize():
     text = "  Iñtërnâtiôn\nàlizætiøn☃💩 –  is a tric\t ky \u00A0 thing!\r"
-    normalized = iscc.text_normalize(text, keep_ws=False)
-    assert normalized == "internationalizætiøn☃💩isatrickything"
 
-    normalized = iscc.text_normalize(text, keep_ws=True)
-    assert normalized == "internation alizætiøn☃💩 is a tric ky thing"
+    normalized = iscc.text_normalize(text)
+    assert normalized == "internation alizætiøn☃💩 is a tric ky thing!"
 
     assert iscc.text_normalize(" ") == ""
-    assert iscc.text_normalize("  Hello  World ? ", keep_ws=True) == "hello world"
-    assert iscc.text_normalize("Hello\nWorld", keep_ws=True) == "hello world"
+    assert iscc.text_normalize("  Hello  World ? ") == "hello world ?"
+    assert iscc.text_normalize("Hello\nWorld") == "hello world"
 
 
 def test_trim_text():
@@ -204,14 +202,14 @@ def test_content_id_mixed():
     cid_t_2 = iscc.content_id_text("Another Text")
 
     cid_m = iscc.content_id_mixed([cid_t_1])
-    assert cid_m == "CM3hmCp88AZZr"
+    assert cid_m == "CM3LGMnXJvEbR"
 
     cid_m = iscc.content_id_mixed([cid_t_1, cid_t_2])
-    assert cid_m == "CM3pL2R324Lgi"
+    assert cid_m == "CM3LiRzWqKMaK"
 
     cid_i = iscc.content_id_image("file_image_lenna.jpg")
     cid_m = iscc.content_id_mixed([cid_t_1, cid_t_2, cid_i])
-    assert cid_m == "CM3n42M2qyWoq"
+    assert cid_m == "CM3LG2sn7Znpf"
 
 
 def test_content_id_image():

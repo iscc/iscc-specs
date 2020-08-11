@@ -38,7 +38,6 @@ UNICODE_FILTER = frozenset(
         "Pe",
         "Pf",
         "Pi",
-        "Po",
         "Ps",
     }
 )

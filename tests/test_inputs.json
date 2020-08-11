@@ -235,22 +235,13 @@
     },
     "text_normalize": {
         "test_001_decompose": {
-            "inputs": [
-                "Ç 가 Ω ℍ ① ︷ i⁹ ¼ ǆ ⫝̸ ȴ ȷ ɂ ć",
-                false
-            ]
+            "inputs": ["Ç 가 Ω ℍ ① ︷ i⁹ ¼ ǆ ⫝̸ ȴ ȷ ɂ ć"]
         },
         "test_002_tricky": {
-            "inputs": [
-                "  Iñtërnâtiôn\nàlizætiøn☃💩 –  is a tric\t ky \u00A0 thing!\r",
-                false
-            ]
+            "inputs": ["  Iñtërnâtiôn\nàlizætiøn☃💩 –  is a tric\t ky \u00A0 thing!\r"]
         },
         "test_002_tricky_ws": {
-            "inputs": [
-                "  Iñtërnâtiôn\nàlizætiøn☃💩 –  is a tric\t ky \u00A0 thing!\r",
-                true
-            ]
+            "inputs": ["  Iñtërnâtiôn\nàlizætiøn☃💩 –  is a tric\t ky \u00A0 thing!\r"]
         }
     },
     "text_trim": {

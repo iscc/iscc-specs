@@ -20,8 +20,8 @@ from iscc.cdc import data_chunks
 def meta_id(title, extra=""):
 
     # 1. Normalization
-    title_norm = text_normalize(title, keep_ws=True)
-    extra_norm = text_normalize(extra, keep_ws=True)
+    title_norm = text_normalize(title)
+    extra_norm = text_normalize(extra)
 
     # 2. Trimming
     title_trimmed = text_trim(title_norm)
@@ -52,7 +52,7 @@ def meta_id(title, extra=""):
 def content_id_text(text, partial=False):
 
     # 1. Normalize (drop whitespace)
-    text = text_normalize(text, keep_ws=False)
+    text = text_normalize(text)
 
     # 2. Create 13 character n-grams
     ngrams = ("".join(l) for l in sliding_window(text, WINDOW_SIZE_CID_T))
@@ -173,7 +173,7 @@ def text_trim(text):
     return text.encode("utf-8")[:INPUT_TRIM].decode("utf-8", "ignore").strip()
 
 
-def text_normalize(text, keep_ws=False):
+def text_normalize(text):
 
     # 1. Convert bytes to str
     if isinstance(text, bytes):
@@ -198,11 +198,8 @@ def text_normalize(text, keep_ws=False):
             chars.append(c)
     text_filtered = "".join(chars)
 
-    # 6. Keep or remove whitespace (remove duplicate whitespace)
-    if keep_ws:
-        wsproc_text = " ".join(text_filtered.split())
-    else:
-        wsproc_text = "".join(text_filtered.split())
+    # 6. Collapse consecutive whitespace
+    wsproc_text = " ".join(text_filtered.split())
 
     # 7. Recombine
     recombined = unicodedata.normalize("NFKC", wsproc_text)
