@@ -7,6 +7,7 @@ import unicodedata
 from PIL import Image
 import xxhash
 from blake3 import blake3
+from more_itertools import interleave, sliced
 from iscc.minhash import minhash
 from iscc.params import *
 from iscc.cdc import data_chunks
@@ -24,29 +25,31 @@ def meta_id(title, extra=""):
     extra_norm = text_normalize(extra)
 
     # 2. Trimming
-    title_trimmed = text_trim(title_norm, TITLE_TRIM)
-    extra_trimmed = text_trim(extra_norm, META_TRIM)
+    title_trimmed = text_trim(title_norm, TRIM_TITLE)
+    extra_trimmed = text_trim(extra_norm, TRIM_EXTRA)
 
+    # 3. Simhash title
     title_n_grams = sliding_window(title_trimmed, width=WINDOW_SIZE_MID)
     title_hash_digests = [blake3(s.encode("utf-8")).digest() for s in title_n_grams]
-    title_simhash_digest = similarity_hash(title_hash_digests)
+    simhash_digest = similarity_hash(title_hash_digests)
 
-    simhash_digest = title_simhash_digest[:8]
-
+    # 4. Simhash extra metadata
     if extra_trimmed:
         extra_n_grams = sliding_window(extra_trimmed, width=WINDOW_SIZE_MID)
         extra_hash_digests = [blake3(s.encode("utf-8")).digest() for s in extra_n_grams]
         extra_simhash_digest = similarity_hash(extra_hash_digests)
-        simhash_digest = title_simhash_digest[:4] + extra_simhash_digest[:4]
+        simhash_digest = b"".join(
+            interleave(sliced(simhash_digest, 4), sliced(extra_simhash_digest, 4))
+        )
 
-    # 7. Prepend header-byte
-    meta_id_digest = HEAD_MID + simhash_digest
+    # 5. Prepend header
+    meta_id_digest = HEAD_MID + simhash_digest[:8]
 
-    # 8. Encode with base58_iscc
-    meta_id = encode(meta_id_digest)
+    # 6. Encode with base58_iscc
+    code = encode(meta_id_digest)
 
-    # 9. Return encoded Meta-ID, trimmed `title` and trimmed `extra` data.
-    return [meta_id, title_trimmed, extra_trimmed]
+    # 9. Return encoded Meta-ID, trimmed `title` and trimmed `extra` data and tail.
+    return [code, title_trimmed, extra_trimmed]
 
 
 def content_id_text(text, partial=False):
@@ -55,7 +58,7 @@ def content_id_text(text, partial=False):
     text = text_normalize(text)
 
     # 2. Create 13 character n-grams
-    ngrams = ("".join(l) for l in sliding_window(text, WINDOW_SIZE_CID_T))
+    ngrams = ("".join(chars) for chars in sliding_window(text, WINDOW_SIZE_CID_T))
 
     # 3. Create 32-bit features with xxHash32
     features = [xxhash.xxh32_intdigest(s.encode("utf-8")) for s in ngrams]
@@ -287,7 +290,7 @@ def sliding_window(seq, width):
 
     assert width >= 2, "Sliding window width must be 2 or bigger."
     idx = range(max(len(seq) - width + 1, 1))
-    return (seq[i : i + width] for i in idx)
+    return (seq[i:i + width] for i in idx)
 
 
 def dct(values_list):
