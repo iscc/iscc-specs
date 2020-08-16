@@ -357,7 +357,7 @@ mkdocs = ">=1.0.4"
 release = ["twine (1.13.0)"]
 
 [[package]]
-category = "dev"
+category = "main"
 description = "More routines for operating on iterables, beyond itertools"
 name = "more-itertools"
 optional = false
@@ -601,7 +601,7 @@ testing = ["jaraco.itertools", "func-timeout"]
 cython = ["cython"]
 
 [metadata]
-content-hash = "044437fcf4b6b1d1fd1b311c5942efc8fe21108fc3f63614a146021945004ac9"
+content-hash = "e61dd5c80c176e9ef3fdab18ae77ba480fd84f1d42f4d6fa8025c63cbea3e81d"
 lock-version = "1.0"
 python-versions = "^3.6"
 
