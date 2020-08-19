@@ -6,13 +6,14 @@ Simple CDC implementation.
 Compatible with https://pypi.org/project/fastcdc/ v1.3.0
 """
 import io
-
-########################################################################################
-# Top Level Content Defined Chunking Algorithm                                         #
-########################################################################################
+from math import log2
 
 
-def data_chunks(data):
+AVG_SIZE_DATA = 1024
+READ_SIZE = 262144
+
+
+def data_chunks(data, avg_size=AVG_SIZE_DATA, utf32=False, read_size=READ_SIZE):
 
     # Ensure we have a readable stream
     if isinstance(data, str):
@@ -22,52 +23,57 @@ def data_chunks(data):
     else:
         stream = data
 
-    buffer = stream.read(READ_SIZE)
+    buffer = stream.read(read_size)
     if not buffer:
         yield b""
 
+    mi, ma, cs, mask_s, mask_l = get_params(avg_size)
+
     buffer = memoryview(buffer)
     while buffer:
-        if len(buffer) <= MAX:
-            buffer = memoryview(bytes(buffer) + stream.read(READ_SIZE))
-        cut_point = cdc_offset(buffer)
-        chunk = buffer[:cut_point]
-        yield chunk
+        if len(buffer) <= ma:
+            buffer = memoryview(bytes(buffer) + stream.read(read_size))
+        cut_point = cdc_offset(buffer, mi, ma, cs, mask_s, mask_l)
+
+        # Make sure cut points are at 4-byte character boundaries
+        if utf32:
+            cut_point -= cut_point % 4
+
+        yield bytes(buffer[:cut_point])
         buffer = buffer[cut_point:]
 
 
-def cdc_offset(buffer):
+def cdc_offset(buffer, mi, ma, cs, mask_s, mask_l):
 
     pattern = 0
-    i = MIN
+    i = mi
     size = len(buffer)
-    barrier = min(CENTER_SIZE, size)
+    barrier = min(cs, size)
     while i < barrier:
         pattern = (pattern >> 1) + GEAR[buffer[i]]
-        if not pattern & MASK_S:
+        if not pattern & mask_s:
             return i + 1
         i += 1
-    barrier = min(MAX, size)
+    barrier = min(ma, size)
     while i < barrier:
         pattern = (pattern >> 1) + GEAR[buffer[i]]
-        if not pattern & MASK_L:
+        if not pattern & mask_l:
             return i + 1
         i += 1
     return i
 
 
-########################################################################################
-# Constants                                                                            #
-########################################################################################
-
-
-READ_SIZE = 262144
-AVG = 1024
-MIN = 256
-MAX = 8192
-CENTER_SIZE = 640
-MASK_S = 2047
-MASK_L = 511
+def get_params(avg_size):
+    ceil_div = lambda x, y: (x + y - 1) // y
+    mask = lambda b: 2 ** b - 1
+    min_size = avg_size // 4
+    max_size = avg_size * 8
+    offset = min_size + ceil_div(min_size, 2)
+    center_size = avg_size - offset
+    bits = round(log2(avg_size))
+    mask_s = mask(bits + 1)
+    mask_l = mask(bits - 1)
+    return min_size, max_size, center_size, mask_s, mask_l
 
 
 GEAR = [

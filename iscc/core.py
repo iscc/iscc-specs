@@ -290,7 +290,7 @@ def sliding_window(seq, width):
 
     assert width >= 2, "Sliding window width must be 2 or bigger."
     idx = range(max(len(seq) - width + 1, 1))
-    return (seq[i:i + width] for i in idx)
+    return (seq[i : i + width] for i in idx)
 
 
 def dct(values_list):

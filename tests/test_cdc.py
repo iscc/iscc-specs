@@ -86,3 +86,8 @@ def test_data_chunks_stream():
     assert len(chunks2) == 85
     assert len(chunks2[0]) == 438
     assert len(chunks2[-1]) == 255
+
+
+def test_get_params():
+    assert cdc.get_params(1024) == (256, 8192, 640, 2047, 511)
+    assert cdc.get_params(8192) == (2048, 65536, 5120, 16383, 4095)
