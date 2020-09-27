@@ -8,7 +8,7 @@ from PIL import Image
 import xxhash
 from blake3 import blake3
 from more_itertools import interleave, sliced
-from iscc.minhash import minhash
+from iscc.minhash import minhash_256
 from iscc.params import *
 from iscc.cdc import data_chunks
 
@@ -52,7 +52,7 @@ def meta_id(title, extra=""):
     return [code, title_trimmed, extra_trimmed]
 
 
-def content_id_text(text, partial=False):
+def content_id_text(text, partial=False, bits=64):
 
     # 1. Normalize (drop whitespace)
     text = text_normalize(text)
@@ -64,21 +64,15 @@ def content_id_text(text, partial=False):
     features = [xxhash.xxh32_intdigest(s.encode("utf-8")) for s in ngrams]
 
     # 4. Apply minimum_hash
-    minimum_hash = minhash(features)
+    digest = minhash_256(features)
 
-    # 5. Collect least significant bits of first 64 minhash signatures
-    lsb = "".join([str(x & 1) for x in minimum_hash])
-
-    # 6. Create 64-bit digests
-    digest = int(lsb, 2).to_bytes(8, "big", signed=False)
-
-    # 7. Encode digest with matching header
+    # 6. Encode digest with matching header
     if partial:
-        code = encode(HEAD_CID_T_PCF) + encode(digest)
+        code = encode(HEAD_CID_T_PCF) + encode(digest[: bits // 8])
     else:
-        code = encode(HEAD_CID_T) + encode(digest)
+        code = encode(HEAD_CID_T) + encode(digest[: bits // 8])
 
-    # 8. Return code
+    # 7. Return code
     return code
 
 
@@ -121,21 +115,17 @@ def content_id_mixed(cids, partial=False):
     return code
 
 
-def data_id(data):
+def data_id(data, bits=64):
 
     # 1. & 2. XxHash32 over CDC-Chunks
     features = [xxhash.xxh32_intdigest(chunk) for chunk in data_chunks(data)]
 
     # 3. Apply minimum_hash
-    minimum_hash = minhash(features)
+    digest = minhash_256(features)
 
-    # 4. Collect least significant bits
-    lsb = "".join([str(x & 1) for x in minimum_hash])
+    # 4. Encode with prepended component header
+    code = encode(HEAD_DID) + encode(digest[: bits // 8])
 
-    # 5. Create 64-bit digests
-    digest = int(lsb, 2).to_bytes(8, "big", signed=False)
-
-    code = encode(HEAD_DID) + encode(digest[:8])
     return code
 
 
