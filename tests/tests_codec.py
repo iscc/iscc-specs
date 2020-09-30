@@ -36,9 +36,9 @@ def test_iscc_header_raises():
 
 def test_encode_base32():
     assert encode_base32(b"") == ""
-    assert encode_base32(b"f") == "my"
-    assert encode_base32(b"fo") == "mzxq"
-    assert encode_base32(b"foo") == "mzxw6"
-    assert encode_base32(b"foob") == "mzxw6yq"
-    assert encode_base32(b"fooba") == "mzxw6ytb"
-    assert encode_base32(b"foobar") == "mzxw6ytboi"
+    assert encode_base32(b"f") == "MY"
+    assert encode_base32(b"fo") == "MZXQ"
+    assert encode_base32(b"foo") == "MZXW6"
+    assert encode_base32(b"foob") == "MZXW6YQ"
+    assert encode_base32(b"fooba") == "MZXW6YTB"
+    assert encode_base32(b"foobar") == "MZXW6YTBOI"

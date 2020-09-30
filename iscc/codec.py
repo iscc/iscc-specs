@@ -9,6 +9,7 @@ Header:
 Body:
     <hash-digest>
 """
+import os
 import iscc
 from base64 import b32encode, b32decode
 from typing import Callable, Tuple
@@ -40,6 +41,12 @@ ST_CHAIN_BTC = 1  # Sub-Type Bitcoin
 ST_CHAIN_ETH = 2  # Sub-Type Ethereum
 ST_CHAIN_CBL = 3  # Sub-Type Content Blockchain
 ST_CHAIN_BLX = 4  # Sub-Type Bloxberg
+
+# Base32 Alphabet
+BASE32_STANDARD = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567"
+BASE32_ISCC = "MBSGCFDHIJKLANRPQOETUVWXYZ234567"
+S2I = str.maketrans(BASE32_STANDARD, BASE32_ISCC)
+I2S = str.maketrans(BASE32_ISCC, BASE32_STANDARD)
 
 
 class ISCCHeader:
@@ -79,9 +86,13 @@ class ISCCHeader:
         ST_CHAIN_BLX: "bloxberg",
     }
 
-    def __init__(self, m_type: int, s_type: int, version: int = 0, length: int = 64):
+    def __init__(
+        self, m_type: int, s_type: int = 0, version: int = 0, length: int = 64
+    ):
         assert m_type in self.main_types, "Unknown MainType with id {}.".format(m_type)
-        assert length % 32 == 0, "Component length must be a multiple of 32 bits."
+        assert (
+            length % 32 == 0
+        ), f"Component length {length} must be a multiple of 32 bits."
         assert length <= 256, "Maximum Component length is currently 256 bits."
         self.m_type: int = m_type  # ISCC Component Main-Type
         self.s_type: int = s_type  # ISCC Component Sub-Type
@@ -136,7 +147,7 @@ class ISCCHeader:
 
     def __str__(self):
         """canonical base32 encoded string representation"""
-        return encode_base32(self.bytes)
+        return encode_base32(self.bytes + os.urandom(8))
 
     def __repr__(self):
         return "ISCCHeader({}, {}, {}, {})".format(
@@ -152,26 +163,28 @@ def pack_int(n: int) -> Bits:
 
 def unpack_header(data: bytes) -> Tuple[int, int, int, int]:
     """Unpack component header to type, subtype, version, length indexes"""
-    bits = Bits(data[:2], length=16)
+    bits = Bits(bytes=data[:2], length=16)
     main_type = bits[0:4].uint
     sub_type = bits[4:8].uint
     version = bits[8:12].uint
-    length = bits[12:16].uint
+    length = bits[12:16].uint * 32
     return main_type, sub_type, version, length
 
 
 def encode_base32(digest: bytes) -> str:
     """
-    Standard RFC4648 base32 encoding with padding and lower-case representation.
+    Standard RFC4648 base32 encoding without padding and with custom alphabet.
     """
-    return b32encode(digest).decode("ascii").rstrip("=").lower()
+    code = b32encode(digest).decode("ascii").rstrip("=")
+    return code.translate(S2I)
 
 
-def decode_base32(digest: str) -> bytes:
+def decode_base32(code: str) -> bytes:
     """
     Standard RFC4648 base32 decoding with casefolding.
     """
-    return b32decode(digest, casefold=True)
+    code = code.upper().translate(I2S)
+    return b32decode(code, casefold=True)
 
 
 def encode_component(digest: bytes, encoder: Callable = encode_base32) -> str:
@@ -182,38 +195,3 @@ def encode_component(digest: bytes, encoder: Callable = encode_base32) -> str:
 def decode_component(code: str, decoder: Callable = decode_base32) -> str:
     """Decode a single ISCC Component"""
     return decoder(code)
-
-
-if __name__ == "__main__":
-    header = ISCCHeader(MT_CC, ST_GMT_TXT, 0, 64)
-    print("ISCC Header: ", repr(header))
-    print("Humanized:     ", header.humanized)
-    print("Hex:           ", header.hex)
-    print("Base32:        ", header)
-    print("Base58-ISCC:   ", header.base58_iscc)
-    print("Bits:          ", header.bits)
-    print()
-    header = ISCCHeader(MT_ID, ST_CHAIN_BLX, 0, 64)
-    print("ISCC Header: ", repr(header))
-    print("Humanized:     ", header.humanized)
-    print("Hex:           ", header.hex)
-    print("Base32:        ", header)
-    print("Base58-ISCC:   ", header.base58_iscc)
-    print("Bits:          ", header.bits)
-    print()
-    header = ISCCHeader(MT_IC, ST_NONE, 0, 256)
-    print("ISCC Header: ", repr(header))
-    print("Humanized:     ", header.humanized)
-    print("Hex:           ", header.hex)
-    print("Base32:        ", header)
-    print("Base58-ISCC:   ", header.base58_iscc)
-    print("Bits:          ", header.bits)
-    print()
-    header = ISCCHeader(MT_ID, ST_CHAIN_CBL, 0, 64)
-    print("ISCC Header:   ", repr(header))
-    print("Humanized:     ", header.humanized)
-    print("Hex:           ", header.hex)
-    print("Base32:        ", header)
-    print("Base58-ISCC:   ", header.base58_iscc)
-    print("Bits:          ", header.bits)
-    print()
