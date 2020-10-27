@@ -17,12 +17,12 @@ from bitstring import Bits
 
 
 # ISCC Main-Types
-MT_MC = 0    #: Meta-Code
-MT_SC = 1    #: Semantic-Code
-MT_CC = 2    #: Content-Code
-MT_DC = 3    #: Data-Code
-MT_IC = 4    #: Instance-Code
-MT_ID = 5    #: ISCC-ID (Short-ID)
+MT_MC = 0  #: Meta-Code
+MT_SC = 1  #: Semantic-Code
+MT_CC = 2  #: Content-Code
+MT_DC = 3  #: Data-Code
+MT_IC = 4  #: Instance-Code
+MT_ID = 5  #: ISCC-ID (Short-ID)
 MT_ISCC = 6  #: ISCC-CODE (Fully Qualified ISCC Code)
 # ISCC Sub-Types
 
@@ -73,7 +73,7 @@ class ISCCHeader:
     }
 
     sub_types = {
-        ST_NONE: 'none',
+        ST_NONE: "none",
     }
 
     sub_types_cc = {
@@ -206,30 +206,30 @@ def decode_component(code: str, decoder: Callable = decode_base32) -> str:
     return decoder(code)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     mc_head = ISCCHeader(MT_MC, 0, 0, 64)
     mc_dig = mc_head.bytes + os.urandom(8)
-    print(encode_base32(mc_dig), '->', mc_head.humanized, '...')
+    print(encode_base32(mc_dig), "->", mc_head.humanized, "...")
 
     cid_head = ISCCHeader(MT_CC, ST_GMT_TXT, 0, 64)
     cid_dig = cid_head.bytes + os.urandom(8)
-    print(encode_base32(cid_dig), '->', cid_head.humanized, '...')
+    print(encode_base32(cid_dig), "->", cid_head.humanized, "...")
 
     did_head = ISCCHeader(MT_DC, ST_NONE, 0, 64)
     did_dig = did_head.bytes + os.urandom(8)
-    print(encode_base32(did_dig), '->', did_head.humanized, '...')
+    print(encode_base32(did_dig), "->", did_head.humanized, "...")
 
     iid_head = ISCCHeader(MT_IC, ST_NONE, 0, 128)
     iid_dig = iid_head.bytes + os.urandom(16)
-    print(encode_base32(iid_dig), '->', iid_head.humanized, '...')
+    print(encode_base32(iid_dig), "->", iid_head.humanized, "...")
 
     id_head = ISCCHeader(MT_ID, ST_CHAIN_BTC, 0, 32)
     id_dig = iid_head.bytes + os.urandom(4) + b"\x00"
-    print(encode_base32(id_dig), '->', id_head.humanized, '...')
+    print(encode_base32(id_dig), "->", id_head.humanized, "...")
 
     iscc_head = ISCCHeader(MT_ISCC, ST_GMT_IMG, 0, 256)
     iscc_dig = iscc_head.bytes + os.urandom(32)
-    print(encode_base32(iscc_dig), '->', iscc_head.humanized, '...')
+    print(encode_base32(iscc_dig), "->", iscc_head.humanized, "...")
 
     composit = mc_dig + cid_dig + did_dig + iid_dig[:10]
     print(encode_base32(composit))
