@@ -17,23 +17,24 @@ from bitstring import Bits
 
 
 # ISCC Main-Types
-MT_MC = 0  #: Meta-Code
-MT_SC = 1  #: Semantic-Code
-MT_CC = 2  #: Content-Code
-MT_DC = 3  #: Data-Code
-MT_IC = 4  #: Instance-Code
-MT_ID = 7  #: ISCC-ID (Short-ID)
-
+MT_MC = 0    #: Meta-Code
+MT_SC = 1    #: Semantic-Code
+MT_CC = 2    #: Content-Code
+MT_DC = 3    #: Data-Code
+MT_IC = 4    #: Instance-Code
+MT_ID = 5    #: ISCC-ID (Short-ID)
+MT_ISCC = 6  #: ISCC-CODE (Fully Qualified ISCC Code)
 # ISCC Sub-Types
 
 ST_NONE = 0  #: No Sub-Type
 
 # ISCC Generic Media Sub-Types (for Semantic-Code and Content-Code)
-ST_GMT_TXT = 1  #: Sub-Type Text
-ST_GMT_IMG = 2  #: Sub-Type Image
-ST_GMT_AUD = 3  #: Sub-Type Audio
-ST_GMT_VID = 4  #: Sub-Type Video
-
+ST_GMT_TXT = 0  #: Sub-Type Text
+ST_GMT_IMG = 1  #: Sub-Type Image
+ST_GMT_AUD = 2  #: Sub-Type Audio
+ST_GMT_VID = 3  #: Sub-Type Video
+ST_GMT_GEN = 4  #: Sub-Type Generic
+ST_GMT_MIX = 5  #: Sub-Type Mixed
 
 # ISCC Blockchain-IDs SubTypes (for ISCC-ID/Short-ID)
 ST_CHAIN_PRV = 0  # Sub-Type for testing or private use (no global uniqueness!!!)
@@ -52,7 +53,7 @@ I2S = str.maketrans(BASE32_ISCC, BASE32_STANDARD)
 class ISCCHeader:
     """
     The ISCC-Header has a minimum size of two bytes. It is structured as a sequence
-    of nibble based variable-length encoded integers.
+    of nibble (4-bit) based variable-length encoded integers.
 
     To support forward-compatibility the first bit of each nibble is reserved as a flag
     for a future multi-nibble variable-length encoding.
@@ -68,10 +69,14 @@ class ISCCHeader:
         MT_DC: "data-code",
         MT_IC: "instance-code",
         MT_ID: "iscc-id",
+        MT_ISCC: "iscc-code",
     }
 
     sub_types = {
-        ST_NONE: "none",
+        ST_NONE: 'none',
+    }
+
+    sub_types_cc = {
         ST_GMT_TXT: "text",
         ST_GMT_IMG: "image",
         ST_GMT_AUD: "audio",
@@ -112,7 +117,11 @@ class ISCCHeader:
     @property
     def humanized(self):
         """Return a human readable version of the header"""
-        if self.m_type == MT_ID:
+        if self.m_type == MT_MC:
+            s_type_name = self.sub_types[self.s_type]
+        elif self.m_type in (MT_CC, MT_ISCC):
+            s_type_name = self.sub_types_cc[self.s_type]
+        elif self.m_type == MT_ID:
             s_type_name = self.chain_ids[self.s_type]
         else:
             s_type_name = self.sub_types[self.s_type]
@@ -195,3 +204,32 @@ def encode_component(digest: bytes, encoder: Callable = encode_base32) -> str:
 def decode_component(code: str, decoder: Callable = decode_base32) -> str:
     """Decode a single ISCC Component"""
     return decoder(code)
+
+
+if __name__ == '__main__':
+    mc_head = ISCCHeader(MT_MC, 0, 0, 64)
+    mc_dig = mc_head.bytes + os.urandom(8)
+    print(encode_base32(mc_dig), '->', mc_head.humanized, '...')
+
+    cid_head = ISCCHeader(MT_CC, ST_GMT_TXT, 0, 64)
+    cid_dig = cid_head.bytes + os.urandom(8)
+    print(encode_base32(cid_dig), '->', cid_head.humanized, '...')
+
+    did_head = ISCCHeader(MT_DC, ST_NONE, 0, 64)
+    did_dig = did_head.bytes + os.urandom(8)
+    print(encode_base32(did_dig), '->', did_head.humanized, '...')
+
+    iid_head = ISCCHeader(MT_IC, ST_NONE, 0, 128)
+    iid_dig = iid_head.bytes + os.urandom(16)
+    print(encode_base32(iid_dig), '->', iid_head.humanized, '...')
+
+    id_head = ISCCHeader(MT_ID, ST_CHAIN_BTC, 0, 32)
+    id_dig = iid_head.bytes + os.urandom(4) + b"\x00"
+    print(encode_base32(id_dig), '->', id_head.humanized, '...')
+
+    iscc_head = ISCCHeader(MT_ISCC, ST_GMT_IMG, 0, 256)
+    iscc_dig = iscc_head.bytes + os.urandom(32)
+    print(encode_base32(iscc_dig), '->', iscc_head.humanized, '...')
+
+    composit = mc_dig + cid_dig + did_dig + iid_dig[:10]
+    print(encode_base32(composit))
