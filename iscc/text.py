@@ -24,8 +24,8 @@ def text_fingerprint(text: str, avg_size=AVG_SIZE_TEXT, ngram_size=NGRAM_SIZE):
     Create granular fingerprint for text (minhashes over cdc-chunks)
 
     :param str text: Normalized plaintext.
-    :param avg_size: Average chunk size vor detail hashes.
-    :param ngram_size: Sliding windows widht in number of characters.
+    :param avg_size: Average chunk size for detail hashes.
+    :param ngram_size: Sliding windows width in number of characters.
 
     """
     chunks = text_chunks(text, avg_size=avg_size)
