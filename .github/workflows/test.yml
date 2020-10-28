@@ -23,6 +23,9 @@ jobs:
     - name: Install poetry
       run: pip install poetry
 
+    - name: Configure poetry
+      run: poetry config experimental.new-installer false
+
     - name: Install dependencies
       run: poetry install
 
