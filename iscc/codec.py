@@ -209,27 +209,31 @@ def decode_component(code: str, decoder: Callable = decode_base32) -> str:
 if __name__ == "__main__":
     mc_head = ISCCHeader(MT_MC, 0, 0, 64)
     mc_dig = mc_head.bytes + os.urandom(8)
-    print(encode_base32(mc_dig), "->", mc_head.humanized, "...")
+    print("ISCC:" + encode_base32(mc_dig), "->", mc_head.humanized, "...")
 
     cid_head = ISCCHeader(MT_CC, ST_GMT_TXT, 0, 64)
     cid_dig = cid_head.bytes + os.urandom(8)
-    print(encode_base32(cid_dig), "->", cid_head.humanized, "...")
+    print("ISCC:" + encode_base32(cid_dig), "->", cid_head.humanized, "...")
 
     did_head = ISCCHeader(MT_DC, ST_NONE, 0, 64)
     did_dig = did_head.bytes + os.urandom(8)
-    print(encode_base32(did_dig), "->", did_head.humanized, "...")
+    print("ISCC:" + encode_base32(did_dig), "->", did_head.humanized, "...")
 
     iid_head = ISCCHeader(MT_IC, ST_NONE, 0, 128)
     iid_dig = iid_head.bytes + os.urandom(16)
-    print(encode_base32(iid_dig), "->", iid_head.humanized, "...")
+    print("ISCC:" + encode_base32(iid_dig), "->", iid_head.humanized, "...")
 
-    id_head = ISCCHeader(MT_ID, ST_CHAIN_BTC, 0, 32)
+    id_head = ISCCHeader(MT_ID, ST_CHAIN_BLX, 0, 32)
     id_dig = iid_head.bytes + os.urandom(4) + b"\x00"
-    print(encode_base32(id_dig), "->", id_head.humanized, "...")
+    print("ISCC:" + encode_base32(id_dig), "->", id_head.humanized, "...")
 
     iscc_head = ISCCHeader(MT_ISCC, ST_GMT_IMG, 0, 256)
     iscc_dig = iscc_head.bytes + os.urandom(32)
-    print(encode_base32(iscc_dig), "->", iscc_head.humanized, "...")
+    print("ISCC:" + encode_base32(iscc_dig), "->", iscc_head.humanized, "...")
 
     composit = mc_dig + cid_dig + did_dig + iid_dig[:10]
-    print(encode_base32(composit))
+    print("ISCC:" + encode_base32(composit))
+
+    idbw_header = ISCCHeader(MT_IC, ST_NONE, 0, 256)
+    idbw = encode_base32(idbw_header.bytes + os.urandom(32))
+    print(f'ISCC:{idbw} -> {idbw_header.humanized} (IDB-W)')
