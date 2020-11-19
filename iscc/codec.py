@@ -9,6 +9,7 @@ Header:
 Body:
     <hash-digest>
 """
+import math
 import os
 import iscc
 from base64 import b32encode, b32decode
@@ -24,8 +25,9 @@ MT_DC = 3  #: Data-Code
 MT_IC = 4  #: Instance-Code
 MT_ID = 5  #: ISCC-ID (Short-ID)
 MT_ISCC = 6  #: ISCC-CODE (Fully Qualified ISCC Code)
-# ISCC Sub-Types
 
+
+# ISCC Sub-Types
 ST_NONE = 0  #: No Sub-Type
 
 # ISCC Generic Media Sub-Types (for Semantic-Code and Content-Code)
@@ -42,12 +44,6 @@ ST_CHAIN_BTC = 1  # Sub-Type Bitcoin
 ST_CHAIN_ETH = 2  # Sub-Type Ethereum
 ST_CHAIN_CBL = 3  # Sub-Type Content Blockchain
 ST_CHAIN_BLX = 4  # Sub-Type Bloxberg
-
-# Base32 Alphabet
-BASE32_STANDARD = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567"
-BASE32_ISCC = "MBSGCFDHIJKLANRPQOETUVWXYZ234567"
-S2I = str.maketrans(BASE32_STANDARD, BASE32_ISCC)
-I2S = str.maketrans(BASE32_ISCC, BASE32_STANDARD)
 
 
 class ISCCHeader:
@@ -95,10 +91,10 @@ class ISCCHeader:
         self, m_type: int, s_type: int = 0, version: int = 0, length: int = 64
     ):
         assert m_type in self.main_types, "Unknown MainType with id {}.".format(m_type)
-        assert (
-            length % 32 == 0
-        ), f"Component length {length} must be a multiple of 32 bits."
-        assert length <= 256, "Maximum Component length is currently 256 bits."
+        assert length >= 32, f"Component length {length} must be at least 32bits."
+        is_power_of_two = (math.log2(length) - 5).is_integer()
+        assert is_power_of_two, f"Component length {length} must be power of two."
+        assert length <= 512, "Maximum Component length is currently 256 bits."
         self.m_type: int = m_type  # ISCC Component Main-Type
         self.s_type: int = s_type  # ISCC Component Sub-Type
         self.version: int = version  # ISCC Component Version
@@ -147,11 +143,11 @@ class ISCCHeader:
         return Bits(self.bytes).bin
 
     def __bytes__(self):
-        """Cast to ISCC Header to byte representation"""
+        """Cast ISCC Header to byte representation"""
         mt = pack_int(self.m_type)
         st = pack_int(self.s_type)
         ve = pack_int(self.version)
-        le = pack_int(self.length // 32 - 1)
+        le = pack_int(int(math.log2(self.length) - 5))
         return (mt + st + ve + le).tobytes()
 
     def __str__(self):
@@ -176,7 +172,7 @@ def unpack_header(data: bytes) -> Tuple[int, int, int, int]:
     main_type = bits[0:4].uint
     sub_type = bits[4:8].uint
     version = bits[8:12].uint
-    length = bits[12:16].uint * 32
+    length = 2 ** (5 + bits[12:16].uint)
     return main_type, sub_type, version, length
 
 
@@ -185,14 +181,13 @@ def encode_base32(digest: bytes) -> str:
     Standard RFC4648 base32 encoding without padding and with custom alphabet.
     """
     code = b32encode(digest).decode("ascii").rstrip("=")
-    return code.translate(S2I)
+    return code.lower()
 
 
 def decode_base32(code: str) -> bytes:
     """
     Standard RFC4648 base32 decoding with casefolding.
     """
-    code = code.upper().translate(I2S)
     return b32decode(code, casefold=True)
 
 
@@ -209,31 +204,28 @@ def decode_component(code: str, decoder: Callable = decode_base32) -> str:
 if __name__ == "__main__":
     mc_head = ISCCHeader(MT_MC, 0, 0, 64)
     mc_dig = mc_head.bytes + os.urandom(8)
-    print("ISCC:" + encode_base32(mc_dig), "->", mc_head.humanized, "...")
+    print("iscc:" + encode_base32(mc_dig), "->", mc_head.humanized, "...")
 
     cid_head = ISCCHeader(MT_CC, ST_GMT_TXT, 0, 64)
     cid_dig = cid_head.bytes + os.urandom(8)
-    print("ISCC:" + encode_base32(cid_dig), "->", cid_head.humanized, "...")
+    print("iscc:" + encode_base32(cid_dig), "->", cid_head.humanized, "...")
 
     did_head = ISCCHeader(MT_DC, ST_NONE, 0, 64)
     did_dig = did_head.bytes + os.urandom(8)
-    print("ISCC:" + encode_base32(did_dig), "->", did_head.humanized, "...")
+    print("iscc:" + encode_base32(did_dig), "->", did_head.humanized, "...")
 
     iid_head = ISCCHeader(MT_IC, ST_NONE, 0, 128)
     iid_dig = iid_head.bytes + os.urandom(16)
-    print("ISCC:" + encode_base32(iid_dig), "->", iid_head.humanized, "...")
+    print("iscc:" + encode_base32(iid_dig), "->", iid_head.humanized, "...")
 
     id_head = ISCCHeader(MT_ID, ST_CHAIN_BLX, 0, 32)
     id_dig = iid_head.bytes + os.urandom(4) + b"\x00"
-    print("ISCC:" + encode_base32(id_dig), "->", id_head.humanized, "...")
+    print("iscc:" + encode_base32(id_dig), "->", id_head.humanized, "...")
 
     iscc_head = ISCCHeader(MT_ISCC, ST_GMT_IMG, 0, 256)
     iscc_dig = iscc_head.bytes + os.urandom(32)
-    print("ISCC:" + encode_base32(iscc_dig), "->", iscc_head.humanized, "...")
+    print("iscc:" + encode_base32(iscc_dig), "->", iscc_head.humanized, "...")
 
-    composit = mc_dig + cid_dig + did_dig + iid_dig[:10]
-    print("ISCC:" + encode_base32(composit))
-
-    idbw_header = ISCCHeader(MT_IC, ST_NONE, 0, 256)
-    idbw = encode_base32(idbw_header.bytes + os.urandom(32))
-    print(f'ISCC:{idbw} -> {idbw_header.humanized} (IDB-W)')
+    iscc_head = ISCCHeader(MT_ISCC, ST_GMT_IMG, 0, 512)
+    iscc_dig = iscc_head.bytes + os.urandom(64)
+    print("iscc:" + encode_base32(iscc_dig), "->", iscc_head.humanized, "...")
