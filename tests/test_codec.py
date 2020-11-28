@@ -3,6 +3,29 @@ import pytest
 from iscc.codec import *
 
 
+def test_pack_int():
+
+    with pytest.raises(ValueError):
+        pack_int(-1)
+
+    assert pack_int(0) == Bits(bin="0000")
+    assert pack_int(7) == Bits(bin="0111")
+    assert pack_int(8) == Bits(bin="10000000")
+    assert pack_int(9) == Bits(bin="10000001")
+    assert pack_int(71) == Bits(bin="10111111")
+    assert pack_int(72) == Bits(bin="110000000000")
+    assert pack_int(73) == Bits(bin="110000000001")
+    assert pack_int(583) == Bits(bin="110111111111")
+    assert pack_int(584) == Bits(bin="1110000000000000")
+    assert pack_int(4679) == Bits(bin="1110111111111111")
+
+    with pytest.raises(ValueError):
+        pack_int(4680)
+
+    with pytest.raises(TypeError):
+        pack_int(1.0)
+
+
 def test_iscc_header_meta_code():
     header = ISCCHeader(MT_MC, ST_NONE)
     assert header.length == 64

@@ -161,9 +161,18 @@ class ISCCHeader:
 
 
 def pack_int(n: int) -> Bits:
-    """Pack positive integer into nibble sized bitvector"""
-    assert 8 > n >= 0, "Multi-nibble packing not yet supported. N must be between 0 & 7"
-    return Bits(uint=n, length=4)
+    """Pack positive integer with variable-sized nibble encoding"""
+
+    if 0 <= n < 8:
+        return Bits(uint=n, length=4)
+    if 8 <= n < 72:
+        return Bits(bin="10") + Bits(uint=n - 8, length=6)
+    if 72 <= n < 584:
+        return Bits(bin="110") + Bits(uint=n - 72, length=9)
+    if 584 <= n < 4680:
+        return Bits(bin="1110") + Bits(uint=n - 584, length=12)
+
+    raise ValueError("Value must be between 0 and 4679")
 
 
 def unpack_header(data: bytes) -> Tuple[int, int, int, int]:
@@ -181,7 +190,7 @@ def encode_base32(digest: bytes) -> str:
     Standard RFC4648 base32 encoding without padding and with custom alphabet.
     """
     code = b32encode(digest).decode("ascii").rstrip("=")
-    return code.lower()
+    return code
 
 
 def decode_base32(code: str) -> bytes:
@@ -205,27 +214,33 @@ if __name__ == "__main__":
     mc_head = ISCCHeader(MT_MC, 0, 0, 64)
     mc_dig = mc_head.bytes + os.urandom(8)
     print("iscc:" + encode_base32(mc_dig), "->", mc_head.humanized, "...")
+    print(mc_head.base58_iscc)
 
     cid_head = ISCCHeader(MT_CC, ST_GMT_TXT, 0, 64)
     cid_dig = cid_head.bytes + os.urandom(8)
-    print("iscc:" + encode_base32(cid_dig), "->", cid_head.humanized, "...")
+    print("ISCC:" + encode_base32(cid_dig), "->", cid_head.humanized, "...")
+    print(cid_head.base58_iscc)
 
     did_head = ISCCHeader(MT_DC, ST_NONE, 0, 64)
     did_dig = did_head.bytes + os.urandom(8)
-    print("iscc:" + encode_base32(did_dig), "->", did_head.humanized, "...")
+    print("ISCC:" + encode_base32(did_dig), "->", did_head.humanized, "...")
+    print(did_head.base58_iscc)
 
     iid_head = ISCCHeader(MT_IC, ST_NONE, 0, 128)
     iid_dig = iid_head.bytes + os.urandom(16)
-    print("iscc:" + encode_base32(iid_dig), "->", iid_head.humanized, "...")
+    print("ISCC:" + encode_base32(iid_dig), "->", iid_head.humanized, "...")
+    print(iid_head.base58_iscc)
 
     id_head = ISCCHeader(MT_ID, ST_CHAIN_BLX, 0, 32)
     id_dig = iid_head.bytes + os.urandom(4) + b"\x00"
-    print("iscc:" + encode_base32(id_dig), "->", id_head.humanized, "...")
+    print("ISCC:" + encode_base32(id_dig), "->", id_head.humanized, "...")
+    print(id_head.base58_iscc)
 
     iscc_head = ISCCHeader(MT_ISCC, ST_GMT_IMG, 0, 256)
     iscc_dig = iscc_head.bytes + os.urandom(32)
-    print("iscc:" + encode_base32(iscc_dig), "->", iscc_head.humanized, "...")
+    print("ISCC:" + encode_base32(iscc_dig), "->", iscc_head.humanized, "...")
+    print(iscc_head.base58_iscc)
 
     iscc_head = ISCCHeader(MT_ISCC, ST_GMT_IMG, 0, 512)
     iscc_dig = iscc_head.bytes + os.urandom(64)
-    print("iscc:" + encode_base32(iscc_dig), "->", iscc_head.humanized, "...")
+    print("ISCC:" + encode_base32(iscc_dig), "->", iscc_head.humanized, "...")
