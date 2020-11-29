@@ -44,11 +44,7 @@ def test_unpack_int():
 
     with pytest.raises(ValueError):
         unpack_int(Bits('0xf'))
-
-    with pytest.raises(TypeError):
-        unpack_int(1.0)
-
-
+ 
 def test_iscc_header_meta_code():
     header = ISCCHeader(MT_MC, ST_NONE)
     assert header.length == 64
