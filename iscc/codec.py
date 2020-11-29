@@ -174,6 +174,16 @@ def pack_int(n: int) -> Bits:
 
     raise ValueError("Value must be between 0 and 4679")
 
+def unpack_int(b: Bits) -> int:
+    if not b[0] and b.length = 4:
+        return b.uint
+    elif not b[1] and b.length = 8:
+        return b[2:8].uint + 8
+    elif not b[2] and b.length = 12:
+        return b[3:12].uint + 72 
+    elif not b[3] and b.length = 16:
+        return b[4:16].uint + 584 
+    raise ValueError("Invalid bytestring")
 
 def unpack_header(data: bytes) -> Tuple[int, int, int, int]:
     """Unpack component header to type, subtype, version, length indexes"""
