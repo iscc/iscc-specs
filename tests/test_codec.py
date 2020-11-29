@@ -29,22 +29,23 @@ def test_pack_int():
 def test_unpack_int():
 
     with pytest.raises(ValueError):
-        unpack_int(Bits(bin="1"))
+        unpack_bits(Bits(bin="1"))
 
-    assert unpack_int(Bits(bin="0000")) == 0
-    assert unpack_int(Bits(bin="0111")) == 7
-    assert unpack_int(Bits(bin="10000000")) == 8
-    assert unpack_int(Bits(bin="10000001")) == 9
-    assert unpack_int(Bits(bin="10111111")) == 71
-    assert unpack_int(Bits(bin="110000000000")) == 72
-    assert unpack_int(Bits(bin="110000000001")) == 73
-    assert unpack_int(Bits(bin="110111111111")) == 583
-    assert unpack_int(Bits(bin="1110000000000000")) == 584
-    assert unpack_int(Bits(bin="1110111111111111")) == 4679
+    assert unpack_bits(Bits(bin="0000")) == 0
+    assert unpack_bits(Bits(bin="0111")) == 7
+    assert unpack_bits(Bits(bin="10000000")) == 8
+    assert unpack_bits(Bits(bin="10000001")) == 9
+    assert unpack_bits(Bits(bin="10111111")) == 71
+    assert unpack_bits(Bits(bin="110000000000")) == 72
+    assert unpack_bits(Bits(bin="110000000001")) == 73
+    assert unpack_bits(Bits(bin="110111111111")) == 583
+    assert unpack_bits(Bits(bin="1110000000000000")) == 584
+    assert unpack_bits(Bits(bin="1110111111111111")) == 4679
 
     with pytest.raises(ValueError):
-        unpack_int(Bits('0xf'))
- 
+        unpack_bits(Bits("0xf"))
+
+
 def test_iscc_header_meta_code():
     header = ISCCHeader(MT_MC, ST_NONE)
     assert header.length == 64
