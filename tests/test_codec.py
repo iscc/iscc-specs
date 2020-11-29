@@ -25,6 +25,7 @@ def test_pack_int():
     with pytest.raises(TypeError):
         pack_int(1.0)
 
+
 def test_unpack_int():
 
     with pytest.raises(ValueError):

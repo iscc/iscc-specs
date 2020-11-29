@@ -174,14 +174,15 @@ def pack_int(n: int) -> Bits:
 
     raise ValueError("Value must be between 0 and 4679")
 
+
 def unpack_int(b: Bits) -> int:
-    if not b[0] and b.length == 4:
+    if b.length == 4 and not b[0]:
         return b.uint
-    elif not b[1] and b.length == 8:
+    elif b.length == 8 and not b[1]:
         return b[2:8].uint + 8
-    elif not b[2] and b.length == 12:
+    elif b.length == 12 and not b[2]:
         return b[3:12].uint + 72 
-    elif not b[3] and b.length == 16:
+    elif b.length == 16 and not b[3]:
         return b[4:16].uint + 584 
     raise ValueError("Invalid bytestring")
 
