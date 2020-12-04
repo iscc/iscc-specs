@@ -46,6 +46,51 @@ def test_unpack_int():
         unpack_bits(Bits("0xf"))
 
 
+def test_read_varnibble():
+
+    with pytest.raises(ValueError):
+        read_varnibble(Bits(bin="0"))
+
+    with pytest.raises(ValueError):
+        read_varnibble(Bits(bin="1"))
+
+    with pytest.raises(ValueError):
+        read_varnibble(Bits(bin="011"))
+
+    with pytest.raises(ValueError):
+        read_varnibble(Bits(bin="100"))
+
+    assert read_varnibble(Bits(bin="0000")) == (0, Bits())
+    assert read_varnibble(Bits(bin="000000")) == (0, Bits(bin="00"))
+
+    assert read_varnibble(Bits(bin="0111")) == (7, Bits())
+    assert read_varnibble(Bits(bin="01110")) == (7, Bits(bin="0"))
+    assert read_varnibble(Bits(bin="01111")) == (7, Bits(bin="1"))
+
+    assert read_varnibble(Bits(bin="10000000")) == (8, Bits())
+    assert read_varnibble(Bits(bin="10000001")) == (9, Bits())
+    assert read_varnibble(Bits(bin="10000001110")) == (9, Bits(bin="110"))
+
+    assert read_varnibble(Bits(bin="10111111")) == (71, Bits())
+    assert read_varnibble(Bits(bin="101111110")) == (71, Bits(bin="0"))
+
+    assert read_varnibble(Bits(bin="110000000000")) == (72, Bits())
+    assert read_varnibble(Bits(bin="11000000000010")) == (72, Bits(bin="10"))
+
+    assert read_varnibble(Bits(bin="110000000001")) == (73, Bits())
+    assert read_varnibble(Bits(bin="110000000001010")) == (73, Bits(bin="010"))
+
+    assert read_varnibble(Bits(bin="110111111111")) == (583, Bits())
+    assert read_varnibble(Bits(bin="1101111111111010")) == (583, Bits(bin="1010"))
+    assert read_varnibble(Bits(bin="1110000000000000")) == (584, Bits())
+    assert read_varnibble(Bits(bin="111000000000000001010")) == (584, Bits(bin="01010"))
+    assert read_varnibble(Bits(bin="1110111111111111")) == (4679, Bits())
+    assert read_varnibble(Bits(bin="1110111111111111101010")) == (
+        4679,
+        Bits(bin="101010"),
+    )
+
+
 def test_iscc_header_meta_code():
     header = ISCCHeader(MT_MC, ST_NONE)
     assert header.length == 64
