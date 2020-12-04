@@ -27,6 +27,7 @@ blake3 = "^0.1.5"
 cython = { version = "^0.29", optional = true }
 more-itertools = "^8.4.0"
 bitstring = "^3.1.7"
+bitarray-hardbyte = "^1.6.1"
 
 [tool.poetry.extras]
 cython = ["cython"]
