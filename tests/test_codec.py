@@ -1,132 +1,96 @@
 # -*- coding: utf-8 -*-
 import pytest
-from iscc.codec import *
+from iscc import codec as c
+from bitarray import bitarray as ba
 
 
-def test_pack_int():
-
-    with pytest.raises(ValueError):
-        pack_int(-1)
-
-    assert pack_int(0) == Bits(bin="0000")
-    assert pack_int(7) == Bits(bin="0111")
-    assert pack_int(8) == Bits(bin="10000000")
-    assert pack_int(9) == Bits(bin="10000001")
-    assert pack_int(71) == Bits(bin="10111111")
-    assert pack_int(72) == Bits(bin="110000000000")
-    assert pack_int(73) == Bits(bin="110000000001")
-    assert pack_int(583) == Bits(bin="110111111111")
-    assert pack_int(584) == Bits(bin="1110000000000000")
-    assert pack_int(4679) == Bits(bin="1110111111111111")
-
-    with pytest.raises(ValueError):
-        pack_int(4680)
-
-    with pytest.raises(TypeError):
-        pack_int(1.0)
-
-
-def test_unpack_int():
-
-    with pytest.raises(ValueError):
-        unpack_bits(Bits(bin="1"))
-
-    assert unpack_bits(Bits(bin="0000")) == 0
-    assert unpack_bits(Bits(bin="0111")) == 7
-    assert unpack_bits(Bits(bin="10000000")) == 8
-    assert unpack_bits(Bits(bin="10000001")) == 9
-    assert unpack_bits(Bits(bin="10111111")) == 71
-    assert unpack_bits(Bits(bin="110000000000")) == 72
-    assert unpack_bits(Bits(bin="110000000001")) == 73
-    assert unpack_bits(Bits(bin="110111111111")) == 583
-    assert unpack_bits(Bits(bin="1110000000000000")) == 584
-    assert unpack_bits(Bits(bin="1110111111111111")) == 4679
-
-    with pytest.raises(ValueError):
-        unpack_bits(Bits("0xf"))
-
-
-def test_read_varnibble():
-
-    with pytest.raises(ValueError):
-        read_varnibble(Bits(bin="0"))
-
-    with pytest.raises(ValueError):
-        read_varnibble(Bits(bin="1"))
-
-    with pytest.raises(ValueError):
-        read_varnibble(Bits(bin="011"))
-
-    with pytest.raises(ValueError):
-        read_varnibble(Bits(bin="100"))
-
-    assert read_varnibble(Bits(bin="0000")) == (0, Bits())
-    assert read_varnibble(Bits(bin="000000")) == (0, Bits(bin="00"))
-
-    assert read_varnibble(Bits(bin="0111")) == (7, Bits())
-    assert read_varnibble(Bits(bin="01110")) == (7, Bits(bin="0"))
-    assert read_varnibble(Bits(bin="01111")) == (7, Bits(bin="1"))
-
-    assert read_varnibble(Bits(bin="10000000")) == (8, Bits())
-    assert read_varnibble(Bits(bin="10000001")) == (9, Bits())
-    assert read_varnibble(Bits(bin="10000001110")) == (9, Bits(bin="110"))
-
-    assert read_varnibble(Bits(bin="10111111")) == (71, Bits())
-    assert read_varnibble(Bits(bin="101111110")) == (71, Bits(bin="0"))
-
-    assert read_varnibble(Bits(bin="110000000000")) == (72, Bits())
-    assert read_varnibble(Bits(bin="11000000000010")) == (72, Bits(bin="10"))
-
-    assert read_varnibble(Bits(bin="110000000001")) == (73, Bits())
-    assert read_varnibble(Bits(bin="110000000001010")) == (73, Bits(bin="010"))
-
-    assert read_varnibble(Bits(bin="110111111111")) == (583, Bits())
-    assert read_varnibble(Bits(bin="1101111111111010")) == (583, Bits(bin="1010"))
-    assert read_varnibble(Bits(bin="1110000000000000")) == (584, Bits())
-    assert read_varnibble(Bits(bin="111000000000000001010")) == (584, Bits(bin="01010"))
-    assert read_varnibble(Bits(bin="1110111111111111")) == (4679, Bits())
-    assert read_varnibble(Bits(bin="1110111111111111101010")) == (
-        4679,
-        Bits(bin="101010"),
-    )
-
-
-def test_iscc_header_meta_code():
-    header = ISCCHeader(MT_MC, ST_NONE)
-    assert header.length == 64
-    assert header.version == 0
-    assert header.humanized == "meta-code.none.v0.64bits"
-
-
-def test_iscc_header_content_code():
-    header = ISCCHeader(MT_CC, ST_GMT_TXT)
-    assert header.length == 64
-    assert header.version == 0
-    assert header.humanized == "content-code.text.v0.64bits"
-
-
-def test_iscc_header_version():
-    header = ISCCHeader(MT_MC, ST_NONE, 1)
-    assert header.version == 1
-    assert header.humanized == "meta-code.none.v1.64bits"
-
-
-def test_iscc_header_length():
-    header = ISCCHeader(MT_MC, ST_NONE, length=256)
-    assert header.length == 256
-    assert header.humanized.endswith("256bits")
-
-
-def test_iscc_header_raises():
+def test_write_header():
     with pytest.raises(AssertionError):
-        ISCCHeader(8, 8)
+        c.write_header(0, 0, 0, 0)
+    assert c.write_header(0, 0, 0, 32) == bytes([0b0000_0000, 0b0000_0000])
+    assert c.write_header(1, 0, 0, 32) == bytes([0b0001_0000, 0b0000_0000])
+    assert c.write_header(7, 1, 1, 64) == bytes([0b0111_0001, 0b0001_0001])
+    assert c.write_header(8, 1, 1, 64) == bytes([0b1000_0000, 0b0001_0001, 0b0001_0000])
+    assert c.write_header(8, 8, 1, 64) == bytes([0b1000_0000, 0b1000_0000, 0b0001_0001])
+
+
+def test_read_header():
+    rh = c.read_header
+    assert rh(bytes([0b0000_0000, 0b0000_0000])) == (0, 0, 0, 32, b"")
+    assert rh(bytes([0b0000_0000, 0b0000_0000, 0b0000_0000])) == (0, 0, 0, 32, b"\x00")
+    assert rh(bytes([0b0001_0000, 0b0000_0000])) == (1, 0, 0, 32, b"")
+    assert rh(bytes([0b0111_0001, 0b0001_0001])) == (7, 1, 1, 64, b"")
+    assert rh(bytes([0b1000_0000, 0b0001_0001, 0b0001_0000])) == (8, 1, 1, 64, b"")
+    assert rh(bytes([0b1000_0000, 0b1000_0000, 0b0001_0001])) == (8, 8, 1, 64, b"")
 
 
 def test_encode_base32():
-    assert encode_base32(b"") == ""
-    assert encode_base32(b"f") == "MY"
-    assert encode_base32(b"fo") == "MZXQ"
-    assert encode_base32(b"foo") == "MZXW6"
-    assert encode_base32(b"foob") == "MZXW6YQ"
-    assert encode_base32(b"fooba") == "MZXW6YTB"
-    assert encode_base32(b"foobar") == "MZXW6YTBOI"
+    assert c.encode_base32(b"") == ""
+    assert c.encode_base32(b"f") == "MY"
+    assert c.encode_base32(b"fo") == "MZXQ"
+    assert c.encode_base32(b"foo") == "MZXW6"
+    assert c.encode_base32(b"foob") == "MZXW6YQ"
+    assert c.encode_base32(b"fooba") == "MZXW6YTB"
+    assert c.encode_base32(b"foobar") == "MZXW6YTBOI"
+
+
+def test_decode_base32():
+    assert c.decode_base32("") == b""
+    assert c.decode_base32("MY") == b"f"
+    assert c.decode_base32("My") == b"f"
+    assert c.decode_base32("my") == b"f"
+    assert c.decode_base32("MZXQ") == b"fo"
+    assert c.decode_base32("MZXW6") == b"foo"
+    assert c.decode_base32("MZXW6YQ") == b"foob"
+    assert c.decode_base32("MZXW6YTB") == b"fooba"
+    assert c.decode_base32("MZXW6YTBOI") == b"foobar"
+
+
+def test_write_varnibble():
+    with pytest.raises(ValueError):
+        c._write_varnibble(-1)
+    assert c._write_varnibble(0) == ba("0000")
+    assert c._write_varnibble(7) == ba("0111")
+    assert c._write_varnibble(8) == ba("10000000")
+    assert c._write_varnibble(9) == ba("10000001")
+    assert c._write_varnibble(71) == ba("10111111")
+    assert c._write_varnibble(72) == ba("110000000000")
+    assert c._write_varnibble(73) == ba("110000000001")
+    assert c._write_varnibble(583) == ba("110111111111")
+    assert c._write_varnibble(584) == ba("1110000000000000")
+    assert c._write_varnibble(4679) == ba("1110111111111111")
+    with pytest.raises(ValueError):
+        c._write_varnibble(4680)
+    with pytest.raises(TypeError):
+        c._write_varnibble(1.0)
+
+
+def test_read_varnibble():
+    with pytest.raises(ValueError):
+        c._read_varnibble(ba("0"))
+    with pytest.raises(ValueError):
+        c._read_varnibble(ba("1"))
+    with pytest.raises(ValueError):
+        c._read_varnibble(ba("011"))
+    with pytest.raises(ValueError):
+        c._read_varnibble(ba("100"))
+    assert c._read_varnibble(ba("0000")) == (0, ba())
+    assert c._read_varnibble(ba("000000")) == (0, ba("00"))
+    assert c._read_varnibble(ba("0111")) == (7, ba())
+    assert c._read_varnibble(ba("01110")) == (7, ba("0"))
+    assert c._read_varnibble(ba("01111")) == (7, ba("1"))
+    assert c._read_varnibble(ba("10000000")) == (8, ba())
+    assert c._read_varnibble(ba("10000001")) == (9, ba())
+    assert c._read_varnibble(ba("10000001110")) == (9, ba("110"))
+    assert c._read_varnibble(ba("10111111")) == (71, ba())
+    assert c._read_varnibble(ba("101111110")) == (71, ba("0"))
+    assert c._read_varnibble(ba("110000000000")) == (72, ba())
+    assert c._read_varnibble(ba("11000000000010")) == (72, ba("10"))
+    assert c._read_varnibble(ba("110000000001")) == (73, ba())
+    assert c._read_varnibble(ba("110000000001010")) == (73, ba("010"))
+    assert c._read_varnibble(ba("110111111111")) == (583, ba())
+    assert c._read_varnibble(ba("1101111111111010")) == (583, ba("1010"))
+    assert c._read_varnibble(ba("1110000000000000")) == (584, ba())
+    assert c._read_varnibble(ba("111000000000000001010")) == (584, ba("01010"))
+    assert c._read_varnibble(ba("1110111111111111")) == (4679, ba())
+    assert c._read_varnibble(ba("1110111111111111101010")) == (4679, ba("101010"))
