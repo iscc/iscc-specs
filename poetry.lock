@@ -56,14 +56,6 @@ optional = false
 python-versions = "*"
 
 [[package]]
-name = "bitstring"
-version = "3.1.7"
-description = "Simple construction, analysis and modification of binary data."
-category = "main"
-optional = false
-python-versions = "*"
-
-[[package]]
 name = "black"
 version = "19.10b0"
 description = "The uncompromising code formatter."
@@ -599,7 +591,7 @@ cython = ["cython"]
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.6"
-content-hash = "a8c658701a64b1612042cdeef9bfc282eb6fd432e6bb4cc73c5e3196deb54547"
+content-hash = "570198b36bc7feecf7ffd43256fa62be28a4f9b1225b43ac38232e710e6972d8"
 
 [metadata.files]
 appdirs = [
@@ -663,9 +655,6 @@ bitarray-hardbyte = [
     {file = "bitarray_hardbyte-1.6.1-cp38-cp38-manylinux2010_x86_64.whl", hash = "sha256:e3996531f830e379190baaed34d3b30dea61299360b3a12d8a323ed0b89f8d26"},
     {file = "bitarray_hardbyte-1.6.1-cp38-cp38-win32.whl", hash = "sha256:b25136e165a128c36a61594d0975cc6435b8b6c72d8310294a1f32fc01676803"},
     {file = "bitarray_hardbyte-1.6.1-cp38-cp38-win_amd64.whl", hash = "sha256:cdb38127badd329faea1771e959be0eff2b4da9bf8c6c5f787060580bfa9b5bf"},
-]
-bitstring = [
-    {file = "bitstring-3.1.7.tar.gz", hash = "sha256:fdf3eb72b229d2864fb507f8f42b1b2c57af7ce5fec035972f9566de440a864a"},
 ]
 black = [
     {file = "black-19.10b0-py36-none-any.whl", hash = "sha256:1b30e59be925fafc1ee4565e5e08abef6b03fe455102883820fe5ee2e4734e0b"},

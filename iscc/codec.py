@@ -117,4 +117,4 @@ def _read_varnibble(b: bitarray) -> Tuple[int, bitarray]:
     if bits >= 16 and b[3] == 0:
         return ba2int(b[4:16]) + 584, b[16:]
 
-    raise ValueError("Invalid bitstring")
+    raise ValueError("Invalid bitarray")
