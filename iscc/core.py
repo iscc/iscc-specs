@@ -7,7 +7,7 @@ import unicodedata
 from PIL import Image
 import xxhash
 from blake3 import blake3
-from more_itertools import interleave, sliced
+from more_itertools import interleave, sliced, windowed
 from iscc.minhash import minhash_256
 from iscc.params import *
 from iscc.cdc import data_chunks
@@ -74,6 +74,23 @@ def content_id_text(text, partial=False, bits=64):
 
     # 7. Return code
     return code
+
+
+def content_id_audio(features, partial=False, bits=64):
+    digests = []
+
+    for int_features in windowed(features, 8, fillvalue=0):
+        digest = b""
+        for int_feature in int_features:
+            digest += int_feature.to_bytes(4, "big", signed=True)
+        digests.append(digest)
+    shash_digest = similarity_hash(digests)
+    n_bytes = bits // 8
+    if partial:
+        content_id_audio_digest = HEAD_CID_A_PCF + shash_digest[:n_bytes]
+    else:
+        content_id_audio_digest = HEAD_CID_A + shash_digest[:n_bytes]
+    return encode(content_id_audio_digest)
 
 
 def content_id_image(img, partial=False):

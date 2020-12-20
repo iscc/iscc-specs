@@ -119,6 +119,32 @@
             ]
         }
     },
+    "content_id_audio": {
+        "test_001_audio_empty": {
+            "inputs": [
+                [],
+                false
+            ]
+        },
+        "test_002_audio_one": {
+            "inputs": [
+                [1],
+                false
+            ]
+        },
+        "test_003_audio_two": {
+            "inputs": [
+                [1, 2],
+                false
+            ]
+        },
+        "test_003_audio_signed": {
+            "inputs": [
+                [-1, 0, 1],
+                false
+            ]
+        }
+    },
     "content_id_mixed": {
         "test_001_cid_t_one": {
             "inputs": [

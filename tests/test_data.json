@@ -1,4 +1,44 @@
 {
+  "content_id_audio": {
+    "required": false,
+    "test_001_audio_empty": {
+      "inputs": [
+        [],
+        false
+      ],
+      "outputs": "CFSVvzFyWvGoT"
+    },
+    "test_002_audio_one": {
+      "inputs": [
+        [
+          1
+        ],
+        false
+      ],
+      "outputs": "CFSVvzG63w6wD"
+    },
+    "test_003_audio_signed": {
+      "inputs": [
+        [
+          -1,
+          0,
+          1
+        ],
+        false
+      ],
+      "outputs": "CGW1wBpWb979M"
+    },
+    "test_003_audio_two": {
+      "inputs": [
+        [
+          1,
+          2
+        ],
+        false
+      ],
+      "outputs": "CFSVvzG63w6wb"
+    }
+  },
   "content_id_image": {
     "required": true,
     "test_001_file_image_pixel_png_transp_png": {
