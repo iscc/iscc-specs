@@ -11,7 +11,7 @@ from more_itertools import interleave, sliced, windowed
 from iscc.minhash import minhash_256
 from iscc.params import *
 from iscc.cdc import data_chunks
-
+from iscc.wtahash import wtahash
 
 ###############################################################################
 # Top-Level functions for generating ISCC Component Codes                     #
@@ -91,6 +91,18 @@ def content_id_audio(features, partial=False, bits=64):
     else:
         content_id_audio_digest = HEAD_CID_A + shash_digest[:n_bytes]
     return encode(content_id_audio_digest)
+
+
+def content_id_video(features, partial=False, bits=64):
+    sigs = set(features)
+    vecsum = [sum(col) for col in zip(*sigs)]
+    sh = wtahash(vecsum, hl=bits)
+    n_bytes = bits // 8
+    if partial:
+        content_id_video_digest = HEAD_CID_V_PCF + sh[:n_bytes]
+    else:
+        content_id_video_digest = HEAD_CID_V + sh[:n_bytes]
+    return encode(content_id_video_digest)
 
 
 def content_id_image(img, partial=False):
