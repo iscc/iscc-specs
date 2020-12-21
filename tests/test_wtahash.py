@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import pytest
 from iscc.wtahash import wtahash, wta_permutations, WTA_SEED, WTA_VIDEO_ID_PERMUTATIONS
 
 
@@ -50,3 +51,18 @@ def test_wtahash_256():
 def test_wtahash_prefix_stable():
     vec = tuple(reversed(range(380)))
     assert wtahash(vec, 256).hex()[:16] == wtahash(vec, 64).hex()
+
+
+def test_needs_two_uniques():
+    with pytest.raises(AssertionError):
+        wtahash([1, 1])
+
+
+def test_any_vector_length():
+    assert wtahash([1, 2], 64).hex() == "a4a91662a8728c07"
+    assert wtahash([1, 2], 128).hex() == "a4a91662a8728c07660bad1ceb784b2a"
+    assert wtahash(range(1024), 64).hex() == "a2582f1885555623"
+    assert (
+        wtahash(range(1024), 196).hex()
+        == "a2582f18855556238d26ba4b8c2c023687c3e81dc83c6128d0"
+    )
