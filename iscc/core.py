@@ -76,6 +76,24 @@ def content_id_text(text, partial=False, bits=64):
     return code
 
 
+def content_id_image(img, partial=False):
+
+    # 1. Normalize image to 2-dimensional pixel array
+    pixels = image_normalize(img)
+
+    # 2. Calculate image hash
+    hash_digest = image_hash(pixels)
+
+    # 3. Encode with component header
+    if partial:
+        code = encode(HEAD_CID_I_PCF) + encode(hash_digest)
+    else:
+        code = encode(HEAD_CID_I) + encode(hash_digest)
+
+    # 4. Return
+    return code
+
+
 def content_id_audio(features, partial=False, bits=64):
     digests = []
 
@@ -103,24 +121,6 @@ def content_id_video(features, partial=False, bits=64):
     else:
         content_id_video_digest = HEAD_CID_V + sh[:n_bytes]
     return encode(content_id_video_digest)
-
-
-def content_id_image(img, partial=False):
-
-    # 1. Normalize image to 2-dimensional pixel array
-    pixels = image_normalize(img)
-
-    # 2. Calculate image hash
-    hash_digest = image_hash(pixels)
-
-    # 3. Encode with component header
-    if partial:
-        code = encode(HEAD_CID_I_PCF) + encode(hash_digest)
-    else:
-        code = encode(HEAD_CID_I) + encode(hash_digest)
-
-    # 4. Return
-    return code
 
 
 def content_id_mixed(cids, partial=False):
