@@ -30,6 +30,7 @@ bitarray-hardbyte = "^1.6.1"
 bech32 = "^1.2.0"
 numpy = "<= 1.19.3"
 numba = { version = "^0.52.0", python = ">=3.6,<3.9", optional = true}
+loguru = "^0.5.3"
 
 
 [tool.poetry.extras]
