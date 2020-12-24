@@ -28,6 +28,9 @@ cython = { version = "^0.29", optional = true }
 more-itertools = "^8.4.0"
 bitarray-hardbyte = "^1.6.1"
 bech32 = "^1.2.0"
+numpy = "<= 1.19.3"
+numba = { version = "^0.52.0", optional = true}
+
 
 [tool.poetry.extras]
 cython = ["cython"]
