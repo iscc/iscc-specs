@@ -253,7 +253,7 @@ name = "llvmlite"
 version = "0.35.0"
 description = "lightweight wrapper around basic LLVM functionality"
 category = "main"
-optional = false
+optional = true
 python-versions = ">=3.6"
 
 [[package]]
@@ -408,7 +408,7 @@ name = "numba"
 version = "0.52.0"
 description = "compiling Python code using LLVM"
 category = "main"
-optional = false
+optional = true
 python-versions = ">=3.6,<3.9"
 
 [package.dependencies]
@@ -638,8 +638,8 @@ cython = ["cython"]
 
 [metadata]
 lock-version = "1.1"
-python-versions = ">=3.6,<3.9"
-content-hash = "c45cc190840d1ca216905edc89cb5e31dd1f63e31b8ca83280e79aeedd8fce31"
+python-versions = "^3.6"
+content-hash = "f326df632c000dc0b6a30d6828843e1f878fdaf675df1b787e6d035da8162376"
 
 [metadata.files]
 appdirs = [
