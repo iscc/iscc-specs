@@ -4,9 +4,11 @@
      https://www.ffmpeg.org/doxygen/3.4/vf__signature_8c_source.html
 
 """
-import numpy as np
-from dataclasses import dataclass
 import datetime
+from dataclasses import dataclass
+from fractions import Fraction
+from typing import Tuple, List
+import numpy as np
 from loguru import logger
 
 # try loading optional jit compiler for speedup
@@ -24,7 +26,7 @@ except ImportError:
         return do_nothing
 
     if __name__ == "__main__":
-        logger.debug("can not load numba")
+        logger.debug("can not load numba lib")
 
 
 @dataclass
@@ -32,7 +34,7 @@ class FFMpegFrameSignature:
     """datatype to return by read_ffmpeg_signature"""
 
     vectors: np.ndarray  # 380 vectors, range: 0..2
-    elapsed: datetime.timedelta  # time elapsed since start of video
+    elapsed: Fraction  # time elapsed since start of video
     confidence: int  # signature confidence, range: 0..255
 
 
@@ -51,7 +53,7 @@ def to_binary(byte_data: bytes) -> np.ndarray:
 
 
 @jit
-def pop_bits(data_bits: np.ndarray, pos: int, bits: int = 32) -> tuple:
+def pop_bits(data_bits: np.ndarray, pos: int, bits: int = 32) -> Tuple[int, int]:
     """take out 0/1 values and pack them again to an unsigned integer
     :param data_bits: 0/1 data
     :param pos: position in 0/1 data
@@ -66,7 +68,7 @@ def pop_bits(data_bits: np.ndarray, pos: int, bits: int = 32) -> tuple:
 
 
 @jit
-def pop_bit(data_bits: np.ndarray, pos: int) -> tuple:
+def pop_bit(data_bits: np.ndarray, pos: int) -> Tuple[int, int]:
     """take out 1 bit of 0/1 values
     :param data_bits: 0/1 data
     :param pos: position in 0/1 data
@@ -95,11 +97,13 @@ SIGELEM_SIZE = 380
 
 
 @jit
-def nada(s):
+def nada(_):
     pass
 
 
-def _read_ffmpeg_signature(byte_data: bytes, test_mode: bool, debug=nada) -> tuple:
+def _read_ffmpeg_signature(
+    byte_data: bytes, test_mode: bool, debug=nada
+) -> Tuple[List[np.ndarray], List[int], List[int], List[int]]:
     """read data from the binary FFMpeg signature
         return lists of: vectors, elapsed time, confidence
         there is one entry for each frame.
@@ -175,6 +179,7 @@ def _read_ffmpeg_signature(byte_data: bytes, test_mode: bool, debug=nada) -> tup
     frame_sigs_v = []
     frame_sigs_c = []
     frame_sigs_e = []
+    frame_sigs_tu = []
     # for (fs = sc->finesiglist; fs; fs = fs->next) {
     for i in range(num_of_frames):
         if test_mode:
@@ -211,18 +216,21 @@ def _read_ffmpeg_signature(byte_data: bytes, test_mode: bool, debug=nada) -> tup
             vec[p : p + 5] = table_3_bit[dat]
             p += 5
         frame_sigs_v.append(vec)
-        frame_sigs_e.append(raw_media_time / media_time_unit)
+        frame_sigs_e.append(raw_media_time)
         frame_sigs_c.append(frame_confidence)
+        frame_sigs_tu.append(media_time_unit)
         if test_mode:
             debug(vec)
             # /* frame signature */
             # for (i = 0; i < SIGELEM_SIZE/5; i++) {
             #     put_bits(&buf, 8, fs->framesig[i]);
 
-    return frame_sigs_v, frame_sigs_e, frame_sigs_c
+    return frame_sigs_v, frame_sigs_e, frame_sigs_c, frame_sigs_tu
 
 
-def read_ffmpeg_signature(byte_data: bytes, test_mode=False) -> list:
+def read_ffmpeg_signature(
+    byte_data: bytes, test_mode=False
+) -> List[FFMpegFrameSignature]:
     """wrapper for _read_ffmpeg_signature as numba code can not return a dataclass
 
     :param byte_data: actual ffmpeg signature data
@@ -234,11 +242,9 @@ def read_ffmpeg_signature(byte_data: bytes, test_mode=False) -> list:
     else:
         l = jit(_read_ffmpeg_signature)(byte_data, test_mode)
     frame_signatures = []
-    for v, e, c in zip(*l):
+    for v, e, c, tu in zip(*l):
         frame_signatures.append(
-            FFMpegFrameSignature(
-                vectors=v, elapsed=datetime.timedelta(seconds=e), confidence=c
-            )
+            FFMpegFrameSignature(vectors=v, elapsed=Fraction(e, tu), confidence=c)
         )
     return frame_signatures
 
