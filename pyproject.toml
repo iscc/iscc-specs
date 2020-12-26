@@ -14,40 +14,41 @@ classifiers=[
     "Intended Audience :: Developers",
     "License :: OSI Approved :: BSD License",
     "Natural Language :: English",
-    "Programming Language :: Python :: 3.5",
     "Programming Language :: Python :: 3.6",
     "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
 ]
 
 [tool.poetry.dependencies]
 python = "^3.6"
 xxhash = "^2"
 Pillow = "^8"
-blake3 = "^0.1.5"
+blake3 = "^0.1.8"
 cython = { version = "^0.29", optional = true }
-more-itertools = "^8.4.0"
-bitarray-hardbyte = "^1.6.1"
-bech32 = "^1.2.0"
-numpy = "<= 1.19.3"
-numba = { version = "0.52.0", python = ">=3.6,<3.9", optional = true}
-loguru = "^0.5.3"
-
+more-itertools = "^8.6"
+bitarray-hardbyte = "^1.6"
+bech32 = "^1.2"
+numpy = "<=1.19.3"
+numba = { version = "0.52", python = ">=3.6,<3.9", optional = true}
+loguru = "^0.5"
+imageio-ffmpeg = "^0.4.2"
 
 [tool.poetry.extras]
-cython = ["cython"]
+turbo = ["cython", "numba"]
 
 [tool.poetry.dev-dependencies]
 pytest = "^5"
 mkdocs = "^1"
 mkdocs-material = "^4"
-mkdocs-redirects = "^1.0.0"
+mkdocs-redirects = "^1"
 mkdocs-minify-plugin = "^0"
 mkdocs-git-revision-date-localized-plugin = "^0"
-black = "20.8b1"
-lxml = "4.6.2"
-codetiming = "^1.2.0"
-humanize = "^2.5.0"
-fauxfactory = "^3.0.6"
+black = { version = "*", allow-prereleases = true }
+lxml = "^4.6"
+codetiming = "^1.2"
+humanize = "^3.2"
+fauxfactory = "^3.1"
 
 [build-system]
 requires = ["poetry>=1.0", "setuptools", "wheel", "cython"]

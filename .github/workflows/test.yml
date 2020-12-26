@@ -23,9 +23,6 @@ jobs:
     - name: Install poetry
       run: pip install poetry
 
-    - name: Configure poetry
-      run: poetry config experimental.new-installer false
-
     - name: Install dependencies
       run: poetry install
 
@@ -33,7 +30,7 @@ jobs:
       run: poetry run pytest -q tests
 
     - name: Install dependencies with extras
-      run: poetry install --extras cython
+      run: poetry install --extras turbo
 
     - name: Run pytest
       run: poetry run pytest -q tests
