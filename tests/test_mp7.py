@@ -1,12 +1,9 @@
 # -*- coding: utf-8 -*-
 from lxml import etree
 import numpy as np
-import os
 
-os.environ["NUMBA_DISABLE_JIT"] = "1"
 from iscc.mp7 import read_ffmpeg_signature
 
-del os.environ["NUMBA_DISABLE_JIT"]
 from fractions import Fraction
 
 example_bin = "ffmpeg_signature.bin"
