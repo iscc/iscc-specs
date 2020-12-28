@@ -45,5 +45,5 @@ jobs:
     - name: Install dependencies with extras
       run: poetry install --extras turbo
 
-    - name: Run pytest
+    - name: Run pytest with extras
       run: poetry run pytest -q tests
