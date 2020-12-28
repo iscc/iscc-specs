@@ -100,7 +100,7 @@ SIGELEM_SIZE = 380
 def nada(_):
     pass
 
-
+@jit
 def _read_ffmpeg_signature(
     byte_data: bytes, test_mode: bool, debug=nada
 ) -> Tuple[List[np.ndarray], List[int], List[int], List[int]]:
@@ -240,7 +240,7 @@ def read_ffmpeg_signature(
     if test_mode:
         l = _read_ffmpeg_signature(byte_data, test_mode, debug=logger.debug)
     else:
-        l = jit(_read_ffmpeg_signature)(byte_data, test_mode)
+        l = _read_ffmpeg_signature(byte_data, test_mode)
     frame_signatures = []
     for v, e, c, tu in zip(*l):
         frame_signatures.append(
