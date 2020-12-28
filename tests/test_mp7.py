@@ -2,7 +2,9 @@
 from loguru import logger
 from lxml import etree
 import numpy as np
+
 from iscc.mp7 import read_ffmpeg_signature
+
 from fractions import Fraction
 
 

@@ -228,6 +228,52 @@ def _read_ffmpeg_signature(
     return frame_sigs_v, frame_sigs_e, frame_sigs_c, frame_sigs_tu
 
 
+@jit
+def _read_ffmpeg_signature_jit(
+    byte_data: bytes,
+) -> Tuple[List[np.ndarray], List[int], List[int], List[int]]:
+    """read data from the binary FFMpeg signature
+        return lists of: vectors, elapsed time, confidence
+        there is one entry for each frame.
+    :param byte_data: actual ffmpeg signature data
+    :param test_mode: basic data assert verification, print out details
+    :return: [vectors],[elapsed time],[confidence]
+    """
+
+    table_3_bit = calc_byte_to_bit3()
+    data_bits = to_binary(byte_data)
+    pos = 0
+    pos += 129
+    num_of_frames, pos = pop_bits(data_bits, pos)
+    media_time_unit, pos = pop_bits(data_bits, pos, 16)
+    pos += 1 + 32 + 32
+    num_of_segments, pos = pop_bits(data_bits, pos)
+    pos += num_of_segments * (4 * 32 + 1 + 5 * 243)
+    pos += 1
+    frame_sigs_v = []
+    frame_sigs_c = []
+    frame_sigs_e = []
+    frame_sigs_tu = []
+    # for (fs = sc->finesiglist; fs; fs = fs->next) {
+    for i in range(num_of_frames):
+        pos += 1
+        raw_media_time, pos = pop_bits(data_bits, pos)
+        frame_confidence, pos = pop_bits(data_bits, pos, 8)
+        pos += 5 * 8
+        vec = np.zeros((SIGELEM_SIZE,), dtype=np.uint8)
+        p = 0
+        for ii in range(SIGELEM_SIZE // 5):
+            dat, pos = pop_bits(data_bits, pos, 8)
+            vec[p : p + 5] = table_3_bit[dat]
+            p += 5
+        frame_sigs_v.append(vec)
+        frame_sigs_e.append(raw_media_time)
+        frame_sigs_c.append(frame_confidence)
+        frame_sigs_tu.append(media_time_unit)
+
+    return frame_sigs_v, frame_sigs_e, frame_sigs_c, frame_sigs_tu
+
+
 def read_ffmpeg_signature(
     byte_data: bytes, test_mode=False
 ) -> List[FFMpegFrameSignature]:
@@ -240,7 +286,7 @@ def read_ffmpeg_signature(
     if test_mode:
         l = _read_ffmpeg_signature(byte_data, test_mode, debug=logger.debug)
     else:
-        l = jit(_read_ffmpeg_signature)(byte_data, test_mode)
+        l = _read_ffmpeg_signature_jit(byte_data)
     frame_signatures = []
     for v, e, c, tu in zip(*l):
         frame_signatures.append(
@@ -256,7 +302,7 @@ if __name__ == "__main__":
     import time
 
     # without the jit compiling..
-    _ = read_ffmpeg_signature(byte_data=signature_byte_data)
+    # _ = read_ffmpeg_signature(byte_data=signature_byte_data)
 
     start = time.time()
     frame_signature = read_ffmpeg_signature(byte_data=signature_byte_data)
