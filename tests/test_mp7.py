@@ -1,11 +1,16 @@
 # -*- coding: utf-8 -*-
+from loguru import logger
 from lxml import etree
 import numpy as np
 from iscc.mp7 import read_ffmpeg_signature
 from fractions import Fraction
 
+
 example_bin = "ffmpeg_signature.bin"
 example_xml = "ffmpeg_signature.xml"
+
+
+logger.remove()
 
 
 def test_bin_integrity():

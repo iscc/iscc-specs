@@ -27,7 +27,7 @@ def test_compute_signature_with_crop():
 
 def test_signature_generator():
     gen = video.signature_generator()
-    with open(SAMPLE, 'rb') as infile:
+    with open(SAMPLE, "rb") as infile:
         data = infile.read(4096)
         while data:
             gen.send(data)
