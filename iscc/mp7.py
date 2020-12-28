@@ -100,6 +100,7 @@ SIGELEM_SIZE = 380
 def nada(_):
     pass
 
+
 @jit
 def _read_ffmpeg_signature(
     byte_data: bytes, test_mode: bool, debug=nada
