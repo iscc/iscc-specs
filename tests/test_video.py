@@ -37,10 +37,14 @@ def test_signature_generator():
     assert sigh == "021f4901f79bbb5c49edb0027103ec352f2bdb4feca53e6ce4f2f7d76c3dab5f"
 
 
-def test_content_id_video():
-    assert content_id_video([tuple(range(380))]) == "CTURv6NMw3oub"
+def test_compute_video_hash():
+    assert video.compute_video_hash([tuple(range(380))]).hex() == "528f91431f7c4ad2"
 
 
 def test_content_id_video_0_features():
     with pytest.raises(AssertionError):
-        content_id_video([tuple([0] * 380)])
+        video.compute_video_hash([tuple([0] * 380)])
+
+
+def test_content_id_video():
+    assert content_id_video(SAMPLE) == "CTWkQX8PEkdCd"

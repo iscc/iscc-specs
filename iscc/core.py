@@ -11,7 +11,10 @@ from more_itertools import interleave, sliced, windowed
 from iscc.minhash import minhash_256
 from iscc.params import *
 from iscc.cdc import data_chunks
-from iscc.wtahash import wtahash
+from iscc.utils import File, Streamable
+from iscc.mp7 import read_ffmpeg_signature
+from iscc.video import compute_video_hash, signature_generator
+
 
 ###############################################################################
 # Top-Level functions for generating ISCC Component Codes                     #
@@ -111,15 +114,19 @@ def content_id_audio(features, partial=False, bits=64):
     return encode(content_id_audio_digest)
 
 
-def content_id_video(features, partial=False, bits=64):
-    sigs = set(features)
-    vecsum = [sum(col) for col in zip(*sigs)]
-    sh = wtahash(vecsum, hl=bits)
-    n_bytes = bits // 8
-    if partial:
-        content_id_video_digest = HEAD_CID_V_PCF + sh[:n_bytes]
-    else:
-        content_id_video_digest = HEAD_CID_V + sh[:n_bytes]
+def content_id_video(video: File, bits=64) -> str:
+    read_size = 262144
+    sig_gen = signature_generator()
+    with Streamable(video) as stream:
+        data = stream.read(read_size)
+        while data:
+            sig_gen.send(data)
+            data = stream.read(read_size)
+    mp7sig = next(sig_gen)
+    frame_sigs = read_ffmpeg_signature(mp7sig)
+    features = [tuple(sig.vector.tolist()) for sig in frame_sigs]
+    video_hash = compute_video_hash(features)
+    content_id_video_digest = HEAD_CID_V + video_hash
     return encode(content_id_video_digest)
 
 

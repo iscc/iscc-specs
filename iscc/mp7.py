@@ -4,7 +4,6 @@
      https://www.ffmpeg.org/doxygen/3.4/vf__signature_8c_source.html
 
 """
-import datetime
 from dataclasses import dataclass
 from fractions import Fraction
 from typing import Tuple, List
@@ -33,7 +32,7 @@ except ImportError:
 class FFMpegFrameSignature:
     """datatype to return by read_ffmpeg_signature"""
 
-    vectors: np.ndarray  # 380 vectors, range: 0..2
+    vector: np.ndarray  # 380 dimensional vector, range: 0..2
     elapsed: Fraction  # time elapsed since start of video
     confidence: int  # signature confidence, range: 0..255
 
@@ -109,7 +108,7 @@ def _read_ffmpeg_signature(
         there is one entry for each frame.
     :param byte_data: actual ffmpeg signature data
     :param test_mode: basic data assert verification, print out details
-    :return: [vectors],[elapsed time],[confidence]
+    :return: [vector],[elapsed time],[confidence]
     """
 
     table_3_bit = calc_byte_to_bit3()
@@ -290,7 +289,7 @@ def read_ffmpeg_signature(
     frame_signatures = []
     for v, e, c, tu in zip(*l):
         frame_signatures.append(
-            FFMpegFrameSignature(vectors=v, elapsed=Fraction(e, tu), confidence=c)
+            FFMpegFrameSignature(vector=v, elapsed=Fraction(e, tu), confidence=c)
         )
     return frame_signatures
 

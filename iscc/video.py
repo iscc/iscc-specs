@@ -6,13 +6,22 @@ import sys
 from subprocess import Popen, PIPE, DEVNULL
 from os.path import basename, dirname
 from secrets import token_hex
-from typing import Generator
+from typing import Generator, Sequence, Tuple
 import imageio_ffmpeg
 from statistics import mode
 from iscc.utils import cd
+from iscc.wtahash import wtahash
 
 
 FFMPEG = imageio_ffmpeg.get_ffmpeg_exe()
+
+
+def compute_video_hash(features: Sequence[Tuple[int]], bits=64) -> bytes:
+    """Compute wta-hash for a list of frame signature vectors"""
+    sigs = set(features)
+    vecsum = [sum(col) for col in zip(*sigs)]
+    video_hash = wtahash(vecsum, hl=bits)
+    return video_hash
 
 
 def compute_signature(file_path: str, crop=None) -> bytes:

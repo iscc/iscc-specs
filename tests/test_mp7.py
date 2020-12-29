@@ -36,7 +36,7 @@ def test_all_signatures():
     l_bin = read_ffmpeg_signature(signature_byte_data)
     last_elapsed = Fraction(0, 1)
     for xml, bin in zip(l_xml, l_bin):
-        assert xml.all() == bin.vectors.all()
+        assert xml.all() == bin.vector.all()
         assert 0 <= bin.confidence <= 256
         assert last_elapsed <= bin.elapsed
         last_elapsed = bin.elapsed
