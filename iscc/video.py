@@ -6,9 +6,10 @@ import sys
 from subprocess import Popen, PIPE, DEVNULL
 from os.path import basename, dirname
 from secrets import token_hex
-from typing import Generator, Sequence, Tuple
+from typing import Generator, List, Sequence, Tuple
 import imageio_ffmpeg
 from statistics import mode
+from scenedetect import ContentDetector, SceneManager, VideoManager
 from iscc.utils import cd
 from iscc.wtahash import wtahash
 
@@ -80,3 +81,23 @@ def detect_crop(file_path: str) -> str:
         if line.startswith("[Parsed_cropdetect")
     ]
     return mode(crops)
+
+
+def detect_scenes(video) -> List[str]:
+    video_manager = VideoManager([video])
+    scene_manager = SceneManager()
+    scene_manager.add_detector(ContentDetector(threshold=50.0, min_scene_len=15))
+    base_timecode = video_manager.get_base_timecode()
+    video_manager.set_downscale_factor()
+    video_manager.start()
+    scene_manager.detect_scenes(frame_source=video_manager, show_progress=False)
+    slist = scene_manager.get_cut_list(base_timecode)
+    return [ft.get_timecode() for ft in slist]
+
+
+if __name__ == "__main__":
+    from pprint import pprint
+
+    scenes = detect_scenes("../tests/test.3gp")
+    print(len(scenes))
+    pprint(scenes)

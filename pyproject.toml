@@ -34,6 +34,7 @@ numba = { version = "0.52", python = ">=3.6,<3.9", optional = true}
 loguru = "^0.5"
 imageio-ffmpeg = "^0.4.2"
 pydantic = "^1.7.3"
+scenedetect = {extras = ["opencv-headless"], version = "^0.5.4"}
 
 [tool.poetry.extras]
 turbo = ["cython", "numba"]

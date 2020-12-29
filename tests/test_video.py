@@ -48,3 +48,17 @@ def test_content_id_video_0_features():
 
 def test_content_id_video():
     assert content_id_video(SAMPLE) == "CTWkQX8PEkdCd"
+
+
+def test_detect_scenes():
+    assert video.detect_scenes(SAMPLE) == [
+        '00:00:07.625',
+        '00:00:10.125',
+        '00:00:15.208',
+        '00:00:16.458',
+        '00:00:20.208',
+        '00:00:23.000',
+        '00:00:38.458',
+        '00:00:46.625',
+        '00:00:59.667',
+    ]
