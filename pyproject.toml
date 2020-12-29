@@ -33,6 +33,7 @@ numpy = "<=1.19.3"
 numba = { version = "0.52", python = ">=3.6,<3.9", optional = true}
 loguru = "^0.5"
 imageio-ffmpeg = "^0.4.2"
+pydantic = "^1.7.3"
 
 [tool.poetry.extras]
 turbo = ["cython", "numba"]
