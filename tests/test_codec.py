@@ -46,6 +46,26 @@ def test_decode_base32():
     assert c.decode_base32("MZXW6YTBOI") == b"foobar"
 
 
+def test_encode_base64():
+    assert c.encode_base64(b"") == ""
+    assert c.encode_base64(b"f") == "Zg"
+    assert c.encode_base64(b"fo") == "Zm8"
+    assert c.encode_base64(b"foo") == "Zm9v"
+    assert c.encode_base64(b"foob") == "Zm9vYg"
+    assert c.encode_base64(b"fooba") == "Zm9vYmE"
+    assert c.encode_base64(b"foobar") == "Zm9vYmFy"
+
+
+def test_decode_base64():
+    assert c.decode_base64("") == b""
+    assert c.decode_base64("Zg") == b"f"
+    assert c.decode_base64("Zm8") == b"fo"
+    assert c.decode_base64("Zm9v") == b"foo"
+    assert c.decode_base64("Zm9vYg") == b"foob"
+    assert c.decode_base64("Zm9vYmE") == b"fooba"
+    assert c.decode_base64("Zm9vYmFy") == b"foobar"
+
+
 def test_write_varnibble():
     with pytest.raises(ValueError):
         c._write_varnibble(-1)

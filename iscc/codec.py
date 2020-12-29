@@ -9,6 +9,7 @@ Header:
 Body:
     <hash-digest> with number of bits as indicated byi <length>
 """
+import base64
 from typing import Tuple
 from bitarray import bitarray
 from bitarray.util import int2ba, ba2int
@@ -60,7 +61,7 @@ def read_header(data: bytes) -> Tuple[int, int, int, int, bytes]:
     return tuple(result)
 
 
-def encode_base32(data):
+def encode_base32(data: bytes) -> str:
     """
     Standard RFC4648 base32 encoding without padding.
     """
@@ -68,7 +69,7 @@ def encode_base32(data):
     return "".join([BASE32_CHARSET[c] for c in b32])
 
 
-def decode_base32(code):
+def decode_base32(code: str) -> bytes:
     """
     Standard RFC4648 base32 decoding without padding and with casefolding.
     """
@@ -76,6 +77,23 @@ def decode_base32(code):
     data = [BASE32_CHARSET.find(c) for c in code]
     dec = convertbits(data, 5, 8, False)
     return bytes(dec)
+
+
+def encode_base64(data: bytes) -> str:
+    """
+    Standard RFC4648 base64url encoding without padding.
+    """
+    code = base64.urlsafe_b64encode(data).decode("ascii")
+    return code.rstrip("=")
+
+
+def decode_base64(code: str) -> bytes:
+    """
+    Standard RFC4648 base64url decoding without padding.
+    """
+    padding = 4 - (len(code) % 4)
+    string = code + ("=" * padding)
+    return base64.urlsafe_b64decode(string)
 
 
 def _write_varnibble(n: int) -> bitarray:
