@@ -42,7 +42,7 @@ def compute_signature(file_path: str, crop=None) -> bytes:
 
 
 def signature_generator() -> Generator:
-    """Streaming signature generator (use gen.send(chunk)."""
+    """Streaming signature generator (use gen.send(chunk))."""
 
     def raw_generator():
         sigfile = token_hex(16) + ".bin"

@@ -42,7 +42,7 @@ def wta_permutations(seed=WTA_SEED, vl=380, n=256) -> Tuple:
     return tuple(perms)
 
 
-# For reference in case python pseudorandom genarator becomes unstable
+# For reference and in case python pseudorandom genarator becomes unstable
 WTA_VIDEO_ID_PERMUTATIONS = (
     (292, 16),
     (219, 247),
