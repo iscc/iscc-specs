@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 import pytest
+from scenedetect import FrameTimecode
+
 from iscc.core import content_id_video
 from iscc import video
 from blake3 import blake3
@@ -52,13 +54,13 @@ def test_content_id_video():
 
 def test_detect_scenes():
     assert video.detect_scenes(SAMPLE) == [
-        '00:00:07.625',
-        '00:00:10.125',
-        '00:00:15.208',
-        '00:00:16.458',
-        '00:00:20.208',
-        '00:00:23.000',
-        '00:00:38.458',
-        '00:00:46.625',
-        '00:00:59.667',
+        FrameTimecode(timecode=183, fps=24),
+        FrameTimecode(timecode=243, fps=24),
+        FrameTimecode(timecode=365, fps=24),
+        FrameTimecode(timecode=395, fps=24),
+        FrameTimecode(timecode=485, fps=24),
+        FrameTimecode(timecode=552, fps=24),
+        FrameTimecode(timecode=923, fps=24),
+        FrameTimecode(timecode=1119, fps=24),
+        FrameTimecode(timecode=1432, fps=24),
     ]

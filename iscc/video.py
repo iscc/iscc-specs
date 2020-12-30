@@ -9,7 +9,7 @@ from secrets import token_hex
 from typing import Generator, List, Sequence, Tuple
 import imageio_ffmpeg
 from statistics import mode
-from scenedetect import ContentDetector, SceneManager, VideoManager
+from scenedetect import ContentDetector, FrameTimecode, SceneManager, VideoManager
 from iscc.utils import cd
 from iscc.wtahash import wtahash
 
@@ -83,7 +83,7 @@ def detect_crop(file_path: str) -> str:
     return mode(crops)
 
 
-def detect_scenes(video) -> List[str]:
+def detect_scenes(video) -> List[FrameTimecode]:
     video_manager = VideoManager([video])
     scene_manager = SceneManager()
     scene_manager.add_detector(ContentDetector(threshold=50.0, min_scene_len=15))
@@ -91,8 +91,7 @@ def detect_scenes(video) -> List[str]:
     video_manager.set_downscale_factor()
     video_manager.start()
     scene_manager.detect_scenes(frame_source=video_manager, show_progress=False)
-    slist = scene_manager.get_cut_list(base_timecode)
-    return [ft.get_timecode() for ft in slist]
+    return scene_manager.get_cut_list(base_timecode)
 
 
 if __name__ == "__main__":
