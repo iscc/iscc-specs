@@ -5,7 +5,6 @@ from pydantic import BaseModel, Field
 DEFAULT_WINDOW = 7
 DEFAULT_OVERLAP = 3
 FEATURE_REGEX = "^[-A-Za-z0-9_]{11}"
-TIMECODE_REGEX = "(^(?:(?:[0-1][0-9]|[0-2][0-3]):)(?:[0-5][0-9]:){2}(?:[0-2][0-9])$)"
 
 
 class Features(BaseModel):
@@ -14,8 +13,8 @@ class Features(BaseModel):
     If only a list of features is provided it is assumed that those have been created
     with the default values for 'window' and 'overlap'.
 
-    If timecodes are provided it is assumed that we deal with custom segment sizes
-    based on scene detection.
+    If sizes are provided it is assumed that we deal with custom segment sizes
+    based on content aware chunking.
     """
 
     features: List[str] = Field(
@@ -24,13 +23,14 @@ class Features(BaseModel):
         min_items=1,
     )
     window: Optional[int] = Field(
-        DEFAULT_WINDOW, description="Windows size of feature segments"
+        DEFAULT_WINDOW, description="Window size of feature segments",
     )
     overlap: Optional[int] = Field(
-        DEFAULT_OVERLAP, description="Overlap size of feature segments"
+        DEFAULT_OVERLAP, description="Overlap size of feature segments",
     )
-    timecodes: Optional[List[str]] = Field(
-        description="Timecodes of features (SMTPE)", regex=TIMECODE_REGEX
+    sizes: Optional[List[int]] = Field(
+        description="Sizes of segmets used for feature calculation",
+        min_items=1,
     )
 
 
