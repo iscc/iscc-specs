@@ -29,7 +29,7 @@ except ImportError:
 
 
 @dataclass
-class FFMpegFrameSignature:
+class Frame:
     """datatype to return by read_ffmpeg_signature"""
 
     vector: np.ndarray  # 380 dimensional vector, range: 0..2
@@ -273,9 +273,7 @@ def _read_ffmpeg_signature_jit(
     return frame_sigs_v, frame_sigs_e, frame_sigs_c, frame_sigs_tu
 
 
-def read_ffmpeg_signature(
-    byte_data: bytes, test_mode=False
-) -> List[FFMpegFrameSignature]:
+def read_ffmpeg_signature(byte_data: bytes, test_mode=False) -> List[Frame]:
     """wrapper for _read_ffmpeg_signature as numba code can not return a dataclass
 
     :param byte_data: actual ffmpeg signature data
@@ -288,9 +286,7 @@ def read_ffmpeg_signature(
         l = _read_ffmpeg_signature_jit(byte_data)
     frame_signatures = []
     for v, e, c, tu in zip(*l):
-        frame_signatures.append(
-            FFMpegFrameSignature(vector=v, elapsed=Fraction(e, tu), confidence=c)
-        )
+        frame_signatures.append(Frame(vector=v, elapsed=Fraction(e, tu), confidence=c))
     return frame_signatures
 
 

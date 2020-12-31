@@ -10,11 +10,15 @@ from typing import Generator, List, Sequence, Tuple
 import imageio_ffmpeg
 from statistics import mode
 from scenedetect import ContentDetector, FrameTimecode, SceneManager, VideoManager
+from iscc.codec import encode_base64
 from iscc.utils import cd
 from iscc.wtahash import wtahash
+from iscc.mp7 import Frame
 
 
 FFMPEG = imageio_ffmpeg.get_ffmpeg_exe()
+Scene = Tuple[FrameTimecode, FrameTimecode]
+SceneSig = Tuple[float, str]
 
 
 def compute_video_hash(features: Sequence[Tuple[int]], bits=64) -> bytes:
@@ -25,8 +29,8 @@ def compute_video_hash(features: Sequence[Tuple[int]], bits=64) -> bytes:
     return video_hash
 
 
-def compute_signature(file_path: str, crop=None) -> bytes:
-    """Computes MP7 Video Signature"""
+def extract_signature(file_path: str, crop=None) -> bytes:
+    """Extracts MP7 Video Signature"""
     sigfile = basename(file_path) + ".bin"
     folder = dirname(file_path)
     if crop:
@@ -42,13 +46,16 @@ def compute_signature(file_path: str, crop=None) -> bytes:
     return sigdata
 
 
-def signature_generator() -> Generator:
+def signature_extractor(crop=None) -> Generator:
     """Streaming signature generator (use gen.send(chunk))."""
 
-    def raw_generator():
+    def raw_generator(crop=None):
         sigfile = token_hex(16) + ".bin"
         log.info(sigfile)
-        vf = "signature=format=binary:filename={}".format(sigfile)
+        if crop:
+            vf = "{},signature=format=binary:filename={}".format(crop, sigfile)
+        else:
+            vf = "signature=format=binary:filename={}".format(sigfile)
         cmd = [FFMPEG, "-i", "-", "-vf", vf, "-f", "null", "-"]
         proc = Popen(cmd, stdout=DEVNULL, stderr=DEVNULL, stdin=PIPE)
         data = yield
@@ -62,7 +69,7 @@ def signature_generator() -> Generator:
         os.remove(sigfile)
         yield sigdata
 
-    initialized_generator = raw_generator()
+    initialized_generator = raw_generator(crop)
     next(initialized_generator)
     return initialized_generator
 
@@ -84,6 +91,7 @@ def detect_crop(file_path: str) -> str:
 
 
 def detect_scenes(video) -> List[FrameTimecode]:
+    """Compute Scenedetection and return cutpoint"""
     video_manager = VideoManager([video])
     scene_manager = SceneManager()
     scene_manager.add_detector(ContentDetector(threshold=50.0, min_scene_len=15))
@@ -91,12 +99,20 @@ def detect_scenes(video) -> List[FrameTimecode]:
     video_manager.set_downscale_factor()
     video_manager.start()
     scene_manager.detect_scenes(frame_source=video_manager, show_progress=False)
-    return scene_manager.get_cut_list(base_timecode)
+    return scene_manager.get_scene_list(base_timecode)
 
 
-if __name__ == "__main__":
-    from pprint import pprint
-
-    scenes = detect_scenes("../tests/test.3gp")
-    print(len(scenes))
-    pprint(scenes)
+def compute_scene_signatures(frames: List[Frame], scenes=List[Scene]) -> List[SceneSig]:
+    """Compute video signatures for individuale scenes in video."""
+    scenes_fc = scenes[-1][-1].get_frames()
+    frames_fc = len(frames)
+    assert scenes_fc == frames_fc, f"{scenes_fc} scenes vs {frames_fc} frames"
+    result = []
+    for start, end in scenes:
+        scene_duration = end.get_seconds() - start.get_seconds()
+        scene_duration = round(scene_duration, 3)
+        scene_frames = frames[start.get_frames() : end.get_frames()]
+        scene_sigs = [tuple(frame.vector.tolist()) for frame in scene_frames]
+        scene_hash = compute_video_hash(scene_sigs)
+        result.append((scene_duration, encode_base64(scene_hash)))
+    return result

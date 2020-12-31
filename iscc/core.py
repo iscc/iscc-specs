@@ -13,7 +13,7 @@ from iscc.params import *
 from iscc.cdc import data_chunks
 from iscc.utils import File, Streamable
 from iscc.mp7 import read_ffmpeg_signature
-from iscc.video import compute_video_hash, signature_generator
+from iscc.video import compute_video_hash, signature_extractor
 
 
 ###############################################################################
@@ -116,7 +116,7 @@ def content_id_audio(features, partial=False, bits=64):
 
 def content_id_video(video: File, bits=64) -> str:
     read_size = 262144
-    sig_gen = signature_generator()
+    sig_gen = signature_extractor()
     with Streamable(video) as stream:
         data = stream.read(read_size)
         while data:
