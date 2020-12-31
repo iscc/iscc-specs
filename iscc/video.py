@@ -6,7 +6,7 @@ import sys
 from subprocess import Popen, PIPE, DEVNULL
 from os.path import basename, dirname
 from secrets import token_hex
-from typing import Generator, List, Sequence, Tuple
+from typing import Generator, List, Sequence, Tuple, Optional
 import imageio_ffmpeg
 from statistics import mode
 from scenedetect import ContentDetector, FrameTimecode, SceneManager, VideoManager
@@ -17,11 +17,14 @@ from iscc.mp7 import Frame
 
 
 FFMPEG = imageio_ffmpeg.get_ffmpeg_exe()
+WINDOW = 7
+OVERLAP = 3
 Scene = Tuple[FrameTimecode, FrameTimecode]
 SceneSig = Tuple[float, str]
 
 
-def compute_video_hash(features: Sequence[Tuple[int]], bits=64) -> bytes:
+def compute_video_hash(features, bits=64):
+    # type: (Sequence[Tuple[int]], int) -> bytes
     """Compute wta-hash for a list of frame signature vectors"""
     sigs = set(features)
     vecsum = [sum(col) for col in zip(*sigs)]
@@ -29,7 +32,8 @@ def compute_video_hash(features: Sequence[Tuple[int]], bits=64) -> bytes:
     return video_hash
 
 
-def extract_signature(file_path: str, crop=None) -> bytes:
+def extract_signature(file_path, crop=None):
+    # type: (str, Optional[str]) -> bytes
     """Extracts MP7 Video Signature"""
     sigfile = basename(file_path) + ".bin"
     folder = dirname(file_path)
@@ -46,10 +50,12 @@ def extract_signature(file_path: str, crop=None) -> bytes:
     return sigdata
 
 
-def signature_extractor(crop=None) -> Generator:
+def signature_extractor(crop=None):
+    # type: (Optional[str]) -> Generator
     """Streaming signature generator (use gen.send(chunk))."""
 
     def raw_generator(crop=None):
+        # type: (Optional[str]) -> Generator
         sigfile = token_hex(16) + ".bin"
         log.info(sigfile)
         if crop:
@@ -74,7 +80,8 @@ def signature_extractor(crop=None) -> Generator:
     return initialized_generator
 
 
-def detect_crop(file_path: str) -> str:
+def detect_crop(file_path):
+    # type: (str) -> str
     """
     Detect crop value for video.
     Example result: crop=176:96:0:24
@@ -90,9 +97,10 @@ def detect_crop(file_path: str) -> str:
     return mode(crops)
 
 
-def detect_scenes(video) -> List[FrameTimecode]:
-    """Compute Scenedetection and return cutpoint"""
-    video_manager = VideoManager([video])
+def detect_scenes(video_file):
+    # type: (str) -> List[Tuple[FrameTimecode, FrameTimecode]]
+    """Compute Scenedetection and return cutpoints"""
+    video_manager = VideoManager([video_file])
     scene_manager = SceneManager()
     scene_manager.add_detector(ContentDetector(threshold=50.0, min_scene_len=15))
     base_timecode = video_manager.get_base_timecode()
@@ -102,7 +110,8 @@ def detect_scenes(video) -> List[FrameTimecode]:
     return scene_manager.get_scene_list(base_timecode)
 
 
-def compute_scene_signatures(frames: List[Frame], scenes=List[Scene]) -> List[SceneSig]:
+def compute_scene_signatures(frames, scenes):
+    # type: (List[Frame], List[Scene]) -> List[SceneSig]
     """Compute video signatures for individuale scenes in video."""
     scenes_fc = scenes[-1][-1].get_frames()
     frames_fc = len(frames)
@@ -116,3 +125,14 @@ def compute_scene_signatures(frames: List[Frame], scenes=List[Scene]) -> List[Sc
         scene_hash = compute_video_hash(scene_sigs)
         result.append((scene_duration, encode_base64(scene_hash)))
     return result
+
+
+def compute_rolling_signatures(frames, window=WINDOW, overlap=OVERLAP):
+    # type: (List[Frame], int, int) -> List[str]
+    """
+    Compute video signatures based on rolling window.
+
+    Generates segment-wise features where 'window' is the duration of segments in
+    seconds and 'overlap' is the number of seconds that overlap for each segment.
+    """
+    pass
