@@ -23,10 +23,12 @@ class Features(BaseModel):
         min_items=1,
     )
     window: Optional[int] = Field(
-        DEFAULT_WINDOW, description="Window size of feature segments",
+        DEFAULT_WINDOW,
+        description="Window size of feature segments",
     )
     overlap: Optional[int] = Field(
-        DEFAULT_OVERLAP, description="Overlap size of feature segments",
+        DEFAULT_OVERLAP,
+        description="Overlap size of feature segments",
     )
     sizes: Optional[List[int]] = Field(
         description="Sizes of segmets used for feature calculation",
