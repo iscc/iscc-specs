@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
 import io
 import os
+from pathlib import Path
 from typing import BinaryIO, Union
 
 
-File = Union[str, bytes, BinaryIO]
+File = Union[str, bytes, BinaryIO, Path]
 
 
 class Streamable:
@@ -12,7 +13,7 @@ class Streamable:
 
     def __init__(self, data: File):
         self.manage = True
-        if isinstance(data, str):
+        if isinstance(data, (str, Path)):
             self.stream = open(data, "rb")
         elif not hasattr(data, "read"):
             self.stream = io.BytesIO(data)
