@@ -139,39 +139,6 @@ def test_trim_text():
     assert 128 == len(trimmed.encode("utf-8"))
 
 
-def test_sliding_window():
-    assert list(iscc.sliding_window("", width=4)) == [""]
-    assert list(iscc.sliding_window("A", width=4)) == ["A"]
-    assert list(iscc.sliding_window("Hello", width=4)) == ["Hell", "ello"]
-    words = ("lorem", "ipsum", "dolor", "sit", "amet")
-    assert list(iscc.sliding_window(words, 2))[0] == ("lorem", "ipsum")
-
-
-def test_similarity_hash():
-    all_zero = 0b0 .to_bytes(8, "big")
-    assert iscc.similarity_hash((all_zero, all_zero)) == all_zero
-
-    all_ones = 0b11111111 .to_bytes(1, "big")
-    assert iscc.similarity_hash((all_ones, all_ones)) == all_ones
-
-    a = 0b0110 .to_bytes(1, "big")
-    b = 0b1100 .to_bytes(1, "big")
-    r = 0b1110 .to_bytes(1, "big")
-    assert iscc.similarity_hash((a, b)) == r
-
-    a = 0b01101001 .to_bytes(1, "big")
-    b = 0b00111000 .to_bytes(1, "big")
-    c = 0b11100100 .to_bytes(1, "big")
-    r = 0b01101000 .to_bytes(1, "big")
-    assert iscc.similarity_hash((a, b, c)) == r
-
-    a = 0b0110100101101001 .to_bytes(2, "big")
-    b = 0b0011100000111000 .to_bytes(2, "big")
-    c = 0b1110010011100100 .to_bytes(2, "big")
-    r = 0b0110100001101000 .to_bytes(2, "big")
-    assert iscc.similarity_hash((a, b, c)) == r
-
-
 def test_hamming_distance():
     a = 0b0001111
     b = 0b1000111

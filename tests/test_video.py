@@ -54,26 +54,46 @@ def test_content_id_video():
 
 def test_detect_scenes():
     assert video.detect_scenes(SAMPLE) == [
-        (FrameTimecode(timecode=0, fps=24.000000),
-         FrameTimecode(timecode=183, fps=24.000000)),
-        (FrameTimecode(timecode=183, fps=24.000000),
-         FrameTimecode(timecode=243, fps=24.000000)),
-        (FrameTimecode(timecode=243, fps=24.000000),
-         FrameTimecode(timecode=365, fps=24.000000)),
-        (FrameTimecode(timecode=365, fps=24.000000),
-         FrameTimecode(timecode=395, fps=24.000000)),
-        (FrameTimecode(timecode=395, fps=24.000000),
-         FrameTimecode(timecode=485, fps=24.000000)),
-        (FrameTimecode(timecode=485, fps=24.000000),
-         FrameTimecode(timecode=552, fps=24.000000)),
-        (FrameTimecode(timecode=552, fps=24.000000),
-         FrameTimecode(timecode=923, fps=24.000000)),
-        (FrameTimecode(timecode=923, fps=24.000000),
-         FrameTimecode(timecode=1119, fps=24.000000)),
-        (FrameTimecode(timecode=1119, fps=24.000000),
-         FrameTimecode(timecode=1432, fps=24.000000)),
-        (FrameTimecode(timecode=1432, fps=24.000000),
-         FrameTimecode(timecode=1441, fps=24.000000))
+        (
+            FrameTimecode(timecode=0, fps=24.000000),
+            FrameTimecode(timecode=183, fps=24.000000),
+        ),
+        (
+            FrameTimecode(timecode=183, fps=24.000000),
+            FrameTimecode(timecode=243, fps=24.000000),
+        ),
+        (
+            FrameTimecode(timecode=243, fps=24.000000),
+            FrameTimecode(timecode=365, fps=24.000000),
+        ),
+        (
+            FrameTimecode(timecode=365, fps=24.000000),
+            FrameTimecode(timecode=395, fps=24.000000),
+        ),
+        (
+            FrameTimecode(timecode=395, fps=24.000000),
+            FrameTimecode(timecode=485, fps=24.000000),
+        ),
+        (
+            FrameTimecode(timecode=485, fps=24.000000),
+            FrameTimecode(timecode=552, fps=24.000000),
+        ),
+        (
+            FrameTimecode(timecode=552, fps=24.000000),
+            FrameTimecode(timecode=923, fps=24.000000),
+        ),
+        (
+            FrameTimecode(timecode=923, fps=24.000000),
+            FrameTimecode(timecode=1119, fps=24.000000),
+        ),
+        (
+            FrameTimecode(timecode=1119, fps=24.000000),
+            FrameTimecode(timecode=1432, fps=24.000000),
+        ),
+        (
+            FrameTimecode(timecode=1432, fps=24.000000),
+            FrameTimecode(timecode=1441, fps=24.000000),
+        ),
     ]
 
 
@@ -83,14 +103,14 @@ def test_compute_scene_signatures():
     scenes = video.detect_scenes(SAMPLE)
     scene_signatures = video.compute_scene_signatures(frames, scenes)
     assert scene_signatures == [
-        (7.625, 'XxqD_x1a8vw'),
-        (2.5, 'HEqWY8AX9oQ'),
-        (5.083, 'VA7U9A0f8-w'),
-        (1.25, 'V5QEfpj-tlQ'),
-        (3.75, 'dm6ETGUEwmc'),
-        (2.792, 'vhqD3HFKdtE'),
-        (15.458, 'Hg4X9f1acng'),
-        (8.167, 'XkoAn8YVcqU'),
-        (13.042, 'V06CXFQdUrQ'),
-        (0.375, 'XBgT_nxD8tE')
+        (7.625, "XxqD_x1a8vw"),
+        (2.5, "HEqWY8AX9oQ"),
+        (5.083, "VA7U9A0f8-w"),
+        (1.25, "V5QEfpj-tlQ"),
+        (3.75, "dm6ETGUEwmc"),
+        (2.792, "vhqD3HFKdtE"),
+        (15.458, "Hg4X9f1acng"),
+        (8.167, "XkoAn8YVcqU"),
+        (13.042, "V06CXFQdUrQ"),
+        (0.375, "XBgT_nxD8tE"),
     ]

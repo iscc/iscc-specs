@@ -4,6 +4,7 @@ import io
 from statistics import median
 import math
 import unicodedata
+from typing import List, Optional
 from PIL import Image
 import xxhash
 from blake3 import blake3
@@ -11,9 +12,11 @@ from more_itertools import interleave, sliced, windowed
 from iscc.minhash import minhash_256
 from iscc.params import *
 from iscc.cdc import data_chunks
-from iscc.utils import File, Streamable
+from iscc.utils import File, Streamable, sliding_window
 from iscc.mp7 import read_ffmpeg_signature
 from iscc.video import compute_video_hash, signature_extractor
+from iscc.simhash import similarity_hash
+from iscc.meta import meta_hash
 
 
 ###############################################################################
@@ -22,36 +25,15 @@ from iscc.video import compute_video_hash, signature_extractor
 
 
 def meta_id(title, extra=""):
+    # type: (str, Optional[str]) -> List[str]
 
-    # 1. Normalization
     title_norm = text_normalize(title)
     extra_norm = text_normalize(extra)
-
-    # 2. Trimming
     title_trimmed = text_trim(title_norm, TRIM_TITLE)
     extra_trimmed = text_trim(extra_norm, TRIM_EXTRA)
-
-    # 3. Simhash title
-    title_n_grams = sliding_window(title_trimmed, width=WINDOW_SIZE_MID)
-    title_hash_digests = [blake3(s.encode("utf-8")).digest() for s in title_n_grams]
-    simhash_digest = similarity_hash(title_hash_digests)
-
-    # 4. Simhash extra metadata
-    if extra_trimmed:
-        extra_n_grams = sliding_window(extra_trimmed, width=WINDOW_SIZE_MID)
-        extra_hash_digests = [blake3(s.encode("utf-8")).digest() for s in extra_n_grams]
-        extra_simhash_digest = similarity_hash(extra_hash_digests)
-        simhash_digest = b"".join(
-            interleave(sliced(simhash_digest, 4), sliced(extra_simhash_digest, 4))
-        )
-
-    # 5. Prepend header
-    meta_id_digest = HEAD_MID + simhash_digest[:8]
-
-    # 6. Encode with base58_iscc
+    mhash = meta_hash(title_trimmed, extra_trimmed)
+    meta_id_digest = HEAD_MID + mhash[:8]
     code = encode(meta_id_digest)
-
-    # 9. Return encoded Meta-ID, trimmed `title` and trimmed `extra` data and tail.
     return [code, title_trimmed, extra_trimmed]
 
 
@@ -257,28 +239,6 @@ def image_normalize(img):
 ###############################################################################
 
 
-def similarity_hash(hash_digests):
-
-    n_bytes = len(hash_digests[0])
-    n_bits = n_bytes * 8
-    vector = [0] * n_bits
-
-    for digest in hash_digests:
-        h = int.from_bytes(digest, "big", signed=False)
-
-        for i in range(n_bits):
-            vector[i] += h & 1
-            h >>= 1
-
-    minfeatures = len(hash_digests) * 1.0 / 2
-    shash = 0
-
-    for i in range(n_bits):
-        shash |= int(vector[i] >= minfeatures) << i
-
-    return shash.to_bytes(n_bytes, "big", signed=False)
-
-
 def image_hash(pixels):
 
     # 1. DCT per row
@@ -310,13 +270,6 @@ def image_hash(pixels):
     hash_digest = int(bitstring, 2).to_bytes(8, "big", signed=False)
 
     return hash_digest
-
-
-def sliding_window(seq, width):
-
-    assert width >= 2, "Sliding window width must be 2 or bigger."
-    idx = range(max(len(seq) - width + 1, 1))
-    return (seq[i : i + width] for i in idx)
 
 
 def dct(values_list):
