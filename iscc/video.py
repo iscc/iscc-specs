@@ -1,5 +1,8 @@
 # -*- coding: utf-8 -*-
 import subprocess
+from pathlib import Path
+from tempfile import gettempdir, mkdtemp
+
 from loguru import logger as log
 import os
 import sys
@@ -56,12 +59,14 @@ def signature_extractor(crop=None):
 
     def raw_generator(crop=None):
         # type: (Optional[str]) -> Generator
-        sigfile = token_hex(16) + ".bin"
-        log.info(sigfile)
+        sigfile = Path(mkdtemp(), token_hex(16) + ".bin")
+        # We need to escape colon from windows drive letter prefixes
+        # See: https://stackoverflow.com/a/28770642/51627
+        sigfile_escaped = sigfile.as_posix().replace(":", "\\\\:")
         if crop:
-            vf = "{},signature=format=binary:filename={}".format(crop, sigfile)
+            vf = "{},signature=format=binary:filename={}".format(crop, sigfile_escaped)
         else:
-            vf = "signature=format=binary:filename={}".format(sigfile)
+            vf = "signature=format=binary:filename={}".format(sigfile_escaped)
         cmd = [FFMPEG, "-i", "-", "-vf", vf, "-f", "null", "-"]
         proc = Popen(cmd, stdout=DEVNULL, stderr=DEVNULL, stdin=PIPE)
         data = yield
