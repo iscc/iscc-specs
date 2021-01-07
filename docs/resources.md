@@ -50,7 +50,7 @@ The Content Blockchain Testnet is running a public data-stream of ISCC codes for
 
 ### [Clink.ID](https://clink.id/)
 
-[CLink.ID](https://clink.id/) is an interoperable registry, architected to recognize identifiers and meta-data regardless of whether they are Handle- or content-based and/or block-chain inspired. CLink.ID is operated by [CLink Media , Inc.](https://clink.media/) and has integrated [ISCC in its registry](https://clink.id/%22%20%5Cl%20%22objects/20.500.12200.100/5d8e3c3f9d6c6a759261).
+[CLink.ID](https://clink.id/) is an interoperable registry, architected to recognize identifiers and meta-data regardless of whether they are Handle- or content-based and/or block-chain inspired. CLink.ID is operated by [CLink Media , Inc.](https://clink.media/) and has integrated [ISCC in its registry](https://clink.id/#objects/20.500.12200.100/5d8e3c3f9d6c6a759261).
 
 ### [Smart License Demo](https://smartlicense.coblo.net/)
 
