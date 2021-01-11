@@ -9,7 +9,7 @@ import xxhash
 from blake3 import blake3
 from more_itertools import windowed
 from iscc.minhash import minhash_256
-from codec import (
+from iscc.codec import (
     MT,
     ST,
     ST_CC,
