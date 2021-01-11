@@ -57,13 +57,13 @@ def test_test_data():
 
 def test_meta_id():
     mid1, _, _ = iscc.meta_id("ISCC Content Identifiers")
-    assert mid1 == "CCbSJTQquHMj8"
+    assert mid1 == "AAA47ZR5JWZ6E7Q3"
 
     mid1, _, _ = iscc.meta_id(b"ISCC Content Identifiers")
-    assert mid1 == "CCbSJTQquHMj8"
+    assert mid1 == "AAA47ZR5JWZ6E7Q3"
 
     mid1, title, extra = iscc.meta_id("Die Unendliche Geschichte")
-    assert mid1 == "CCWkuc9ZnPtRt"
+    assert mid1 == "AAA3DZ6UG5MYA7MF"
     assert title == "die unendliche geschichte"
     assert extra == ""
     mid2 = iscc.meta_id(" Die unéndlíche,  Geschichte ")[0]
@@ -82,29 +82,19 @@ def test_meta_id():
 def test_meta_id_composite():
     mid1, _, _ = iscc.meta_id("This is some Title", "")
     mid2, _, _ = iscc.meta_id("This is some Title", "And some extra metadata")
-    assert iscc.decode(mid1)[:5] == iscc.decode(mid2)[:5]
-    assert iscc.decode(mid1)[5:] != iscc.decode(mid2)[5:]
-
-
-def test_encode():
-    digest = bytes.fromhex("f7d3a5b201dc92f7a7")
-    code = iscc.encode(digest[:1]) + iscc.encode(digest[1:])
-    assert code == "5GcvF7s13LK2L"
-
-
-def test_decode():
-    code = "5GcQF7sC3iY2i"
-    digest = iscc.decode(code)
-    assert digest.hex() == "f7d6bd587d22a7cb6d"
+    assert iscc.decode_base32(mid1)[:5] == iscc.decode_base32(mid2)[:5]
+    assert iscc.decode_base32(mid1)[5:] != iscc.decode_base32(mid2)[5:]
 
 
 def test_content_id_text():
     cid_t_np = iscc.content_id_text("")
-    assert len(cid_t_np) == 13
-    assert cid_t_np == "CT7A4zpmccuEv"
-    cid_t_p = iscc.content_id_text("", partial=True)
-    assert cid_t_p == "Ct7A4zpmccuEv"
-    assert 0 == iscc.distance(cid_t_p, cid_t_np)
+    assert len(cid_t_np) == 16
+    assert cid_t_np == "EAASL4F2WZY7KBXB"
+    cid_t_p = iscc.content_id_text("", bits=128)
+    assert cid_t_p == "EABSL4F2WZY7KBXBYUZPREWZ26IXU"
+
+    with pytest.raises(AssertionError):
+        iscc.distance(cid_t_p, cid_t_np)
 
     cid_t_a = iscc.content_id_text(TEXT_A)
     cid_t_b = iscc.content_id_text(TEXT_B)
@@ -176,25 +166,25 @@ def test_content_id_mixed():
     cid_t_2 = iscc.content_id_text("Another Text")
 
     cid_m = iscc.content_id_mixed([cid_t_1])
-    assert cid_m == "CM3LGMnXJvEbR"
+    assert cid_m == "EUASAAJV7U3YRWXF"
 
     cid_m = iscc.content_id_mixed([cid_t_1, cid_t_2])
-    assert cid_m == "CM3LiRzWqKMaK"
+    assert cid_m == "EUASAAJX7635T7X7"
 
     cid_i = iscc.content_id_image("file_image_lenna.jpg")
     cid_m = iscc.content_id_mixed([cid_t_1, cid_t_2, cid_i])
-    assert cid_m == "CM3LG2sn7Znpf"
+    assert cid_m == "EUASAAJVZ43AT7HT"
 
 
 def test_content_id_image():
     cid_i = iscc.content_id_image("file_image_lenna.jpg")
-    assert len(cid_i) == 13
-    assert cid_i == "CYmLoqBRgV32u"
+    assert len(cid_i) == 16
+    assert cid_i == "EEAZTRSWFV2THIUW"
 
     data = BytesIO(open("file_image_lenna.jpg", "rb").read())
-    cid_i = iscc.content_id_image(data, partial=True)
-    assert len(cid_i) == 13
-    assert cid_i == "CimLoqBRgV32u"
+    cid_i = iscc.content_id_image(data)
+    assert len(cid_i) == 16
+    assert cid_i == "EEAZTRSWFV2THIUW"
 
     img1 = Image.open("file_image_lenna.jpg")
     img2 = img1.filter(ImageFilter.GaussianBlur(10))

@@ -59,25 +59,25 @@
         "test_001_empty": {
             "inputs": [
                 "",
-                false
+                64
             ]
         },
         "test_002_short": {
             "inputs": [
                 "Some short text",
-                false
+                64
             ]
         },
         "test_003_long": {
             "inputs": [
                 "Their most significant and usefull property of similarity-preserving fingerprints gets lost in the fragmentation of individual, propietary and use case specific implementations. The real benefit lies in similarity preservation beyond your local data archive on a global scale accross vendors.",
-                false
+                64
             ]
         },
         "test_004_partial": {
             "inputs": [
                 "Some text for partial content id text",
-                true
+                64
             ]
         }
     },
@@ -85,37 +85,37 @@
         "test_001_file_image_pixel_png_transp_png": {
             "inputs": [
                 "file_image_pixel_png_transp.png",
-                false
+                64
             ]
         },
         "test_002_file_image_pixel_png_white_png": {
             "inputs": [
                 "file_image_pixel_png_white.png",
-                false
+                64
             ]
         },
         "test_003_file_image_pixel_png_black_png": {
             "inputs": [
                 "file_image_pixel_png_black.png",
-                false
+                64
             ]
         },
         "test_004_file_image_cat_jpg": {
             "inputs": [
                 "file_image_cat.jpg",
-                false
+                64
             ]
         },
         "test_005_file_image_cat_png": {
             "inputs": [
                 "file_image_cat.png",
-                false
+                64
             ]
         },
         "test_006_file_image_cat_gif": {
             "inputs": [
                 "file_image_cat.gif",
-                false
+                64
             ]
         }
     },
@@ -123,25 +123,25 @@
         "test_001_audio_empty": {
             "inputs": [
                 [],
-                false
+                64
             ]
         },
         "test_002_audio_one": {
             "inputs": [
                 [1],
-                false
+                64
             ]
         },
         "test_003_audio_two": {
             "inputs": [
                 [1, 2],
-                false
+                64
             ]
         },
         "test_003_audio_signed": {
             "inputs": [
                 [-1, 0, 1],
-                false
+                64
             ]
         }
     },
@@ -149,27 +149,27 @@
         "test_001_cid_t_one": {
             "inputs": [
                 [
-                    "CTZYQRgV5eCQp"
+                    "EAATL7JXRDNOLADW"
                 ],
-                false
+                64
             ]
         },
-        "test_002_cid_t_two_partial": {
+        "test_002_cid_t_two": {
             "inputs": [
                 [
-                    "CTZYQRgV5eCQp",
-                    "CTDVyoiMYHq6F"
+                    "EAATL7JXRDNOLADW",
+                    "EAATOT5CKG6NXCMK"
                 ],
-                true
+                64
             ]
         },
         "test_003_cid_t_and_i": {
             "inputs": [
                 [
-                    "CTZYQRgV5eCQp",
-                    "CYDfTq7Qc7Fre"
+                    "EAATL7JXRDNOLADW",
+                    "EEAZTRSWFV2THIUW"
                 ],
-                false
+                64
             ]
         }
     },

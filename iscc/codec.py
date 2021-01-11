@@ -10,6 +10,7 @@ Body:
     <hash-digest> with number of bits as indicated byi <length>
 """
 import base64
+import enum
 from typing import Tuple
 from bitarray import bitarray
 from bitarray.util import int2ba, ba2int
@@ -17,6 +18,43 @@ from bech32 import convertbits
 
 
 BASE32_CHARSET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567"
+
+
+class MT(enum.IntEnum):
+    """ISCC Main Types"""
+
+    META = 0
+    SEMANTIC = 1
+    CONTENT = 2
+    DATA = 3
+    INSTANCE = 4
+
+    @property
+    def humanized(self):
+        return self.name.lower() + "-code"
+
+
+class ST(enum.IntEnum):
+    """Generic SubTypes"""
+
+    NONE = 0
+
+
+class ST_CC(enum.IntEnum):
+    """SubTypes for Content Codes"""
+
+    TEXT = 0
+    IMAGE = 1
+    AUDIO = 2
+    VIDEO = 3
+    GENERIC = 4
+    MIXED = 5
+
+
+class VS(enum.IntEnum):
+    """ISCC code Versions"""
+
+    V0 = 0
 
 
 def write_header(mtype: int, stype: int, version: int = 0, length: int = 64) -> bytes:

@@ -1,15 +1,24 @@
 # -*- coding: utf-8 -*-
 """ISCC Reference Implementation"""
-import io
 from statistics import median
 import math
 import unicodedata
-from typing import List, Optional
+from typing import BinaryIO, List, Optional, Union
 from PIL import Image
 import xxhash
 from blake3 import blake3
-from more_itertools import interleave, sliced, windowed
+from more_itertools import windowed
 from iscc.minhash import minhash_256
+from codec import (
+    MT,
+    ST,
+    ST_CC,
+    VS,
+    decode_base32,
+    encode_base32,
+    read_header,
+    write_header,
+)
 from iscc.params import *
 from iscc.cdc import data_chunks
 from iscc.utils import File, Streamable, sliding_window
@@ -24,20 +33,22 @@ from iscc.meta import meta_hash
 ###############################################################################
 
 
-def meta_id(title, extra=""):
-    # type: (str, Optional[str]) -> List[str]
+def meta_id(title, extra="", bits=64):
+    # type: (Union[str, bytes], Optional[Union[str, bytes]], int) -> List[str, str, str]
 
     title_norm = text_normalize(title)
     extra_norm = text_normalize(extra)
     title_trimmed = text_trim(title_norm, TRIM_TITLE)
     extra_trimmed = text_trim(extra_norm, TRIM_EXTRA)
     mhash = meta_hash(title_trimmed, extra_trimmed)
-    meta_id_digest = HEAD_MID + mhash[:8]
-    code = encode(meta_id_digest)
+    header = write_header(MT.META, ST.NONE, VS.V0, bits)
+    digest = header + mhash[: bits // 8]
+    code = encode_base32(digest)
     return [code, title_trimmed, extra_trimmed]
 
 
-def content_id_text(text, partial=False, bits=64):
+def content_id_text(text, bits=64):
+    # type: (Union[str, bytes], int) -> str
 
     # 1. Normalize (drop whitespace)
     text = text_normalize(text)
@@ -49,37 +60,25 @@ def content_id_text(text, partial=False, bits=64):
     features = [xxhash.xxh32_intdigest(s.encode("utf-8")) for s in ngrams]
 
     # 4. Apply minimum_hash
-    digest = minhash_256(features)
+    content_hash = minhash_256(features)
+    header = write_header(MT.CONTENT, ST_CC.TEXT, VS.V0, bits)
+    code = encode_base32(header + content_hash[: bits // 8])
 
-    # 6. Encode digest with matching header
-    if partial:
-        code = encode(HEAD_CID_T_PCF) + encode(digest[: bits // 8])
-    else:
-        code = encode(HEAD_CID_T) + encode(digest[: bits // 8])
-
-    # 7. Return code
     return code
 
 
-def content_id_image(img, partial=False):
+def content_id_image(img, bits=64):
+    # type: (Union[str, BytesIO, Image.Image], int) -> str
 
-    # 1. Normalize image to 2-dimensional pixel array
     pixels = image_normalize(img)
-
-    # 2. Calculate image hash
     hash_digest = image_hash(pixels)
-
-    # 3. Encode with component header
-    if partial:
-        code = encode(HEAD_CID_I_PCF) + encode(hash_digest)
-    else:
-        code = encode(HEAD_CID_I) + encode(hash_digest)
-
-    # 4. Return
+    header = write_header(MT.CONTENT, ST_CC.IMAGE, VS.V0, bits)
+    code = encode_base32(header + hash_digest)
     return code
 
 
-def content_id_audio(features, partial=False, bits=64):
+def content_id_audio(features, bits=64):
+    # type: (List[int], int) -> str
     digests = []
 
     for int_features in windowed(features, 8, fillvalue=0):
@@ -89,14 +88,13 @@ def content_id_audio(features, partial=False, bits=64):
         digests.append(digest)
     shash_digest = similarity_hash(digests)
     n_bytes = bits // 8
-    if partial:
-        content_id_audio_digest = HEAD_CID_A_PCF + shash_digest[:n_bytes]
-    else:
-        content_id_audio_digest = HEAD_CID_A + shash_digest[:n_bytes]
-    return encode(content_id_audio_digest)
+    header = write_header(MT.CONTENT, ST_CC.AUDIO, VS.V0, bits)
+    code = encode_base32(header + shash_digest[:n_bytes])
+    return code
 
 
-def content_id_video(video: File, bits=64) -> str:
+def content_id_video(video, bits=64):
+    # type: (File, int) -> str
     read_size = 262144
     sig_gen = signature_extractor()
     with Streamable(video) as stream:
@@ -107,29 +105,22 @@ def content_id_video(video: File, bits=64) -> str:
     mp7sig = next(sig_gen)
     frame_sigs = read_ffmpeg_signature(mp7sig)
     features = [tuple(sig.vector.tolist()) for sig in frame_sigs]
-    video_hash = compute_video_hash(features)
-    content_id_video_digest = HEAD_CID_V + video_hash
-    return encode(content_id_video_digest)
+    video_hash = compute_video_hash(features, bits)
+    header = write_header(MT.CONTENT, ST_CC.VIDEO, VS.V0, bits)
+    code = encode_base32(header + video_hash)
+    return code
 
 
-def content_id_mixed(cids, partial=False):
+def content_id_mixed(cids, bits=64):
+    # type: (List[str], int) -> str
 
-    # 1. Decode CIDs
-    decoded = (decode(code) for code in cids)
-
-    # 2. Extract first 8-bytes
-    truncated = [data[:8] for data in decoded]
+    decoded = (decode_base32(code) for code in cids)
+    truncated = [data[: bits // 8] for data in decoded]
 
     # 3. Apply Similarity hash
     simhash_digest = similarity_hash(truncated)
-
-    # 4. Encode with prepended component header
-    if partial:
-        code = encode(HEAD_CID_M_PCF) + encode(simhash_digest)
-    else:
-        code = encode(HEAD_CID_M) + encode(simhash_digest)
-
-    # 5. Return Code
+    header = write_header(MT.CONTENT, ST_CC.MIXED, VS.V0, bits)
+    code = encode_base32(header + simhash_digest)
     return code
 
 
@@ -139,37 +130,32 @@ def data_id(data, bits=64):
     features = [xxhash.xxh32_intdigest(chunk) for chunk in data_chunks(data)]
 
     # 3. Apply minimum_hash
-    digest = minhash_256(features)
+    data_hash = minhash_256(features)
 
     # 4. Encode with prepended component header
-    code = encode(HEAD_DID) + encode(digest[: bits // 8])
-
+    header = write_header(MT.DATA, ST.NONE, VS.V0, bits)
+    code = encode_base32(header + data_hash[: bits // 8])
     return code
 
 
-def instance_id(data):
-
-    # Ensure we have a readable stream
-    if isinstance(data, str):
-        stream = open(data, "rb")
-    elif not hasattr(data, "read"):
-        stream = io.BytesIO(data)
-    else:
-        stream = data
+def instance_id(data, bits=64):
+    # type: (Union[str, BinaryIO, bytes], int) -> List[str, str, int]
 
     size = 0
     b3 = blake3()
-    while True:
-        d = stream.read(IID_READ_SIZE)
-        if not d:
-            break
-        b3.update(d)
-        size += len(d)
+    with Streamable(data) as stream:
+        while True:
+            d = stream.read(IID_READ_SIZE)
+            if not d:
+                break
+            b3.update(d)
+            size += len(d)
 
     top_hash_digest = b3.digest()
-
-    code = encode(HEAD_IID) + encode(top_hash_digest[:8])
-    tail = encode(top_hash_digest[8:])
+    header = write_header(MT.INSTANCE, ST.NONE, VS.V0, bits)
+    n_bytes = bits // 8
+    code = encode_base32(header + top_hash_digest[:n_bytes])
+    tail = encode_base32(top_hash_digest[n_bytes:])
 
     return [code, tail, size]
 
@@ -303,59 +289,18 @@ def dct(values_list):
 
 
 def distance(a, b):
+    # type: (str, str) -> int
 
     if isinstance(a, str) and isinstance(b, str):
-        a = decode(a)[1:]
-        b = decode(b)[1:]
+        a = decode_base32(a)
+        b = decode_base32(b)
+        a = read_header(a)[-1]
+        b = read_header(b)[-1]
+
+        assert len(a) == len(b), "Codes must be equal length"
 
     if isinstance(a, bytes) and isinstance(b, bytes):
         a = int.from_bytes(a, "big", signed=False)
         b = int.from_bytes(b, "big", signed=False)
 
     return bin(a ^ b).count("1")
-
-
-def encode(digest):
-
-    digest = reversed(digest)
-    value = 0
-    numvalues = 1
-    for octet in digest:
-        octet *= numvalues
-        value += octet
-        numvalues *= 256
-    chars = []
-    while numvalues > 0:
-        chars.append(value % 58)
-        value //= 58
-        numvalues //= 58
-    return str.translate("".join([chr(c) for c in reversed(chars)]), V2CTABLE)
-
-
-def decode(code):
-
-    bit_length = math.floor(math.log(58 ** len(code), 256)) * 8
-    n = len(code)
-
-    # TODO remove magic handling of specific code sizes
-    if n == 13:
-        return decode(code[:2]) + decode(code[2:])
-
-    code = reversed(str.translate(code, C2VTABLE))
-    value = 0
-    numvalues = 1
-
-    for c in code:
-        c = ord(c)
-        c *= numvalues
-        value += c
-        numvalues *= 58
-    numvalues = 2 ** bit_length
-
-    data = []
-    while numvalues > 1:
-        data.append(value % 256)
-        value //= 256
-        numvalues //= 256
-
-    return bytes(reversed(data))

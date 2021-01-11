@@ -49,7 +49,7 @@ def test_content_id_video_0_features():
 
 
 def test_content_id_video():
-    assert content_id_video(SAMPLE) == "CTWkQX8PEkdCd"
+    assert content_id_video(SAMPLE) == "EMAV4DUD6RORW4X4"
 
 
 def test_detect_scenes():
