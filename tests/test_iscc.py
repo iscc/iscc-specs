@@ -11,28 +11,6 @@ TESTS_PATH = os.path.dirname(os.path.realpath(__file__))
 os.chdir(TESTS_PATH)
 
 
-TEXT_A = u"""
-    Their most significant and usefull property of similarity-preserving
-    fingerprints gets lost in the fragmentation of individual, propietary and
-    use case specific implementations. The real benefit lies in similarity
-    preservation beyond your local data archive on a global scale accross
-    vendors.
-"""
-
-TEXT_B = u"""
-    The most significant and usefull property of similarity-preserving
-    fingerprints gets lost in the fragmentation of individual, propietary and
-    use case specific implementations. The real benefit lies in similarity
-    preservation beyond your local data archive on a global scale accross
-    vendors.
-"""
-
-TEXT_C = u"""
-    A need for open standard fingerprinting. We don´t need the best
-    Fingerprinting algorithm just an accessible and widely used one.
-"""
-
-
 def test_test_data():
     with open("test_data.json", encoding="utf-8") as jfile:
         data = json.load(jfile)
@@ -84,49 +62,6 @@ def test_meta_id_composite():
     mid2, _, _ = iscc.meta_id("This is some Title", "And some extra metadata")
     assert iscc.decode_base32(mid1)[:5] == iscc.decode_base32(mid2)[:5]
     assert iscc.decode_base32(mid1)[5:] != iscc.decode_base32(mid2)[5:]
-
-
-def test_content_id_text():
-    cid_t_np = iscc.content_id_text("")
-    assert len(cid_t_np) == 16
-    assert cid_t_np == "EAASL4F2WZY7KBXB"
-    cid_t_p = iscc.content_id_text("", bits=128)
-    assert cid_t_p == "EABSL4F2WZY7KBXBYUZPREWZ26IXU"
-
-    with pytest.raises(AssertionError):
-        iscc.distance(cid_t_p, cid_t_np)
-
-    cid_t_a = iscc.content_id_text(TEXT_A)
-    cid_t_b = iscc.content_id_text(TEXT_B)
-    assert iscc.distance(cid_t_a, cid_t_b) == 2
-
-
-def test_text_normalize():
-    text = "  Iñtërnâtiôn\nàlizætiøn☃💩 –  is a tric\t ky \u00A0 thing!\r"
-
-    normalized = iscc.text_normalize(text)
-    assert normalized == "internation alizætiøn☃💩 is a tric ky thing!"
-
-    assert iscc.text_normalize(" ") == ""
-    assert iscc.text_normalize("  Hello  World ? ") == "hello world ?"
-    assert iscc.text_normalize("Hello\nWorld") == "hello world"
-
-
-def test_trim_text():
-    multibyte_2 = "ü" * 128
-    trimmed = iscc.text_trim(multibyte_2, 128)
-    assert 64 == len(trimmed)
-    assert 128 == len(trimmed.encode("utf-8"))
-
-    multibyte_3 = "驩" * 128
-    trimmed = iscc.text_trim(multibyte_3, 128)
-    assert 42 == len(trimmed)
-    assert 126 == len(trimmed.encode("utf-8"))
-
-    mixed = "Iñtërnâtiônàlizætiøn☃💩" * 6
-    trimmed = iscc.text_trim(mixed, 128)
-    assert 85 == len(trimmed)
-    assert 128 == len(trimmed.encode("utf-8"))
 
 
 def test_hamming_distance():

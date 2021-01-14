@@ -2,13 +2,13 @@
 """ISCC Reference Implementation"""
 from statistics import median
 import math
-import unicodedata
 from typing import BinaryIO, List, Optional, Union
 from PIL import Image
 import xxhash
 from blake3 import blake3
 from more_itertools import windowed
 from iscc.minhash import minhash_256
+from iscc.text import text_hash, text_normalize, text_trim
 from iscc.codec import (
     MT,
     ST,
@@ -50,19 +50,10 @@ def meta_id(title, extra="", bits=64):
 def content_id_text(text, bits=64):
     # type: (Union[str, bytes], int) -> str
 
-    # 1. Normalize (drop whitespace)
     text = text_normalize(text)
-
-    # 2. Create 13 character n-grams
-    ngrams = ("".join(chars) for chars in sliding_window(text, WINDOW_SIZE_CID_T))
-
-    # 3. Create 32-bit features with xxHash32
-    features = [xxhash.xxh32_intdigest(s.encode("utf-8")) for s in ngrams]
-
-    # 4. Apply minimum_hash
-    content_hash = minhash_256(features)
+    th = text_hash(text)
     header = write_header(MT.CONTENT, ST_CC.TEXT, VS.V0, bits)
-    code = encode_base32(header + content_hash[: bits // 8])
+    code = encode_base32(header + th[: bits // 8])
 
     return code
 
@@ -163,44 +154,6 @@ def instance_id(data, bits=64):
 ###############################################################################
 # Content Normalization Functions                                             #
 ###############################################################################
-
-
-def text_trim(text, nbytes):
-    return text.encode("utf-8")[:nbytes].decode("utf-8", "ignore").strip()
-
-
-def text_normalize(text):
-
-    # 1. Convert bytes to str
-    if isinstance(text, bytes):
-        text = text.decode("utf-8")
-
-    # 2. Remove leading/trailing whitespace
-    text_stripped = text.strip()
-
-    # 3. Lower case
-    text_lower = text_stripped.lower()
-
-    # 4. Decompose with NFD
-    text_decomposed = unicodedata.normalize("NFD", text_lower)
-
-    # 5. Filter
-    chars = []
-    for c in text_decomposed:
-        cat = unicodedata.category(c)
-        if cat not in UNICODE_FILTER:
-            chars.append(c)
-        elif c in CC_WHITESPACE:
-            chars.append(c)
-    text_filtered = "".join(chars)
-
-    # 6. Collapse consecutive whitespace
-    wsproc_text = " ".join(text_filtered.split())
-
-    # 7. Recombine
-    recombined = unicodedata.normalize("NFKC", wsproc_text)
-
-    return recombined
 
 
 def image_normalize(img):

@@ -22,32 +22,6 @@ HEAD_IID = b"\x30"
 # Instance-ID - Bytes to read per blake3 hash update.
 IID_READ_SIZE = 524288
 
-# Unicode categories to remove during text normalization
-UNICODE_FILTER = frozenset(
-    {
-        "Cc",
-        "Cf",
-        "Cn",
-        "Co",
-        "Cs",
-        "Mc",
-        "Me",
-        "Mn",
-        "Pc",
-        "Pd",
-        "Pe",
-        "Pf",
-        "Pi",
-        "Ps",
-    }
-)
-
-# Common Control Characters considered whitespace
-CC_WHITESPACE = (
-    "\u0009",  # Horizontal Tab (TAB)
-    "\u000A",  # Linefeed (LF)
-    "\u000D",  # Carriage Return (CR)
-)
 
 SYMBOLS = "C23456789rB1ZEFGTtYiAaVvMmHUPWXKDNbcdefghLjkSnopRqsJuQwxyz"
 VALUES = "".join([chr(i) for i in range(58)])
