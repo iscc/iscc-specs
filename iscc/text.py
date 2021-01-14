@@ -1,12 +1,11 @@
 # -*- coding: utf-8 -*-
 import unicodedata
-from collections import Generator
-from typing import List
+from typing import List, Tuple, Generator, Union
 import xxhash
 from iscc.cdc import data_chunks
 from iscc.minhash import compress, minhash, minhash_256
 from iscc.utils import sliding_window
-from codec import encode_base64
+from iscc.codec import encode_base64
 
 AVG_SIZE_TEXT = 1024  # Default average number of characters per text chunk
 NGRAM_SIZE = 13  # Default number of characters per feature hash
