@@ -1,9 +1,7 @@
 # -*- coding: utf-8 -*-
 import subprocess
 from pathlib import Path
-from tempfile import gettempdir, mkdtemp
-
-from loguru import logger as log
+from tempfile import mkdtemp
 import os
 import sys
 from subprocess import Popen, PIPE, DEVNULL
@@ -33,6 +31,51 @@ def compute_video_hash(features, bits=64):
     vecsum = [sum(col) for col in zip(*sigs)]
     video_hash = wtahash(vecsum, hl=bits)
     return video_hash
+
+
+def compute_rolling_signatures(frames, window=WINDOW, overlap=OVERLAP):
+    # type: (List[Frame], int, int) -> List[str]
+    """
+    Compute video signatures based on rolling window.
+
+    Generates segment-wise features where 'window' is the duration of segments in
+    seconds and 'overlap' is the number of seconds that overlap for each segment.
+    """
+    assert overlap < window, "Overlap must be shorter than window"
+    shift = window - overlap
+    cut_indexes = [0]
+    start = 0
+    for fidx, frame in enumerate(frames):
+        if frame.elapsed > start + shift:
+            cut_indexes.append(fidx)
+            start = frame.elapsed
+    sigs = []
+    for ci in cut_indexes:
+        segment_frames = []
+        start = frames[ci].elapsed
+        for frame in frames[ci:]:
+            segment_frames.append(tuple(frame.vector.tolist()))
+            if frame.elapsed > start + window:
+                sigs.append(encode_base64(compute_video_hash(segment_frames)))
+                break
+    return sigs
+
+
+def compute_scene_signatures(frames, scenes):
+    # type: (List[Frame], List[Scene]) -> List[SceneSig]
+    """Compute video signatures for individual scenes in video."""
+    scenes_fc = scenes[-1][-1].get_frames()
+    frames_fc = len(frames)
+    assert scenes_fc == frames_fc, f"{scenes_fc} scenes vs {frames_fc} frames"
+    result = []
+    for start, end in scenes:
+        scene_duration = end.get_seconds() - start.get_seconds()
+        scene_duration = round(scene_duration, 3)
+        scene_frames = frames[start.get_frames() : end.get_frames()]
+        scene_sigs = [tuple(frame.vector.tolist()) for frame in scene_frames]
+        scene_hash = compute_video_hash(scene_sigs)
+        result.append((scene_duration, encode_base64(scene_hash)))
+    return result
 
 
 def extract_signature(file_path, crop=None):
@@ -113,31 +156,3 @@ def detect_scenes(video_file):
     video_manager.start()
     scene_manager.detect_scenes(frame_source=video_manager, show_progress=False)
     return scene_manager.get_scene_list(base_timecode)
-
-
-def compute_scene_signatures(frames, scenes):
-    # type: (List[Frame], List[Scene]) -> List[SceneSig]
-    """Compute video signatures for individuale scenes in video."""
-    scenes_fc = scenes[-1][-1].get_frames()
-    frames_fc = len(frames)
-    assert scenes_fc == frames_fc, f"{scenes_fc} scenes vs {frames_fc} frames"
-    result = []
-    for start, end in scenes:
-        scene_duration = end.get_seconds() - start.get_seconds()
-        scene_duration = round(scene_duration, 3)
-        scene_frames = frames[start.get_frames() : end.get_frames()]
-        scene_sigs = [tuple(frame.vector.tolist()) for frame in scene_frames]
-        scene_hash = compute_video_hash(scene_sigs)
-        result.append((scene_duration, encode_base64(scene_hash)))
-    return result
-
-
-def compute_rolling_signatures(frames, window=WINDOW, overlap=OVERLAP):
-    # type: (List[Frame], int, int) -> List[str]
-    """
-    Compute video signatures based on rolling window.
-
-    Generates segment-wise features where 'window' is the duration of segments in
-    seconds and 'overlap' is the number of seconds that overlap for each segment.
-    """
-    pass
