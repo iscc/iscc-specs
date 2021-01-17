@@ -89,10 +89,10 @@ def content_id_video(video, bits=64):
     read_size = 262144
     sig_gen = signature_extractor()
     with Streamable(video) as stream:
-        data = stream.read(read_size)
+        data = stream.stream.read(read_size)
         while data:
             sig_gen.send(data)
-            data = stream.read(read_size)
+            data = stream.stream.read(read_size)
     mp7sig = next(sig_gen)
     frame_sigs = read_ffmpeg_signature(mp7sig)
     features = [tuple(sig.vector.tolist()) for sig in frame_sigs]
@@ -136,7 +136,7 @@ def instance_id(data, bits=64):
     b3 = blake3()
     with Streamable(data) as stream:
         while True:
-            d = stream.read(IID_READ_SIZE)
+            d = stream.stream.read(IID_READ_SIZE)
             if not d:
                 break
             b3.update(d)

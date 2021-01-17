@@ -408,7 +408,7 @@ pymdown-extensions = ">=6.3"
 
 [[package]]
 name = "mkdocs-minify-plugin"
-version = "0.3.0"
+version = "0.4.0"
 description = "An MkDocs plugin to minify HTML and/or JS files prior to being written to disk"
 category = "dev"
 optional = false
@@ -492,6 +492,14 @@ optional = false
 python-versions = ">=3.6"
 
 [[package]]
+name = "olefile"
+version = "0.46"
+description = "Python package to parse, read and write Microsoft OLE2 files (Structured Storage or Compound Document, Microsoft Office)"
+category = "main"
+optional = false
+python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
+
+[[package]]
 name = "opencv-python-headless"
 version = "4.5.1.48"
 description = "Wrapper package for OpenCV python bindings."
@@ -501,6 +509,22 @@ python-versions = ">=3.6"
 
 [package.dependencies]
 numpy = ">=1.17.3"
+
+[[package]]
+name = "opf-fido"
+version = "1.4.1"
+description = "Format Identification for Digital Objects (FIDO)."
+category = "main"
+optional = false
+python-versions = "*"
+
+[package.dependencies]
+olefile = ">=0.4,<1"
+six = ">=1.10.0,<2"
+
+[package.extras]
+setup = ["pytest-runner"]
+testing = ["pytest"]
 
 [[package]]
 name = "packaging"
@@ -663,7 +687,7 @@ opencv = ["opencv-python (<=4.2.0.32)", "opencv-python"]
 name = "six"
 version = "1.15.0"
 description = "Python 2 and 3 compatibility utilities"
-category = "dev"
+category = "main"
 optional = false
 python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*"
 
@@ -764,7 +788,7 @@ turbo = ["cython", "numba"]
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.6"
-content-hash = "8c7b3cef62df9aa8d75f9f104fc716b03b05b4003bd629e705dfb1fc4beae7c4"
+content-hash = "b392fecdd9ae7250fe7df49087f9e5426b9ed6ab16ecf96e5bdb76e83b42769d"
 
 [metadata.files]
 aiocontextvars = [
@@ -1083,8 +1107,8 @@ mkdocs-material = [
     {file = "mkdocs_material-4.6.3-py2.py3-none-any.whl", hash = "sha256:7f3afa0a09c07d0b89a6a9755fdb00513aee8f0cec3538bb903325c80f66f444"},
 ]
 mkdocs-minify-plugin = [
-    {file = "mkdocs-minify-plugin-0.3.0.tar.gz", hash = "sha256:06fecd8ddb9cb90f30bcee2d94c3d4b46a090f403d7ff0edff089a435906c4ee"},
-    {file = "mkdocs_minify_plugin-0.3.0-py2-none-any.whl", hash = "sha256:9bac96276b1681debb3eb2cf5bae972586b4c1138e8d78ea63a984ea6276563d"},
+    {file = "mkdocs-minify-plugin-0.4.0.tar.gz", hash = "sha256:b975ab8e72b9aeadaa8ba2e2901be401475b280a1d8f1789653d66734ea7d8cc"},
+    {file = "mkdocs_minify_plugin-0.4.0-py2-none-any.whl", hash = "sha256:8893aef8410458a2c1d6454342fc6d1db30439d60f7850c144803932262fd89c"},
 ]
 mkdocs-redirects = [
     {file = "mkdocs-redirects-1.0.1.tar.gz", hash = "sha256:0a21301bee7f743d622226a6869f4718f3bfb26887985e23aafac7f7f6b050aa"},
@@ -1154,6 +1178,9 @@ numpy = [
     {file = "numpy-1.19.3-pp36-pypy36_pp73-manylinux2010_x86_64.whl", hash = "sha256:9a0669787ba8c9d3bb5de5d9429208882fb47764aa79123af25c5edc4f5966b9"},
     {file = "numpy-1.19.3.zip", hash = "sha256:35bf5316af8dc7c7db1ad45bec603e5fb28671beb98ebd1d65e8059efcfd3b72"},
 ]
+olefile = [
+    {file = "olefile-0.46.zip", hash = "sha256:133b031eaf8fd2c9399b78b8bc5b8fcbe4c31e85295749bb17a87cba8f3c3964"},
+]
 opencv-python-headless = [
     {file = "opencv-python-headless-4.5.1.48.tar.gz", hash = "sha256:d16825755e7b5a6d8737f93e116670229e1510199e0af9213004e187ae0dbcc5"},
     {file = "opencv_python_headless-4.5.1.48-cp36-cp36m-macosx_10_13_x86_64.whl", hash = "sha256:f2011ecb3980bbed283d17d43e0f1221bac88c0cac1a6fb59a056544de2df2f7"},
@@ -1180,6 +1207,10 @@ opencv-python-headless = [
     {file = "opencv_python_headless-4.5.1.48-cp39-cp39-manylinux2014_x86_64.whl", hash = "sha256:372149d007e20bf556b7687591d22b58b56b3c225f492da051d81587e5dc7411"},
     {file = "opencv_python_headless-4.5.1.48-cp39-cp39-win32.whl", hash = "sha256:65c9ea57be5ebcaed009b3fee14fe59f3b6aa1e573fe08c5039ff057ad593c53"},
     {file = "opencv_python_headless-4.5.1.48-cp39-cp39-win_amd64.whl", hash = "sha256:a322d4df14c3a5f19701a023b3da91e9b8af8653b0d2ee0c50b0b341212f7343"},
+]
+opf-fido = [
+    {file = "opf-fido-1.4.1.tar.gz", hash = "sha256:3055a65996f9324e1cf8eb99da3536c07ed547602efd193b7ae5cc499a958bd5"},
+    {file = "opf_fido-1.4.1-py2.py3-none-any.whl", hash = "sha256:b8aeaa0d769b4d2c7dbea794fcd68ec6b2303ae5bf0e14d546399d0f00ae81a6"},
 ]
 packaging = [
     {file = "packaging-20.8-py2.py3-none-any.whl", hash = "sha256:24e0da08660a87484d1602c30bb4902d74816b6985b93de36926f5bc95741858"},

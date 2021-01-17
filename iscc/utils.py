@@ -12,17 +12,18 @@ class Streamable:
     """Converts a file path or raw bytes into a managed readable stream."""
 
     def __init__(self, data: File):
-        self.manage = True
         if isinstance(data, (str, Path)):
             self.stream = open(data, "rb")
+            self.name = Path(data).name
         elif not hasattr(data, "read"):
             self.stream = io.BytesIO(data)
+            self.name = ""
         else:
             self.stream = data
-            self.manage = False
+            self.name = ""
 
     def __enter__(self):
-        return self.stream
+        return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         self.stream.close()
