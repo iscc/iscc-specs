@@ -21,7 +21,10 @@ def test_content_id_video():
 
 
 def test_compute_video_hash():
-    assert video.compute_video_hash([tuple(range(380))]).hex() == "528f91431f7c4ad2"
+    features = [tuple(range(380))]
+    assert video.compute_video_hash(features, 64).hex() == "528f91431f7c4ad2"
+    extended = video.compute_video_hash(features, 256).hex()
+    assert extended.startswith("528f91431f7c4ad2")
 
 
 def test_compute_rolling_signatures():
