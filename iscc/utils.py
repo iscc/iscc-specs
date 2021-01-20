@@ -47,11 +47,11 @@ def sliding_window(seq, width):
     # type: (Sequence, int) -> Generator[Sequence[Sequence]]
     """
     Generate a sequence of equal "width" slices each advancing by one elemnt.
-    All types that have a length and can be sliced are supported (list, tuple, str ...)
-    and retain there types the result sequence.
+    All types that have a length and can be sliced are supported (list, tuple, str ...).
+    The result type matches the type of the input sequence.
     Fragment slices smaller than the width at the end of the sequence are not produced.
-    If "witdh" is smaller the the input sequence than one element will be returned that
-    is shorter that the requested width.
+    If "witdh" is smaller than the input sequence than one element will be returned that
+    is shorter than the requested width.
     """
     assert width >= 2, "Sliding window width must be 2 or bigger."
     idx = range(max(len(seq) - width + 1, 1))
