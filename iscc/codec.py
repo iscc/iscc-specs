@@ -11,9 +11,9 @@ Body:
 """
 import base64
 import enum
-from typing import Tuple
+from typing import List, Tuple, Union
 from bitarray import bitarray
-from bitarray.util import int2ba, ba2int
+from bitarray.util import int2ba, ba2int, count_xor
 from bech32 import convertbits
 
 
@@ -28,10 +28,6 @@ class MT(enum.IntEnum):
     CONTENT = 2
     DATA = 3
     INSTANCE = 4
-
-    @property
-    def humanized(self):
-        return self.name.lower() + "-code"
 
 
 class ST(enum.IntEnum):
@@ -174,3 +170,121 @@ def _read_varnibble(b: bitarray) -> Tuple[int, bitarray]:
         return ba2int(b[4:16]) + 584, b[16:]
 
     raise ValueError("Invalid bitarray")
+
+
+class Code:
+    """
+    A singular ISCC component.
+
+    Convenience class to handle different representations of an ISCC component.
+    """
+
+    def __init__(self, code):
+        # type: (Union[str, Tuple[int, int, int, int, bytes], bytes]) -> None
+        if isinstance(code, str):
+            code_fields = read_header(decode_base32(code))
+        elif isinstance(code, tuple):
+            code_fields = code
+        elif isinstance(code, bytes):
+            code_fields = read_header(code)
+        else:
+            raise ValueError("Code must be str, bytes, or tuple")
+
+        self._head = code_fields[:-1]
+        body = bitarray()
+        body.frombytes(code_fields[-1])
+        self._body = body
+
+    def __str__(self):
+        return self.code
+
+    def __repr__(self):
+        return f'Code("{self.code}")'
+
+    def __bytes__(self):
+        return self.bytes
+
+    @property
+    def code(self) -> str:
+        """Standard base32 representation of code."""
+        return encode_base32(self.bytes)
+
+    @property
+    def bytes(self) -> bytes:
+        """Raw bytes of code (including header)."""
+        return write_header(*self._head) + self._body.tobytes()
+
+    @property
+    def hex(self) -> str:
+        """Hex representation of code (including header)."""
+        return self.bytes.hex()
+
+    @property
+    def type_id(self) -> str:
+        """A unique composite type-id (use as name to index codes seperately)."""
+        return (
+            f"{self.maintype.name}-"
+            f"{self.subtype.name}-"
+            f"{self.version.name}-"
+            f"{self.length}"
+        )
+
+    @property
+    def explain(self) -> str:
+        """Human readble representation of code header."""
+        return f"{self.type_id}-{self.hex}"
+
+    @property
+    def hash_bytes(self) -> bytes:
+        """Byte representation of code (without header)"""
+        return self._body.tobytes()
+
+    @property
+    def hash_hex(self) -> str:
+        """Hex string representation of code (without header)."""
+        return self._body.hex()
+
+    @property
+    def hash_bits(self) -> str:
+        """String of 0,1 representing the bits of the code (without header)."""
+        return self._body.to01()
+
+    @property
+    def hash_ints(self) -> List[int]:
+        """List of 0,1 integers representing the bits of the code (without header)."""
+        return self._body.tolist(as_ints=True)
+
+    @property
+    def hash_uint(self) -> int:
+        """Unsinged integer representation of the code (without header)."""
+        return int.from_bytes(self._body, "big", signed=False)
+
+    @property
+    def maintype(self) -> MT:
+        """Enum maintype of code."""
+        return MT(self._head[0])
+
+    @property
+    def subtype(self) -> Union[ST, ST_CC]:
+        """Enum subtype of code."""
+        if self.maintype == MT.CONTENT:
+            return ST_CC(self._head[1])
+        return ST(self._head[1])
+
+    @property
+    def version(self) -> VS:
+        """Enum version of code."""
+        return VS(self._head[2])
+
+    @property
+    def length(self) -> int:
+        """Length of code in number of bits."""
+        return self._head[3]
+
+    def distance(self, other) -> int:
+        """Calculate hamming distance of codes."""
+        return self ^ other
+
+    def __xor__(self, other) -> int:
+        """Use XOR operator for hamming distance caldulation."""
+        return count_xor(self._body, other._body)
