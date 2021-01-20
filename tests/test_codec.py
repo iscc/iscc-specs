@@ -7,7 +7,6 @@ from bitarray import bitarray as ba
 def test_main_type():
     assert isinstance(c.MT.META, int)
     assert c.MT.META == 0
-    assert c.MT.META.humanized == "meta-code"
 
 
 def test_write_header():
