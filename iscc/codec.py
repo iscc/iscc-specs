@@ -13,7 +13,7 @@ import base64
 import enum
 from typing import List, Tuple, Union
 from bitarray import bitarray
-from bitarray.util import int2ba, ba2int, count_xor
+from bitarray.util import ba2hex, int2ba, ba2int, count_xor
 from bech32 import convertbits
 
 
@@ -242,7 +242,7 @@ class Code:
     @property
     def hash_hex(self) -> str:
         """Hex string representation of code (without header)."""
-        return self._body.hex()
+        return ba2hex(self._body)
 
     @property
     def hash_bits(self) -> str:
@@ -286,5 +286,5 @@ class Code:
         return self ^ other
 
     def __xor__(self, other) -> int:
-        """Use XOR operator for hamming distance caldulation."""
+        """Use XOR operator for hamming distance calculation."""
         return count_xor(self._body, other._body)
