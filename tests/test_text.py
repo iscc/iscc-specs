@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 import pytest
-from iscc.core import content_id_text, distance
+from iscc.core import content_id_text
 from iscc.text import *
+from iscc.metrics import distance
 from fauxfactory.factories.strings import gen_utf8
 
 

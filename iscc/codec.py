@@ -278,7 +278,7 @@ class Code:
 
     @property
     def length(self) -> int:
-        """Length of code in number of bits."""
+        """Length of code hash in number of bits (without header)."""
         return self._head[3]
 
     def __xor__(self, other) -> int:

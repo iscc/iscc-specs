@@ -239,21 +239,3 @@ def dct(values_list):
         result.append(alpha[-1])
         result.append(beta[-1])
         return result
-
-
-def distance(a, b):
-    # type: (str, str) -> int
-
-    if isinstance(a, str) and isinstance(b, str):
-        a = decode_base32(a)
-        b = decode_base32(b)
-        a = read_header(a)[-1]
-        b = read_header(b)[-1]
-
-        assert len(a) == len(b), "Codes must be equal length"
-
-    if isinstance(a, bytes) and isinstance(b, bytes):
-        a = int.from_bytes(a, "big", signed=False)
-        b = int.from_bytes(b, "big", signed=False)
-
-    return bin(a ^ b).count("1")

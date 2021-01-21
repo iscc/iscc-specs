@@ -5,3 +5,4 @@ from iscc.params import *
 from iscc.cdc import *
 from iscc.minhash import *
 from iscc.text import *
+from iscc.metrics import distance
