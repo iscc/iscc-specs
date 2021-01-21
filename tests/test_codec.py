@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
+from binascii import unhexlify
 import pytest
 from iscc import codec as c
+from iscc.core import meta_id
 from bitarray import bitarray as ba
 
 
@@ -119,3 +121,31 @@ def test_read_varnibble():
     assert c._read_varnibble(ba("111000000000000001010")) == (584, ba("01010"))
     assert c._read_varnibble(ba("1110111111111111")) == (4679, ba())
     assert c._read_varnibble(ba("1110111111111111101010")) == (4679, ba("101010"))
+
+
+def test_code_properties():
+    c64 = c.Code(meta_id("Hello World")[0])
+    c256 = c.Code(meta_id("Hello World", bits=256)[0])
+    assert c64.code == "AAA77PPFVS6JDUQB"
+    assert c256.code == "AAD77PPFVS6JDUQBWZDBIUGOUNAGIZYGCQ75ICNLH5QV73OXGWZV5CQ"
+    assert c64.bytes == unhexlify(c64.hex)
+    assert c64.type_id == "META-NONE-V0-64"
+    assert c64.explain == "META-NONE-V0-64-" + c64.hex
+    assert isinstance(c64.hash_ints[0], int)
+    assert c64.hash_bits == "".join(str(i) for i in c64.hash_ints)
+    assert c256.hash_bits == "".join(str(i) for i in c256.hash_ints)
+    assert c64.hash_uint == 18428137780330746369
+    assert (
+        c256.hash_uint
+        == 115675295640858983304133651543519403601786105490037992581561449255353963470474
+    )
+    assert c64.maintype == c.MT.META
+    assert c64.maintype == 0
+    assert c64.subtype == c.ST.NONE
+    assert c64.subtype == 0
+    assert c64.version == c.VS.V0
+    assert c64.length == 64
+    assert c256.length == 256
+    assert c64 ^ c64 == 0
+    with pytest.raises(ValueError):
+        c64 ^ c256

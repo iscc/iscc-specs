@@ -252,12 +252,12 @@ class Code:
     @property
     def hash_ints(self) -> List[int]:
         """List of 0,1 integers representing the bits of the code (without header)."""
-        return self._body.tolist(as_ints=True)
+        return self._body.tolist(True)
 
     @property
     def hash_uint(self) -> int:
         """Unsinged integer representation of the code (without header)."""
-        return int.from_bytes(self._body, "big", signed=False)
+        return ba2int(self._body, signed=False)
 
     @property
     def maintype(self) -> MT:
@@ -280,10 +280,6 @@ class Code:
     def length(self) -> int:
         """Length of code in number of bits."""
         return self._head[3]
-
-    def distance(self, other) -> int:
-        """Calculate hamming distance of codes."""
-        return self ^ other
 
     def __xor__(self, other) -> int:
         """Use XOR operator for hamming distance calculation."""
