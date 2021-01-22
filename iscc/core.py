@@ -10,26 +10,33 @@ from more_itertools import windowed
 from iscc.minhash import minhash_256
 from iscc.text import text_hash, text_normalize, text_trim
 from iscc.codec import (
+    Code,
     MT,
     ST,
     ST_CC,
     VS,
     decode_base32,
     encode_base32,
-    read_header,
     write_header,
 )
 from iscc.params import *
 from iscc.cdc import data_chunks
-from iscc.utils import File, Streamable, sliding_window
+from iscc.utils import Streamable
 from iscc.mp7 import read_ffmpeg_signature
-from iscc.video import compute_video_hash, signature_extractor
+from iscc.video import (
+    compute_rolling_signatures,
+    compute_scene_signatures,
+    compute_video_hash,
+    detect_crop,
+    detect_scenes,
+    extract_signature,
+)
 from iscc.simhash import similarity_hash
 from iscc.meta import meta_hash
 
 
 ###############################################################################
-# Top-Level functions for generating ISCC Component Codes                     #
+# Top-Level functions for generating ISCCs                                    #
 ###############################################################################
 
 
@@ -84,22 +91,55 @@ def content_id_audio(features, bits=64):
     return code
 
 
-def content_id_video(video, bits=64):
-    # type: (File, int) -> str
-    read_size = 262144
-    sig_gen = signature_extractor()
-    with Streamable(video) as stream:
-        data = stream.stream.read(read_size)
-        while data:
-            sig_gen.send(data)
-            data = stream.stream.read(read_size)
-    mp7sig = next(sig_gen)
-    frame_sigs = read_ffmpeg_signature(mp7sig)
-    features = [tuple(sig.vector.tolist()) for sig in frame_sigs]
-    video_hash = compute_video_hash(features, bits)
-    header = write_header(MT.CONTENT, ST_CC.VIDEO, VS.V0, bits)
-    code = encode_base32(header + video_hash)
-    return code
+def content_id_video(video, scenes=False, crop=True, window=0, overlap=0, bits=64):
+    # types: (File, bool, bool, int, int, int) -> dict
+    """Compute Content-ID video.
+
+    :param video: The video file.
+    :param bool scenes: If True generate scene detection based granular features.
+    :param bool crop: If True detect and remove black borders before processing.
+    :param int window: Duration in seconds for rolling window based granular features.
+    :param int overlap: Overlap in seconds for rolling window bases granular features.
+
+    Returns a dictionary with the following fields:
+        video_code: the calculated ISCC video code
+        signature: raw bytes of extracted mp7 signature
+
+    Optinally depending on settings these additional fields are provided:
+        crop: the crop value that has been applied (if any) before signature extraction.
+        features: list of base64 encoded granular video features.
+        sizes: list of scene durations corresponding to features (only if scenes=True).
+        window: window size of segements in seconds (only provided if scenes is False).
+        overlap: overlap of segments in seconds (only provided if scenes is False).
+
+    The window and overlap parameters are ignored if 0 or if scenes is False.
+    Set crop=False if you know your video has no black borders to improve performance.
+    """
+    crop_value = detect_crop(video) if crop else None
+    signature = extract_signature(video, crop_value)
+    frames = read_ffmpeg_signature(signature)
+    features = [tuple(sig.vector.tolist()) for sig in frames]
+    video_hash = compute_video_hash(features, bits=bits)
+    video_code = Code((MT.CONTENT, ST_CC.VIDEO, VS.V0, bits, video_hash))
+    result = dict(
+        video_code=video_code.code,
+        signature=signature,
+    )
+    if crop_value:
+        result["crop"] = crop_value.lstrip("crop=")
+
+    if scenes:
+        cutpoints = detect_scenes(video)
+        features, durations = compute_scene_signatures(frames, cutpoints)
+        result["features"] = features
+        result["sizes"] = durations
+    elif any((window, overlap)):
+        features = compute_rolling_signatures(frames, window=window, overlap=overlap)
+        result["features"] = features
+        result["window"] = window
+        result["overlap"] = overlap
+
+    return result
 
 
 def content_id_mixed(cids, bits=64):

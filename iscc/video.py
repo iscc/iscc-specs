@@ -11,17 +11,17 @@ from typing import Generator, List, Sequence, Tuple, Optional
 import imageio_ffmpeg
 from statistics import mode
 from scenedetect import ContentDetector, FrameTimecode, SceneManager, VideoManager
-from iscc.codec import encode_base64
+from iscc.codec import Code, MT, ST_CC, VS, encode_base64
 from iscc.utils import cd
 from iscc.wtahash import wtahash
-from iscc.mp7 import Frame
+from iscc.mp7 import Frame, read_ffmpeg_signature
 
 
 FFMPEG = imageio_ffmpeg.get_ffmpeg_exe()
-WINDOW = 7
-OVERLAP = 3
+WINDOW = 7  # Default window size in seconds
+OVERLAP = 3  # Default overlap size in seconds
 Scene = Tuple[FrameTimecode, FrameTimecode]
-SceneSig = Tuple[float, str]
+SceneSig = Tuple[List[str], List[int]]  # feature hashes, scene durations
 
 
 def compute_video_hash(features, bits=64):
@@ -62,20 +62,23 @@ def compute_rolling_signatures(frames, window=WINDOW, overlap=OVERLAP):
 
 
 def compute_scene_signatures(frames, scenes):
-    # type: (List[Frame], List[Scene]) -> List[SceneSig]
-    """Compute video signatures for individual scenes in video."""
+    # type: (List[Frame], List[Scene]) -> Tuple[List[str], List[float]]
+    """Compute video signatures for individual scenes in video.
+    Returns features and durations as tuple.
+    """
     scenes_fc = scenes[-1][-1].get_frames()
     frames_fc = len(frames)
     assert scenes_fc == frames_fc, f"{scenes_fc} scenes vs {frames_fc} frames"
-    result = []
+    durations, features = [], []
     for start, end in scenes:
         scene_duration = end.get_seconds() - start.get_seconds()
         scene_duration = round(scene_duration, 3)
         scene_frames = frames[start.get_frames() : end.get_frames()]
         scene_sigs = [tuple(frame.vector.tolist()) for frame in scene_frames]
         scene_hash = compute_video_hash(scene_sigs)
-        result.append((scene_duration, encode_base64(scene_hash)))
-    return result
+        durations.append(scene_duration)
+        features.append(encode_base64(scene_hash))
+    return features, durations
 
 
 def extract_signature(file_path, crop=None):

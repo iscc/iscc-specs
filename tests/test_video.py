@@ -17,7 +17,34 @@ def test_content_id_video_0_features():
 
 
 def test_content_id_video():
-    assert content_id_video(SAMPLE) == "EMAV4DUD6RORW4X4"
+    result = content_id_video(SAMPLE)
+    assert "video_code" in result
+    assert "signature" in result
+    assert "crop" in result
+    assert result["video_code"] == "EMAVMHMC7RMJF6XZ"
+    assert result["crop"] == "176:96:0:24"
+
+
+def test_content_id_video_no_crop():
+    result = content_id_video(SAMPLE, crop=False)
+    assert "video_code" in result
+    assert "signature" in result
+    assert "crop" not in result
+    assert result["video_code"] == "EMAV4DUD6RORW4X4"
+
+
+def test_content_id_video_scenes():
+    result = content_id_video(SAMPLE, scenes=True)
+    assert "features" in result
+    assert "sizes" in result
+
+
+def test_content_id_video_rolling():
+    result = content_id_video(SAMPLE, window=10, overlap=4)
+    assert "features" in result
+    assert "sizes" not in result
+    assert result["window"] == 10
+    assert result["overlap"] == 4
 
 
 def test_compute_video_hash():
@@ -54,18 +81,21 @@ def test_compute_scene_signatures():
     frames = mp7.read_ffmpeg_signature(signature)
     scenes = video.detect_scenes(SAMPLE)
     scene_signatures = video.compute_scene_signatures(frames, scenes)
-    assert scene_signatures == [
-        (7.625, "XxqD_x1a8vw"),
-        (2.5, "HEqWY8AX9oQ"),
-        (5.083, "VA7U9A0f8-w"),
-        (1.25, "V5QEfpj-tlQ"),
-        (3.75, "dm6ETGUEwmc"),
-        (2.792, "vhqD3HFKdtE"),
-        (15.458, "Hg4X9f1acng"),
-        (8.167, "XkoAn8YVcqU"),
-        (13.042, "V06CXFQdUrQ"),
-        (0.375, "XBgT_nxD8tE"),
-    ]
+    assert scene_signatures == (
+        [
+            "XxqD_x1a8vw",
+            "HEqWY8AX9oQ",
+            "VA7U9A0f8-w",
+            "V5QEfpj-tlQ",
+            "dm6ETGUEwmc",
+            "vhqD3HFKdtE",
+            "Hg4X9f1acng",
+            "XkoAn8YVcqU",
+            "V06CXFQdUrQ",
+            "XBgT_nxD8tE",
+        ],
+        [7.625, 2.5, 5.083, 1.25, 3.75, 2.792, 15.458, 8.167, 13.042, 0.375],
+    )
 
 
 def test_extract_signature():
