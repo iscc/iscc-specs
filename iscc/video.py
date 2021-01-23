@@ -11,10 +11,11 @@ from typing import Generator, List, Sequence, Tuple, Optional
 import imageio_ffmpeg
 from statistics import mode
 from scenedetect import ContentDetector, FrameTimecode, SceneManager, VideoManager
-from iscc.codec import Code, MT, ST_CC, VS, encode_base64
+from iscc.codec import encode_base64
 from iscc.utils import cd
 from iscc.wtahash import wtahash
-from iscc.mp7 import Frame, read_ffmpeg_signature
+from iscc.mp7 import Frame
+import av
 
 
 FFMPEG = imageio_ffmpeg.get_ffmpeg_exe()
@@ -159,3 +160,29 @@ def detect_scenes(video_file):
     video_manager.start()
     scene_manager.detect_scenes(frame_source=video_manager, show_progress=False)
     return scene_manager.get_scene_list(base_timecode)
+
+
+def get_metadata(video):
+    with av.open(video) as container:
+        duration = round(container.duration / 1000000, ndigits=3)
+        format_ = container.format.long_name
+        width = container.streams.video[0].format.width
+        height = container.streams.video[0].format.height
+        fps = container.streams.video[0].guessed_rate
+        bitrate = container.bit_rate
+
+        lang = set()
+        for stream in container.streams:
+            lang.add(stream.language)
+
+        metadata = dict(
+            duration=duration,
+            format=format_,
+            width=width,
+            height=height,
+            fps=round(float(fps), ndigits=3),
+            bitrate=bitrate,
+            language=lang.pop() if len(lang) == 1 else list(lang),
+        )
+        metadata.update(container.metadata)
+        return dict(sorted(metadata.items()))
