@@ -115,6 +115,15 @@ class CustomFido(Fido):
         return dict(sorted(result.items()))
 
 
+_detector = CustomFido(
+    quiet=True,
+    zip=False,
+    nocontainer=True,
+    format_files=["formats-v96.xml", "format_extensions.xml"],
+    containersignature_file="container-signature-20200121.xml",
+)
+
+
 # Custom mappings from PUID to mediatype
 PRONOM_MEDIATYPE_MAP = {
     "fmt/414": "audio/x-aiff",
@@ -146,10 +155,72 @@ MIME_NORMALIZE_MAP = {
     "application/x-matroska": "video/x-matroska",
 }
 
-_detector = CustomFido(
-    quiet=True,
-    zip=False,
-    nocontainer=True,
-    format_files=["formats-v96.xml", "format_extensions.xml"],
-    containersignature_file="container-signature-20200121.xml",
-)
+SUPPORTED_MEDIATYPES = {
+    # Text Formats
+    "application/rtf": {"gmt": "text", "ext": "rtf"},
+    "application/msword": {"gmt": "text", "ext": "doc"},
+    "application/pdf": {"gmt": "text", "ext": "pdf"},
+    "application/epub+zip": {"gmt": "text", "ext": "epub"},
+    "application/xml": {"gmt": "text", "ext": "xml"},
+    "application/xhtml+xml": {"gmt": "text", "ext": "xhtml"},
+    "application/vnd.oasis.opendocument.text": {"gmt": "text", "ext": "odt"},
+    "text/html": {"gmt": "text", "ext": "html"},
+    "text/plain": {"gmt": "text", "ext": "txt"},
+    "application/x-ibooks+zip": {"gmt": "text", "ext": "ibooks"},
+    "text/x-web-markdown": {"gmt": "text", "ext": "md"},
+    "application/vnd.openxmlformats-officedocument.wordprocessingml.document": {
+        "gmt": "text",
+        "ext": "docx",
+    },
+    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": {
+        "gmt": "text",
+        "ext": "xlsx",
+    },
+    "application/vnd.ms-excel": {"gmt": "text", "ext": "xls"},
+    "application/x-mobipocket-ebook": {
+        "gmt": "text",
+        "ext": ["mobi", "prc", "azw", "azw3", "azw4"],
+    },
+    # Image Formats
+    "image/bmp": {"gmt": "image", "ext": "bmp"},
+    "image/gif": {"gmt": "image", "ext": "gif"},
+    "image/jpeg": {"gmt": "image", "ext": ["jpg", "jpeg"]},
+    "image/png": {"gmt": "image", "ext": "png"},
+    "image/tiff": {"gmt": "image", "ext": "tif"},
+    "image/vnd.adobe.photoshop": {"gmt": "image", "ext": "psd"},
+    "application/postscript": {"gmt": "image", "ext": "eps"},
+    # Audio Formats
+    "audio/mpeg": {"gmt": "audio", "ext": "mp3"},
+    "audio/vnd.wave": {"gmt": "audio", "ext": "wav"},
+    "audio/vorbis": {"gmt": "audio", "ext": "ogg"},
+    "audio/x-aiff": {"gmt": "audio", "ext": "aif"},
+    "audio/x-flac": {"gmt": "audio", "ext": "flac"},
+    "audio/opus": {"gmt": "audio", "ext": "opus"},
+    # Video Formats
+    "application/vnd.rn-realmedia": {"gmt": "video", "ext": "rm"},
+    "video/x-dirac": {"gmt": "video", "ext": "drc"},
+    "video/3gpp": {"gmt": "video", "ext": "3gp"},
+    "video/3gpp2": {"gmt": "video", "ext": "3g2"},
+    "video/x-ms-asf": {"gmt": "video", "ext": "asf"},
+    "video/x-msvideo": {"gmt": "video", "ext": "avi"},
+    "video/webm": {"gmt": "video", "ext": "webm"},
+    "video/mpeg": {"gmt": "video", "ext": ["mpeg", "mpg", "m1v", "vob"]},
+    "video/mp4": {"gmt": "video", "ext": "mp4"},
+    "video/x-m4v": {"gmt": "video", "ext": "m4v"},
+    "video/x-matroska": {"gmt": "video", "ext": "mkv"},
+    "video/theora": {"gmt": "video", "ext": ["ogg", "ogv"]},
+    "video/quicktime": {"gmt": "video", "ext": ["mov", "f4v"]},
+    "video/x-flv": {"gmt": "video", "ext": "flv"},
+    "application/x-shockwave-flash": {"gmt": "video", "ext": "swf"},
+    "video/h264": {"gmt": "video", "ext": "h264"},
+    "video/x-ms-wmv": {"gmt": "video", "ext": "wmv"},
+}
+
+SUPPORTED_EXTENSIONS = []
+for v in SUPPORTED_MEDIATYPES.values():
+    ext = v["ext"]
+    if isinstance(ext, str):
+        SUPPORTED_EXTENSIONS.append(ext)
+    else:
+        for e in ext:
+            SUPPORTED_EXTENSIONS.append(e)

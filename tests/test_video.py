@@ -169,3 +169,21 @@ def test_detect_scenes():
             FrameTimecode(timecode=1441, fps=24.000000),
         ),
     ]
+
+
+def test_get_metadata():
+    meta = video.get_metadata(SAMPLE)
+    assert meta == {
+        "bitrate": 177952,
+        "compatible_brands": "isommp42",
+        "creation_time": "2020-01-04T11:30:09.000000Z",
+        "duration": 60.14,
+        "format": "QuickTime / MOV",
+        "fps": 24.0,
+        "height": 144,
+        "language": "eng",
+        "major_brand": "mp42",
+        "minor_version": "0",
+        "title": "Kali by Anokato - Spiral Sessions 2019",
+        "width": 176,
+    }
