@@ -36,6 +36,7 @@ imageio-ffmpeg = "^0.4.2"
 pydantic = "^1.7.3"
 scenedetect = {extras = ["opencv-headless"], version = "^0.5.4"}
 opf-fido = "^1.4.1"
+av = "^8.0.3"
 
 [tool.poetry.extras]
 turbo = ["cython", "numba"]
