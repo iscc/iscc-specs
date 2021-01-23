@@ -11,7 +11,8 @@ File = Union[str, bytes, BinaryIO, Path]
 class Streamable:
     """Converts a file path or raw bytes into a managed readable stream."""
 
-    def __init__(self, data: File):
+    def __init__(self, data: File, close=True):
+        self.do_close = close
         if isinstance(data, (str, Path)):
             self.stream = open(data, "rb")
             self.name = Path(data).name
@@ -26,7 +27,8 @@ class Streamable:
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
-        self.stream.close()
+        if self.do_close:
+            self.stream.close()
 
 
 class cd:

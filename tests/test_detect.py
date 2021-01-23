@@ -14,7 +14,15 @@ def test_detect_path():
 
 def test_detect_file():
     with open(SAMPLE, "rb") as infile:
-        result = detect(SAMPLE)
+        result = detect(infile)
+        assert infile.tell() == 1337753
+    assert result == {"mediatype": "video/mp4", "puid": "fmt/199"}
+
+
+def test_detect_data():
+    with open(SAMPLE, "rb") as infile:
+        data = infile.read(1024)
+        result = detect(data)
     assert result == {"mediatype": "video/mp4", "puid": "fmt/199"}
 
 

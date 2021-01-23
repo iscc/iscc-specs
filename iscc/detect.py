@@ -18,7 +18,7 @@ def detect(file):
         https://www.iana.org/assignments/media-types/media-types.xhtml
         https://www.nationalarchives.gov.uk/PRONOM/
     """
-    with Streamable(file) as stream:
+    with Streamable(file, close=False) as stream:
         result = _detector.identify_stream(stream.stream, stream.name)
 
     if not result:
