@@ -187,3 +187,10 @@ def test_get_metadata():
         "title": "Kali by Anokato - Spiral Sessions 2019",
         "width": 176,
     }
+
+
+def test_get_metadata_open_file():
+    with open(SAMPLE, 'rb') as infile:
+        meta = video.get_metadata(infile)
+        assert meta['bitrate'] == 177952
+        assert infile.tell() == 65536
