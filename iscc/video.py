@@ -10,6 +10,7 @@ from secrets import token_hex
 from typing import Generator, List, Sequence, Tuple, Optional
 import imageio_ffmpeg
 from statistics import mode
+from langcodes import standardize_tag
 from scenedetect import ContentDetector, FrameTimecode, SceneManager, VideoManager
 from iscc.codec import encode_base64
 from iscc.utils import cd
@@ -163,26 +164,51 @@ def detect_scenes(video_file):
 
 
 def get_metadata(video):
-    with av.open(video) as container:
-        duration = round(container.duration / 1000000, ndigits=3)
-        format_ = container.format.long_name
-        width = container.streams.video[0].format.width
-        height = container.streams.video[0].format.height
-        fps = container.streams.video[0].guessed_rate
-        bitrate = container.bit_rate
+    with av.open(video) as v:
+        metadata = {}
+        c_duration = v.duration
+        # Lower Case all keys in metadata
+        c_metadata = {key.lower(): value for key, value in v.metadata.items()}
+        vstreams = 0
+        languages = set()
 
-        lang = set()
-        for stream in container.streams:
-            lang.add(stream.language)
+        metadata_fields = ["title"]
+        for field in metadata_fields:
+            value = c_metadata.get(field)
+            if value:
+                metadata[field] = value
 
-        metadata = dict(
-            duration=duration,
-            format=format_,
-            width=width,
-            height=height,
-            fps=round(float(fps), ndigits=3),
-            bitrate=bitrate,
-            language=lang.pop() if len(lang) == 1 else list(lang),
-        )
-        metadata.update(container.metadata)
+        for stream in v.streams:
+            if stream.type == "video":
+                if vstreams == 0:
+                    # Stream Duration
+                    duration = stream.duration or c_duration
+                    ds = round(float(duration * stream.time_base), ndigits=3)
+                    if ds > 0:
+                        metadata["duration"] = ds
+
+                    fps = stream.guessed_rate
+                    if fps:
+                        metadata["fps"] = round(float(fps), ndigits=3)
+
+                    # Stream Language
+                    if stream.language and stream.language != "und":
+                        languages.add(standardize_tag(stream.language))
+
+                    # Stream Dimensions and FPS
+                    format_attrs = ("width", "height")
+                    for attr in format_attrs:
+                        value = getattr(stream.format, attr)
+                        if value:
+                            metadata[attr] = value
+                vstreams += 1
+            if stream.type == "audio":
+                # Add languages of audio streams
+                if stream.language and stream.language != "und":
+                    languages.add(standardize_tag(stream.language))
+
+        lng = languages.pop() if len(languages) == 1 else list(languages)
+        if lng:
+            metadata["language"] = lng
+
         return dict(sorted(metadata.items()))
