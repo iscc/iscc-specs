@@ -37,7 +37,7 @@ pydantic = "^1.7.3"
 scenedetect = {extras = ["opencv-headless"], version = "^0.5.4"}
 opf-fido = "^1.4.1"
 av = "^8.0.3"
-langcodes = "^2.1.0"
+langcodes = { git = "https://github.com/goodmami/langcodes.git", branch = "use-pygtrie"}
 
 [tool.poetry.extras]
 turbo = ["cython", "numba"]
