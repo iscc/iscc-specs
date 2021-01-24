@@ -8,6 +8,7 @@ import xxhash
 from blake3 import blake3
 from more_itertools import windowed
 from iscc.minhash import minhash_256
+from iscc.detect import SUPPORTED_MEDIATYPES
 from iscc.text import text_hash, text_normalize, text_trim
 from iscc.codec import (
     Code,
@@ -33,11 +34,19 @@ from iscc.video import (
 )
 from iscc.simhash import similarity_hash
 from iscc.meta import meta_hash
+from iscc.uread import uread
 
 
 ###############################################################################
 # Top-Level functions for generating ISCCs                                    #
 ###############################################################################
+
+
+def compute(data, title="", extra=""):
+    file = uread(data)
+    if not file.mediatype or file.mediatype not in SUPPORTED_MEDIATYPES:
+        raise ValueError(f"Unsupported media type {file.mediatype}.")
+    return None
 
 
 def meta_id(title, extra="", bits=64):
