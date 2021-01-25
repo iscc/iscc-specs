@@ -5,7 +5,7 @@ from os.path import basename, exists
 from pathlib import Path
 import mmap
 from typing import Union, BinaryIO, Optional
-from iscc.detect import detect
+from iscc.mediatype import guess
 
 
 Readable = Union[str, Path, bytes, bytearray, memoryview, BinaryIO]
@@ -28,7 +28,6 @@ class uread:
         self._file = None
         self._data = None
         self._mediatype = None
-        self._puid = None
         self._start_pos = None
         self._do_close = False
 
@@ -89,21 +88,7 @@ class uread:
 
     @property
     def mediatype(self):
-        return self._mediatype or self._sniff().get("mediatype")
-
-    @property
-    def puid(self):
-        return self._puid or self._sniff().get("puid")
-
-    def _sniff(self):
-        pos = self.tell()
-        self.seek(0)
-        data = self.read(4096)
-        result = detect(data)
-        self.seek(pos)
-        self._mediatype = result.get("mediatype")
-        self._puid = result.get("puid")
-        return result
+        return self._mediatype or guess(self._uri)
 
     def close(self):
         return self._file.close()

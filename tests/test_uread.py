@@ -16,7 +16,7 @@ uris = OrderedDict(
     raw_bytes=open(FP, "rb").read(),
     file_obj=open(FP, "rb"),
     mem_view=memoryview(open(FP, "rb").read()),
-    uread_obj=uread(FP),
+    # uread_obj=uread(FP),
 )
 
 values = uris.values()
@@ -64,13 +64,7 @@ def test_uread_filename(uri):
 @pytest.mark.parametrize("uri", values, ids=ids)
 def test_uread_mediatype(uri):
     file = uread(uri)
-    assert file.mediatype == "video/mp4"
-
-
-@pytest.mark.parametrize("uri", values, ids=ids)
-def test_uread_puid(uri):
-    file = uread(uri)
-    assert file.puid == "fmt/199"
+    assert file.mediatype in ("video/mp4", "video/3gpp")
 
 
 def test_uread_context_manager():

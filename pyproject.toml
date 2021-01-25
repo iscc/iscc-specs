@@ -35,9 +35,12 @@ loguru = "^0.5"
 imageio-ffmpeg = "^0.4.2"
 pydantic = "^1.7.3"
 scenedetect = {extras = ["opencv-headless"], version = "^0.5.4"}
-opf-fido = "^1.4.1"
 av = "^8.0.3"
-langcodes = { git = "https://github.com/goodmami/langcodes.git", branch = "use-pygtrie"}
+langcodes = [
+    { python = "<3.9", version = "^2.1.0"},
+    { python = ">=3.9", git = "https://github.com/goodmami/langcodes.git", branch = "use-pygtrie"}
+]
+python-magic-bin = "^0.4.14"
 
 [tool.poetry.extras]
 turbo = ["cython", "numba"]
@@ -54,7 +57,7 @@ lxml = "^4.6"
 codetiming = "^1.2"
 humanize = "^3.2"
 fauxfactory = "^3.1"
-iscc-samples = "^0.1.0"
+iscc-samples = "^0.2.0"
 
 [build-system]
 requires = ["poetry>=1.0", "setuptools", "wheel", "cython"]

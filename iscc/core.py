@@ -8,7 +8,7 @@ import xxhash
 from blake3 import blake3
 from more_itertools import windowed
 from iscc.minhash import minhash_256
-from iscc.detect import SUPPORTED_MEDIATYPES
+from iscc.mediatype import SUPPORTED_MEDIATYPES
 from iscc.text import text_hash, text_normalize, text_trim
 from iscc.codec import (
     Code,
