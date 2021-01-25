@@ -36,14 +36,15 @@ def test_detect_junk():
 def test_detect_samples():
     for sample in samples.texts():
         if sample.name not in ("demo.txt", "demo.json", "demo.md"):
-            assert len(detect(sample)) == 2
+            assert len(detect(sample.as_posix())) == 2
 
     for sample in samples.images():
-        assert len(detect(sample)) == 2
+        if sample.name not in ("demo.bmp", ):
+            assert len(detect(sample.as_posix())) == 2
 
     for sample in samples.audios():
-        assert len(detect(sample)) == 2
+        assert len(detect(sample.as_posix())) == 2
 
     for sample in samples.videos():
         if sample.name != "demo.3g2":
-            assert len(detect(sample)) == 2, sample
+            assert len(detect(sample.as_posix())) == 2, sample
