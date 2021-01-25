@@ -74,7 +74,7 @@ def test_uread_puid(uri):
 
 
 def test_uread_context_manager():
-    file = open(FP, 'rb')
+    file = open(FP, "rb")
     file.seek(10)
     # don´t close if initiated with open file
     with uread(file) as u:
@@ -92,6 +92,3 @@ def test_uread_context_manager():
 def test_uread_close(uri):
     file = uread(uri)
     assert file.close() == None
-
-
-

@@ -19,6 +19,7 @@ class uread:
     When used as a context manager it will only close the file if it was opened by
     uread else it will restore the file cursor after exit.
     """
+
     def __init__(self, uri, filename=None):
         # type: (Readable, Optional[str]) -> None
         self._uri = uri
@@ -31,7 +32,7 @@ class uread:
         self._start_pos = None
         self._do_close = False
 
-        if hasattr(uri, 'tell'):
+        if hasattr(uri, "tell"):
             # Store eventual cursor to restore at exit.
             self._start_pos = uri.tell()
 
