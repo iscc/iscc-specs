@@ -16,6 +16,7 @@ uris = OrderedDict(
     raw_bytes=open(FP, "rb").read(),
     file_obj=open(FP, "rb"),
     mem_view=memoryview(open(FP, "rb").read()),
+    uread_obj=uread(FP),
 )
 
 values = uris.values()
@@ -38,6 +39,7 @@ def test_uread_seek(uri):
 @pytest.mark.parametrize("uri", values, ids=ids)
 def test_uread_read(uri):
     file = uread(uri)
+    file.seek(0)
     data = file.read(8)
     assert data.hex() == "0000001866747970"
     assert file.tell() == 8
@@ -46,7 +48,8 @@ def test_uread_read(uri):
 @pytest.mark.parametrize("uri", values, ids=ids)
 def test_uread_size(uri):
     file = uread(uri)
-    assert file.size == FILE_SIZE
+    file.seek(0)
+    assert file.size() == FILE_SIZE
     assert file.tell() == 0
 
 
@@ -56,17 +59,6 @@ def test_uread_filename(uri):
     assert file.filename in ("test.3gp", "undefined.und")
     file = uread(uri, "customfile.txt")
     assert file.filename == "customfile.txt"
-
-
-@pytest.mark.parametrize("uri", values, ids=ids)
-def test_uread_view(uri):
-    file = uread(uri)
-    assert file.tell() == 0
-    view = file.view()
-    view.seek(10)
-    assert view.tell() == 10
-    assert file.tell() == 0
-    view.close()
 
 
 @pytest.mark.parametrize("uri", values, ids=ids)
@@ -81,7 +73,25 @@ def test_uread_puid(uri):
     assert file.puid == "fmt/199"
 
 
+def test_uread_context_manager():
+    file = open(FP, 'rb')
+    file.seek(10)
+    # don´t close if initiated with open file
+    with uread(file) as u:
+        u.seek(20)
+        assert u.tell() == 20
+    assert file.closed == False
+    assert file.tell() == 10
+    # do close if initiated from file path
+    with uread(FP) as u:
+        u.read(10)
+    assert u._file.closed
+
+
 @pytest.mark.parametrize("uri", values, ids=ids)
 def test_uread_close(uri):
     file = uread(uri)
     assert file.close() == None
+
+
+

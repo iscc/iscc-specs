@@ -12,6 +12,13 @@ Readable = Union[str, Path, bytes, bytearray, memoryview, BinaryIO]
 
 
 class uread:
+    """
+    Universal Reader.
+
+    Can handle differnt inputs such as file paths or file-like objects.
+    When used as a context manager it will only close the file if it was opened by
+    uread else it will restore the file cursor after exit.
+    """
     def __init__(self, uri, filename=None):
         # type: (Readable, Optional[str]) -> None
         self._uri = uri
@@ -21,11 +28,18 @@ class uread:
         self._data = None
         self._mediatype = None
         self._puid = None
+        self._start_pos = None
+        self._do_close = False
+
+        if hasattr(uri, 'tell'):
+            # Store eventual cursor to restore at exit.
+            self._start_pos = uri.tell()
 
         if isinstance(uri, (str, Path)):
             if exists(uri):
                 self._filename = self._filename or basename(uri)
                 file = open(uri, mode="rb")
+                self._do_close = True  # We manage lifecyle
                 self._file = mmap.mmap(file.fileno(), length=0, access=mmap.ACCESS_READ)
         elif isinstance(uri, (bytes, bytearray, memoryview)):
             self._data = memoryview(uri)
@@ -37,7 +51,14 @@ class uread:
         else:
             raise ValueError(f"Cannot open {uri}")
 
-        self.seek(0)
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        if self._start_pos is not None:
+            self.seek(self._start_pos)
+        if self._do_close:
+            self.close()
 
     def tell(self):
         return self._file.tell()
@@ -48,7 +69,6 @@ class uread:
     def read(self, num):
         return self._file.read(num)
 
-    @property
     def size(self):
         if self._size:
             return self._size
@@ -63,14 +83,8 @@ class uread:
             return self._filename
         elif hasattr(self._file, "name"):
             return basename(self._file.name)
-
-    def view(self):
-        if self._data:
-            return io.BytesIO(self._data)
-        elif hasattr(self._file, "fileno"):
-            return open(self._file.name, "rb")
-        else:
-            return io.BytesIO(self._file)
+        elif hasattr(self._file, "filename"):
+            return basename(self._file.filename)
 
     @property
     def mediatype(self):
