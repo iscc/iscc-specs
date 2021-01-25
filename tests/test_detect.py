@@ -35,7 +35,7 @@ def test_detect_junk():
 
 def test_detect_samples():
     for sample in samples.texts():
-        if sample.name != "text.txt":
+        if sample.name != "demo.txt":
             assert len(detect(sample)) == 2
 
     for sample in samples.images():
