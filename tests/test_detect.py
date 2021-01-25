@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from iscc.detect import detect
+import iscc_samples as samples
 from tests import HERE
 from os.path import join
 
@@ -30,3 +31,19 @@ def test_detect_junk():
     data = b"\xff" * 1024
     result = detect(data)
     assert result == {}
+
+
+def test_detect_samples():
+    for sample in samples.texts():
+        assert len(detect(sample)) == 2
+
+    for sample in samples.images():
+        assert len(detect(sample)) == 2
+
+    for sample in samples.audios():
+        assert len(detect(sample)) == 2
+
+    for sample in samples.videos():
+        if sample.name != 'demo.3g2':
+            assert len(detect(sample)) == 2, sample
+
