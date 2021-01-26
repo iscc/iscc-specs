@@ -18,19 +18,19 @@ def test_content_id_video_0_features():
 
 def test_content_id_video():
     result = content_id_video(SAMPLE)
-    assert "video_code" in result
-    assert "signature" in result
+    assert "code_video" in result
+    # assert "signature" in result
     assert "crop" in result
-    assert result["video_code"] == "EMAVMHMC7RMJF6XZ"
+    assert result["code_video"] == "EMAVMHMC7RMJF6XZ"
     assert result["crop"] == "176:96:0:24"
 
 
 def test_content_id_video_no_crop():
     result = content_id_video(SAMPLE, crop=False)
-    assert "video_code" in result
-    assert "signature" in result
+    assert "code_video" in result
+    # assert "signature" in result
     assert "crop" not in result
-    assert result["video_code"] == "EMAV4DUD6RORW4X4"
+    assert result["code_video"] == "EMAV4DUD6RORW4X4"
 
 
 def test_content_id_video_scenes():

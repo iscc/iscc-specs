@@ -1,9 +1,14 @@
 # -*- coding: utf-8 -*-
+from os.path import basename, splitext
 from typing import Optional
+from urllib.parse import urlparse
 from more_itertools import interleave, sliced
+from iscc.text import text_normalize, text_trim
+from iscc.params import TRIM_TITLE
 from iscc.utils import sliding_window
 from iscc.simhash import similarity_hash
 from blake3 import blake3
+from mediatype import clean_mime, mime_to_gmt
 
 
 WINDOW_SIZE_MID = 3
@@ -33,3 +38,35 @@ def meta_hash(title, extra=""):
         )
 
     return simhash_digest[:32]
+
+
+def title_from_tika(tika_result: dict, guess=False, uri=None):
+    """Extract title from tika result. Fallback to uri."""
+    title = ""
+    meta = tika_result.get("metadata")
+    mime_type = clean_mime(meta.get("Content-Type"))
+    gmt = mime_to_gmt(mime_type)
+
+    if meta:
+        title = meta.get("dc:title", "")
+        title = title[0].strip() if isinstance(title, list) else title.strip()
+        if not title:
+            title = meta.get("title", "")
+            title = title[0].strip() if isinstance(title, list) else title.strip()
+
+    # See if string would survive normalization
+    norm_title = text_normalize(title)
+
+    if not norm_title and guess and gmt == "text":
+        content = tika_result.get("content", "")
+        if content is not None:
+            first_line = content.strip().splitlines()[0]
+            title = text_trim(text_normalize(first_line), TRIM_TITLE)
+
+    if not title and uri is not None:
+        result = urlparse(uri)
+        base = basename(result.path)
+        title = splitext(base)[0]
+        title = title.replace("-", " ")
+        title = title.replace("_", " ")
+    return title

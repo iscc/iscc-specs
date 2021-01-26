@@ -1,10 +1,12 @@
 # -*- coding: utf-8 -*-
+from loguru import logger
 from pathlib import Path
-from typing import Optional, Union
+from typing import List, Optional, Union
 from os import path
 import mimetypes
 import magic
 import io
+from PIL import Image
 
 
 def guess(data):
@@ -47,6 +49,33 @@ def from_name(name: str) -> Optional[str]:
 def from_data(data: bytes) -> Optional[str]:
     """Guess mediatype by sniffing raw header data."""
     return magic.from_buffer(data, mime=True)
+
+
+def clean_mime(mime: Union[str, List]):
+    """Returns first entry in mime and removes semicolon separated encoding info"""
+    if mime and isinstance(mime, List):
+        mime = mime[0]
+    if mime:
+        mime = mime.split(";")[0]
+    return mime.strip()
+
+
+def mime_to_gmt(mime_type, file_path=None):
+    """Get generic mediatype from mime type"""
+    mime_type = clean_mime(mime_type)
+    if mime_type == "image/gif" and file_path:
+        img = Image.open(file_path)
+        if img.is_animated:
+            return "video"
+        else:
+            return "image"
+    entry = SUPPORTED_MEDIATYPES.get(mime_type)
+    if entry:
+        return entry["gmt"]
+    gmt = mime_type.split("/")[0]
+    if gmt in ("text", "image", "audio", "video"):
+        logger.warning(f"Guessing GMT from {mime_type}")
+        return gmt
 
 
 mimetypes.add_type("text/markdown", ".md")
@@ -95,6 +124,7 @@ SUPPORTED_MEDIATYPES = {
     "audio/wav": {"gmt": "audio", "ext": "wav"},
     "audio/ogg": {"gmt": "audio", "ext": "ogg"},
     "audio/aiff": {"gmt": "audio", "ext": "aif"},
+    "audio/x-aiff": {"gmt": "audio", "ext": "aif"},
     "audio/x-flac": {"gmt": "audio", "ext": "flac"},
     "audio/opus": {"gmt": "audio", "ext": "opus"},
     # Video Formats

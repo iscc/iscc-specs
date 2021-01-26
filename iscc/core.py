@@ -8,7 +8,7 @@ import xxhash
 from blake3 import blake3
 from more_itertools import windowed
 from iscc.minhash import minhash_256
-from iscc.mediatype import SUPPORTED_MEDIATYPES
+from iscc.mediatype import SUPPORTED_MEDIATYPES, mime_to_gmt
 from iscc.text import text_hash, text_normalize, text_trim
 from iscc.codec import (
     Code,
@@ -33,20 +33,46 @@ from iscc.video import (
     extract_signature,
 )
 from iscc.simhash import similarity_hash
-from iscc.meta import meta_hash
-from iscc.uread import uread
-
+from iscc.meta import meta_hash, title_from_tika
+from tika import parser, detector
+from iscc import video
 
 ###############################################################################
 # Top-Level functions for generating ISCCs                                    #
 ###############################################################################
 
 
-def compute(data, title="", extra=""):
-    file = uread(data)
-    if not file.mediatype or file.mediatype not in SUPPORTED_MEDIATYPES:
-        raise ValueError(f"Unsupported media type {file.mediatype}.")
-    return None
+def compute(filepath, title="", extra=""):
+    result = {}
+    mediatype = detector.from_file(filepath)
+    if mediatype not in SUPPORTED_MEDIATYPES:
+        raise ValueError(f"Unsupported media type {mediatype}.")
+    result["mediatype"] = mediatype
+    tika_result = parser.from_file(filepath)
+
+    if not title:
+        title = title_from_tika(tika_result, guess=True, uri=filepath)
+
+    mid, norm_title, norm_extra = meta_id(title, extra)
+    result["code_meta"] = mid
+    result["norm_title"] = norm_title
+    result["norm_extra"] = norm_extra
+
+    gmt = mime_to_gmt(mediatype)
+    result["gmt"] = gmt
+    if gmt == "text":
+        text = tika_result["content"]
+        if not text:
+            raise ValueError("Could not extract text")
+        result["code_text"] = content_id_text(tika_result["content"])
+
+    elif gmt == "image":
+        result["code_image"] = content_id_image(filepath)
+    elif gmt == "video":
+        result.update(video.get_metadata(filepath))
+        vid = content_id_video(filepath, scenes=True, crop=False)
+        result.update(vid)
+    return dict(sorted(result.items()))
 
 
 def meta_id(title, extra="", bits=64):
@@ -131,8 +157,8 @@ def content_id_video(video, scenes=False, crop=True, window=0, overlap=0, bits=6
     video_hash = compute_video_hash(features, bits=bits)
     video_code = Code((MT.CONTENT, ST_CC.VIDEO, VS.V0, bits, video_hash))
     result = dict(
-        video_code=video_code.code,
-        signature=signature,
+        code_video=video_code.code,
+        # signature=signature,
     )
     if crop_value:
         result["crop"] = crop_value.lstrip("crop=")
@@ -288,3 +314,13 @@ def dct(values_list):
         result.append(alpha[-1])
         result.append(beta[-1])
         return result
+
+
+if __name__ == "__main__":
+    import iscc_samples as samples
+
+    for sample in samples.all():
+        try:
+            print(sample.name, compute(sample.as_posix()))
+        except Exception as e:
+            print(e)

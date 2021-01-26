@@ -39,6 +39,7 @@ av = "^8.0.3"
 langcodes = {git = "https://github.com/goodmami/langcodes.git", branch = "use-pygtrie"}
 python-magic-bin = { version = "^0.4.14", markers = "sys_platform == 'win32' or sys_platform == 'darwin'" }
 python-magic = { version = "^0.4.18", markers = "sys_platform == 'linux'" }
+tika = "^1.24"
 
 [tool.poetry.extras]
 turbo = ["cython", "numba"]
