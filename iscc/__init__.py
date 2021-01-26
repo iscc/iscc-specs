@@ -1,13 +1,12 @@
 # -*- coding: utf-8 -*-
 import os
-import appdirs
+from pathlib import Path
 
+HERE = Path(__file__).parent
+TIKA_BIN = HERE / "tika-server-1.25.jar"
 __version__ = "1.0.5"
-APP_NAME = "iscc"
-APP_DIR = appdirs.user_data_dir(APP_NAME, roaming=False)
-os.makedirs(APP_DIR, exist_ok=True)
-os.environ["TIKA_PATH"] = APP_DIR
-os.environ["TIKA_LOG_PATH"] = APP_DIR
+
+os.environ["TIKA_SERVER_JAR"] = TIKA_BIN.as_uri()
 os.environ["TIKA_STARTUP_MAX_RETRY"] = "8"
 os.environ["LOGURU_AUTOINIT"] = "False"
 from tika import tika
