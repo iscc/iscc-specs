@@ -8,7 +8,7 @@ from iscc.params import TRIM_TITLE
 from iscc.utils import sliding_window
 from iscc.simhash import similarity_hash
 from blake3 import blake3
-from mediatype import clean_mime, mime_to_gmt
+from iscc.mediatype import clean_mime, mime_to_gmt
 
 
 WINDOW_SIZE_MID = 3
