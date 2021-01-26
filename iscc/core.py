@@ -8,7 +8,6 @@ import xxhash
 from blake3 import blake3
 from more_itertools import windowed
 from iscc.minhash import minhash_256
-from iscc.mediatype import SUPPORTED_MEDIATYPES, mime_to_gmt
 from iscc.text import text_hash, text_normalize, text_trim
 from iscc.codec import (
     Code,
@@ -33,50 +32,15 @@ from iscc.video import (
     extract_signature,
 )
 from iscc.simhash import similarity_hash
-from iscc.meta import meta_hash, title_from_tika
-from tika import parser, detector
-from iscc import video
+from iscc.meta import meta_hash
 
 ###############################################################################
 # Top-Level functions for generating ISCCs                                    #
 ###############################################################################
 
 
-def compute(filepath, title="", extra=""):
-    result = {}
-    mediatype = detector.from_file(filepath)
-    if mediatype not in SUPPORTED_MEDIATYPES:
-        raise ValueError(f"Unsupported media type {mediatype}.")
-    result["mediatype"] = mediatype
-    tika_result = parser.from_file(filepath)
-
-    if not title:
-        title = title_from_tika(tika_result, guess=True, uri=filepath)
-
-    mid, norm_title, norm_extra = meta_id(title, extra)
-    result["code_meta"] = mid
-    result["norm_title"] = norm_title
-    result["norm_extra"] = norm_extra
-
-    gmt = mime_to_gmt(mediatype)
-    result["gmt"] = gmt
-    if gmt == "text":
-        text = tika_result["content"]
-        if not text:
-            raise ValueError("Could not extract text")
-        result["code_text"] = content_id_text(tika_result["content"])
-
-    elif gmt == "image":
-        result["code_image"] = content_id_image(filepath)
-    elif gmt == "video":
-        result.update(video.get_metadata(filepath))
-        vid = content_id_video(filepath, scenes=True, crop=False)
-        result.update(vid)
-    return dict(sorted(result.items()))
-
-
 def meta_id(title, extra="", bits=64):
-    # type: (Union[str, bytes], Optional[Union[str, bytes]], int) -> List[str, str, str]
+    # type: (Union[str, bytes], Optional[Union[str, bytes]], int) -> dict
 
     title_norm = text_normalize(title)
     extra_norm = text_normalize(extra)
@@ -86,7 +50,13 @@ def meta_id(title, extra="", bits=64):
     header = write_header(MT.META, ST.NONE, VS.V0, bits)
     digest = header + mhash[: bits // 8]
     code = encode_base32(digest)
-    return [code, title_trimmed, extra_trimmed]
+    result = dict(
+        code_meta=code,
+        title=title_trimmed,
+    )
+    if extra_trimmed:
+        result["extra"] = extra_trimmed
+    return result
 
 
 def content_id_text(text, bits=64):

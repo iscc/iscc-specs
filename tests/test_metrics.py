@@ -11,9 +11,11 @@ C_INT = 0b0000_1111
 A_BYT = A_INT.to_bytes(length=2, byteorder="big", signed=False)
 B_BYT = B_INT.to_bytes(length=2, byteorder="big", signed=False)
 C_BYT = C_INT.to_bytes(length=2, byteorder="big", signed=False)
-A_CODE = Code(meta_id("Hello World Hello World Hello World Hello World")[0])
-B_CODE = Code(meta_id("Hello World Hello World Hello World Hello Worlt")[0])
-C_CODE = Code(meta_id("Hello World Hello World Hello World Hello Worlt", bits=256)[0])
+A_CODE = Code(meta_id("Hello World Hello World Hello World Hello World")["code_meta"])
+B_CODE = Code(meta_id("Hello World Hello World Hello World Hello Worlt")["code_meta"])
+C_CODE = Code(
+    meta_id("Hello World Hello World Hello World Hello Worlt", bits=256)["code_meta"]
+)
 
 
 def test_distance():

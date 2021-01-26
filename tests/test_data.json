@@ -3609,99 +3609,91 @@
         "",
         ""
       ],
-      "outputs": [
-        "AAA26E2JXH27TING",
-        "",
-        ""
-      ]
+      "outputs": {
+        "code_meta": "AAA26E2JXH27TING",
+        "title": ""
+      }
     },
     "test_002_basic": {
       "inputs": [
         "Die Unendliche Geschichte",
         ""
       ],
-      "outputs": [
-        "AAA3DZ6UG5MYA7MF",
-        "die unendliche geschichte",
-        ""
-      ]
+      "outputs": {
+        "code_meta": "AAA3DZ6UG5MYA7MF",
+        "title": "die unendliche geschichte"
+      }
     },
     "test_003_punctuation": {
       "inputs": [
         "Die Unendliche, Geschichte",
         ""
       ],
-      "outputs": [
-        "AAA3TZ6GX7NYB34F",
-        "die unendliche, geschichte",
-        ""
-      ]
+      "outputs": {
+        "code_meta": "AAA3TZ6GX7NYB34F",
+        "title": "die unendliche, geschichte"
+      }
     },
     "test_004_white_space": {
       "inputs": [
         " Die Unendliche, Geschichte  ",
         ""
       ],
-      "outputs": [
-        "AAA3TZ6GX7NYB34F",
-        "die unendliche, geschichte",
-        ""
-      ]
+      "outputs": {
+        "code_meta": "AAA3TZ6GX7NYB34F",
+        "title": "die unendliche, geschichte"
+      }
     },
     "test_005_non_ascii": {
       "inputs": [
         "Die unéndlíche,  Geschichte",
         ""
       ],
-      "outputs": [
-        "AAA3TZ6GX7NYB34F",
-        "die unendliche, geschichte",
-        ""
-      ]
+      "outputs": {
+        "code_meta": "AAA3TZ6GX7NYB34F",
+        "title": "die unendliche, geschichte"
+      }
     },
     "test_006_i18n": {
       "inputs": [
         "Iñtërnâtiônàlizætiøn☃",
         ""
       ],
-      "outputs": [
-        "AAAQPPCUKBYKGY4N",
-        "internationalizætiøn☃",
-        ""
-      ]
+      "outputs": {
+        "code_meta": "AAAQPPCUKBYKGY4N",
+        "title": "internationalizætiøn☃"
+      }
     },
     "test_007_extra": {
       "inputs": [
         "Die unendliche Geschichte",
         "The Movie"
       ],
-      "outputs": [
-        "AAA3DZ6UG4H7BVDF",
-        "die unendliche geschichte",
-        "the movie"
-      ]
+      "outputs": {
+        "code_meta": "AAA3DZ6UG4H7BVDF",
+        "extra": "the movie",
+        "title": "die unendliche geschichte"
+      }
     },
     "test_008_long": {
       "inputs": [
         "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed",
         ""
       ],
-      "outputs": [
-        "AAAS72V6FCYNQOJ7",
-        "lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquy",
-        ""
-      ]
+      "outputs": {
+        "code_meta": "AAAS72V6FCYNQOJ7",
+        "title": "lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquy"
+      }
     },
     "test_009_long_i18n": {
       "inputs": [
         "Iñtërnâtiônàlizætiøn☃ Iñtërnâtiônàlizætiøn☃ Iñtërnâtiônàlizætiøn☃ Iñtërnâtiônàlizætiøn☃ Iñtërnâtiônàlizætiøn☃ Iñtërnâtiônàlizætiøn☃",
         ""
       ],
-      "outputs": [
-        "AAAQPPSUCDYKOQ64",
-        "internationalizætiøn☃ internationalizætiøn☃ internationalizætiøn☃ internationalizætiøn☃ internationalizætiøn",
-        ""
-      ]
+      "outputs": {
+        "code_meta": "AAAQPPSUCDYKOQ64",
+        "title": "internationalizætiøn☃ internationalizætiøn☃ internationalizætiøn☃ internationalizætiøn☃ internationalizætiøn"
+      }
     }
   },
   "minhash": {

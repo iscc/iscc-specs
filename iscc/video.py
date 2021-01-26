@@ -163,7 +163,7 @@ def detect_scenes(video_file):
     return scene_manager.get_scene_list(base_timecode)
 
 
-def get_metadata(video):
+def get_video_metadata(video):
     with av.open(video) as v:
         metadata = {}
         c_duration = v.duration
