@@ -149,3 +149,31 @@ def test_code_properties():
     assert c64 ^ c64 == 0
     with pytest.raises(ValueError):
         c64 ^ c256
+    assert c.Code.rnd(c.MT.META).maintype == c.MT.META
+    assert c.Code.rnd(c.MT.DATA, c.LN.L256).length == c.LN.L256
+    code = c.Code.rnd()
+    assert code == c.Code(code.bytes)
+    assert code == c.Code(code.code)
+    assert code == c.Code(tuple(code))
+
+
+def test_compose_iscc():
+    mid = c.Code.rnd(c.MT.META, 64)
+    cid = c.Code.rnd(c.MT.CONTENT, 64)
+    did = c.Code.rnd(c.MT.DATA, 128)
+    iid = c.Code.rnd(c.MT.INSTANCE, 256)
+    ic = c.compose_iscc([mid, cid, did, iid])
+    assert ic.maintype == c.MT.ISCC
+    assert ic.length == 256
+    assert ic.explain.startswith("ISCC-")
+    assert c.compose_iscc([did, mid, cid, iid]) == ic
+
+
+def test_compose_iscc_sum():
+    did = c.Code.rnd(c.MT.DATA, 128)
+    iid = c.Code.rnd(c.MT.INSTANCE, 256)
+    isum = c.compose_iscc([did, iid])
+    assert isum.maintype == c.MT.SUM
+    assert isum.length == 256
+    assert isum.explain.startswith("SUM-NONE")
+    assert c.compose_iscc([iid, did]) == isum

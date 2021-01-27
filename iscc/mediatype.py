@@ -162,12 +162,15 @@ if __name__ == "__main__":
 
     for fp in samples.all():
         by_name = from_name(fp.as_posix())
-        by_data = from_data(fp.open(mode="rb").read())
+        by_data = from_data(fp.open(mode="rb").read(4096))
         by_guess = guess(fp.as_posix())
-        print(fp.name, end=" ")
-        print(by_name, end=" ")
-        print(by_data, end=" ")
-        print(by_guess, end=" ")
-        if fp.name not in ("demo.sqlite", "demo.f4v"):
-            assert by_guess in SUPPORTED_MEDIATYPES, fp.name
-        print()
+        gmt = mime_to_gmt(by_guess)
+        print(f"{gmt} " f"{fp.name} " f"{by_guess}")
+        # print(fp.name, end= "")
+        # print(gmt, end=" ")
+        # print(fp.name, end=" ")
+        # print(by_name, end=" ")
+        # print(by_data, end=" ")
+        # print(by_guess, end=" ")
+
+        # print()

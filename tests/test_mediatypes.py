@@ -31,7 +31,18 @@ def test_from_data():
 
 def test_guess_samples():
     for path in samples.all():
-        assert isinstance(mediatype.guess(path), (str, type(None)))
+        file_header = path.open(mode="rb").read(4096)
+        mt = mediatype.guess(file_header)
+        assert isinstance(mt, str)
+        assert "/" in mt
+
+
+def test_mime_to_gmt():
+    for path in samples.all():
+        file_header = path.open(mode="rb").read(4096)
+        mt = mediatype.guess(file_header)
+        gmt = mediatype.mime_to_gmt(mt)
+        assert gmt in ("text", "image", "audio", "video", None)
 
 
 #

@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from enum import Enum
 from typing import List, Optional
 from pydantic import BaseModel, Field
 
@@ -36,6 +37,16 @@ class Features(BaseModel):
     )
 
 
+class GMT(str, Enum):
+    """Generic Metdia Type"""
+
+    text = "text"
+    image = "image"
+    audio = "audio"
+    video = "video"
+    unknown = "unknown"
+
+
 class ISCC(BaseModel):
     version: int = Field(0, description="ISCC Schema Version")
     iscc: str = Field(description="ISCC code of the identified digital asset.")
@@ -53,16 +64,15 @@ class ISCC(BaseModel):
         description="Filename of the referenced digital asset (automatically used as "
         "fallback if no seed_title element is specified)"
     )
-
     identifier: Optional[str] = Field(
         description="Other identifier(s) such as those defined by ISO/TC 46/SC 9 "
         "referencing the work, product or other abstraction of which the "
         "referenced digital asset is a full or partial manifestation "
         "(automatically used as fallback if no extra element is specified)."
     )
+    gmt: GMT = Field(GMT.unknown, description="Generic Media Type")
     language: Optional[List[str]] = Field(
-        description="Language(s) of textual content (BCP-47) in weighted order "
-        "(GMT Text only)."
+        description="Language(s) of content (BCP-47) in weighted order."
     )
     characters: Optional[int] = Field(
         description="Number of text characters (code points after Unicode "

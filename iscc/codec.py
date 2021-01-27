@@ -11,6 +11,9 @@ Body:
 """
 import base64
 import enum
+import os
+from operator import attrgetter
+from random import choice
 from typing import List, Tuple, Union
 from bitarray import bitarray
 from bitarray.util import ba2hex, int2ba, ba2int, count_xor
@@ -28,6 +31,8 @@ class MT(enum.IntEnum):
     CONTENT = 2
     DATA = 3
     INSTANCE = 4
+    ISCC = 5
+    SUM = 6
 
 
 class ST(enum.IntEnum):
@@ -53,6 +58,15 @@ class VS(enum.IntEnum):
     V0 = 0
 
 
+class LN(enum.IntEnum):
+    """ISCC lenth in bits"""
+
+    L32 = 32
+    L64 = 64
+    L128 = 128
+    L256 = 256
+
+
 def write_header(mtype: int, stype: int, version: int = 0, length: int = 64) -> bytes:
     """
     Encodes header values with nibble-sized variable-length encoding.
@@ -64,7 +78,7 @@ def write_header(mtype: int, stype: int, version: int = 0, length: int = 64) -> 
     header = bitarray()
     for n in (mtype, stype, version, length):
         header += _write_varnibble(n)
-    # Add padding if required
+    # Append zero-padding if required (right side, least significant bits).
     header.fill()
     return header.tobytes()
 
@@ -180,7 +194,7 @@ class Code:
     """
 
     def __init__(self, code):
-        # type: (Union[str, Tuple[int, int, int, int, bytes], bytes]) -> None
+        # type: (Union[str, Tuple[MT, Union[ST, ST_CC], VS, LN, bytes], bytes]) -> None
         if isinstance(code, str):
             code_fields = read_header(decode_base32(code))
         elif isinstance(code, tuple):
@@ -203,6 +217,11 @@ class Code:
 
     def __bytes__(self):
         return self.bytes
+
+    def __iter__(self):
+        for f in self._head:
+            yield f
+        yield self.hash_bytes
 
     @property
     def code(self) -> str:
@@ -267,7 +286,7 @@ class Code:
     @property
     def subtype(self) -> Union[ST, ST_CC]:
         """Enum subtype of code."""
-        if self.maintype == MT.CONTENT:
+        if self.maintype in (MT.CONTENT, MT.ISCC):
             return ST_CC(self._head[1])
         return ST(self._head[1])
 
@@ -284,3 +303,37 @@ class Code:
     def __xor__(self, other) -> int:
         """Use XOR operator for hamming distance calculation."""
         return count_xor(self._body, other._body)
+
+    def __eq__(self, other):
+        return self.code == other.code
+
+    @classmethod
+    def rnd(cls, mt=None, bits=64):
+        """Returns a syntactically correct random code"""
+        mt = choice(list(MT)) if mt is None else mt
+        st = choice(list(ST_CC)) if mt == MT.CONTENT else choice(list(ST))
+        vs = choice(list(VS))
+        ln = bits or choice(list(LN)).value
+        data = os.urandom(ln // 8)
+        return cls((mt, st, vs, ln, data))
+
+
+def compose_iscc(codes: List[Code]) -> Code:
+    assert len(set(c.version for c in codes)), "Codes must have same version"
+    assert len(codes) in (2, 4), "Can only compose ISCC from 2 or 4 codes"
+    codes = sorted(codes, key=attrgetter("maintype"))
+    types = tuple(c.maintype for c in codes)
+    if len(codes) == 2:
+        assert types == (MT.DATA, MT.INSTANCE), "ISCC SUM needs DATA and INSTANCE codes"
+        for code in codes:
+            assert code.length >= LN.L128, "ISCC SUM requires min 128-bit codes"
+        chash = codes[0].bytes[:16] + codes[1].bytes[:16]
+        return Code((MT.SUM, ST.NONE, codes[0].version, LN.L256, chash))
+    if len(codes) == 4:
+        assert types == (MT.META, MT.CONTENT, MT.DATA, MT.INSTANCE)
+        for code in codes:
+            assert code.length >= LN.L64, "ISCC requires min 64-bit codes"
+            chash = b""
+            for c in codes:
+                chash += c.bytes[:8]
+            return Code((MT.ISCC, codes[1].subtype, codes[1].version, LN.L256, chash))
