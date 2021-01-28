@@ -14,9 +14,7 @@ C_BYT = C_INT.to_bytes(length=2, byteorder="big", signed=False)
 A_CODE = Code(meta_id("Hello World Hello World Hello World Hello World")["code"])
 B_CODE = Code(meta_id("Hello World Hello World Hello World Hello Worlt")["code"])
 C_CODE = Code(
-    meta_id("Hello World Hello World Hello World Hello Worlt", opts={"meta_bits": 256})[
-        "code"
-    ]
+    meta_id("Hello World Hello World Hello World Hello Worlt", meta_bits=256)["code"]
 )
 
 

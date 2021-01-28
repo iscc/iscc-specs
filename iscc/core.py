@@ -39,10 +39,10 @@ from iscc.schema import Opts
 ###############################################################################
 
 
-def meta_id(title, extra="", opts=None):
-    # type: (Union[str, bytes], Optional[Union[str, bytes]], Optional[Union[Opts, dict]) -> dict
+def meta_id(title, extra="", **kwargs):
+    # type: (Union[str, bytes], Optional[Union[str, bytes]], **int) -> dict
     """Generate Meta Code from title and extra metadata"""
-    opts = Opts(**opts) if opts else Opts()
+    opts = Opts(**kwargs)
     nbits = opts.meta_bits
     nbytes = nbits // 8
     title_norm = text_normalize(title, lower=False)
