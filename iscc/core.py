@@ -1,13 +1,12 @@
 # -*- coding: utf-8 -*-
 """ISCC Reference Implementation"""
-from statistics import median
-import math
 from typing import BinaryIO, List, Optional, Union
 from PIL import Image
 import xxhash
 from blake3 import blake3
 from more_itertools import windowed
 from iscc.minhash import minhash_256
+from iscc.image import image_hash, image_normalize
 from iscc.text import text_hash, text_normalize, text_trim
 from iscc.codec import (
     Code,
@@ -194,103 +193,3 @@ def instance_id(data, bits=64):
     tail = encode_base32(top_hash_digest[n_bytes:])
 
     return [code, tail, size]
-
-
-###############################################################################
-# Content Normalization Functions                                             #
-###############################################################################
-
-
-def image_normalize(img):
-
-    if not isinstance(img, Image.Image):
-        img = Image.open(img)
-
-    # 1. Convert to greyscale
-    img = img.convert("L")
-
-    # 2. Resize to 32x32
-    img = img.resize((32, 32), Image.BICUBIC)
-
-    # 3. Create two dimensional array
-    pixels = [[list(img.getdata())[32 * i + j] for j in range(32)] for i in range(32)]
-
-    return pixels
-
-
-###############################################################################
-# Feature Hashing                                                             #
-###############################################################################
-
-
-def image_hash(pixels):
-
-    # 1. DCT per row
-    dct_row_lists = []
-    for pixel_list in pixels:
-        dct_row_lists.append(dct(pixel_list))
-
-    # 2. DCT per col
-    dct_row_lists_t = list(map(list, zip(*dct_row_lists)))
-    dct_col_lists_t = []
-    for dct_list in dct_row_lists_t:
-        dct_col_lists_t.append(dct(dct_list))
-
-    dct_lists = list(map(list, zip(*dct_col_lists_t)))
-
-    # 3. Extract upper left 8x8 corner
-    flat_list = [x for sublist in dct_lists[:8] for x in sublist[:8]]
-
-    # 4. Calculate median
-    med = median(flat_list)
-
-    # 5. Create 64-bit digest by comparing to median
-    bitstring = ""
-    for value in flat_list:
-        if value > med:
-            bitstring += "1"
-        else:
-            bitstring += "0"
-    hash_digest = int(bitstring, 2).to_bytes(8, "big", signed=False)
-
-    return hash_digest
-
-
-def dct(values_list):
-    """
-    Discrete cosine transform algorithm by Project Nayuki. (MIT License)
-    See: https://www.nayuki.io/page/fast-discrete-cosine-transform-algorithms
-    """
-
-    n = len(values_list)
-    if n == 1:
-        return list(values_list)
-    elif n == 0 or n % 2 != 0:
-        raise ValueError()
-    else:
-        half = n // 2
-        alpha = [(values_list[i] + values_list[-(i + 1)]) for i in range(half)]
-        beta = [
-            (values_list[i] - values_list[-(i + 1)])
-            / (math.cos((i + 0.5) * math.pi / n) * 2.0)
-            for i in range(half)
-        ]
-        alpha = dct(alpha)
-        beta = dct(beta)
-        result = []
-        for i in range(half - 1):
-            result.append(alpha[i])
-            result.append(beta[i] + beta[i + 1])
-        result.append(alpha[-1])
-        result.append(beta[-1])
-        return result
-
-
-if __name__ == "__main__":
-    import iscc_samples as samples
-
-    for sample in samples.all():
-        try:
-            print(sample.name, compute(sample.as_posix()))
-        except Exception as e:
-            print(e)
