@@ -11,9 +11,28 @@ FEATURE_REGEX = "^[-A-Za-z0-9_]{11}"
 class Opts(BaseSettings):
     """Options for ISCC generation"""
 
-    meta_bits: int = 64
-    meta_trim_title: int = 128
-    meta_trim_extra: int = 4096
+    meta_bits: int = Field(64, description="Length of generated Meta-Code in bits")
+    meta_trim_title: int = Field(
+        128, description="Trim title length to this mumber of bytes"
+    )
+    meta_trim_extra: int = Field(4096, description="Trim extra to this number of bytes")
+
+    text_bits: int = Field(
+        64, description="Length of generated Content-Code Text in bits"
+    )
+
+    text_ngram_size: int = Field(
+        13, description="Number of characters per feature hash (size of sliding window)"
+    )
+
+    text_granular: bool = Field(
+        False, description="Calculate and return granular text features"
+    )
+
+    text_avg_chunk_size: int = Field(
+        1024,
+        description="Avg number of characters per text chunk for granular fingerprints",
+    )
 
 
 class Features(BaseModel):

@@ -97,8 +97,8 @@ def test_hamming_distance():
 
 
 def test_content_id_mixed():
-    cid_t_1 = iscc.content_id_text("Some Text")
-    cid_t_2 = iscc.content_id_text("Another Text")
+    cid_t_1 = iscc.content_id_text("Some Text")["code"]
+    cid_t_2 = iscc.content_id_text("Another Text")["code"]
 
     cid_m = iscc.content_id_mixed([cid_t_1])
     assert cid_m == "EUASAAJV7U3YRWXF"

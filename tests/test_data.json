@@ -120,31 +120,42 @@
     "required": true,
     "test_001_empty": {
       "inputs": [
-        "",
-        64
+        ""
       ],
-      "outputs": "EAASL4F2WZY7KBXB"
+      "outputs": {
+        "characters": 0,
+        "code": "EAASL4F2WZY7KBXB"
+      }
     },
     "test_002_short": {
       "inputs": [
-        "Some short text",
-        64
+        "Some short text"
       ],
-      "outputs": "EAASAVRSXM2GDM4I"
+      "outputs": {
+        "characters": 15,
+        "code": "EAASAVRSXM2GDM4I",
+        "language": "en"
+      }
     },
     "test_003_long": {
       "inputs": [
-        "Their most significant and usefull property of similarity-preserving fingerprints gets lost in the fragmentation of individual, propietary and use case specific implementations. The real benefit lies in similarity preservation beyond your local data archive on a global scale accross vendors.",
-        64
+        "Their most significant and usefull property of similarity-preserving fingerprints gets lost in the fragmentation of individual, propietary and use case specific implementations. The real benefit lies in similarity preservation beyond your local data archive on a global scale accross vendors."
       ],
-      "outputs": "EAAR7BVKOFMBVNE4"
+      "outputs": {
+        "characters": 291,
+        "code": "EAAR7BVKOFMBVNE4",
+        "language": "en"
+      }
     },
     "test_004_partial": {
       "inputs": [
-        "Some text for partial content id text",
-        64
+        "Some text for partial content id text"
       ],
-      "outputs": "EAAZHWMAG7IZOUIF"
+      "outputs": {
+        "characters": 37,
+        "code": "EAAZHWMAG7IZOUIF",
+        "language": "ca"
+      }
     }
   },
   "data_chunks": {

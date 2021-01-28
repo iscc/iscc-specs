@@ -58,26 +58,22 @@
     "content_id_text": {
         "test_001_empty": {
             "inputs": [
-                "",
-                64
+                ""
             ]
         },
         "test_002_short": {
             "inputs": [
-                "Some short text",
-                64
+                "Some short text"
             ]
         },
         "test_003_long": {
             "inputs": [
-                "Their most significant and usefull property of similarity-preserving fingerprints gets lost in the fragmentation of individual, propietary and use case specific implementations. The real benefit lies in similarity preservation beyond your local data archive on a global scale accross vendors.",
-                64
+                "Their most significant and usefull property of similarity-preserving fingerprints gets lost in the fragmentation of individual, propietary and use case specific implementations. The real benefit lies in similarity preservation beyond your local data archive on a global scale accross vendors."
             ]
         },
         "test_004_partial": {
             "inputs": [
-                "Some text for partial content id text",
-                64
+                "Some text for partial content id text"
             ]
         }
     },

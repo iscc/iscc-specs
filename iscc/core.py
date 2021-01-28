@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 """ISCC Reference Implementation"""
+from loguru import logger
 from typing import BinaryIO, List, Optional, Union
 from PIL import Image
 import xxhash
@@ -7,7 +8,7 @@ from blake3 import blake3
 from more_itertools import windowed
 from iscc.minhash import minhash_256
 from iscc.image import image_hash, image_normalize
-from iscc.text import text_hash, text_normalize, text_trim
+from iscc.text import text_features, text_hash, text_normalize, text_trim
 from iscc.codec import (
     Code,
     MT,
@@ -33,6 +34,11 @@ from iscc.video import (
 from iscc.simhash import similarity_hash
 from iscc.meta import meta_hash
 from iscc.schema import Opts
+import langdetect
+import langcodes
+
+# Set for deterministic language detection
+langdetect.DetectorFactory.seed = 0
 
 ###############################################################################
 # Top-Level functions for generating ISCCs                                    #
@@ -41,7 +47,11 @@ from iscc.schema import Opts
 
 def meta_id(title, extra="", **kwargs):
     # type: (Union[str, bytes], Optional[Union[str, bytes]], **int) -> dict
-    """Generate Meta Code from title and extra metadata"""
+    """Generate Meta Code from title and extra metadata.
+
+    :param str title: Used as input for first half of meta code
+    :param str extra: Used as input for second half of meta code
+    """
     opts = Opts(**kwargs)
     nbits = opts.meta_bits
     nbytes = nbits // 8
@@ -62,15 +72,29 @@ def meta_id(title, extra="", **kwargs):
     return result
 
 
-def content_id_text(text, bits=64):
-    # type: (Union[str, bytes], int) -> str
+def content_id_text(text, **kwargs):
+    # type: (Union[str, bytes], **int) -> dict
+    """Generate Content-ID Text"""
+    opts = Opts(**kwargs)
 
-    text = text_normalize(text)
+    nbits = opts.text_bits
+    nbytes = nbits // 8
+    text = text_normalize(text, lower=True)
     th = text_hash(text)
-    header = write_header(MT.CONTENT, ST_CC.TEXT, VS.V0, bits)
-    code = encode_base32(header + th[: bits // 8])
+    header = write_header(MT.CONTENT, ST_CC.TEXT, VS.V0, nbits)
+    code = encode_base32(header + th[:nbytes])
 
-    return code
+    result = dict(code=code, characters=len(text))
+
+    try:
+        result["language"] = langcodes.standardize_tag(langdetect.detect(text))
+    except Exception as e:
+        logger.warning(f"Language detection failed: {e}")
+
+    if opts.text_granular:
+        result["features"] = text_features(text, **kwargs)
+
+    return result
 
 
 def content_id_image(img, bits=64):

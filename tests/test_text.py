@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 import pytest
+
+from iscc.codec import Code
 from iscc.core import content_id_text
 from iscc.text import *
 from iscc.metrics import distance, distance_hex
@@ -28,19 +30,48 @@ TEXT_C = u"""
 """
 
 
-def test_content_id_text():
-    cid_t_np = content_id_text("")
-    assert len(cid_t_np) == 16
-    assert cid_t_np == "EAASL4F2WZY7KBXB"
-    cid_t_p = content_id_text("", bits=128)
-    assert cid_t_p == "EABSL4F2WZY7KBXBYUZPREWZ26IXU"
+def test_content_id_text_empty():
+    r64 = content_id_text("")
+    assert r64 == dict(code="EAASL4F2WZY7KBXB", characters=0)
+    r128 = content_id_text("", text_bits=128)
+    assert r128 == dict(code="EABSL4F2WZY7KBXBYUZPREWZ26IXU", characters=0)
 
     with pytest.raises(AssertionError):
-        distance(cid_t_p, cid_t_np)
+        distance(r64["code"], r128["code"])
 
-    cid_t_a = content_id_text(TEXT_A)
-    cid_t_b = content_id_text(TEXT_B)
-    assert distance(cid_t_a, cid_t_b) == 2
+    assert distance(Code(r64["code"]), Code(r128["code"]), mixed=True) == 0
+
+
+def test_content_id_text_default():
+    a = content_id_text(TEXT_A)
+    assert a == {"characters": 291, "code": "EAAR7BVKOFMBVNE4", "language": "en"}
+    b = content_id_text(TEXT_B)
+    assert b == {"characters": 289, "code": "EAAR7BVKOFMBVNGM", "language": "en"}
+    assert distance(a["code"], b["code"]) == 2
+
+
+def test_content_id_text_granular():
+    a = content_id_text(TEXT_A, text_granular=True, text_avg_chunk_size=100)
+    assert a == {
+        "characters": 291,
+        "code": "EAAR7BVKOFMBVNE4",
+        "features": {
+            "features": ["XYy_cVAdfP8", "7LaIeVSCsaA", "_pZVWTpBYOY", "kSem2vF2HOo"],
+            "sizes": [78, 91, 66, 56],
+        },
+        "language": "en",
+    }
+    b = content_id_text(TEXT_B, text_granular=True, text_avg_chunk_size=100)
+    assert b == {
+        "characters": 289,
+        "code": "EAAR7BVKOFMBVNGM",
+        "features": {
+            "features": ["XY29cVA9fO4", "7LaIeVSCsaA", "_pZVWTpBYOY", "kSem2vF2HOo"],
+            "sizes": [76, 91, 66, 56],
+        },
+        "language": "en",
+    }
+    assert distance(a["code"], b["code"]) == 2
 
 
 def test_text_hash():
@@ -54,32 +85,39 @@ def test_text_hash():
 
 
 def test_text_features():
-    features = text_features(TEXT_A, avg_size=64, ngram_size=13)
-    assert sum(x[0] for x in features) == len(TEXT_A)
-    assert features == [
-        (88, "Ha83PFApXsU"),
-        (43, "tJCNM3GDmqo"),
-        (52, "ybOgbVaQd6w"),
-        (70, "j97uHe9D0AY"),
-        (41, "saWu27FmmP4"),
-        (20, "fCr9n6iDBWo"),
-    ]
-    features = text_features(TEXT_B, avg_size=64, ngram_size=13)
-    assert sum(x[0] for x in features) == len(TEXT_B)
-    assert features == [
-        (20, "XOS48cKcoeg"),
-        (66, "nYc2flAhXsU"),
-        (43, "tJCNM3GDmqo"),
-        (52, "ybOgbVaQd6w"),
-        (70, "j97uHe9D0AY"),
-        (41, "saWu27FmmP4"),
-        (20, "fCr9n6iDBWo"),
-    ]
+    result = text_features(TEXT_A, text_avg_chunk_size=64, text_ngram_size=13)
+    assert sum(result["sizes"]) == len(TEXT_A)
+    assert result == {
+        "features": [
+            "Ha83PFApXsU",
+            "tJCNM3GDmqo",
+            "ybOgbVaQd6w",
+            "j97uHe9D0AY",
+            "saWu27FmmP4",
+            "fCr9n6iDBWo",
+        ],
+        "sizes": [88, 43, 52, 70, 41, 20],
+    }
+
+    result = text_features(TEXT_B, text_avg_chunk_size=64, text_ngram_size=13)
+    assert sum(result["sizes"]) == len(TEXT_B)
+    assert result == {
+        "features": [
+            "XOS48cKcoeg",
+            "nYc2flAhXsU",
+            "tJCNM3GDmqo",
+            "ybOgbVaQd6w",
+            "j97uHe9D0AY",
+            "saWu27FmmP4",
+            "fCr9n6iDBWo",
+        ],
+        "sizes": [20, 66, 43, 52, 70, 41, 20],
+    }
 
 
 def test_text_chunks():
     txt = gen_utf8(1024 * 100)
-    chunks = list(text_chunks(txt, avg_size=1024))
+    chunks = list(text_chunks(txt, text_avg_chunk_size=1024))
     assert "".join(chunks) == txt
 
 

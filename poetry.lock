@@ -326,6 +326,17 @@ python-versions = ">=3.5"
 marisa-trie = "*"
 
 [[package]]
+name = "langdetect"
+version = "1.0.8"
+description = "Language detection library ported from Google's language-detection."
+category = "main"
+optional = false
+python-versions = "*"
+
+[package.dependencies]
+six = "*"
+
+[[package]]
 name = "livereload"
 version = "2.6.3"
 description = "Python LiveReload is an awesome tool for web developers"
@@ -756,7 +767,7 @@ opencv = ["opencv-python (<=4.2.0.32)", "opencv-python"]
 name = "six"
 version = "1.15.0"
 description = "Python 2 and 3 compatibility utilities"
-category = "dev"
+category = "main"
 optional = false
 python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*"
 
@@ -881,7 +892,7 @@ turbo = ["cython", "numba"]
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.6"
-content-hash = "6553222f130667357161f244f8809af83da2ef5cf00d24a6a41cab6275cc35c8"
+content-hash = "db40b01be0250fc79683a31f39a2bff7b65929432c8dd792ca62b5ad5732428b"
 
 [metadata.files]
 aiocontextvars = [
@@ -1135,6 +1146,10 @@ jsmin = [
 ]
 langcodes = [
     {file = "langcodes-2.1.0.tar.gz", hash = "sha256:75bcaca8825e1a321965b136815dee53083c63314975e024ad0ccff8545e681f"},
+]
+langdetect = [
+    {file = "langdetect-1.0.8-py2-none-any.whl", hash = "sha256:f37495e63607865e47deed08d78f7f8e58172658216ff954b2f14671bcd87740"},
+    {file = "langdetect-1.0.8.tar.gz", hash = "sha256:363795ea005f1243c958e953245dac5d814fabdc025c9afa91588c5fa6b2fa83"},
 ]
 livereload = [
     {file = "livereload-2.6.3.tar.gz", hash = "sha256:776f2f865e59fde56490a56bcc6773b6917366bce0c267c60ee8aaf1a0959869"},

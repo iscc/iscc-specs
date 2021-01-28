@@ -1,14 +1,12 @@
 # -*- coding: utf-8 -*-
 import unicodedata
-from typing import List, Tuple, Generator, Union
+from typing import Generator, Union
 import xxhash
 from iscc.cdc import data_chunks
 from iscc.minhash import compress, minhash, minhash_256
+from iscc.schema import Opts
 from iscc.utils import sliding_window
 from iscc.codec import encode_base64
-
-AVG_SIZE_TEXT = 1024  # Default average number of characters per text chunk
-NGRAM_SIZE = 13  # Default number of characters per feature hash
 
 
 # Common Control Characters considered whitespace
@@ -40,45 +38,53 @@ UNICODE_FILTER = frozenset(
 )
 
 
-def text_hash(text, window=NGRAM_SIZE):
+def text_hash(text, **kwargs):
     # type: (str, int) -> bytes
     """
     Create a 256-bit similarity preserving hash for text input.
     Text should be normalized before hash creation.
     """
+    opts = Opts(**kwargs)
     text = text.lower()
-    ngrams = ("".join(chars) for chars in sliding_window(text, window))
+    ngrams = ("".join(chars) for chars in sliding_window(text, opts.text_ngram_size))
     features = [xxhash.xxh32_intdigest(s.encode("utf-8")) for s in ngrams]
     shash = minhash_256(features)
     return shash
 
 
-def text_features(text, avg_size=AVG_SIZE_TEXT, ngram_size=NGRAM_SIZE):
-    # type: (str, int, int) -> List[Tuple[int, str]]
+def text_features(text, **kwargs):
+    # type: (str, **int) -> dict
     """
     Create granular fingerprint for text (minhashes over cdc-chunks).
 
     :param str text: Normalized plaintext.
-    :param int avg_size: Average chunk size for detail hashes.
-    :param int ngram_size: Sliding window size in number of characters.
-    :returns list: Tuples of (chunksize, hash). Hash values are base64 encoded.
+    :param int text_avg_chunk_size: Average chunk size for detail hashes.
+    :param int text_ngram_size: Sliding window size in number of characters.
+    :returns dict: Dictionary with 'sizes' and 'features'
     """
-    chunks = text_chunks(text, avg_size=avg_size)
-    fingerprint = []
+    opts = Opts(**kwargs)
+    chunks = text_chunks(text, text_avg_chunk_size=opts.text_avg_chunk_size)
+    sizes = []
+    feats = []
     for chunk in chunks:
-        ngrams = ("".join(chars) for chars in sliding_window(chunk, ngram_size))
+        ngrams = (
+            "".join(chars) for chars in sliding_window(chunk, opts.text_ngram_size)
+        )
         features = [xxhash.xxh32_intdigest(s.encode("utf-8")) for s in ngrams]
         minimum_hash = minhash(features)
         minimum_hash_digest = compress(minimum_hash, 1)
-        fingerprint.append((len(chunk), encode_base64(minimum_hash_digest)))
-    return fingerprint
+        sizes.append(len(chunk))
+        feats.append(encode_base64(minimum_hash_digest))
+    return dict(features=feats, sizes=sizes)
 
 
-def text_chunks(text, avg_size=AVG_SIZE_TEXT):
+def text_chunks(text, **kwargs):
     # type: (str, int) -> Generator[str]
     """
     Generates variable sized text chunks (without leading BOM)
     """
+    opts = Opts(**kwargs)
+    avg_size = opts.text_avg_chunk_size
     data = text.encode("utf-32-be")
     avg_size *= 4  # 4 bytes per character
     for chunk in data_chunks(data, avg_size=avg_size, utf32=True):
