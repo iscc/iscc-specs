@@ -32,25 +32,29 @@ from iscc.video import (
 )
 from iscc.simhash import similarity_hash
 from iscc.meta import meta_hash
+from iscc.schema import Opts
 
 ###############################################################################
 # Top-Level functions for generating ISCCs                                    #
 ###############################################################################
 
 
-def meta_id(title, extra="", bits=64):
-    # type: (Union[str, bytes], Optional[Union[str, bytes]], int) -> dict
-
-    title_norm = text_normalize(title)
-    extra_norm = text_normalize(extra)
-    title_trimmed = text_trim(title_norm, TRIM_TITLE)
-    extra_trimmed = text_trim(extra_norm, TRIM_EXTRA)
+def meta_id(title, extra="", opts=None):
+    # type: (Union[str, bytes], Optional[Union[str, bytes]], Optional[Union[Opts, dict]) -> dict
+    """Generate Meta Code from title and extra metadata"""
+    opts = Opts(**opts) if opts else Opts()
+    nbits = opts.meta_bits
+    nbytes = nbits // 8
+    title_norm = text_normalize(title, lower=False)
+    extra_norm = text_normalize(extra, lower=False)
+    title_trimmed = text_trim(title_norm, opts.meta_trim_title)
+    extra_trimmed = text_trim(extra_norm, opts.meta_trim_extra)
     mhash = meta_hash(title_trimmed, extra_trimmed)
-    header = write_header(MT.META, ST.NONE, VS.V0, bits)
-    digest = header + mhash[: bits // 8]
+    header = write_header(MT.META, ST.NONE, VS.V0, nbits)
+    digest = header + mhash[:nbytes]
     code = encode_base32(digest)
     result = dict(
-        code_meta=code,
+        code=code,
         title=title_trimmed,
     )
     if extra_trimmed:

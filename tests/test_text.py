@@ -2,7 +2,7 @@
 import pytest
 from iscc.core import content_id_text
 from iscc.text import *
-from iscc.metrics import distance
+from iscc.metrics import distance, distance_hex
 from fauxfactory.factories.strings import gen_utf8
 
 
@@ -47,9 +47,10 @@ def test_text_hash():
     a = text_hash(TEXT_A).hex()
     b = text_hash(TEXT_B).hex()
     c = text_hash(TEXT_C).hex()
-    assert a == "5f869a775c18bfbc3a117ab0114e13b2bf92614cda91513ee1f889fef3d6985f"
-    assert b == "5f869a775c18bdfc3a117ab0114e13f2bf92610cda91513ee1f889bef3d6985f"
-    assert c == "377b2f7b099a6df6bbc4a2ee4ff957b944c6434fa0e78842e7aad1169b71dd07"
+    assert a == "1f869a735c10bf9c32107ab4114e13d2bf93614cda99513ee9f989faf3d6983f"
+    assert b == "1f869a735c18bfcc32107ab4114e13d2bf9b614cda91513ee9f189faf3d6987f"
+    assert c == "366f2f1b08ba65efbbb48acf4b9953d144be674fa0af8802e7a6f1769b19c576"
+    assert distance_hex(a, b) == 7
 
 
 def test_text_features():

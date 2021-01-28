@@ -19,6 +19,7 @@ def compute(filepath, title="", extra=""):
         title = title_from_tika(tika_result, guess=True, uri=filepath)
 
     meta_result = iscc.meta_id(title, extra)
+    meta_result["code_meta"] = meta_result.pop("code")
     result.update(meta_result)
 
     gmt = mime_to_gmt(mediatype)

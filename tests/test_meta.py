@@ -11,7 +11,7 @@ def test_meta_empty():
 def test_meta_extra_only():
     m = meta.meta_hash("", "Hello")
     assert len(m) == 32
-    assert m.hex() == "af1349b9ef6ce4ebf5f9a1a6bf7f41a8a0404dea8344375936dcc94952ef42f4"
+    assert m.hex() == "af1349b9652ce5bbf5f9a1a63fd7018aa0404dea8746265c36dcc949d8a542f4"
 
 
 def test_meta_interleaved():

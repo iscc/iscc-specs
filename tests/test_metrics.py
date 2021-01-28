@@ -11,10 +11,12 @@ C_INT = 0b0000_1111
 A_BYT = A_INT.to_bytes(length=2, byteorder="big", signed=False)
 B_BYT = B_INT.to_bytes(length=2, byteorder="big", signed=False)
 C_BYT = C_INT.to_bytes(length=2, byteorder="big", signed=False)
-A_CODE = Code(meta_id("Hello World Hello World Hello World Hello World")["code_meta"])
-B_CODE = Code(meta_id("Hello World Hello World Hello World Hello Worlt")["code_meta"])
+A_CODE = Code(meta_id("Hello World Hello World Hello World Hello World")["code"])
+B_CODE = Code(meta_id("Hello World Hello World Hello World Hello Worlt")["code"])
 C_CODE = Code(
-    meta_id("Hello World Hello World Hello World Hello Worlt", bits=256)["code_meta"]
+    meta_id("Hello World Hello World Hello World Hello Worlt", opts={"meta_bits": 256})[
+        "code"
+    ]
 )
 
 

@@ -46,6 +46,7 @@ def text_hash(text, window=NGRAM_SIZE):
     Create a 256-bit similarity preserving hash for text input.
     Text should be normalized before hash creation.
     """
+    text = text.lower()
     ngrams = ("".join(chars) for chars in sliding_window(text, window))
     features = [xxhash.xxh32_intdigest(s.encode("utf-8")) for s in ngrams]
     shash = minhash_256(features)
@@ -90,8 +91,8 @@ def text_trim(text, nbytes):
     return text.encode("utf-8")[:nbytes].decode("utf-8", "ignore").strip()
 
 
-def text_normalize(text):
-    # type: (Union[str, bytes]) -> str
+def text_normalize(text, lower=True):
+    # type: (Union[str, bytes], bool) -> str
 
     # 1. Convert bytes to str
     if isinstance(text, bytes):
@@ -101,7 +102,7 @@ def text_normalize(text):
     text_stripped = text.strip()
 
     # 3. Lower case
-    text_lower = text_stripped.lower()
+    text_lower = text_stripped.lower() if lower else text_stripped
 
     # 4. Decompose with NFD
     text_decomposed = unicodedata.normalize("NFD", text_lower)

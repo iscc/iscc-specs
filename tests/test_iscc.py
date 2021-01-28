@@ -34,23 +34,23 @@ def test_test_data():
 
 
 def test_meta_id():
-    mid1 = iscc.meta_id("ISCC Content Identifiers")["code_meta"]
+    mid1 = iscc.meta_id("ISCC Content Identifiers")["code"]
     assert mid1 == "AAA47ZR5JWZ6E7Q3"
 
-    mid1 = iscc.meta_id(b"ISCC Content Identifiers")["code_meta"]
+    mid1 = iscc.meta_id(b"ISCC Content Identifiers")["code"]
     assert mid1 == "AAA47ZR5JWZ6E7Q3"
 
     mid1, title = iscc.meta_id("Die Unendliche Geschichte").values()
     assert mid1 == "AAA3DZ6UG5MYA7MF"
-    assert title == "die unendliche geschichte"
+    assert title == "Die Unendliche Geschichte"
 
-    mid2 = iscc.meta_id(" Die unéndlíche,  Geschichte ")["code_meta"]
+    mid2 = iscc.meta_id(" Die unéndlíche,  Geschichte ")["code"]
     assert mid1 != mid2
 
-    mid3 = iscc.meta_id("Die Unentliche Geschichte")["code_meta"]
+    mid3 = iscc.meta_id("Die Unentliche Geschichte")["code"]
     assert iscc.distance(mid1, mid3) == 11
 
-    mid4 = iscc.meta_id("Geschichte, Die Unendliche")["code_meta"]
+    mid4 = iscc.meta_id("Geschichte, Die Unendliche")["code"]
     assert iscc.distance(mid1, mid4) == 11
 
     with pytest.raises(UnicodeDecodeError):
@@ -58,8 +58,8 @@ def test_meta_id():
 
 
 def test_meta_id_composite():
-    mid1 = iscc.meta_id("This is some Title", "")["code_meta"]
-    mid2 = iscc.meta_id("This is some Title", "And some extra metadata")["code_meta"]
+    mid1 = iscc.meta_id("This is some Title", "")["code"]
+    mid2 = iscc.meta_id("This is some Title", "And some extra metadata")["code"]
     assert iscc.decode_base32(mid1)[:5] == iscc.decode_base32(mid2)[:5]
     assert iscc.decode_base32(mid1)[5:] != iscc.decode_base32(mid2)[5:]
 
@@ -69,30 +69,30 @@ def test_hamming_distance():
     b = 0b1000111
     assert iscc.distance(a, b) == 2
 
-    mid1 = iscc.meta_id("Die Unendliche Geschichte", "von Michael Ende")["code_meta"]
+    mid1 = iscc.meta_id("Die Unendliche Geschichte", "von Michael Ende")["code"]
 
     # Change one Character
-    mid2 = iscc.meta_id("Die UnXndliche Geschichte", "von Michael Ende")["code_meta"]
+    mid2 = iscc.meta_id("Die UnXndliche Geschichte", "von Michael Ende")["code"]
     assert iscc.distance(mid1, mid2) <= 10
 
     # Delete one Character
-    mid2 = iscc.meta_id("Die nendliche Geschichte", "von Michael Ende")["code_meta"]
+    mid2 = iscc.meta_id("Die nendliche Geschichte", "von Michael Ende")["code"]
     assert iscc.distance(mid1, mid2) <= 14
 
     # Add one Character
-    mid2 = iscc.meta_id("Die UnendlicheX Geschichte", "von Michael Ende")["code_meta"]
+    mid2 = iscc.meta_id("Die UnendlicheX Geschichte", "von Michael Ende")["code"]
     assert iscc.distance(mid1, mid2) <= 13
 
     # Add, change, delete
-    mid2 = iscc.meta_id("Diex Unandlische Geschiche", "von Michael Ende")["code_meta"]
+    mid2 = iscc.meta_id("Diex Unandlische Geschiche", "von Michael Ende")["code"]
     assert iscc.distance(mid1, mid2) <= 22
 
     # Change Word order
-    mid2 = iscc.meta_id("Unendliche Geschichte, Die", "von Michael Ende")["code_meta"]
+    mid2 = iscc.meta_id("Unendliche Geschichte, Die", "von Michael Ende")["code"]
     assert iscc.distance(mid1, mid2) <= 13
 
     # Totaly different
-    mid2 = iscc.meta_id("Now for something different")["code_meta"]
+    mid2 = iscc.meta_id("Now for something different")["code"]
     assert iscc.distance(mid1, mid2) >= 24
 
 

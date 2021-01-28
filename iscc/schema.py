@@ -1,11 +1,19 @@
 # -*- coding: utf-8 -*-
 from enum import Enum
 from typing import List, Optional
-from pydantic import BaseModel, Field
+from pydantic import BaseSettings, BaseModel, Field
 
 DEFAULT_WINDOW = 7
 DEFAULT_OVERLAP = 3
 FEATURE_REGEX = "^[-A-Za-z0-9_]{11}"
+
+
+class Opts(BaseSettings):
+    """Options for ISCC generation"""
+
+    meta_bits: int = 64
+    meta_trim_title: int = 128
+    meta_trim_extra: int = 4096
 
 
 class Features(BaseModel):

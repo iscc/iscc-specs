@@ -3610,7 +3610,7 @@
         ""
       ],
       "outputs": {
-        "code_meta": "AAA26E2JXH27TING",
+        "code": "AAA26E2JXH27TING",
         "title": ""
       }
     },
@@ -3620,8 +3620,8 @@
         ""
       ],
       "outputs": {
-        "code_meta": "AAA3DZ6UG5MYA7MF",
-        "title": "die unendliche geschichte"
+        "code": "AAA3DZ6UG5MYA7MF",
+        "title": "Die Unendliche Geschichte"
       }
     },
     "test_003_punctuation": {
@@ -3630,8 +3630,8 @@
         ""
       ],
       "outputs": {
-        "code_meta": "AAA3TZ6GX7NYB34F",
-        "title": "die unendliche, geschichte"
+        "code": "AAA3TZ6GX7NYB34F",
+        "title": "Die Unendliche, Geschichte"
       }
     },
     "test_004_white_space": {
@@ -3640,8 +3640,8 @@
         ""
       ],
       "outputs": {
-        "code_meta": "AAA3TZ6GX7NYB34F",
-        "title": "die unendliche, geschichte"
+        "code": "AAA3TZ6GX7NYB34F",
+        "title": "Die Unendliche, Geschichte"
       }
     },
     "test_005_non_ascii": {
@@ -3650,8 +3650,8 @@
         ""
       ],
       "outputs": {
-        "code_meta": "AAA3TZ6GX7NYB34F",
-        "title": "die unendliche, geschichte"
+        "code": "AAA3TZ6GX7NYB34F",
+        "title": "Die unendliche, Geschichte"
       }
     },
     "test_006_i18n": {
@@ -3660,8 +3660,8 @@
         ""
       ],
       "outputs": {
-        "code_meta": "AAAQPPCUKBYKGY4N",
-        "title": "internationalizætiøn☃"
+        "code": "AAAQPPCUKBYKGY4N",
+        "title": "Internationalizætiøn☃"
       }
     },
     "test_007_extra": {
@@ -3670,9 +3670,9 @@
         "The Movie"
       ],
       "outputs": {
-        "code_meta": "AAA3DZ6UG4H7BVDF",
-        "extra": "the movie",
-        "title": "die unendliche geschichte"
+        "code": "AAA3DZ6UG4H7BVDF",
+        "extra": "The Movie",
+        "title": "Die unendliche Geschichte"
       }
     },
     "test_008_long": {
@@ -3681,8 +3681,8 @@
         ""
       ],
       "outputs": {
-        "code_meta": "AAAS72V6FCYNQOJ7",
-        "title": "lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquy"
+        "code": "AAAS72V6FCYNQOJ7",
+        "title": "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquy"
       }
     },
     "test_009_long_i18n": {
@@ -3691,8 +3691,8 @@
         ""
       ],
       "outputs": {
-        "code_meta": "AAAQPPSUCDYKOQ64",
-        "title": "internationalizætiøn☃ internationalizætiøn☃ internationalizætiøn☃ internationalizætiøn☃ internationalizætiøn"
+        "code": "AAAQPPSUCDYKOQ64",
+        "title": "Internationalizætiøn☃ Internationalizætiøn☃ Internationalizætiøn☃ Internationalizætiøn☃ Internationalizætiøn"
       }
     }
   },
