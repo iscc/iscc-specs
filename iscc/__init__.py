@@ -7,7 +7,7 @@ TIKA_BIN = HERE / "tika-server-1.25.jar"
 __version__ = "1.0.5"
 
 os.environ["TIKA_SERVER_JAR"] = TIKA_BIN.as_uri()
-os.environ["TIKA_STARTUP_MAX_RETRY"] = "8"
+os.environ["TIKA_STARTUP_MAX_RETRY"] = "12"
 os.environ["LOGURU_AUTOINIT"] = "False"
 from tika import tika
 
