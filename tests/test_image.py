@@ -3,6 +3,64 @@ import math
 from iscc import image
 from iscc_samples import images
 from PIL import Image
+from iscc.core import content_id_image
+from iscc.codec import Code
+
+
+def test_content_id_image_plain():
+    assert content_id_image(images()[0]) == {
+        "code": "EEA4GQZQTY6J5DTH",
+        "height": 133,
+        "width": 200,
+    }
+
+
+def test_content_id_image_with_meta():
+    assert content_id_image(images()[2]) == {
+        "code": "EEA4GQZQTY6J5DTH",
+        "height": 133,
+        "title": "Concentrated Cat",
+        "width": 200,
+    }
+
+
+def test_content_id_image_bits32():
+    cidi32 = content_id_image(images()[0], image_bits=32)
+    assert cidi32 == {"code": "EEAMGQZQTY", "height": 133, "width": 200}
+    c1 = Code(cidi32["code"])
+    assert c1.length == 32
+    cidi64 = content_id_image(images()[0], image_bits=32)
+    c2 = Code(cidi64["code"])
+    assert c1 ^ c2 == 0
+
+
+def test_content_id_image_preview():
+    cidi = content_id_image(images()[0], image_preview=True)
+    assert cidi == {
+        "code": "EEA4GQZQTY6J5DTH",
+        "height": 133,
+        "preview": "data:image/webp;base64,UklGRswDAABXRUJQVlA4IMADAACwEACdASpgAEAACABo"
+        "JZQDIYvS17veY5eXPqEJqvlApXmiu2bhfpM/W/OPSMtv0v3NWnE7ZAsZmjG5hKvywya"
+        "fA1JdP8/jFyiv3c1IZWr3VMZcwp49igAZ1QWn6UW8qnCirNPyo/7bwaD1Jbc6Da/Icw"
+        "BayTVikvoxCJjXizEZ1GzNrVdvWA0usbFRgSgAAP7xXR2CX/ZHf4/pPp+Ua9oRn3JwO"
+        "KXGKHn6uU9pyilwnPuIj5fYLGVVn8y8IrlBFc+UHFkj8nRItgG14HoFcaUZXt95lWTW"
+        "rbRGOdCbSCfoMVO5fnJyP83Y7nDK39qCV0S+jbWj2uTIA7CARh5WjXfOFXvZ0qumiIC"
+        "JfK7C7lR0fU3qk9C/gGeT7b/KuGYgmZnt915K/M+rcXSxrPlei2bV4V9sFDUzaHqSa+"
+        "D4EcmHUT5Q2Ke3wgBtVBdamYcekS3ihkpdv5ew56BESirzXbtQ/A0rLW2tSz3WgEJ5W"
+        "MO4XY6PLC1Us9QF/pMFnF3iegC4mo+KbVcq1CJwvEJxfSqBLqUmQmc0S6CT0aYc/wx9"
+        "CzMGBgNP+BzMc7MkwjYXDRwxSenz4c5ZOBlvQWsGwodCJqIVDEnC6bL1DyV4s/wpATl"
+        "659UKMi7lhRz0kI4PnKu4y26R9X8v39j2p7f1tSjRRButwGvo4o5d2R/oPycC/u6fbF"
+        "VK1On/8i3Ih0cxfWE3jma8Yxe4MqF2t/09Jp91CyTOMfT4eqoLmS4/Uscwdjpx0YZxq"
+        "PWeATIiB0w4rbt2fBkmYnUHFnjjNDJhG8qKTxQvAvje//XQm5SmvZSwvOdCVfleHHsE"
+        "iFetOP+zdOeGvspuHEK1Sggaw1ERZvM/6hKaG8x8naVl+TMfVlweNA9Coc4Rjsl8IrX"
+        "cMJfVfLwawb7+6SDXPdnGlShqM6Oi8hl9D+KLe7Q2hgCNbcLPDrYbJWoVyiHPWLsJql"
+        "7mGXawzYcZciW2XK0d6ycsJzthDhzbaS390Hzb2z3JwzsDh3tgTZUIqM3RlzP3D9HeJ"
+        "BTkfZ5tKrZIzmqozxb+ejSxG6uYG64L576ToHAtzYXa0uGl/B873OCjjFUDzuIZCZFH"
+        "IROn1N2HJ5L5raeppgIOiPAtC+6UY/5SeCO6QsnDZO6tOuvGwV7rjKoLI/Xtp4vAwoL"
+        "F9uhMMN2MdRwyfOdUe0GZu+cD813M1k34ImOB5WLLp2yjmTESIAe4BbDv2Z6Us3yWMK"
+        "m0Bls6jDNAPHRsjibF4K6ekLqFE9WhcznGgHj4DQTy/e8y8eFtM5xAAAA=",
+        "width": 200,
+    }
 
 
 def test_image_normalize_inputs():
@@ -32,6 +90,11 @@ def test_image_hash_reference():
         "c343309e3c9e8e67",
         "c343309e3c9e8e67",
     ]
+
+
+def test_image_metadata():
+    assert image.image_metadata(images()[0].as_posix()) is None
+    assert image.image_metadata(images()[2].as_posix()) == {"title": "Concentrated Cat"}
 
 
 def test_pi():

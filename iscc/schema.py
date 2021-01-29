@@ -11,14 +11,14 @@ FEATURE_REGEX = "^[-A-Za-z0-9_]{11}"
 class Opts(BaseSettings):
     """Options for ISCC generation"""
 
-    meta_bits: int = Field(64, description="Length of generated Meta-Code in bits")
+    meta_bits: int = Field(64, description="Length of generated Meta-ID in bits")
     meta_trim_title: int = Field(
         128, description="Trim title length to this mumber of bytes"
     )
     meta_trim_extra: int = Field(4096, description="Trim extra to this number of bytes")
 
     text_bits: int = Field(
-        64, description="Length of generated Content-Code Text in bits"
+        64, description="Length of generated Content-ID-Text in bits"
     )
 
     text_ngram_size: int = Field(
@@ -32,6 +32,32 @@ class Opts(BaseSettings):
     text_avg_chunk_size: int = Field(
         1024,
         description="Avg number of characters per text chunk for granular fingerprints",
+    )
+
+    image_bits: int = Field(
+        64, description="Length of generated Content-ID-Image in bits"
+    )
+
+    image_trim: bool = Field(
+        False,
+        description="Autocrop empty borders of images",
+    )
+
+    image_preview: bool = Field(
+        False, description="Generate 128px image preview thumbnail."
+    )
+
+    image_preview_size: int = Field(
+        96, description="Size of larger side of thumbnail in pixels"
+    )
+
+    image_preview_quality: int = Field(
+        30, description="Image compression setting (0-100)"
+    )
+
+    image_exif_transpose: bool = Field(
+        True,
+        description="Transpose according to EXIF Orientation tag before hashing",
     )
 
 

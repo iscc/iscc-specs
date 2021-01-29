@@ -99,6 +99,7 @@ def text_trim(text, nbytes):
 
 def text_normalize(text, lower=True):
     # type: (Union[str, bytes], bool) -> str
+    """Unicode normalization and character filtering."""
 
     # 1. Convert bytes to str
     if isinstance(text, bytes):

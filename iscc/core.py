@@ -1,5 +1,8 @@
 # -*- coding: utf-8 -*-
 """ISCC Reference Implementation"""
+from io import BytesIO
+
+from PIL.ImageOps import exif_transpose
 from loguru import logger
 from typing import BinaryIO, List, Optional, Union
 from PIL import Image
@@ -7,7 +10,14 @@ import xxhash
 from blake3 import blake3
 from more_itertools import windowed
 from iscc.minhash import minhash_256
-from iscc.image import image_hash, image_normalize
+from iscc.image import (
+    image_data_uri,
+    image_hash,
+    image_metadata,
+    image_normalize,
+    image_thumbnail,
+    image_trim,
+)
 from iscc.text import text_features, text_hash, text_normalize, text_trim
 from iscc.codec import (
     Code,
@@ -97,17 +107,42 @@ def content_id_text(text, **kwargs):
     return result
 
 
-def content_id_image(img, bits=64):
-    # type: (Union[str, BytesIO, Image.Image], int) -> dict
+def content_id_image(img, **kwargs):
+    # type: (Union[str, BytesIO, Image.Image], **int) -> dict
+
+    opts = Opts(**kwargs)
+    nbits = opts.image_bits
+    nbytes = nbits // 8
+    assert nbits in (32, 64), "Content-ID Image does not yet support more than 64-bits"
 
     if not isinstance(img, Image.Image):
+        # We cannot pass PIL Image for metadata extraction
+        result = image_metadata(img) or {}
         img = Image.open(img)
+    else:
+        logger.warning(f"Skipped image metadata extraction {img}")
+        result = {}
 
-    result = dict(width=img.size[0], height=img.size[0])
+    if opts.image_exif_transpose:
+        img = exif_transpose(img)
+
+    width, height = img.size
+    result.update(dict(width=width, height=height))
+
+    if opts.image_trim:
+        img = image_trim(img)
+        if img.size != result.values():
+            tw, th = img.size
+            result["trimmed"] = dict(width=tw, height=th)
+
+    if opts.image_preview:
+        preview = image_thumbnail(img, **opts.dict())
+        preview_uri = image_data_uri(preview, **opts.dict())
+        result["preview"] = preview_uri
 
     pixels = image_normalize(img)
-    hash_digest = image_hash(pixels)
-    header = write_header(MT.CONTENT, ST_CC.IMAGE, VS.V0, bits)
+    hash_digest = image_hash(pixels)[:nbytes]
+    header = write_header(MT.CONTENT, ST_CC.IMAGE, VS.V0, nbits)
     code = encode_base32(header + hash_digest)
     result["code"] = code
 

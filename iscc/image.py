@@ -1,11 +1,20 @@
 # -*- coding: utf-8 -*-
 """Content-ID Image functions"""
+import base64
+import io
+from collections import defaultdict
+from io import BytesIO
+
+import pyexiv2
+from loguru import logger
 from pathlib import Path
-from typing import List, Union
+from typing import List, Optional, Union
 import math
 from statistics import median
-from PIL import Image, ImageChops
+from PIL import Image, ImageChops, ImageEnhance
 import numpy as np
+from iscc.schema import Opts
+from iscc.text import text_normalize
 
 
 def image_hash(pixels):
@@ -62,9 +71,9 @@ def image_normalize(img):
     return pixels
 
 
-def image_trim_border(img):
+def image_trim(img):
     # type: (Union[str, Path, Image.Image]) -> Image.Image
-    """Trim uniform colored border."""
+    """Trim uniform colored (empty) border."""
 
     if not isinstance(img, Image.Image):
         img = Image.open(img)
@@ -74,8 +83,106 @@ def image_trim_border(img):
     diff = ImageChops.add(diff, diff, 2.0, -100)
     bbox = diff.getbbox()
     if bbox:
+        logger.debug(f"Image has been trimmed: {img}")
         return img.crop(bbox)
     return img
+
+
+def image_thumbnail(img, **kwargs):
+    # type: (Union[str, Path, Image.Image], **int) -> Image.Image
+    opts = Opts(**kwargs)
+    size = opts.image_preview_size
+    if not isinstance(img, Image.Image):
+        img = Image.open(img)
+    else:
+        # Pillow thumbnail operates inplace - avoid side effects.
+        img = img.copy()
+    img.thumbnail((size, size), resample=Image.LANCZOS)
+    return ImageEnhance.Sharpness(img).enhance(1.4)
+
+
+def image_data_uri(img, **kwargs):
+    # type: (Union[str, Path, Image.Image]) -> str
+    """Converts image to WebP data-uri."""
+    opts = Opts(**kwargs)
+    quality = opts.image_preview_quality
+    if not isinstance(img, Image.Image):
+        img = Image.open(img)
+    raw = io.BytesIO()
+    img.save(raw, format="WEBP", lossless=False, quality=quality, method=6)
+    raw.seek(0)
+    enc = base64.b64encode(raw.read()).decode("ascii")
+    return "data:image/webp;base64," + enc
+
+
+def image_metadata(img):
+    # type: (Union[str, Path, bytes, BytesIO]) -> Optional[dict]
+    try:
+        if isinstance(img, Path):
+            img_obj = pyexiv2.Image(img.as_posix())
+        elif isinstance(img, str):
+            img_obj = pyexiv2.Image(img)
+        elif isinstance(bytes):
+            img_obj = pyexiv2.ImageData(img)
+        elif isinstance(img, BytesIO):
+            img_obj = pyexiv2.ImageData(img.read())
+        else:
+            raise ValueError("Path to image or bytes required")
+
+        meta = {}
+        meta.update(img_obj.read_exif())
+        meta.update(img_obj.read_iptc())
+        meta.update(img_obj.read_xmp())
+    except Exception as e:
+        logger.warning(f"Image metadata extraction failed: {e}")
+        return None
+
+    selected_meta = defaultdict(set)
+    for k, v in meta.items():
+        if k not in IMAGE_META_MAP:
+            continue
+        if isinstance(v, list):
+            v = tuple(text_normalize(item, lower=False) for item in v)
+            if not v:
+                continue
+            v = ";".join(v)
+            v = v.replace('lang="xdefault"', "").strip()
+        elif isinstance(v, str):
+            v = text_normalize(v, lower=False)
+            v = v.replace('lang="xdefault"', "").strip()
+            if not v:
+                continue
+        else:
+            raise ValueError(f"missed type {type(v)}")
+
+        field = IMAGE_META_MAP[k]
+        selected_meta[field].add(v)
+
+    longest_meta = {}
+    for k, v in selected_meta.items():
+        # value is a set of candidates
+        best_v = max(selected_meta[k], key=len)
+        if not best_v:
+            continue
+        longest_meta[k] = best_v
+    return longest_meta or None
+
+
+IMAGE_META_MAP = {
+    "Xmp.dc.title": "title",
+    "Xmp.dc.identifier": "identifier",
+    "Xmp.dc.language": "language",
+    "Xmp.xmp.Identifier": "identifier",
+    "Xmp.xmp.Nickname": "title",
+    "Xmp.xmpDM.shotName": "title",
+    "Xmp.photoshop.Headline": "title",
+    "Xmp.iptcExt.AOTitle": "title",
+    "Iptc.Application2.Headline": "title",
+    "Iptc.Application2.Language": "language",
+    "Exif.Image.ImageID": "identifier",
+    "Exif.Image.XPTitle": "title",
+    "Exif.Photo.ImageUniqueID": "identifier",
+}
 
 
 def dct(values_list):
@@ -106,3 +213,13 @@ def dct(values_list):
         result.append(alpha[-1])
         result.append(beta[-1])
         return result
+
+
+if __name__ == "__main__":
+    import iscc_samples as s
+
+    tn = image_thumbnail(s.images()[0])
+    tn.show()
+    uri = image_data_uri(tn)
+    print(uri)
+    # tn.show()
