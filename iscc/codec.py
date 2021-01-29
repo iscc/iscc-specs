@@ -305,6 +305,7 @@ class Code:
         return count_xor(self._body, other._body)
 
     def __eq__(self, other):
+        # type: (Code) -> bool
         return self.code == other.code
 
     @classmethod
