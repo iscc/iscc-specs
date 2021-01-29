@@ -98,13 +98,20 @@ def content_id_text(text, **kwargs):
 
 
 def content_id_image(img, bits=64):
-    # type: (Union[str, BytesIO, Image.Image], int) -> str
+    # type: (Union[str, BytesIO, Image.Image], int) -> dict
+
+    if not isinstance(img, Image.Image):
+        img = Image.open(img)
+
+    result = dict(width=img.size[0], height=img.size[0])
 
     pixels = image_normalize(img)
     hash_digest = image_hash(pixels)
     header = write_header(MT.CONTENT, ST_CC.IMAGE, VS.V0, bits)
     code = encode_base32(header + hash_digest)
-    return code
+    result["code"] = code
+
+    return result
 
 
 def content_id_audio(features, bits=64):

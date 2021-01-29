@@ -5,6 +5,7 @@ from io import BytesIO
 import pytest
 from PIL import Image, ImageFilter, ImageEnhance
 import iscc
+import iscc_samples as samples
 
 
 TESTS_PATH = os.path.dirname(os.path.realpath(__file__))
@@ -106,30 +107,30 @@ def test_content_id_mixed():
     cid_m = iscc.content_id_mixed([cid_t_1, cid_t_2])
     assert cid_m == "EUASAAJX7635T7X7"
 
-    cid_i = iscc.content_id_image("file_image_lenna.jpg")
+    cid_i = iscc.content_id_image("file_image_lenna.jpg")["code"]
     cid_m = iscc.content_id_mixed([cid_t_1, cid_t_2, cid_i])
     assert cid_m == "EUASAAJVZ43AT7HT"
 
 
 def test_content_id_image():
     cid_i = iscc.content_id_image("file_image_lenna.jpg")
-    assert len(cid_i) == 16
-    assert cid_i == "EEAZTRSWFV2THIUW"
+    assert len(cid_i["code"]) == 16
+    assert cid_i == {"code": "EEAZTRSWFV2THIUW", "height": 512, "width": 512}
 
     data = BytesIO(open("file_image_lenna.jpg", "rb").read())
     cid_i = iscc.content_id_image(data)
-    assert len(cid_i) == 16
-    assert cid_i == "EEAZTRSWFV2THIUW"
+    assert len(cid_i["code"]) == 16
+    assert cid_i == {"code": "EEAZTRSWFV2THIUW", "height": 512, "width": 512}
 
     img1 = Image.open("file_image_lenna.jpg")
     img2 = img1.filter(ImageFilter.GaussianBlur(10))
     img3 = ImageEnhance.Brightness(img1).enhance(1.4)
     img4 = ImageEnhance.Contrast(img1).enhance(1.2)
 
-    cid1 = iscc.content_id_image(img1)
-    cid2 = iscc.content_id_image(img2)
-    cid3 = iscc.content_id_image(img3)
-    cid4 = iscc.content_id_image(img4)
+    cid1 = iscc.content_id_image(img1)["code"]
+    cid2 = iscc.content_id_image(img2)["code"]
+    cid3 = iscc.content_id_image(img3)["code"]
+    cid4 = iscc.content_id_image(img4)["code"]
 
     assert iscc.distance(cid1, cid2) == 0
     assert iscc.distance(cid1, cid3) == 2

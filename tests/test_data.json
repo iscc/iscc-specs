@@ -46,42 +46,66 @@
         "file_image_pixel_png_transp.png",
         64
       ],
-      "outputs": "EEAQAAAAAAAAAAAA"
+      "outputs": {
+        "code": "EEAQAAAAAAAAAAAA",
+        "height": 1,
+        "width": 1
+      }
     },
     "test_002_file_image_pixel_png_white_png": {
       "inputs": [
         "file_image_pixel_png_white.png",
         64
       ],
-      "outputs": "EEAYAAAAAAAAAAAA"
+      "outputs": {
+        "code": "EEAYAAAAAAAAAAAA",
+        "height": 1,
+        "width": 1
+      }
     },
     "test_003_file_image_pixel_png_black_png": {
       "inputs": [
         "file_image_pixel_png_black.png",
         64
       ],
-      "outputs": "EEAQAAAAAAAAAAAA"
+      "outputs": {
+        "code": "EEAQAAAAAAAAAAAA",
+        "height": 1,
+        "width": 1
+      }
     },
     "test_004_file_image_cat_jpg": {
       "inputs": [
         "file_image_cat.jpg",
         64
       ],
-      "outputs": "EEA4GQZQTY6J5DTH"
+      "outputs": {
+        "code": "EEA4GQZQTY6J5DTH",
+        "height": 200,
+        "width": 200
+      }
     },
     "test_005_file_image_cat_png": {
       "inputs": [
         "file_image_cat.png",
         64
       ],
-      "outputs": "EEA4GQZQTY6J5DTH"
+      "outputs": {
+        "code": "EEA4GQZQTY6J5DTH",
+        "height": 200,
+        "width": 200
+      }
     },
     "test_006_file_image_cat_gif": {
       "inputs": [
         "file_image_cat.gif",
         64
       ],
-      "outputs": "EEA4GQZQTY6J5DTH"
+      "outputs": {
+        "code": "EEA4GQZQTY6J5DTH",
+        "height": 200,
+        "width": 200
+      }
     }
   },
   "content_id_mixed": {
