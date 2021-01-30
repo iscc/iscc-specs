@@ -208,9 +208,9 @@ def content_id_video(video, **kwargs):
     features = [tuple(sig.vector.tolist()) for sig in frames]
     video_hash = hash_video(features, **opts.dict())
     video_code = Code((MT.CONTENT, ST_CC.VIDEO, VS.V0, nbits, video_hash))
-    result['code'] = video_code.code
+    result["code"] = video_code.code
     if opts.video_scenes is False:
-        result['signature_fps'] = opts.video_fps
+        result["signature_fps"] = opts.video_fps
 
     if crop_value:
         result["crop"] = crop_value.lstrip("crop=")

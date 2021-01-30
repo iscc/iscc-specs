@@ -78,16 +78,15 @@ class Opts(BaseSettings):
     )
 
     video_fps: int = Field(
-        5, description="Frames per second to process for video hash (ignored when 0 or when scene detection is active)"
+        5,
+        description="Frames per second to process for video hash (ignored when 0 or when scene detection is active)",
     )
 
     video_crop: bool = Field(
         True, description="Detect and remove black borders before processing"
     )
 
-    video_granular: bool = Field(
-        False, description="Generate granular features"
-    )
+    video_granular: bool = Field(False, description="Generate granular features")
 
     video_scenes: bool = Field(
         False, description="Use scene detection for granular features"

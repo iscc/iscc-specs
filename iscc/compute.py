@@ -35,7 +35,12 @@ def compute(filepath, title="", extra=""):
         result["code_image"] = iscc.content_id_image(filepath)
     elif gmt == "video":
         result.update(video_metadata(filepath))
-        vid = iscc.content_id_video(filepath, scenes=True, crop=False)
+        vid = iscc.content_id_video(
+            filepath,
+            video_granular=True,
+            video_scenes=True,
+            video_crop=False,
+        )
         result.update(vid)
 
     # Data Code

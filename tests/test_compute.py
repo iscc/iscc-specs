@@ -11,10 +11,10 @@ def test_compute():
     result = compute.compute(SAMPLE)
     assert isinstance(result, dict)
     assert result == {
+        "code": "EMAV4DUD6RORW4X4",
         "code_data": "GAA2Q3TYZFBE6BTJ",
         "code_instance": "IAAY2QAMLUTU2ZYE",
         "code_meta": "AAA73CA6R4XJLI5C",
-        "code_video": "EMAV4DUD6RORW4X4",
         "duration": 60.042,
         "features": [
             "XxqD_x1a8vw",
