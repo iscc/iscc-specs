@@ -91,6 +91,11 @@ def test_content_id_video_granular_rolling():
     }
 
 
+def test_content_id_video_include_mp7sig():
+    result = content_id_video(SAMPLE, video_include_mp7sig=True)
+    assert result['mp7sig'].endswith('SZVP2HM')
+
+
 def test_hash_video():
     features = [tuple(range(380))]
     assert video.hash_video(features, video_bits=64).hex() == "528f91431f7c4ad2"

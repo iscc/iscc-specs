@@ -178,7 +178,7 @@ def content_id_audio(f, **kwargs):
 
 
 def content_id_video(video, **kwargs):
-    # type: (File) -> dict
+    # type: (File, **int) -> dict
     """Compute Content-ID video.
 
     :param video: The video file.
