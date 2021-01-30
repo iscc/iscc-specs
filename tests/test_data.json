@@ -3,19 +3,21 @@
     "required": false,
     "test_001_audio_empty": {
       "inputs": [
-        [],
-        64
+        []
       ],
-      "outputs": "EIAQAAAAAAAAAAAA"
+      "outputs": {
+        "code": "EIAQAAAAAAAAAAAA"
+      }
     },
     "test_002_audio_one": {
       "inputs": [
         [
           1
-        ],
-        64
+        ]
       ],
-      "outputs": "EIAQAAAAAEAAAAAA"
+      "outputs": {
+        "code": "EIAQAAAAAEAAAAAA"
+      }
     },
     "test_003_audio_signed": {
       "inputs": [
@@ -23,20 +25,22 @@
           -1,
           0,
           1
-        ],
-        64
+        ]
       ],
-      "outputs": "EIA7777774AAAAAA"
+      "outputs": {
+        "code": "EIA7777774AAAAAA"
+      }
     },
     "test_003_audio_two": {
       "inputs": [
         [
           1,
           2
-        ],
-        64
+        ]
       ],
-      "outputs": "EIAQAAAAAEAAAAAC"
+      "outputs": {
+        "code": "EIAQAAAAAEAAAAAC"
+      }
     }
   },
   "content_id_image": {

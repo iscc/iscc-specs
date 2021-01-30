@@ -112,26 +112,22 @@
     "content_id_audio": {
         "test_001_audio_empty": {
             "inputs": [
-                [],
-                64
+                []
             ]
         },
         "test_002_audio_one": {
             "inputs": [
-                [1],
-                64
+                [1]
             ]
         },
         "test_003_audio_two": {
             "inputs": [
-                [1, 2],
-                64
+                [1, 2]
             ]
         },
         "test_003_audio_signed": {
             "inputs": [
-                [-1, 0, 1],
-                64
+                [-1, 0, 1]
             ]
         }
     },

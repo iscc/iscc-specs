@@ -149,17 +149,20 @@ def content_id_image(img, **kwargs):
     return result
 
 
-def content_id_audio(file, **kwargs):
-    # type: (Union[str, BinaryIO]) -> dict
-
+def content_id_audio(f, **kwargs):
+    # type: (Union[str, BinaryIO], List) -> dict
+    """Generate Audio-ID from file(path) or Chromaprint features"""
     opts = Opts(**kwargs)
     result = dict()
     nbits = opts.audio_bits
     nbytes = nbits // 8
-    chroma = extract_chromaprint(file, **opts.dict())
-    shash_digest = audio_hash(chroma["fingerprint"])
+    if isinstance(f, list):
+        chroma = dict(fingerprint=f)
+    else:
+        chroma = extract_chromaprint(f, **opts.dict())
+        result["duration"] = chroma["duration"]
 
-    result["duration"] = chroma["duration"]
+    shash_digest = audio_hash(chroma["fingerprint"])
 
     if opts.audio_granular:
         features = encode_chomaprint(chroma["fingerprint"])
