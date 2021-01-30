@@ -78,7 +78,7 @@ class Opts(BaseSettings):
     )
 
     video_fps: int = Field(
-        5, description="Frames per second to process for video hash"
+        5, description="Frames per second to process for video hash (ignored when 0 or when scene detection is active)"
     )
 
     video_crop: bool = Field(
@@ -101,7 +101,7 @@ class Opts(BaseSettings):
         3, description="Seconds of video that overlap in roling window mode"
     )
 
-    video_include_raw: bool = Field(
+    video_include_mp7sig: bool = Field(
         False, description="Include raw MPEG-7 Video Signature in output"
     )
 

@@ -12,6 +12,7 @@ import imageio_ffmpeg
 from statistics import mode
 from langcodes import standardize_tag
 from scenedetect import ContentDetector, FrameTimecode, SceneManager, VideoManager
+from iscc.schema import Opts
 from iscc.codec import encode_base64
 from iscc.utils import cd
 from iscc.wtahash import wtahash
@@ -20,29 +21,33 @@ import av
 
 
 FFMPEG = imageio_ffmpeg.get_ffmpeg_exe()
-WINDOW = 7  # Default window size in seconds
-OVERLAP = 3  # Default overlap size in seconds
+# WINDOW = 7  # Default window size in seconds
+# OVERLAP = 3  # Default overlap size in seconds
 Scene = Tuple[FrameTimecode, FrameTimecode]
 SceneSig = Tuple[List[str], List[int]]  # feature hashes, scene durations
 
 
-def compute_video_hash(features, bits=64):
-    # type: (Sequence[Tuple[int]], int) -> bytes
+def hash_video(features, **kwargs):
+    # type: (Sequence[Tuple[int]], **int) -> bytes
     """Compute wta-hash for a list of frame signature vectors"""
+    opts = Opts(**kwargs)
     sigs = set(features)
     vecsum = [sum(col) for col in zip(*sigs)]
-    video_hash = wtahash(vecsum, hl=bits)
+    video_hash = wtahash(vecsum, hl=opts.video_bits)
     return video_hash
 
 
-def compute_rolling_signatures(frames, window=WINDOW, overlap=OVERLAP):
-    # type: (List[Frame], int, int) -> List[str]
+def compute_rolling_signatures(frames, **kwargs):
+    # type: (List[Frame], **int) -> List[str]
     """
     Compute video signatures based on rolling window.
 
     Generates segment-wise features where 'window' is the duration of segments in
     seconds and 'overlap' is the number of seconds that overlap for each segment.
     """
+    opts = Opts(**kwargs)
+    window = opts.video_window
+    overlap = opts.video_overlap
     assert overlap < window, "Overlap must be shorter than window"
     shift = window - overlap
     cut_indexes = [0]
@@ -58,7 +63,7 @@ def compute_rolling_signatures(frames, window=WINDOW, overlap=OVERLAP):
         for frame in frames[ci:]:
             segment_frames.append(tuple(frame.vector.tolist()))
             if frame.elapsed > start + window:
-                sigs.append(encode_base64(compute_video_hash(segment_frames)))
+                sigs.append(encode_base64(hash_video(segment_frames)))
                 break
     return sigs
 
@@ -77,21 +82,26 @@ def compute_scene_signatures(frames, scenes):
         scene_duration = round(scene_duration, 3)
         scene_frames = frames[start.get_frames() : end.get_frames()]
         scene_sigs = [tuple(frame.vector.tolist()) for frame in scene_frames]
-        scene_hash = compute_video_hash(scene_sigs)
+        scene_hash = hash_video(scene_sigs)
         durations.append(scene_duration)
         features.append(encode_base64(scene_hash))
     return features, durations
 
 
-def extract_signature(file_path, crop=None):
-    # type: (str, Optional[str]) -> bytes
+def extract_signature(file_path, crop=None, **kwargs):
+    # type: (str, Optional[str], **int) -> bytes
     """Extracts MP7 Video Signature"""
+    opts = Opts(**kwargs)
     sigfile = basename(file_path) + ".bin"
     folder = dirname(file_path)
+
+    vf = f"signature=format=binary:filename={sigfile}"
     if crop:
-        vf = "{},signature=format=binary:filename={}".format(crop, sigfile)
-    else:
-        vf = "signature=format=binary:filename={}".format(sigfile)
+        vf = f"{crop}," + vf
+    if opts.video_scenes is False:
+        if opts.video_fps:
+            vf = f"fps=fps={opts.video_fps}," + vf
+
     with cd(folder):
         cmd = [FFMPEG, "-i", file_path, "-vf", vf, "-f", "null", "-"]
         subprocess.run(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)

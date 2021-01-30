@@ -194,7 +194,7 @@ class Code:
     """
 
     def __init__(self, code):
-        # type: (Union[str, Tuple[MT, Union[ST, ST_CC], VS, LN, bytes], bytes]) -> None
+        # type: (Union[str, Tuple[MT, Union[ST, ST_CC], VS, Union(LN, int), bytes], bytes]) -> None
         if isinstance(code, str):
             code_fields = read_header(decode_base32(code))
         elif isinstance(code, tuple):

@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 """ISCC Reference Implementation"""
+import base64
 from io import BytesIO
 
 from PIL.ImageOps import exif_transpose
@@ -36,7 +37,7 @@ from iscc.mp7 import read_ffmpeg_signature
 from iscc.video import (
     compute_rolling_signatures,
     compute_scene_signatures,
-    compute_video_hash,
+    hash_video,
     detect_crop,
     detect_scenes,
     extract_signature,
@@ -176,18 +177,14 @@ def content_id_audio(f, **kwargs):
     return result
 
 
-def content_id_video(video, scenes=False, crop=True, window=0, overlap=0, bits=64):
-    # types: (File, bool, bool, int, int, int) -> dict
+def content_id_video(video, **kwargs):
+    # type: (File) -> dict
     """Compute Content-ID video.
 
     :param video: The video file.
-    :param bool scenes: If True generate scene detection based granular features.
-    :param bool crop: If True detect and remove black borders before processing.
-    :param int window: Duration in seconds for rolling window based granular features.
-    :param int overlap: Overlap in seconds for rolling window bases granular features.
 
     Returns a dictionary with the following fields:
-        video_code: the calculated ISCC video code
+        code: the calculated ISCC video code
         signature: raw bytes of extracted mp7 signature
 
     Optinally depending on settings these additional fields are provided:
@@ -200,29 +197,40 @@ def content_id_video(video, scenes=False, crop=True, window=0, overlap=0, bits=6
     The window and overlap parameters are ignored if 0 or if scenes is False.
     Set crop=False if you know your video has no black borders to improve performance.
     """
-    crop_value = detect_crop(video) if crop else None
-    signature = extract_signature(video, crop_value)
+    opts = Opts(**kwargs)
+    nbits = opts.video_bits
+
+    result = video_metadata(video)
+
+    crop_value = detect_crop(video) if opts.video_crop else None
+    signature = extract_signature(video, crop_value, **opts.dict())
     frames = read_ffmpeg_signature(signature)
     features = [tuple(sig.vector.tolist()) for sig in frames]
-    video_hash = compute_video_hash(features, bits=bits)
-    video_code = Code((MT.CONTENT, ST_CC.VIDEO, VS.V0, bits, video_hash))
-    result = dict(
-        code_video=video_code.code,
-        # signature=signature,
-    )
+    video_hash = hash_video(features, **opts.dict())
+    video_code = Code((MT.CONTENT, ST_CC.VIDEO, VS.V0, nbits, video_hash))
+    result['code'] = video_code.code
+    if opts.video_scenes is False:
+        result['signature_fps'] = opts.video_fps
+
     if crop_value:
         result["crop"] = crop_value.lstrip("crop=")
 
-    if scenes:
+    if opts.video_include_mp7sig:
+        result["mp7sig"] = base64.b64encode(signature).decode("ascii")
+
+    if opts.video_granular is False:
+        return result
+
+    if opts.video_scenes:
         cutpoints = detect_scenes(video)
         features, durations = compute_scene_signatures(frames, cutpoints)
         result["features"] = features
         result["sizes"] = durations
-    elif any((window, overlap)):
-        features = compute_rolling_signatures(frames, window=window, overlap=overlap)
+    else:
+        features = compute_rolling_signatures(frames, **opts.dict())
         result["features"] = features
-        result["window"] = window
-        result["overlap"] = overlap
+        result["window"] = opts.video_window
+        result["overlap"] = opts.video_overlap
 
     return result
 
