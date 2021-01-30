@@ -60,6 +60,19 @@ class Opts(BaseSettings):
         description="Transpose according to EXIF Orientation tag before hashing",
     )
 
+    audio_bits: int = Field(
+        64, description="Length of generated Content-ID-Audio in bits"
+    )
+
+    audio_granular: bool = Field(
+        False, description="Calculate and return granular audio features"
+    )
+
+    audio_max_duration: int = Field(
+        120,
+        description="Maximum seconds of audio to process",
+    )
+
 
 class Features(BaseModel):
     """Granular feature codes.

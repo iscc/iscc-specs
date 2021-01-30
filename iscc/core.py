@@ -8,8 +8,8 @@ from typing import BinaryIO, List, Optional, Union
 from PIL import Image
 import xxhash
 from blake3 import blake3
-from more_itertools import windowed
 from iscc.minhash import minhash_256
+from iscc.audio import audio_hash, encode_chomaprint, extract_chromaprint
 from iscc.image import (
     image_data_uri,
     image_hash,
@@ -149,20 +149,26 @@ def content_id_image(img, **kwargs):
     return result
 
 
-def content_id_audio(features, bits=64):
-    # type: (List[int], int) -> str
-    digests = []
+def content_id_audio(file, **kwargs):
+    # type: (Union[str, BinaryIO]) -> dict
 
-    for int_features in windowed(features, 8, fillvalue=0):
-        digest = b""
-        for int_feature in int_features:
-            digest += int_feature.to_bytes(4, "big", signed=True)
-        digests.append(digest)
-    shash_digest = similarity_hash(digests)
-    n_bytes = bits // 8
-    header = write_header(MT.CONTENT, ST_CC.AUDIO, VS.V0, bits)
-    code = encode_base32(header + shash_digest[:n_bytes])
-    return code
+    opts = Opts(**kwargs)
+    result = dict()
+    nbits = opts.audio_bits
+    nbytes = nbits // 8
+    chroma = extract_chromaprint(file, **opts.dict())
+    shash_digest = audio_hash(chroma["fingerprint"])
+
+    result["duration"] = chroma["duration"]
+
+    if opts.audio_granular:
+        features = encode_chomaprint(chroma["fingerprint"])
+        result["features"] = features
+
+    header = write_header(MT.CONTENT, ST_CC.AUDIO, VS.V0, nbits)
+    code = encode_base32(header + shash_digest[:nbytes])
+    result["code"] = code
+    return result
 
 
 def content_id_video(video, scenes=False, crop=True, window=0, overlap=0, bits=64):

@@ -42,6 +42,8 @@ tika = "^1.24"
 langcodes = "^2.1.0"
 langdetect = "^1.0.8"
 pyexiv2 = "^2.4.1"
+click = "^7.1.2"
+requests = "^2.25.1"
 
 [tool.poetry.extras]
 turbo = ["cython", "numba"]
