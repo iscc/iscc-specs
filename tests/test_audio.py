@@ -16,7 +16,9 @@ def test_fpcalc_is_installed():
 
 def test_download_url():
     url = audio.fpcalc_download_url()
-    assert platform.system().lower() in url
+    pl = platform.system().lower()
+    pl = "macos" if pl == "darwin" else pl
+    assert pl in url
     assert audio.FPCALC_VERSION in url
 
 
