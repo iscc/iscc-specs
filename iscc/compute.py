@@ -3,7 +3,7 @@
 from tika import parser, detector
 from iscc.mediatype import SUPPORTED_MEDIATYPES, mime_to_gmt
 from iscc.meta import title_from_tika
-from iscc.video import get_video_metadata
+from iscc.video import video_metadata
 import iscc
 
 
@@ -34,7 +34,7 @@ def compute(filepath, title="", extra=""):
     elif gmt == "image":
         result["code_image"] = iscc.content_id_image(filepath)
     elif gmt == "video":
-        result.update(get_video_metadata(filepath))
+        result.update(video_metadata(filepath))
         vid = iscc.content_id_video(filepath, scenes=True, crop=False)
         result.update(vid)
 

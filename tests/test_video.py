@@ -172,7 +172,7 @@ def test_detect_scenes():
 
 
 def test_get_metadata():
-    meta = video.get_video_metadata(SAMPLE)
+    meta = video.video_metadata(SAMPLE)
     assert meta == {
         "duration": 60.042,
         "fps": 24.0,
@@ -185,7 +185,7 @@ def test_get_metadata():
 
 def test_get_metadata_open_file():
     with open(SAMPLE, "rb") as infile:
-        meta = video.get_video_metadata(infile)
+        meta = video.video_metadata(infile)
         assert infile.tell() == 65536
         assert meta == {
             "duration": 60.042,

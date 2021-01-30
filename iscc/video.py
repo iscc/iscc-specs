@@ -163,7 +163,7 @@ def detect_scenes(video_file):
     return scene_manager.get_scene_list(base_timecode)
 
 
-def get_video_metadata(video):
+def video_metadata(video):
     with av.open(video) as v:
         metadata = {}
         c_duration = v.duration
@@ -171,7 +171,6 @@ def get_video_metadata(video):
         c_metadata = {key.lower(): value for key, value in v.metadata.items()}
         vstreams = 0
         languages = set()
-
         metadata_fields = ["title"]
         for field in metadata_fields:
             value = c_metadata.get(field)
