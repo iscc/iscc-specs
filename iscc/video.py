@@ -139,7 +139,7 @@ def detect_crop(file_path):
     Detect crop value for video.
     Example result: crop=176:96:0:24
     """
-    cmd = [FFMPEG, "-i", file_path, "-vf", "cropdetect", "-f", "null", "-"]
+    cmd = [FFMPEG, "-t", "3:00", "-i", file_path, "-vf", "cropdetect", "-f", "null", "-"]
     res = subprocess.run(cmd, stderr=subprocess.PIPE)
     text = res.stderr.decode(encoding=sys.stdout.encoding)
     crops = [
