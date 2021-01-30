@@ -73,6 +73,42 @@ class Opts(BaseSettings):
         description="Maximum seconds of audio to process",
     )
 
+    video_bits: int = Field(
+        64, description="Length of generated Content-ID-Video in bits"
+    )
+
+    video_fps: int = Field(
+        5, description="Frames per second to process for video hash"
+    )
+
+    video_crop: bool = Field(
+        True, description="Detect and remove black borders before processing"
+    )
+
+    video_granular: bool = Field(
+        False, description="Generate granular features"
+    )
+
+    video_scenes: bool = Field(
+        False, description="Use scene detection for granular features"
+    )
+
+    video_window: int = Field(
+        7, description="Seconds of video per granular feature in rolling window mode"
+    )
+
+    video_overlap: int = Field(
+        3, description="Seconds of video that overlap in roling window mode"
+    )
+
+    video_include_raw: bool = Field(
+        False, description="Include raw MPEG-7 Video Signature in output"
+    )
+
+    video_preview: bool = Field(
+        False, description="Generate 128px video preview thumbnail(s)"
+    )
+
 
 class Features(BaseModel):
     """Granular feature codes.
