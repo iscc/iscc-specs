@@ -93,7 +93,7 @@ def test_content_id_video_granular_rolling():
 
 def test_content_id_video_include_mp7sig():
     result = content_id_video(SAMPLE, video_include_mp7sig=True)
-    assert result['mp7sig'].endswith('SZVP2HM')
+    assert result["mp7sig"].endswith("SZVP2HM")
 
 
 def test_hash_video():
