@@ -77,6 +77,7 @@ def test_content_id_audio():
     assert content_id_audio(audios()[0].as_posix()) == {
         "code": "EIAWUJFCEZVCJIRG",
         "duration": 15.5,
+        "title": "Belly Button",
     }
 
 
@@ -84,6 +85,7 @@ def test_content_id_audio_256():
     assert content_id_audio(audios()[0].as_posix(), audio_bits=256) == {
         "code": "EIDWUJFCEZVCJIRGNISKEBTKESRAM2REUIDGUJFCEZVCJIRGNISKEJQ",
         "duration": 15.5,
+        "title": "Belly Button",
     }
 
 
@@ -106,6 +108,7 @@ def test_content_id_audio_granular_short():
             "c67LgXLty4A",
             "YmzOgA",
         ],
+        "title": "Belly Button",
     }
 
 
@@ -168,4 +171,5 @@ def test_content_id_audio_granular_default():
             "OEciRnjGMvY",
             "eIYOpniEC6Y",
         ],
+        "title": "Belly Button",
     }

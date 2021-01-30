@@ -40,6 +40,7 @@ from iscc.video import (
     detect_crop,
     detect_scenes,
     extract_signature,
+    video_metadata,
 )
 from iscc.simhash import similarity_hash
 from iscc.meta import meta_hash
@@ -150,7 +151,7 @@ def content_id_image(img, **kwargs):
 
 
 def content_id_audio(f, **kwargs):
-    # type: (Union[str, BinaryIO], List) -> dict
+    # type: (Union[str, BinaryIO, List], **int) -> dict
     """Generate Audio-ID from file(path) or Chromaprint features"""
     opts = Opts(**kwargs)
     result = dict()
@@ -161,6 +162,7 @@ def content_id_audio(f, **kwargs):
     else:
         chroma = extract_chromaprint(f, **opts.dict())
         result["duration"] = chroma["duration"]
+        result.update(video_metadata(f))
 
     shash_digest = audio_hash(chroma["fingerprint"])
 
