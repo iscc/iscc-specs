@@ -1,14 +1,12 @@
 # -*- coding: utf-8 -*-
 """Content-ID Image functions"""
 import base64
-import io
 from collections import defaultdict
-from io import BytesIO
-
+import io
 import pyexiv2
 from loguru import logger
 from pathlib import Path
-from typing import List, Optional, Union
+from typing import Any, List, Optional, Union
 import math
 from statistics import median
 from PIL import Image, ImageChops, ImageEnhance
@@ -88,9 +86,10 @@ def image_trim(img):
     return img
 
 
-def image_thumbnail(img, **kwargs):
-    # type: (Union[str, Path, Image.Image], **int) -> Image.Image
-    opts = Opts(**kwargs)
+def image_thumbnail(img, **options):
+    # type: (Union[str, Path, Image.Image], **Any) -> Image.Image
+    """Create a thumbnail for an image."""
+    opts = Opts(**options)
     size = opts.image_preview_size
     if not isinstance(img, Image.Image):
         img = Image.open(img)
@@ -101,13 +100,18 @@ def image_thumbnail(img, **kwargs):
     return ImageEnhance.Sharpness(img).enhance(1.4)
 
 
-def image_data_uri(img, **kwargs):
-    # type: (Union[str, Path, Image.Image]) -> str
+def image_data_uri(img, **options):
+    # type: (Union[str, Path, Image.Image, bytes, io.BytesIO], **Any) -> str
     """Converts image to WebP data-uri."""
-    opts = Opts(**kwargs)
+    opts = Opts(**options)
     quality = opts.image_preview_quality
+
+    if isinstance(img, bytes):
+        img = io.BytesIO(img)
+
     if not isinstance(img, Image.Image):
         img = Image.open(img)
+
     raw = io.BytesIO()
     img.save(raw, format="WEBP", lossless=False, quality=quality, method=6)
     raw.seek(0)
@@ -116,7 +120,7 @@ def image_data_uri(img, **kwargs):
 
 
 def image_metadata(img):
-    # type: (Union[str, Path, bytes, BytesIO]) -> Optional[dict]
+    # type: (Union[str, Path, bytes, io.BytesIO]) -> Optional[dict]
     try:
         if isinstance(img, Path):
             img_obj = pyexiv2.Image(img.as_posix())
@@ -124,7 +128,7 @@ def image_metadata(img):
             img_obj = pyexiv2.Image(img)
         elif isinstance(bytes):
             img_obj = pyexiv2.ImageData(img)
-        elif isinstance(img, BytesIO):
+        elif isinstance(img, io.BytesIO):
             img_obj = pyexiv2.ImageData(img.read())
         else:
             raise ValueError("Path to image or bytes required")

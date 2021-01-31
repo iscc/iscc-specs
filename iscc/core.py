@@ -37,6 +37,7 @@ from iscc.mp7 import read_ffmpeg_signature
 from iscc.video import (
     compute_rolling_signatures,
     compute_scene_signatures,
+    extract_video_preview,
     hash_video,
     detect_crop,
     detect_scenes,
@@ -226,6 +227,10 @@ def code_video(video, **options):
 
     if opts.video_include_mp7sig:
         result["mp7sig"] = base64.b64encode(signature).decode("ascii")
+
+    if opts.video_preview:
+        img_raw = extract_video_preview(video)
+        result["preview"] = image_data_uri(img_raw)
 
     if opts.video_granular is False:
         return result

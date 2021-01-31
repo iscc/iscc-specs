@@ -96,6 +96,11 @@ def test_code_video_include_mp7sig():
     assert result["mp7sig"].endswith("SZVP2HM")
 
 
+def test_code_video_preview():
+    result = code_video(SAMPLE, video_preview=True)
+    assert result["preview"].endswith("Z4h6t54UOnUxIAA")
+
+
 def test_hash_video():
     features = [tuple(range(380))]
     assert video.hash_video(features, video_bits=64).hex() == "528f91431f7c4ad2"

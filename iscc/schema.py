@@ -40,12 +40,10 @@ class Opts(BaseSettings):
 
     image_trim: bool = Field(
         False,
-        description="Autocrop empty borders of images",
+        description="Autocrop empty borders of images before Image-Code generation",
     )
 
-    image_preview: bool = Field(
-        False, description="Generate 128px image preview thumbnail."
-    )
+    image_preview: bool = Field(False, description="Generate image preview thumbnail")
 
     image_preview_size: int = Field(
         96, description="Size of larger side of thumbnail in pixels"

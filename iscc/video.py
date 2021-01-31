@@ -95,6 +95,29 @@ def compute_scene_signatures(frames, scenes):
     return features, durations
 
 
+def extract_video_preview(file_path, **options):
+    # type: (str, **Any) -> bytes
+    """Extract thumbnail from video and return raw png byte data."""
+    opts = Opts(**options)
+    size = opts.image_preview_size
+    cmd = [
+        FFMPEG,
+        "-i",
+        file_path,
+        "-vf",
+        f"thumbnail,scale={size}:-1",
+        "-frames:v",
+        "1",
+        "-c:v",
+        "png",
+        "-f",
+        "image2pipe",
+        "-",
+    ]
+    result = subprocess.run(cmd, stdout=PIPE, stderr=DEVNULL)
+    return result.stdout
+
+
 def extract_signature(file_path, crop=None, **kwargs):
     # type: (str, Optional[str], **Any) -> bytes
     """Extracts MP7 Video Signature"""
@@ -248,3 +271,9 @@ def extract_video_metadata(video):
             metadata["language"] = lng
 
         return dict(sorted(metadata.items()))
+
+
+if __name__ == "__main__":
+    import iscc_samples
+
+    extract_video_preview(iscc_samples.videos()[0].as_posix())
