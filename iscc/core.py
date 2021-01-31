@@ -4,6 +4,7 @@ import base64
 from io import BytesIO
 
 from PIL.ImageOps import exif_transpose
+from humanize import naturalsize
 from loguru import logger
 from typing import BinaryIO, List, Optional, Union
 from PIL import Image
@@ -41,7 +42,7 @@ from iscc.video import (
     detect_crop,
     detect_scenes,
     extract_signature,
-    video_metadata,
+    extract_video_metadata,
 )
 from iscc.simhash import similarity_hash
 from iscc.meta import meta_hash
@@ -163,7 +164,7 @@ def content_id_audio(f, **kwargs):
     else:
         chroma = extract_chromaprint(f, **opts.dict())
         result["duration"] = chroma["duration"]
-        result.update(video_metadata(f))
+        result.update(extract_video_metadata(f))
 
     shash_digest = audio_hash(chroma["fingerprint"])
 
@@ -200,17 +201,18 @@ def content_id_video(video, **kwargs):
     opts = Opts(**kwargs)
     nbits = opts.video_bits
 
-    result = video_metadata(video)
+    result = extract_video_metadata(video)
 
     crop_value = detect_crop(video) if opts.video_crop else None
     signature = extract_signature(video, crop_value, **opts.dict())
+    logger.debug(f"mp7 signature size {naturalsize(len(signature))}")
     frames = read_ffmpeg_signature(signature)
+    logger.debug(f"mp7 signature frames {len(frames)}")
     features = [tuple(sig.vector.tolist()) for sig in frames]
     video_hash = hash_video(features, **opts.dict())
     video_code = Code((MT.CONTENT, ST_CC.VIDEO, VS.V0, nbits, video_hash))
     result["code"] = video_code.code
-    if opts.video_scenes is False:
-        result["signature_fps"] = opts.video_fps
+    result["signature_fps"] = opts.video_fps
 
     if crop_value:
         result["crop"] = crop_value.lstrip("crop=")

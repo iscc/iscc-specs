@@ -44,6 +44,7 @@ langdetect = "^1.0.8"
 pyexiv2 = "^2.4.1"
 click = "^7.1.2"
 requests = "^2.25.1"
+humanize = "^3.2"
 
 [tool.poetry.extras]
 turbo = ["cython", "numba"]
@@ -58,7 +59,6 @@ mkdocs-git-revision-date-localized-plugin = "^0"
 black = { version = "*", allow-prereleases = true }
 lxml = "^4.6"
 codetiming = "^1.2"
-humanize = "^3.2"
 fauxfactory = "^3.1"
 iscc-samples = "^0.2.0"
 

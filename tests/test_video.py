@@ -39,21 +39,21 @@ def test_content_id_video_granular_scenes():
         "crop": "176:96:0:24",
         "duration": 60.042,
         "features": [
-            "ThICHh1advw",
-            "GgmyIMqXmyU",
-            "Vo7S1g8Yvu0",
-            "RjUg_g9avmg",
-            "Vx-AncCO7m4",
-            "FJizhvjOltE",
+            "DhuCPB1advw",
+            "OgmyIcqHmyU",
+            "Vo5C1g8Yvu0",
+            "dh2g_g_Sumk",
+            "V5-AvcCOpn8",
+            "lJgzpvjPltM",
             "Hp4D_XrSdtk",
-            "Ypkise4nWlM",
-            "Vg2ibPyrGvM",
-            "BBgR9liDN5k",
+            "Qpkise6nWlM",
+            "Vi2i7PwrGvM",
         ],
         "fps": 24.0,
         "height": 144,
         "language": "en",
-        "sizes": [7.625, 2.5, 5.083, 1.25, 3.75, 2.792, 15.458, 8.167, 13.042, 0.375],
+        "signature_fps": 5,
+        "sizes": [7.625, 2.5, 5.083, 1.25, 3.75, 2.792, 15.458, 8.167, 13.042],
         "title": "Kali by Anokato - Spiral Sessions 2019",
         "width": 176,
     }
@@ -131,23 +131,30 @@ def test_compute_scene_signatures():
     scene_signatures = video.compute_scene_signatures(frames, scenes)
     assert scene_signatures == (
         [
-            "XxqD_x1a8vw",
-            "HEqWY8AX9oQ",
-            "VA7U9A0f8-w",
-            "V5QEfpj-tlQ",
-            "dm6ETGUEwmc",
-            "vhqD3HFKdtE",
-            "Hg4X9f1acng",
+            "XxqT9x1a8vw",
+            "HGqWS0AW8oQ",
+            "Vg7U9A0esuw",
+            "VgYGfgj2tmQ",
+            "dw6FTHUE4nU",
+            "vhqD3XVSdtE",
+            "Hg4X9f1acvg",
             "XkoAn8YVcqU",
-            "V06CXFQdUrQ",
-            "XBgT_nxD8tE",
+            "V06CXBQdUrU",
         ],
-        [7.625, 2.5, 5.083, 1.25, 3.75, 2.792, 15.458, 8.167, 13.042, 0.375],
+        [7.625, 2.5, 5.083, 1.25, 3.75, 2.792, 15.458, 8.167, 13.042],
     )
 
 
 def test_extract_signature():
-    sigh = blake3(video.extract_signature(SAMPLE, video_scenes=True)).hexdigest()
+    sigh = blake3(
+        video.extract_signature(SAMPLE, video_scenes=True, video_fps=5)
+    ).hexdigest()
+    assert sigh == "da170784ef9e47f4f74289c3b2ff842887eda7641b8c53d4ab698ae0de6d7b1c"
+    sigh = blake3(
+        video.extract_signature(SAMPLE, video_scenes=False, video_fps=5)
+    ).hexdigest()
+    assert sigh == "da170784ef9e47f4f74289c3b2ff842887eda7641b8c53d4ab698ae0de6d7b1c"
+    sigh = blake3(video.extract_signature(SAMPLE, video_fps=0)).hexdigest()
     assert sigh == "021f4901f79bbb5c49edb0027103ec352f2bdb4feca53e6ce4f2f7d76c3dab5f"
 
 
@@ -220,7 +227,7 @@ def test_detect_scenes():
 
 
 def test_get_metadata():
-    meta = video.video_metadata(SAMPLE)
+    meta = video.extract_video_metadata(SAMPLE)
     assert meta == {
         "duration": 60.042,
         "fps": 24.0,
@@ -233,7 +240,7 @@ def test_get_metadata():
 
 def test_get_metadata_open_file():
     with open(SAMPLE, "rb") as infile:
-        meta = video.video_metadata(infile)
+        meta = video.extract_video_metadata(infile)
         assert infile.tell() == 65536
         assert meta == {
             "duration": 60.042,

@@ -7,7 +7,7 @@ import sys
 from subprocess import Popen, PIPE, DEVNULL
 from os.path import basename, dirname
 from secrets import token_hex
-from typing import Generator, List, Sequence, Tuple, Optional
+from typing import Generator, List, Sequence, Tuple, Optional, BinaryIO, Union
 import imageio_ffmpeg
 from statistics import mode
 from langcodes import standardize_tag
@@ -21,8 +21,6 @@ import av
 
 
 FFMPEG = imageio_ffmpeg.get_ffmpeg_exe()
-# WINDOW = 7  # Default window size in seconds
-# OVERLAP = 3  # Default overlap size in seconds
 Scene = Tuple[FrameTimecode, FrameTimecode]
 SceneSig = Tuple[List[str], List[int]]  # feature hashes, scene durations
 
@@ -73,18 +71,26 @@ def compute_scene_signatures(frames, scenes):
     """Compute video signatures for individual scenes in video.
     Returns features and durations as tuple.
     """
-    scenes_fc = scenes[-1][-1].get_frames()
-    frames_fc = len(frames)
-    assert scenes_fc == frames_fc, f"{scenes_fc} scenes vs {frames_fc} frames"
+
+    scene_idx = 0
+    scene = scenes[scene_idx]
     durations, features = [], []
-    for start, end in scenes:
-        scene_duration = end.get_seconds() - start.get_seconds()
-        scene_duration = round(scene_duration, 3)
-        scene_frames = frames[start.get_frames() : end.get_frames()]
-        scene_sigs = [tuple(frame.vector.tolist()) for frame in scene_frames]
-        scene_hash = hash_video(scene_sigs)
-        durations.append(scene_duration)
-        features.append(encode_base64(scene_hash))
+    segment = []
+    for fidx, frame in enumerate(frames):
+        frame_t = tuple(frame.vector.tolist())
+        segment.append(frame_t)
+        if frame.elapsed >= scene[1].get_seconds():
+            features.append(encode_base64(hash_video(segment)))
+            segment = []
+            duration = scene[1].get_seconds() - scene[0].get_seconds()
+            duration = round(duration, 3)
+            durations.append(duration)
+            scene_idx += 1
+            try:
+                scene = scenes[scene_idx]
+            except IndexError:
+                break
+
     return features, durations
 
 
@@ -98,9 +104,9 @@ def extract_signature(file_path, crop=None, **kwargs):
     vf = f"signature=format=binary:filename={sigfile}"
     if crop:
         vf = f"{crop}," + vf
-    if opts.video_scenes is False:
-        if opts.video_fps:
-            vf = f"fps=fps={opts.video_fps}," + vf
+
+    if opts.video_fps:
+        vf = f"fps=fps={opts.video_fps}," + vf
 
     with cd(folder):
         cmd = [FFMPEG, "-i", file_path, "-vf", vf, "-f", "null", "-"]
@@ -184,7 +190,9 @@ def detect_scenes(video_file):
     return scene_manager.get_scene_list(base_timecode)
 
 
-def video_metadata(video):
+def extract_video_metadata(video):
+    # type: (Union[str, BinaryIO]) -> dict
+    """Extract basic metadata from video files."""
     with av.open(video) as v:
         metadata = {}
         c_duration = v.duration

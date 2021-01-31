@@ -229,7 +229,7 @@ python-versions = "*"
 name = "humanize"
 version = "3.2.0"
 description = "Python humanize utilities"
-category = "dev"
+category = "main"
 optional = false
 python-versions = ">=3.6"
 
@@ -900,7 +900,7 @@ turbo = ["cython", "numba"]
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.6"
-content-hash = "afd35e23da32e865900b9a88d3c49fb2a9d51bd67d36515510c7862c0e470a6d"
+content-hash = "673241e3342dce8fa5d40e0c28cd7307fdd7f0cc0ce2dabd06bd01ae6db7580c"
 
 [metadata.files]
 aiocontextvars = [
