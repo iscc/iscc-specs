@@ -133,31 +133,31 @@
       "inputs": [
         "file_image_cat.jpg"
       ],
-      "outputs": [
-        "IAAYOKTRSPSYUCL6",
-        "EJJHAKXUGUHKPYN5HR7RAO2XUUUA2CQYMUR3ZCY",
-        12963
-      ]
+      "outputs": {
+        "code": "IAAYOKTRSPSYUCL6",
+        "datahash": "872a7193e58a097e2252702af4350ea7e1bd3c7f103b57a5280d0a186523bc8b",
+        "filesize": 12963
+      }
     },
     "test_002_file_image_cat_png": {
       "inputs": [
         "file_image_cat.png"
       ],
-      "outputs": [
-        "IAA3PLWUS7JNMAR2",
-        "5MXTNADSHJUNNYVR6KDBG6TW4AYZWLLORGFQAOY",
-        53759
-      ]
+      "outputs": {
+        "code": "IAA3PLWUS7JNMAR2",
+        "datahash": "b7aed497d2d6023aeb2f3680723a68d6e2b1f286137a76e0319b2d6e898b003b",
+        "filesize": 53759
+      }
     },
     "test_003_file_image_cat_gif": {
       "inputs": [
         "file_image_cat.gif"
       ],
-      "outputs": [
-        "IAA4SM2PQJ4UZIJ5",
-        "ZFXEDOB5MG52E6RFQDMUVCIJTGUMZSM6BPSVVWQ",
-        18535
-      ]
+      "outputs": {
+        "code": "IAA4SM2PQJ4UZIJ5",
+        "datahash": "c9334f82794ca13dc96e41b83d61bba27a2580d94a890999a8ccc99e0be55ada",
+        "filesize": 18535
+      }
     }
   },
   "code_meta": {

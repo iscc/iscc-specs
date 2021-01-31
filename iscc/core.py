@@ -262,11 +262,11 @@ def code_data(data, **options):
 
 
 def code_instance(data, **options):
-    # type: (Union[str, BinaryIO, bytes], int) -> List[str, str, int]
+    # type: (Union[str, BinaryIO, bytes], int) -> dict
     opts = Opts(**options)
     nbits = opts.instance_bits
     nbytes = nbits // 8
-    size = 0
+    filesize = 0
     b3 = blake3()
     with Streamable(data) as stream:
         while True:
@@ -274,11 +274,11 @@ def code_instance(data, **options):
             if not d:
                 break
             b3.update(d)
-            size += len(d)
+            filesize += len(d)
 
-    top_hash_digest = b3.digest()
+    datahash_digest = b3.digest()
     header = write_header(MT.INSTANCE, ST.NONE, VS.V0, nbits)
-    code = encode_base32(header + top_hash_digest[:nbytes])
-    tail = encode_base32(top_hash_digest[nbytes:])
+    code = encode_base32(header + datahash_digest[:nbytes])
+    datahash = datahash_digest.hex()
 
-    return [code, tail, size]
+    return dict(code=code, datahash=datahash, filesize=filesize)

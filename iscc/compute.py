@@ -47,8 +47,9 @@ def compute(filepath, title="", extra=""):
     result["code_data"] = iscc.code_data(filepath)
 
     # Instance Code
-    iid, tail, size = iscc.code_instance(filepath)
-    result["code_instance"] = iid
+    instance_result = iscc.code_instance(filepath)
+    instance_result["code_instance"] = instance_result.pop("code")
+    result.update(instance_result)
 
     result = {k: result[k] for k in sorted(result)}
     return result

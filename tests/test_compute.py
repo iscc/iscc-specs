@@ -15,6 +15,7 @@ def test_compute():
         "code_data": "GAA2Q3TYZFBE6BTJ",
         "code_instance": "IAAY2QAMLUTU2ZYE",
         "code_meta": "AAA73CA6R4XJLI5C",
+        "datahash": "8d400c5d274d670476eb3e62d199c172084ea0760f65d8566f0a9aa19c335610",
         "duration": 60.042,
         "features": [
             "XxqT9x1a8vw",
@@ -27,6 +28,7 @@ def test_compute():
             "XkoAn8YVcqU",
             "V06CXBQdUrU",
         ],
+        "filesize": 1337753,
         "fps": 24.0,
         "gmt": "video",
         "height": 144,
