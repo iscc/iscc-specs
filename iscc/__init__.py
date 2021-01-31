@@ -18,8 +18,7 @@ from tika import tika
 tika.log.disabled = True
 
 from iscc.core import *
-from iscc.params import *
-from iscc.cdc import *
-from iscc.minhash import *
-from iscc.text import *
 from iscc.metrics import distance
+from iscc.image import normalize_image
+from iscc.minhash import minhash
+from iscc.text import normalize_text, trim_text

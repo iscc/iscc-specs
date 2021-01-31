@@ -3,7 +3,7 @@ from os.path import basename, splitext
 from typing import Optional
 from urllib.parse import urlparse
 from more_itertools import interleave, sliced
-from iscc.text import text_normalize, text_trim
+from iscc.text import normalize_text, trim_text
 from iscc.schema import Opts
 from iscc.utils import sliding_window
 from iscc.simhash import similarity_hash
@@ -56,13 +56,13 @@ def title_from_tika(tika_result: dict, guess=False, uri=None):
             title = title[0].strip() if isinstance(title, list) else title.strip()
 
     # See if string would survive normalization
-    norm_title = text_normalize(title)
+    norm_title = normalize_text(title)
 
     if not norm_title and guess and gmt == "text":
         content = tika_result.get("content", "")
         if content is not None:
             first_line = content.strip().splitlines()[0]
-            title = text_trim(text_normalize(first_line), Opts.meta_trim_title)
+            title = trim_text(normalize_text(first_line), Opts.meta_trim_title)
 
     if not title and uri is not None:
         result = urlparse(uri)

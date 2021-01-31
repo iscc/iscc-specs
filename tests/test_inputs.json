@@ -165,7 +165,7 @@
             ]
         }
     },
-    "image_normalize": {
+    "normalize_image": {
         "test_001_file_image_cat_jpg": {
             "inputs": [
                 "file_image_cat.jpg"
@@ -217,7 +217,7 @@
             ]
         }
     },
-    "text_normalize": {
+    "normalize_text": {
         "test_001_decompose": {
             "inputs": ["Ç 가 Ω ℍ ① ︷ i⁹ ¼ ǆ ⫝̸ ȴ ȷ ɂ ć"]
         },
@@ -228,7 +228,7 @@
             "inputs": ["  Iñtërnâtiôn\nàlizætiøn☃💩 –  is a tric\t ky \u00A0 thing!\r"]
         }
     },
-    "text_trim": {
+    "trim_text": {
         "test_001_empty": {
             "inputs": [
                 "", 128

@@ -5,6 +5,7 @@ from io import BytesIO
 import pytest
 from PIL import Image, ImageFilter, ImageEnhance
 import iscc
+from iscc.codec import decode_base32
 
 
 TESTS_PATH = os.path.dirname(os.path.realpath(__file__))
@@ -57,11 +58,11 @@ def test_meta_id():
         iscc.code_meta(b"\xc3\x28")
 
 
-def test_meta_id_composite():
+def test_code_meta_composite():
     mid1 = iscc.code_meta("This is some Title", "")["code"]
     mid2 = iscc.code_meta("This is some Title", "And some extra metadata")["code"]
-    assert iscc.decode_base32(mid1)[:5] == iscc.decode_base32(mid2)[:5]
-    assert iscc.decode_base32(mid1)[5:] != iscc.decode_base32(mid2)[5:]
+    assert decode_base32(mid1)[:5] == decode_base32(mid2)[:5]
+    assert decode_base32(mid1)[5:] != decode_base32(mid2)[5:]
 
 
 def test_hamming_distance():

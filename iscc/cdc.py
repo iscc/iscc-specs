@@ -8,7 +8,6 @@ Compatible with https://pypi.org/project/fastcdc/ v1.3.0
 import io
 from math import log2
 
-
 AVG_SIZE_DATA = 1024
 READ_SIZE = 262144
 

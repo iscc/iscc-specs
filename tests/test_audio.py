@@ -39,41 +39,41 @@ def test_get_version_info():
 
 
 def test_extract_chromaprint():
-    result = audio.extract_chromaprint(audios()[0].as_posix())
+    result = audio.extract_audio_features(audios()[0].as_posix())
     assert result["duration"] == 15.5
     assert result["fingerprint"][:4] == [684003877, 683946551, 1749295639, 2017796679]
     assert result["fingerprint"][-4:] == [944185926, 2026255094, 2022051494, 2021919654]
 
 
-def test_audio_hash_empty():
+def test_hash_audio_empty():
     assert (
-        audio.audio_hash([]).hex()
+        audio.hash_audio([]).hex()
         == "0000000000000000000000000000000000000000000000000000000000000000"
     )
 
 
-def test_audio_hash_audio_single():
+def test_hash_audio_single():
     assert (
-        audio.audio_hash([1]).hex()
+        audio.hash_audio([1]).hex()
         == "0000000100000000000000000000000000000000000000000000000000000000"
     )
 
 
-def test_audio_hash_audio_short():
+def test_hash_audio_short():
     assert (
-        audio.audio_hash([1, 2]).hex()
+        audio.hash_audio([1, 2]).hex()
         == "0000000100000002000000000000000000000000000000000000000000000000"
     )
 
 
-def test_audio_hash_audio_signed():
+def test_hash_audio_signed():
     assert (
-        audio.audio_hash([-1, 0, 1]).hex()
+        audio.hash_audio([-1, 0, 1]).hex()
         == "ffffffff00000000000000010000000000000000000000000000000000000000"
     )
 
 
-def test_content_id_audio():
+def test_code_audio_audio():
     assert code_audio(audios()[0].as_posix()) == {
         "code": "EIAWUJFCEZVCJIRG",
         "duration": 15.5,
@@ -81,7 +81,7 @@ def test_content_id_audio():
     }
 
 
-def test_content_id_audio_256():
+def test_code_audio_256():
     assert code_audio(audios()[0].as_posix(), audio_bits=256) == {
         "code": "EIDWUJFCEZVCJIRGNISKEBTKESRAM2REUIDGUJFCEZVCJIRGNISKEJQ",
         "duration": 15.5,
@@ -89,7 +89,7 @@ def test_content_id_audio_256():
     }
 
 
-def test_content_id_audio_granular_short():
+def test_code_audio_granular_short():
     result = code_audio(
         audios()[0].as_posix(), audio_granular=True, audio_max_duration=5
     )
@@ -112,7 +112,7 @@ def test_content_id_audio_granular_short():
     }
 
 
-def test_content_id_audio_granular_default():
+def test_code_audio_granular_default():
     result = code_audio(audios()[0].as_posix(), audio_granular=True)
     assert result == {
         "code": "EIAWUJFCEZVCJIRG",

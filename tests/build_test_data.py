@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from loguru import logger
 import json
 import iscc
 
@@ -20,6 +21,7 @@ def main():
         for testname, testdata in tests.items():
             func = getattr(iscc, funcname)
             args = testdata["inputs"]
+            logger.debug(func)
             result = func(*args)
             if funcname in ["data_chunks"]:
                 result = ["hex:" + data.hex() for data in result]

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 import unicodedata
-from typing import Generator, Union
+from typing import Any, Generator, Union
 import xxhash
 from iscc.cdc import data_chunks
 from iscc.minhash import compress, minhash, minhash_256
@@ -38,13 +38,13 @@ UNICODE_FILTER = frozenset(
 )
 
 
-def text_hash(text, **kwargs):
-    # type: (str, int) -> bytes
+def hash_text(text, **options):
+    # type: (str, **Any) -> bytes
     """
     Create a 256-bit similarity preserving hash for text input.
     Text should be normalized before hash creation.
     """
-    opts = Opts(**kwargs)
+    opts = Opts(**options)
     text = text.lower()
     ngrams = ("".join(chars) for chars in sliding_window(text, opts.text_ngram_size))
     features = [xxhash.xxh32_intdigest(s.encode("utf-8")) for s in ngrams]
@@ -52,8 +52,8 @@ def text_hash(text, **kwargs):
     return shash
 
 
-def text_features(text, **kwargs):
-    # type: (str, **int) -> dict
+def compute_text_features(text, **options):
+    # type: (str, **Any) -> dict
     """
     Create granular fingerprint for text (minhashes over cdc-chunks).
 
@@ -62,8 +62,8 @@ def text_features(text, **kwargs):
     :param int text_ngram_size: Sliding window size in number of characters.
     :returns dict: Dictionary with 'sizes' and 'features'
     """
-    opts = Opts(**kwargs)
-    chunks = text_chunks(text, text_avg_chunk_size=opts.text_avg_chunk_size)
+    opts = Opts(**options)
+    chunks = chunk_text(text, text_avg_chunk_size=opts.text_avg_chunk_size)
     sizes = []
     feats = []
     for chunk in chunks:
@@ -78,12 +78,12 @@ def text_features(text, **kwargs):
     return dict(features=feats, sizes=sizes)
 
 
-def text_chunks(text, **kwargs):
-    # type: (str, int) -> Generator[str]
+def chunk_text(text, **options):
+    # type: (str, **Any) -> Generator[str]
     """
     Generates variable sized text chunks (without leading BOM)
     """
-    opts = Opts(**kwargs)
+    opts = Opts(**options)
     avg_size = opts.text_avg_chunk_size
     data = text.encode("utf-32-be")
     avg_size *= 4  # 4 bytes per character
@@ -91,13 +91,13 @@ def text_chunks(text, **kwargs):
         yield chunk.decode("utf-32-be")
 
 
-def text_trim(text, nbytes):
+def trim_text(text, nbytes):
     # type: (str, int) -> str
     """Trim text such that its utf-8 encoded size does not exceed nbytes."""
     return text.encode("utf-8")[:nbytes].decode("utf-8", "ignore").strip()
 
 
-def text_normalize(text, lower=True):
+def normalize_text(text, lower=True):
     # type: (Union[str, bytes], bool) -> str
     """Unicode normalization and character filtering."""
 

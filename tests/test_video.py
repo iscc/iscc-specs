@@ -108,10 +108,10 @@ def test_hash_video():
     assert extended.startswith("528f91431f7c4ad2")
 
 
-def test_compute_rolling_signatures():
-    signature = video.extract_signature(SAMPLE)
+def test_compute_video_features_rolling():
+    signature = video.extract_video_signature(SAMPLE)
     frames = mp7.read_ffmpeg_signature(signature)
-    rolling_sigs = video.compute_rolling_signatures(frames)
+    rolling_sigs = video.compute_video_features_rolling(frames)
     assert rolling_sigs == [
         "XxqT9x1b8nw",
         "Hi7Wfg0a8u0",
@@ -129,11 +129,13 @@ def test_compute_rolling_signatures():
     ]
 
 
-def test_compute_scene_signatures():
-    signature = video.extract_signature(SAMPLE, video_granular=True, video_scenes=True)
+def test_compute_video_features_scenes():
+    signature = video.extract_video_signature(
+        SAMPLE, video_granular=True, video_scenes=True
+    )
     frames = mp7.read_ffmpeg_signature(signature)
-    scenes = video.detect_scenes(SAMPLE)
-    scene_signatures = video.compute_scene_signatures(frames, scenes)
+    scenes = video.detect_video_scenes(SAMPLE)
+    scene_signatures = video.compute_video_features_scenes(frames, scenes)
     assert scene_signatures == (
         [
             "XxqT9x1a8vw",
@@ -150,22 +152,22 @@ def test_compute_scene_signatures():
     )
 
 
-def test_extract_signature():
+def test_extract_video_signature():
     sigh = blake3(
-        video.extract_signature(SAMPLE, video_scenes=True, video_fps=5)
+        video.extract_video_signature(SAMPLE, video_scenes=True, video_fps=5)
     ).hexdigest()
     assert sigh == "da170784ef9e47f4f74289c3b2ff842887eda7641b8c53d4ab698ae0de6d7b1c"
     sigh = blake3(
-        video.extract_signature(SAMPLE, video_scenes=False, video_fps=5)
+        video.extract_video_signature(SAMPLE, video_scenes=False, video_fps=5)
     ).hexdigest()
     assert sigh == "da170784ef9e47f4f74289c3b2ff842887eda7641b8c53d4ab698ae0de6d7b1c"
-    sigh = blake3(video.extract_signature(SAMPLE, video_fps=0)).hexdigest()
+    sigh = blake3(video.extract_video_signature(SAMPLE, video_fps=0)).hexdigest()
     assert sigh == "021f4901f79bbb5c49edb0027103ec352f2bdb4feca53e6ce4f2f7d76c3dab5f"
 
 
-def test_extract_signature_with_crop():
-    crop = video.detect_crop(SAMPLE)
-    sigh = blake3(video.extract_signature(SAMPLE, crop, video_fps=0)).hexdigest()
+def test_extract_video_signature_with_crop():
+    crop = video.detect_video_crop(SAMPLE)
+    sigh = blake3(video.extract_video_signature(SAMPLE, crop, video_fps=0)).hexdigest()
     assert sigh == "5dc1f30d13d798b062c2a47870364a9f5a6e2161bdd6e242e93eb5e6309bc4fa"
 
 
@@ -176,8 +178,8 @@ def test_code_video_hwaccel():
 
 
 def test_signature_extractor():
-    sig1 = blake3(video.extract_signature(SAMPLE, video_fps=0)).hexdigest()
-    gen = video.signature_extractor()
+    sig1 = blake3(video.extract_video_signature(SAMPLE, video_fps=0)).hexdigest()
+    gen = video._signature_extractor()
     with open(SAMPLE, "rb") as infile:
         data = infile.read(4096)
         while data:
@@ -188,12 +190,12 @@ def test_signature_extractor():
     assert sig1 == sig2
 
 
-def test_detect_crop():
-    assert video.detect_crop(SAMPLE) == "crop=176:96:0:24"
+def test_detect_video_crop():
+    assert video.detect_video_crop(SAMPLE) == "crop=176:96:0:24"
 
 
-def test_detect_scenes():
-    assert video.detect_scenes(SAMPLE) == [
+def test_detect_video_scenes():
+    assert video.detect_video_scenes(SAMPLE) == [
         (
             FrameTimecode(timecode=0, fps=24.000000),
             FrameTimecode(timecode=183, fps=24.000000),

@@ -10,41 +10,20 @@ from PIL import Image
 import xxhash
 from blake3 import blake3
 from iscc.minhash import minhash_256
-from iscc.audio import audio_hash, encode_chomaprint, extract_chromaprint
-from iscc.image import (
-    image_data_uri,
-    image_hash,
-    image_metadata,
-    image_normalize,
-    image_thumbnail,
-    image_trim,
-)
-from iscc.text import text_features, text_hash, text_normalize, text_trim
+from iscc import text, image, audio, video
+
 from iscc.codec import (
     Code,
     MT,
     ST,
     ST_CC,
     VS,
-    decode_base32,
     encode_base32,
     write_header,
 )
-from iscc.params import *
 from iscc.cdc import data_chunks
 from iscc.utils import Streamable
 from iscc.mp7 import read_ffmpeg_signature
-from iscc.video import (
-    compute_rolling_signatures,
-    compute_scene_signatures,
-    extract_video_preview,
-    hash_video,
-    detect_crop,
-    detect_scenes,
-    extract_signature,
-    extract_video_metadata,
-)
-from iscc.simhash import similarity_hash
 from iscc.meta import meta_hash
 from iscc.schema import Opts
 import langdetect
@@ -72,10 +51,10 @@ def code_meta(title, extra="", **options):
     opts = Opts(**options)
     nbits = opts.meta_bits
     nbytes = nbits // 8
-    title_norm = text_normalize(title, lower=False)
-    extra_norm = text_normalize(extra, lower=False)
-    title_trimmed = text_trim(title_norm, opts.meta_trim_title)
-    extra_trimmed = text_trim(extra_norm, opts.meta_trim_extra)
+    title_norm = text.normalize_text(title, lower=False)
+    extra_norm = text.normalize_text(extra, lower=False)
+    title_trimmed = text.trim_text(title_norm, opts.meta_trim_title)
+    extra_trimmed = text.trim_text(extra_norm, opts.meta_trim_extra)
     mhash = meta_hash(title_trimmed, extra_trimmed)
     header = write_header(MT.META, ST.NONE, VS.V0, nbits)
     digest = header + mhash[:nbytes]
@@ -93,27 +72,27 @@ def code_content():
     pass
 
 
-def code_text(text, **options):
+def code_text(txt, **options):
     # type: (Union[str, bytes], **Any) -> dict
     """Generate Content-ID Text"""
     opts = Opts(**options)
 
     nbits = opts.text_bits
     nbytes = nbits // 8
-    text = text_normalize(text, lower=True)
-    th = text_hash(text)
+    txt = text.normalize_text(txt, lower=True)
+    th = text.hash_text(txt)
     header = write_header(MT.CONTENT, ST_CC.TEXT, VS.V0, nbits)
     code = encode_base32(header + th[:nbytes])
 
-    result = dict(code=code, characters=len(text))
+    result = dict(code=code, characters=len(txt))
 
     try:
-        result["language"] = langcodes.standardize_tag(langdetect.detect(text))
+        result["language"] = langcodes.standardize_tag(langdetect.detect(txt))
     except Exception as e:
         logger.warning(f"Language detection failed: {e}")
 
     if opts.text_granular:
-        result["features"] = text_features(text, **options)
+        result["features"] = text.compute_text_features(txt, **options)
 
     return result
 
@@ -128,7 +107,7 @@ def code_image(img, **options):
 
     if not isinstance(img, Image.Image):
         # We cannot pass PIL Image for metadata extraction
-        result = image_metadata(img) or {}
+        result = image.extract_image_metadata(img) or {}
         img = Image.open(img)
     else:
         logger.warning(f"Skipped image metadata extraction {img}")
@@ -141,18 +120,18 @@ def code_image(img, **options):
     result.update(dict(width=width, height=height))
 
     if opts.image_trim:
-        img = image_trim(img)
+        img = image.trim_image(img)
         if img.size != result.values():
             tw, th = img.size
             result["trimmed"] = dict(width=tw, height=th)
 
     if opts.image_preview:
-        preview = image_thumbnail(img, **options)
-        preview_uri = image_data_uri(preview, **options)
+        preview = image.extract_image_preview(img, **options)
+        preview_uri = image.encode_image_to_data_uri(preview, **options)
         result["preview"] = preview_uri
 
-    pixels = image_normalize(img)
-    hash_digest = image_hash(pixels)[:nbytes]
+    pixels = image.normalize_image(img)
+    hash_digest = image.hash_image(pixels)[:nbytes]
     header = write_header(MT.CONTENT, ST_CC.IMAGE, VS.V0, nbits)
     code = encode_base32(header + hash_digest)
     result["code"] = code
@@ -170,14 +149,14 @@ def code_audio(f, **options):
     if isinstance(f, list):
         chroma = dict(fingerprint=f)
     else:
-        chroma = extract_chromaprint(f, **options)
+        chroma = audio.extract_audio_features(f, **options)
         result["duration"] = chroma["duration"]
-        result.update(extract_video_metadata(f))
+        result.update(video.extract_video_metadata(f))
 
-    shash_digest = audio_hash(chroma["fingerprint"])
+    shash_digest = audio.hash_audio(chroma["fingerprint"])
 
     if opts.audio_granular:
-        features = encode_chomaprint(chroma["fingerprint"])
+        features = audio.encode_audio_features(chroma["fingerprint"])
         result["features"] = features
 
     header = write_header(MT.CONTENT, ST_CC.AUDIO, VS.V0, nbits)
@@ -186,11 +165,11 @@ def code_audio(f, **options):
     return result
 
 
-def code_video(video, **options):
+def code_video(file, **options):
     # type: (File, **Any) -> dict
     """Compute Content-ID video.
 
-    :param video: The video file.
+    :param file: The video file.
 
     Returns a dictionary with the following fields:
         code: the calculated ISCC video code
@@ -209,15 +188,15 @@ def code_video(video, **options):
     opts = Opts(**options)
     nbits = opts.video_bits
 
-    result = extract_video_metadata(video)
+    result = video.extract_video_metadata(file)
 
-    crop_value = detect_crop(video) if opts.video_crop else None
-    signature = extract_signature(video, crop_value, **options)
+    crop_value = video.detect_video_crop(file) if opts.video_crop else None
+    signature = video.extract_video_signature(file, crop_value, **options)
     logger.debug(f"mp7 signature size {naturalsize(len(signature))}")
     frames = read_ffmpeg_signature(signature)
     logger.debug(f"mp7 signature frames {len(frames)}")
     features = [tuple(sig.vector.tolist()) for sig in frames]
-    video_hash = hash_video(features, **options)
+    video_hash = video.hash_video(features, **options)
     video_code = Code((MT.CONTENT, ST_CC.VIDEO, VS.V0, nbits, video_hash))
     result["code"] = video_code.code
     result["signature_fps"] = opts.video_fps
@@ -229,19 +208,19 @@ def code_video(video, **options):
         result["mp7sig"] = base64.b64encode(signature).decode("ascii")
 
     if opts.video_preview:
-        img_raw = extract_video_preview(video)
-        result["preview"] = image_data_uri(img_raw)
+        img_raw = video.extract_video_preview(file)
+        result["preview"] = image.encode_image_to_data_uri(img_raw)
 
     if opts.video_granular is False:
         return result
 
     if opts.video_scenes:
-        cutpoints = detect_scenes(video)
-        features, durations = compute_scene_signatures(frames, cutpoints)
+        cutpoints = video.detect_video_scenes(file)
+        features, durations = video.compute_video_features_scenes(frames, cutpoints)
         result["features"] = features
         result["sizes"] = durations
     else:
-        features = compute_rolling_signatures(frames, **opts.dict())
+        features = video.compute_video_features_rolling(frames, **options)
         result["features"] = features
         result["window"] = opts.video_window
         result["overlap"] = opts.video_overlap

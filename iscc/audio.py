@@ -14,10 +14,10 @@ from iscc.schema import Opts
 from iscc.simhash import similarity_hash
 from iscc.utils import download_file
 from iscc.codec import encode_base64
-from typing import BinaryIO, Union, List
+from typing import Any, BinaryIO, Union, List
 
 
-def audio_hash(features):
+def hash_audio(features):
     # type: (List[int]) -> bytes
     """Create 256-bit audio similarity hash from chromaprint vector"""
     digests = []
@@ -30,7 +30,29 @@ def audio_hash(features):
     return shash_digest
 
 
-def encode_chomaprint(features):
+def extract_audio_features(file, **options):
+    # type: (Union[str, BinaryIO], **Any) -> dict
+    """Returns Chromaprint fingerprint.
+
+    A dictionary with keys:
+    - duration: total duration of extracted fingerprint in seconds
+    - fingerprint: 32-bit (4 byte) integers as features
+    """
+    opts = Opts(**options)
+    length = str(opts.audio_max_duration)
+    if hasattr(file, "read"):
+        file.seek(0)
+        cmd = [fpcalc_bin(), "-raw", "-json", "-signed", "-length", length, "-"]
+        res = subprocess.run(cmd, stdout=subprocess.PIPE, input=file.read())
+    else:
+        cmd = [fpcalc_bin(), "-raw", "-json", "-signed", "-length", length, file]
+        res = subprocess.run(cmd, stdout=subprocess.PIPE)
+
+    result = json.loads(res.stdout.decode("utf-8"))
+    return result
+
+
+def encode_audio_features(features):
     # type: (List[int]) -> List[str]
     """Pack into 64-bit base encoded features.
 
@@ -43,28 +65,6 @@ def encode_chomaprint(features):
             digest += int_feature.to_bytes(4, "big", signed=True)
         fingerprints.append(encode_base64(digest))
     return fingerprints
-
-
-def extract_chromaprint(file, **kwargs):
-    # type: (Union[str, BinaryIO]) -> dict
-    """Returns Chromaprint fingerprint.
-
-    A dictionary with keys:
-    - duration: total duration of extracted fingerprint in seconds
-    - fingerprint: 32-bit (4 byte) integers as features
-    """
-    opts = Opts(**kwargs)
-    length = str(opts.audio_max_duration)
-    if hasattr(file, "read"):
-        file.seek(0)
-        cmd = [fpcalc_bin(), "-raw", "-json", "-signed", "-length", length, "-"]
-        res = subprocess.run(cmd, stdout=subprocess.PIPE, input=file.read())
-    else:
-        cmd = [fpcalc_bin(), "-raw", "-json", "-signed", "-length", length, file]
-        res = subprocess.run(cmd, stdout=subprocess.PIPE)
-
-    result = json.loads(res.stdout.decode("utf-8"))
-    return result
 
 
 FPCALC_VERSION = "1.5.0"
