@@ -2,11 +2,10 @@
 """ISCC Reference Implementation"""
 import base64
 from io import BytesIO
-
 from PIL.ImageOps import exif_transpose
 from humanize import naturalsize
 from loguru import logger
-from typing import BinaryIO, List, Optional, Union
+from typing import BinaryIO, List, Optional, Union, Any
 from PIL import Image
 import xxhash
 from blake3 import blake3
@@ -58,14 +57,14 @@ langdetect.DetectorFactory.seed = 0
 ###############################################################################
 
 
-def meta_id(title, extra="", **kwargs):
-    # type: (Union[str, bytes], Optional[Union[str, bytes]], **int) -> dict
+def meta_id(title, extra="", **options):
+    # type: (Union[str, bytes], Optional[Union[str, bytes]], **Any) -> dict
     """Generate Meta Code from title and extra metadata.
 
     :param str title: Used as input for first half of meta code
     :param str extra: Used as input for second half of meta code
     """
-    opts = Opts(**kwargs)
+    opts = Opts(**options)
     nbits = opts.meta_bits
     nbytes = nbits // 8
     title_norm = text_normalize(title, lower=False)
@@ -85,10 +84,10 @@ def meta_id(title, extra="", **kwargs):
     return result
 
 
-def content_id_text(text, **kwargs):
-    # type: (Union[str, bytes], **int) -> dict
+def content_id_text(text, **options):
+    # type: (Union[str, bytes], **Any) -> dict
     """Generate Content-ID Text"""
-    opts = Opts(**kwargs)
+    opts = Opts(**options)
 
     nbits = opts.text_bits
     nbytes = nbits // 8
@@ -105,15 +104,15 @@ def content_id_text(text, **kwargs):
         logger.warning(f"Language detection failed: {e}")
 
     if opts.text_granular:
-        result["features"] = text_features(text, **kwargs)
+        result["features"] = text_features(text, **options)
 
     return result
 
 
-def content_id_image(img, **kwargs):
-    # type: (Union[str, BytesIO, Image.Image], **int) -> dict
+def content_id_image(img, **options):
+    # type: (Union[str, BytesIO, Image.Image], **Any) -> dict
 
-    opts = Opts(**kwargs)
+    opts = Opts(**options)
     nbits = opts.image_bits
     nbytes = nbits // 8
     assert nbits in (32, 64), "Content-ID Image does not yet support more than 64-bits"
@@ -139,8 +138,8 @@ def content_id_image(img, **kwargs):
             result["trimmed"] = dict(width=tw, height=th)
 
     if opts.image_preview:
-        preview = image_thumbnail(img, **opts.dict())
-        preview_uri = image_data_uri(preview, **opts.dict())
+        preview = image_thumbnail(img, **options)
+        preview_uri = image_data_uri(preview, **options)
         result["preview"] = preview_uri
 
     pixels = image_normalize(img)
@@ -152,17 +151,17 @@ def content_id_image(img, **kwargs):
     return result
 
 
-def content_id_audio(f, **kwargs):
-    # type: (Union[str, BinaryIO, List], **int) -> dict
+def content_id_audio(f, **options):
+    # type: (Union[str, BinaryIO, List], **Any) -> dict
     """Generate Audio-ID from file(path) or Chromaprint features"""
-    opts = Opts(**kwargs)
+    opts = Opts(**options)
     result = dict()
     nbits = opts.audio_bits
     nbytes = nbits // 8
     if isinstance(f, list):
         chroma = dict(fingerprint=f)
     else:
-        chroma = extract_chromaprint(f, **opts.dict())
+        chroma = extract_chromaprint(f, **options)
         result["duration"] = chroma["duration"]
         result.update(extract_video_metadata(f))
 
@@ -178,7 +177,7 @@ def content_id_audio(f, **kwargs):
     return result
 
 
-def content_id_video(video, **kwargs):
+def content_id_video(video, **options):
     # type: (File, **int) -> dict
     """Compute Content-ID video.
 
@@ -198,18 +197,18 @@ def content_id_video(video, **kwargs):
     The window and overlap parameters are ignored if 0 or if scenes is False.
     Set crop=False if you know your video has no black borders to improve performance.
     """
-    opts = Opts(**kwargs)
+    opts = Opts(**options)
     nbits = opts.video_bits
 
     result = extract_video_metadata(video)
 
     crop_value = detect_crop(video) if opts.video_crop else None
-    signature = extract_signature(video, crop_value, **opts.dict())
+    signature = extract_signature(video, crop_value, **options)
     logger.debug(f"mp7 signature size {naturalsize(len(signature))}")
     frames = read_ffmpeg_signature(signature)
     logger.debug(f"mp7 signature frames {len(frames)}")
     features = [tuple(sig.vector.tolist()) for sig in frames]
-    video_hash = hash_video(features, **opts.dict())
+    video_hash = hash_video(features, **options)
     video_code = Code((MT.CONTENT, ST_CC.VIDEO, VS.V0, nbits, video_hash))
     result["code"] = video_code.code
     result["signature_fps"] = opts.video_fps
