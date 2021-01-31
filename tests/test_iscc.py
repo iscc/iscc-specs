@@ -97,21 +97,6 @@ def test_hamming_distance():
     assert iscc.distance(mid1, mid2) >= 24
 
 
-def test_content_id_mixed():
-    cid_t_1 = iscc.code_text("Some Text")["code"]
-    cid_t_2 = iscc.code_text("Another Text")["code"]
-
-    cid_m = iscc.code_mixed([cid_t_1])
-    assert cid_m == "EUASAAJV7U3YRWXF"
-
-    cid_m = iscc.code_mixed([cid_t_1, cid_t_2])
-    assert cid_m == "EUASAAJX7635T7X7"
-
-    cid_i = iscc.code_image("file_image_lenna.jpg")["code"]
-    cid_m = iscc.code_mixed([cid_t_1, cid_t_2, cid_i])
-    assert cid_m == "EUASAAJVZ43AT7HT"
-
-
 def test_content_id_image():
     cid_i = iscc.code_image("file_image_lenna.jpg")
     assert len(cid_i["code"]) == 16

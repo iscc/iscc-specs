@@ -108,6 +108,12 @@ class Opts(BaseSettings):
         False, description="Generate 128px video preview thumbnail(s)"
     )
 
+    data_bits: int = Field(64, description="Length of generated Data-Code in bits")
+
+    instance_bits: int = Field(
+        64, description="Length of generated Instance-Code in bits"
+    )
+
 
 class Features(BaseModel):
     """Granular feature codes.

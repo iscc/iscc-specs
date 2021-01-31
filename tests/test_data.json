@@ -254,38 +254,6 @@
       }
     }
   },
-  "code_mixed": {
-    "required": false,
-    "test_001_cid_t_one": {
-      "inputs": [
-        [
-          "EAATL7JXRDNOLADW"
-        ],
-        64
-      ],
-      "outputs": "EUASAAJV7U3YRWXF"
-    },
-    "test_002_cid_t_two": {
-      "inputs": [
-        [
-          "EAATL7JXRDNOLADW",
-          "EAATOT5CKG6NXCMK"
-        ],
-        64
-      ],
-      "outputs": "EUASAAJX7635T7X7"
-    },
-    "test_003_cid_t_and_i": {
-      "inputs": [
-        [
-          "EAATL7JXRDNOLADW",
-          "EEAZTRSWFV2THIUW"
-        ],
-        64
-      ],
-      "outputs": "EUASCAN57532377X"
-    }
-  },
   "code_text": {
     "required": false,
     "test_001_empty": {

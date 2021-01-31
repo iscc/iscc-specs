@@ -244,7 +244,10 @@ def code_video(video, **options):
     return result
 
 
-def code_data(data, bits=64):
+def code_data(data, **options):
+    opts = Opts(**options)
+    nbits = opts.data_bits
+    nbytes = nbits // 8
 
     # 1. & 2. XxHash32 over CDC-Chunks
     features = [xxhash.xxh32_intdigest(chunk) for chunk in data_chunks(data)]
@@ -253,14 +256,16 @@ def code_data(data, bits=64):
     data_hash = minhash_256(features)
 
     # 4. Encode with prepended component header
-    header = write_header(MT.DATA, ST.NONE, VS.V0, bits)
-    code = encode_base32(header + data_hash[: bits // 8])
+    header = write_header(MT.DATA, ST.NONE, VS.V0, nbits)
+    code = encode_base32(header + data_hash[:nbytes])
     return code
 
 
-def code_instance(data, bits=64):
+def code_instance(data, **options):
     # type: (Union[str, BinaryIO, bytes], int) -> List[str, str, int]
-
+    opts = Opts(**options)
+    nbits = opts.instance_bits
+    nbytes = nbits // 8
     size = 0
     b3 = blake3()
     with Streamable(data) as stream:
@@ -272,22 +277,8 @@ def code_instance(data, bits=64):
             size += len(d)
 
     top_hash_digest = b3.digest()
-    header = write_header(MT.INSTANCE, ST.NONE, VS.V0, bits)
-    n_bytes = bits // 8
-    code = encode_base32(header + top_hash_digest[:n_bytes])
-    tail = encode_base32(top_hash_digest[n_bytes:])
+    header = write_header(MT.INSTANCE, ST.NONE, VS.V0, nbits)
+    code = encode_base32(header + top_hash_digest[:nbytes])
+    tail = encode_base32(top_hash_digest[nbytes:])
 
     return [code, tail, size]
-
-
-def code_mixed(cids, bits=64):
-    # type: (List[str], int) -> str
-
-    decoded = (decode_base32(code) for code in cids)
-    truncated = [data[: bits // 8] for data in decoded]
-
-    # 3. Apply Similarity hash
-    simhash_digest = similarity_hash(truncated)
-    header = write_header(MT.CONTENT, ST_CC.MIXED, VS.V0, bits)
-    code = encode_base32(header + simhash_digest)
-    return code

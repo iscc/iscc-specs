@@ -131,34 +131,6 @@
             ]
         }
     },
-    "code_mixed": {
-        "test_001_cid_t_one": {
-            "inputs": [
-                [
-                    "EAATL7JXRDNOLADW"
-                ],
-                64
-            ]
-        },
-        "test_002_cid_t_two": {
-            "inputs": [
-                [
-                    "EAATL7JXRDNOLADW",
-                    "EAATOT5CKG6NXCMK"
-                ],
-                64
-            ]
-        },
-        "test_003_cid_t_and_i": {
-            "inputs": [
-                [
-                    "EAATL7JXRDNOLADW",
-                    "EEAZTRSWFV2THIUW"
-                ],
-                64
-            ]
-        }
-    },
     "data_chunks": {
         "test_001_file_image_cat_jpg": {
             "inputs": [
