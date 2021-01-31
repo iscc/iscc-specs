@@ -11,12 +11,12 @@ from os.path import join
 SAMPLE = join(HERE, "test.3gp")
 
 
-def test_content_id_video_0_features():
+def test_hach_video_0_features():
     with pytest.raises(AssertionError):
         video.hash_video([tuple([0] * 380)])
 
 
-def test_content_id_video():
+def test_code_video():
     result = code_video(SAMPLE)
     assert "code" in result
     # assert "signature" in result
@@ -25,14 +25,14 @@ def test_content_id_video():
     assert result["crop"] == "176:96:0:24"
 
 
-def test_content_id_video_no_crop():
+def test_code_video_no_crop():
     result = code_video(SAMPLE, video_crop=False)
     assert result["code"] == "EMAV4DUC6QORW4X4"
     # assert "signature" in result
     assert "crop" not in result
 
 
-def test_content_id_video_granular_scenes():
+def test_code_video_granular_scenes():
     result = code_video(SAMPLE, video_granular=True, video_scenes=True)
     assert result == {
         "code": "EMAVMHMC7RMJF6XZ",
@@ -59,7 +59,7 @@ def test_content_id_video_granular_scenes():
     }
 
 
-def test_content_id_video_granular_rolling():
+def test_code_video_granular_rolling():
     result = code_video(SAMPLE, video_granular=True, video_scenes=False)
     assert result == {
         "code": "EMAVMHMC7RMJF6XZ",
@@ -91,7 +91,7 @@ def test_content_id_video_granular_rolling():
     }
 
 
-def test_content_id_video_include_mp7sig():
+def test_code_video_include_mp7sig():
     result = code_video(SAMPLE, video_include_mp7sig=True)
     assert result["mp7sig"].endswith("SZVP2HM")
 
@@ -158,10 +158,16 @@ def test_extract_signature():
     assert sigh == "021f4901f79bbb5c49edb0027103ec352f2bdb4feca53e6ce4f2f7d76c3dab5f"
 
 
-def test_compute_signature_with_crop():
+def test_extract_signature_with_crop():
     crop = video.detect_crop(SAMPLE)
     sigh = blake3(video.extract_signature(SAMPLE, crop, video_fps=0)).hexdigest()
     assert sigh == "5dc1f30d13d798b062c2a47870364a9f5a6e2161bdd6e242e93eb5e6309bc4fa"
+
+
+def test_code_video_hwaccel():
+    ra = code_video(SAMPLE)
+    rb = code_video(SAMPLE, video_hwaccel="auto")
+    assert ra == rb
 
 
 def test_signature_extractor():
@@ -226,7 +232,7 @@ def test_detect_scenes():
     ]
 
 
-def test_get_metadata():
+def test_extract_video_metadata():
     meta = video.extract_video_metadata(SAMPLE)
     assert meta == {
         "duration": 60.042,
@@ -238,7 +244,7 @@ def test_get_metadata():
     }
 
 
-def test_get_metadata_open_file():
+def test_extract_video_metadata_open_file():
     with open(SAMPLE, "rb") as infile:
         meta = video.extract_video_metadata(infile)
         assert infile.tell() == 65536

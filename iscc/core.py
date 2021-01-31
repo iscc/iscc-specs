@@ -186,7 +186,7 @@ def code_audio(f, **options):
 
 
 def code_video(video, **options):
-    # type: (File, **int) -> dict
+    # type: (File, **Any) -> dict
     """Compute Content-ID video.
 
     :param video: The video file.

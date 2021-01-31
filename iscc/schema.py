@@ -108,6 +108,10 @@ class Opts(BaseSettings):
         False, description="Generate 128px video preview thumbnail(s)"
     )
 
+    video_hwaccel: Optional[str] = Field(
+        None, description="Use hardware acceleration for video processing"
+    )
+
     data_bits: int = Field(64, description="Length of generated Data-Code in bits")
 
     instance_bits: int = Field(

@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from loguru import logger
 import subprocess
 from pathlib import Path
 from tempfile import mkdtemp
@@ -7,7 +8,7 @@ import sys
 from subprocess import Popen, PIPE, DEVNULL
 from os.path import basename, dirname
 from secrets import token_hex
-from typing import Generator, List, Sequence, Tuple, Optional, BinaryIO, Union
+from typing import Any, Generator, List, Sequence, Tuple, Optional, BinaryIO, Union
 import imageio_ffmpeg
 from statistics import mode
 from langcodes import standardize_tag
@@ -95,7 +96,7 @@ def compute_scene_signatures(frames, scenes):
 
 
 def extract_signature(file_path, crop=None, **kwargs):
-    # type: (str, Optional[str], **int) -> bytes
+    # type: (str, Optional[str], **Any) -> bytes
     """Extracts MP7 Video Signature"""
     opts = Opts(**kwargs)
     sigfile = basename(file_path) + ".bin"
@@ -108,8 +109,15 @@ def extract_signature(file_path, crop=None, **kwargs):
     if opts.video_fps:
         vf = f"fps=fps={opts.video_fps}," + vf
 
+    cmd = [FFMPEG]
+
+    if opts.video_hwaccel is not None:
+        cmd.extend(["-hwaccel", opts.video_hwaccel])
+
+    cmd.extend(["-i", file_path, "-vf", vf, "-f", "null", "-"])
+
     with cd(folder):
-        cmd = [FFMPEG, "-i", file_path, "-vf", vf, "-f", "null", "-"]
+        logger.debug(f"Extracting signature with {cmd}")
         subprocess.run(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
         with open(sigfile, "rb") as infile:
             sigdata = infile.read()
