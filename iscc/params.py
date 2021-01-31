@@ -17,11 +17,6 @@ HEAD_CID_M_PCF = b"\x19"
 HEAD_DID = b"\x20"
 HEAD_IID = b"\x30"
 
-# Algorithm Constants
-
-# Instance-ID - Bytes to read per blake3 hash update.
-IID_READ_SIZE = 524288
-
 
 SYMBOLS = "C23456789rB1ZEFGTtYiAaVvMmHUPWXKDNbcdefghLjkSnopRqsJuQwxyz"
 VALUES = "".join([chr(i) for i in range(58)])

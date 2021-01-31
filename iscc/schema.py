@@ -114,6 +114,10 @@ class Opts(BaseSettings):
         64, description="Length of generated Instance-Code in bits"
     )
 
+    io_chunk_size: int = Field(
+        524288, description="Number of bytes per io read operation"
+    )
+
 
 class Features(BaseModel):
     """Granular feature codes.

@@ -270,7 +270,7 @@ def code_instance(data, **options):
     b3 = blake3()
     with Streamable(data) as stream:
         while True:
-            d = stream.stream.read(IID_READ_SIZE)
+            d = stream.stream.read(opts.io_chunk_size)
             if not d:
                 break
             b3.update(d)
