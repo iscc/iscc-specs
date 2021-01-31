@@ -49,19 +49,25 @@
       "inputs": [
         "file_image_cat.jpg"
       ],
-      "outputs": "GAA4SOJOPT4UUL2F"
+      "outputs": {
+        "code": "GAA4SOJOPT4UUL2F"
+      }
     },
     "test_002_file_image_cat_png": {
       "inputs": [
         "file_image_cat.png"
       ],
-      "outputs": "GAARKBZ5TIPXPDC2"
+      "outputs": {
+        "code": "GAARKBZ5TIPXPDC2"
+      }
     },
     "test_003_file_image_cat_gif": {
       "inputs": [
         "file_image_cat.gif"
       ],
-      "outputs": "GAAZIKHZDH746HE3"
+      "outputs": {
+        "code": "GAAZIKHZDH746HE3"
+      }
     }
   },
   "code_image": {

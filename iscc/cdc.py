@@ -14,6 +14,7 @@ READ_SIZE = 262144
 
 
 def data_chunks(data, avg_size=AVG_SIZE_DATA, utf32=False, read_size=READ_SIZE):
+    # type: (Union[str, BinaryIO, bytes, bytearray], int, bool, int) -> Generator
 
     # Ensure we have a readable stream
     if isinstance(data, str):

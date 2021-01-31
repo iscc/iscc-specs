@@ -5,7 +5,6 @@ from io import BytesIO
 import pytest
 from PIL import Image, ImageFilter, ImageEnhance
 import iscc
-import iscc_samples as samples
 
 
 TESTS_PATH = os.path.dirname(os.path.realpath(__file__))

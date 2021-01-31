@@ -245,6 +245,7 @@ def code_video(video, **options):
 
 
 def code_data(data, **options):
+    # type: (Union[str, BinaryIO, bytes, bytearray], **Any) -> dict
     opts = Opts(**options)
     nbits = opts.data_bits
     nbytes = nbits // 8
@@ -258,11 +259,11 @@ def code_data(data, **options):
     # 4. Encode with prepended component header
     header = write_header(MT.DATA, ST.NONE, VS.V0, nbits)
     code = encode_base32(header + data_hash[:nbytes])
-    return code
+    return dict(code=code)
 
 
 def code_instance(data, **options):
-    # type: (Union[str, BinaryIO, bytes], int) -> dict
+    # type: (Union[str, BinaryIO, bytes], **Any) -> dict
     opts = Opts(**options)
     nbits = opts.instance_bits
     nbytes = nbits // 8
