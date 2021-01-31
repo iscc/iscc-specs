@@ -3,12 +3,12 @@ import math
 from iscc import image
 from iscc_samples import images
 from PIL import Image
-from iscc.core import content_id_image
+from iscc.core import code_image
 from iscc.codec import Code
 
 
 def test_content_id_image_plain():
-    assert content_id_image(images()[0]) == {
+    assert code_image(images()[0]) == {
         "code": "EEA4GQZQTY6J5DTH",
         "height": 133,
         "width": 200,
@@ -16,7 +16,7 @@ def test_content_id_image_plain():
 
 
 def test_content_id_image_with_meta():
-    assert content_id_image(images()[2]) == {
+    assert code_image(images()[2]) == {
         "code": "EEA4GQZQTY6J5DTH",
         "height": 133,
         "title": "Concentrated Cat",
@@ -25,17 +25,17 @@ def test_content_id_image_with_meta():
 
 
 def test_content_id_image_bits32():
-    cidi32 = content_id_image(images()[0], image_bits=32)
+    cidi32 = code_image(images()[0], image_bits=32)
     assert cidi32 == {"code": "EEAMGQZQTY", "height": 133, "width": 200}
     c1 = Code(cidi32["code"])
     assert c1.length == 32
-    cidi64 = content_id_image(images()[0], image_bits=32)
+    cidi64 = code_image(images()[0], image_bits=32)
     c2 = Code(cidi64["code"])
     assert c1 ^ c2 == 0
 
 
 def test_content_id_image_preview():
-    cidi = content_id_image(images()[0], image_preview=True)
+    cidi = code_image(images()[0], image_preview=True)
     assert cidi == {
         "code": "EEA4GQZQTY6J5DTH",
         "height": 133,

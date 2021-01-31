@@ -2,7 +2,7 @@
 from binascii import unhexlify
 import pytest
 from iscc import codec as c
-from iscc.core import meta_id
+from iscc.core import code_meta
 from bitarray import bitarray as ba
 
 
@@ -124,8 +124,8 @@ def test_read_varnibble():
 
 
 def test_code_properties():
-    c64 = c.Code(meta_id("Hello World")["code"])
-    c256 = c.Code(meta_id("Hello World", meta_bits=256)["code"])
+    c64 = c.Code(code_meta("Hello World")["code"])
+    c256 = c.Code(code_meta("Hello World", meta_bits=256)["code"])
     assert c64.code == "AAA77PPFVS6JDUQB"
     assert c256.code == "AAD77PPFVS6JDUQBWZDBIUGOUNAGIZYGCQ75ICNLH5QV73OXGWZV5CQ"
     assert c64.bytes == unhexlify(c64.hex)

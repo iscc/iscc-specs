@@ -53,11 +53,15 @@ import langcodes
 langdetect.DetectorFactory.seed = 0
 
 ###############################################################################
-# Top-Level functions for generating ISCCs                                    #
+# High-Level ISCC Code generator functions                                   #
 ###############################################################################
 
 
-def meta_id(title, extra="", **options):
+def code_iscc():
+    pass
+
+
+def code_meta(title, extra="", **options):
     # type: (Union[str, bytes], Optional[Union[str, bytes]], **Any) -> dict
     """Generate Meta Code from title and extra metadata.
 
@@ -84,7 +88,11 @@ def meta_id(title, extra="", **options):
     return result
 
 
-def content_id_text(text, **options):
+def code_content():
+    pass
+
+
+def code_text(text, **options):
     # type: (Union[str, bytes], **Any) -> dict
     """Generate Content-ID Text"""
     opts = Opts(**options)
@@ -109,7 +117,7 @@ def content_id_text(text, **options):
     return result
 
 
-def content_id_image(img, **options):
+def code_image(img, **options):
     # type: (Union[str, BytesIO, Image.Image], **Any) -> dict
 
     opts = Opts(**options)
@@ -151,7 +159,7 @@ def content_id_image(img, **options):
     return result
 
 
-def content_id_audio(f, **options):
+def code_audio(f, **options):
     # type: (Union[str, BinaryIO, List], **Any) -> dict
     """Generate Audio-ID from file(path) or Chromaprint features"""
     opts = Opts(**options)
@@ -177,7 +185,7 @@ def content_id_audio(f, **options):
     return result
 
 
-def content_id_video(video, **options):
+def code_video(video, **options):
     # type: (File, **int) -> dict
     """Compute Content-ID video.
 
@@ -236,20 +244,7 @@ def content_id_video(video, **options):
     return result
 
 
-def content_id_mixed(cids, bits=64):
-    # type: (List[str], int) -> str
-
-    decoded = (decode_base32(code) for code in cids)
-    truncated = [data[: bits // 8] for data in decoded]
-
-    # 3. Apply Similarity hash
-    simhash_digest = similarity_hash(truncated)
-    header = write_header(MT.CONTENT, ST_CC.MIXED, VS.V0, bits)
-    code = encode_base32(header + simhash_digest)
-    return code
-
-
-def data_id(data, bits=64):
+def code_data(data, bits=64):
 
     # 1. & 2. XxHash32 over CDC-Chunks
     features = [xxhash.xxh32_intdigest(chunk) for chunk in data_chunks(data)]
@@ -263,7 +258,7 @@ def data_id(data, bits=64):
     return code
 
 
-def instance_id(data, bits=64):
+def code_instance(data, bits=64):
     # type: (Union[str, BinaryIO, bytes], int) -> List[str, str, int]
 
     size = 0
@@ -283,3 +278,16 @@ def instance_id(data, bits=64):
     tail = encode_base32(top_hash_digest[n_bytes:])
 
     return [code, tail, size]
+
+
+def code_mixed(cids, bits=64):
+    # type: (List[str], int) -> str
+
+    decoded = (decode_base32(code) for code in cids)
+    truncated = [data[: bits // 8] for data in decoded]
+
+    # 3. Apply Similarity hash
+    simhash_digest = similarity_hash(truncated)
+    header = write_header(MT.CONTENT, ST_CC.MIXED, VS.V0, bits)
+    code = encode_base32(header + simhash_digest)
+    return code

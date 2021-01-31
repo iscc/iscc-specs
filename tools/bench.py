@@ -27,8 +27,8 @@ def benchmark(func, data):
     )
 
 
-benchmark(iscc.instance_id, GB1)
+benchmark(iscc.code_instance, GB1)
 benchmark(iscc.data_chunks, GB1)
-benchmark(iscc.data_id, GB1)
-benchmark(iscc.content_id_text, TXT)
+benchmark(iscc.code_data, GB1)
+benchmark(iscc.code_text, TXT)
 benchmark(iscc.text_normalize, TXT)

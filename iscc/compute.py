@@ -18,7 +18,7 @@ def compute(filepath, title="", extra=""):
     if not title:
         title = title_from_tika(tika_result, guess=True, uri=filepath)
 
-    meta_result = iscc.meta_id(title, extra)
+    meta_result = iscc.code_meta(title, extra)
     meta_result["code_meta"] = meta_result.pop("code")
     result.update(meta_result)
 
@@ -30,12 +30,12 @@ def compute(filepath, title="", extra=""):
         text = tika_result["content"]
         if not text:
             raise ValueError("Could not extract text")
-        result["code_text"] = iscc.content_id_text(tika_result["content"])
+        result["code_text"] = iscc.code_text(tika_result["content"])
     elif gmt == "image":
-        result["code_image"] = iscc.content_id_image(filepath)
+        result["code_image"] = iscc.code_image(filepath)
     elif gmt == "video":
         result.update(extract_video_metadata(filepath))
-        vid = iscc.content_id_video(
+        vid = iscc.code_video(
             filepath,
             video_granular=True,
             video_scenes=True,
@@ -44,10 +44,10 @@ def compute(filepath, title="", extra=""):
         result.update(vid)
 
     # Data Code
-    result["code_data"] = iscc.data_id(filepath)
+    result["code_data"] = iscc.code_data(filepath)
 
     # Instance Code
-    iid, tail, size = iscc.instance_id(filepath)
+    iid, tail, size = iscc.code_instance(filepath)
     result["code_instance"] = iid
 
     result = {k: result[k] for k in sorted(result)}

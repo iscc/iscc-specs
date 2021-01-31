@@ -2,7 +2,7 @@
 import pytest
 
 from iscc.codec import Code
-from iscc.core import content_id_text
+from iscc.core import code_text
 from iscc.text import *
 from iscc.metrics import distance, distance_hex
 from fauxfactory.factories.strings import gen_utf8
@@ -31,9 +31,9 @@ TEXT_C = u"""
 
 
 def test_content_id_text_empty():
-    r64 = content_id_text("")
+    r64 = code_text("")
     assert r64 == dict(code="EAASL4F2WZY7KBXB", characters=0)
-    r128 = content_id_text("", text_bits=128)
+    r128 = code_text("", text_bits=128)
     assert r128 == dict(code="EABSL4F2WZY7KBXBYUZPREWZ26IXU", characters=0)
 
     with pytest.raises(AssertionError):
@@ -43,15 +43,15 @@ def test_content_id_text_empty():
 
 
 def test_content_id_text_default():
-    a = content_id_text(TEXT_A)
+    a = code_text(TEXT_A)
     assert a == {"characters": 291, "code": "EAAR7BVKOFMBVNE4", "language": "en"}
-    b = content_id_text(TEXT_B)
+    b = code_text(TEXT_B)
     assert b == {"characters": 289, "code": "EAAR7BVKOFMBVNGM", "language": "en"}
     assert distance(a["code"], b["code"]) == 2
 
 
 def test_content_id_text_granular():
-    a = content_id_text(TEXT_A, text_granular=True, text_avg_chunk_size=100)
+    a = code_text(TEXT_A, text_granular=True, text_avg_chunk_size=100)
     assert a == {
         "characters": 291,
         "code": "EAAR7BVKOFMBVNE4",
@@ -61,7 +61,7 @@ def test_content_id_text_granular():
         },
         "language": "en",
     }
-    b = content_id_text(TEXT_B, text_granular=True, text_avg_chunk_size=100)
+    b = code_text(TEXT_B, text_granular=True, text_avg_chunk_size=100)
     assert b == {
         "characters": 289,
         "code": "EAAR7BVKOFMBVNGM",

@@ -2,7 +2,7 @@
 import os
 from iscc_samples import audios
 from iscc import audio
-from iscc.core import content_id_audio
+from iscc.core import code_audio
 import platform
 
 
@@ -74,7 +74,7 @@ def test_audio_hash_audio_signed():
 
 
 def test_content_id_audio():
-    assert content_id_audio(audios()[0].as_posix()) == {
+    assert code_audio(audios()[0].as_posix()) == {
         "code": "EIAWUJFCEZVCJIRG",
         "duration": 15.5,
         "title": "Belly Button",
@@ -82,7 +82,7 @@ def test_content_id_audio():
 
 
 def test_content_id_audio_256():
-    assert content_id_audio(audios()[0].as_posix(), audio_bits=256) == {
+    assert code_audio(audios()[0].as_posix(), audio_bits=256) == {
         "code": "EIDWUJFCEZVCJIRGNISKEBTKESRAM2REUIDGUJFCEZVCJIRGNISKEJQ",
         "duration": 15.5,
         "title": "Belly Button",
@@ -90,7 +90,7 @@ def test_content_id_audio_256():
 
 
 def test_content_id_audio_granular_short():
-    result = content_id_audio(
+    result = code_audio(
         audios()[0].as_posix(), audio_granular=True, audio_max_duration=5
     )
     assert result == {
@@ -113,7 +113,7 @@ def test_content_id_audio_granular_short():
 
 
 def test_content_id_audio_granular_default():
-    result = content_id_audio(audios()[0].as_posix(), audio_granular=True)
+    result = code_audio(audios()[0].as_posix(), audio_granular=True)
     assert result == {
         "code": "EIAWUJFCEZVCJIRG",
         "duration": 15.5,

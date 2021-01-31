@@ -1,5 +1,5 @@
 {
-  "content_id_audio": {
+  "code_audio": {
     "required": false,
     "test_001_audio_empty": {
       "inputs": [
@@ -43,8 +43,29 @@
       }
     }
   },
-  "content_id_image": {
-    "required": true,
+  "code_data": {
+    "required": false,
+    "test_001_file_image_cat_jpg": {
+      "inputs": [
+        "file_image_cat.jpg"
+      ],
+      "outputs": "GAA4SOJOPT4UUL2F"
+    },
+    "test_002_file_image_cat_png": {
+      "inputs": [
+        "file_image_cat.png"
+      ],
+      "outputs": "GAARKBZ5TIPXPDC2"
+    },
+    "test_003_file_image_cat_gif": {
+      "inputs": [
+        "file_image_cat.gif"
+      ],
+      "outputs": "GAAZIKHZDH746HE3"
+    }
+  },
+  "code_image": {
+    "required": false,
     "test_001_file_image_pixel_png_transp_png": {
       "inputs": [
         "file_image_pixel_png_transp.png"
@@ -106,8 +127,135 @@
       }
     }
   },
-  "content_id_mixed": {
-    "required": true,
+  "code_instance": {
+    "required": false,
+    "test_001_file_image_cat_jpg": {
+      "inputs": [
+        "file_image_cat.jpg"
+      ],
+      "outputs": [
+        "IAAYOKTRSPSYUCL6",
+        "EJJHAKXUGUHKPYN5HR7RAO2XUUUA2CQYMUR3ZCY",
+        12963
+      ]
+    },
+    "test_002_file_image_cat_png": {
+      "inputs": [
+        "file_image_cat.png"
+      ],
+      "outputs": [
+        "IAA3PLWUS7JNMAR2",
+        "5MXTNADSHJUNNYVR6KDBG6TW4AYZWLLORGFQAOY",
+        53759
+      ]
+    },
+    "test_003_file_image_cat_gif": {
+      "inputs": [
+        "file_image_cat.gif"
+      ],
+      "outputs": [
+        "IAA4SM2PQJ4UZIJ5",
+        "ZFXEDOB5MG52E6RFQDMUVCIJTGUMZSM6BPSVVWQ",
+        18535
+      ]
+    }
+  },
+  "code_meta": {
+    "required": false,
+    "test_001_empty": {
+      "inputs": [
+        "",
+        ""
+      ],
+      "outputs": {
+        "code": "AAA26E2JXH27TING",
+        "title": ""
+      }
+    },
+    "test_002_basic": {
+      "inputs": [
+        "Die Unendliche Geschichte",
+        ""
+      ],
+      "outputs": {
+        "code": "AAA3DZ6UG5MYA7MF",
+        "title": "Die Unendliche Geschichte"
+      }
+    },
+    "test_003_punctuation": {
+      "inputs": [
+        "Die Unendliche, Geschichte",
+        ""
+      ],
+      "outputs": {
+        "code": "AAA3TZ6GX7NYB34F",
+        "title": "Die Unendliche, Geschichte"
+      }
+    },
+    "test_004_white_space": {
+      "inputs": [
+        " Die Unendliche, Geschichte  ",
+        ""
+      ],
+      "outputs": {
+        "code": "AAA3TZ6GX7NYB34F",
+        "title": "Die Unendliche, Geschichte"
+      }
+    },
+    "test_005_non_ascii": {
+      "inputs": [
+        "Die unéndlíche,  Geschichte",
+        ""
+      ],
+      "outputs": {
+        "code": "AAA3TZ6GX7NYB34F",
+        "title": "Die unendliche, Geschichte"
+      }
+    },
+    "test_006_i18n": {
+      "inputs": [
+        "Iñtërnâtiônàlizætiøn☃",
+        ""
+      ],
+      "outputs": {
+        "code": "AAAQPPCUKBYKGY4N",
+        "title": "Internationalizætiøn☃"
+      }
+    },
+    "test_007_extra": {
+      "inputs": [
+        "Die unendliche Geschichte",
+        "The Movie"
+      ],
+      "outputs": {
+        "code": "AAA3DZ6UG4H7BVDF",
+        "extra": "The Movie",
+        "title": "Die unendliche Geschichte"
+      }
+    },
+    "test_008_long": {
+      "inputs": [
+        "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed",
+        ""
+      ],
+      "outputs": {
+        "code": "AAAS72V6FCYNQOJ7",
+        "title": "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquy"
+      }
+    },
+    "test_009_long_i18n": {
+      "inputs": [
+        "Iñtërnâtiônàlizætiøn☃ Iñtërnâtiônàlizætiøn☃ Iñtërnâtiônàlizætiøn☃ Iñtërnâtiônàlizætiøn☃ Iñtërnâtiônàlizætiøn☃ Iñtërnâtiônàlizætiøn☃",
+        ""
+      ],
+      "outputs": {
+        "code": "AAAQPPSUCDYKOQ64",
+        "title": "Internationalizætiøn☃ Internationalizætiøn☃ Internationalizætiøn☃ Internationalizætiøn☃ Internationalizætiøn"
+      }
+    }
+  },
+  "code_mixed": {
+    "required": false,
     "test_001_cid_t_one": {
       "inputs": [
         [
@@ -138,8 +286,8 @@
       "outputs": "EUASCAN57532377X"
     }
   },
-  "content_id_text": {
-    "required": true,
+  "code_text": {
+    "required": false,
     "test_001_empty": {
       "inputs": [
         ""
@@ -291,27 +439,6 @@
         "hex:107ef2399753449a44800173c06b6d506f4cd09e6970c9181e0c6590044ea1ff0d83a79ce2c7041a4001fac5f35b4b57a0c88f230e0814285b5b2a86634b4b444b864b690185484b6335356386496d448b2a38339f4c2a892a402433737c382a6344355b33242403611973582a182cba5bba2a6996692c3361032a1a73ba4073739e9f19b7354ac1902c7c03a69f5801694b583303d77c199fa77333589a6958402c696d65122a19e0242c962a48ea403338402a352ce66cd110a58d1d162a8848909044451b0965e0a5b1d6210c8e34970ca988a284cf162d142868d93763570d224aa42112c5a8d026602c70b0d882a48da61a01806c51a489c8ab4fa944a551b16e0f0e12407e597a25eb1a3f5f8f0805440655c5ab307cb0686061a75fff3f73330e8ada9246838a997662959b01040bb74eb2c2c8c5868399c37beb1c2a698361de8019ffda2c9184050b0e99a2ce4d30f2f65f9936848a10792781883c707cda9d0dc0a24d8f346734685152e100a9925697b4519224cdcb259c236db25c77a66a9b6376b99e4cc41bd00c087df1d2c50fc36c15b030b31d9c28d8617eb754709e310ecb9700cf3f31c321d6d1b92f5b0e67180704c7f85b43e7c40d7386c4f8c37312d608d6368d0425354a819b93e6579b1a56c5840c2340dce7cd12357c61d350bed4f0501b970c83d516440480c54c4f4c40821d144c1005059a045408210bade2a0605b04b04d25272d41482108be34541127d5e0c8125c9997ffc1416e45f54a065b9c445b539fd863c97c3135135d7819f4c3426be58df3c96133ad8223096e95a79d307ca0369430e0c81506095d9a87014eebb080450d12b4d1093161cc31c6509b5805449364b571850a07cdd49f83f32975a28bb08461c75d67d5104512037cc151416d6281cc3a6994b18825aff992484b692031c6a72d995803127516d21f2fcd9c8311839f04b9491a38f021572df610818421926aa751783211d21f0b4c38232542fd9d950152861d66d40ce2b483089815cd42825cd4ddc2023b8428d48661d49265d53f696cf1de182901314099de8ef15f259f56d28a0aea01f70b1197a4d4e50413ec45043cc8ed61d8189555c2e0268820b2ff8540aed9444430bd9cf81f168504f0e9167bf0e11eb113b77a521bb05a33009e943424553643a18a03c4bbf2020b996c991a8cc56c2903d630cffc12cc3c1d489bc1acc82263ea433e7d13066063f0a28d55ea6121c104454c7b0d556924d14a2b8c348824752c28626b1b13a44182a3460048199fc864ad700d17aea2b0657608a4c8426e9ec282c40f5e42c8217c8ea793468698c7022b8299470c1fecb0745640a83172ad4c854987812114c3d225554518dbe44c7b0035adbcf9b0204bce168fe71e0932f913e842ae080d188040b033939f93a5f1cdb90705c0622538b6f54f252a042b102b48a43453144f9c95d042cee902f063bd133b9904480c57ff88836d32ac66420a13650824bcee0db9b5a8398804133b5fa37b80c19eb25343c2e89462618504d80c79be9cc5969a4cca1a4b93abd83f40ced3720f1fc421105f2c6c0cf028020bfc9201d7344f4dd71a0ac06a408c59a8ea76e13a4c7d2851b2a7a86602356082679240b884c0630ccb501e658261aa132dcc5737aa518082c3130019027127138afd5e871821bdc21a244058303287b555848b3af191df4c52842aea64c32a4ce815210a350b8bf9e3",
         "hex:4be59bc5ac8e95017f34e817c85b20311ae8935d5ca82d45784812d6131f7759c630e3084ebb00c42c7b28410264a18012ecd02a8548407632315b4f0cd11f0e9ea40818818d9f80812b84082923c49eab4e1224819ccb29a31da4a20d3148d70e00f1916443c1012d54411461f4037ec2e8e213c3030448c0652e19b0d8c9a492c559e441805dbc0e0ada8002091ca00c5fd0c7c9d8d4862418734e98808806b070b9842dc4325b284cc27849bd3604e01c4a98804d3ec4be27bda30c00d94211d2d8263fdae43ffe594839bf253575163313706b138074e19607a1ad71dfa2de6314581ca9f1b230b7f842091ed68fc0cc8728b7302683ce8285241c340de3d4475b20762d7cf2e24e4dd2914e3280814000003b"
       ]
-    }
-  },
-  "data_id": {
-    "required": true,
-    "test_001_file_image_cat_jpg": {
-      "inputs": [
-        "file_image_cat.jpg"
-      ],
-      "outputs": "GAA4SOJOPT4UUL2F"
-    },
-    "test_002_file_image_cat_png": {
-      "inputs": [
-        "file_image_cat.png"
-      ],
-      "outputs": "GAARKBZ5TIPXPDC2"
-    },
-    "test_003_file_image_cat_gif": {
-      "inputs": [
-        "file_image_cat.gif"
-      ],
-      "outputs": "GAAZIKHZDH746HE3"
     }
   },
   "image_normalize": {
@@ -3600,133 +3727,6 @@
           52
         ]
       ]
-    }
-  },
-  "instance_id": {
-    "required": true,
-    "test_001_file_image_cat_jpg": {
-      "inputs": [
-        "file_image_cat.jpg"
-      ],
-      "outputs": [
-        "IAAYOKTRSPSYUCL6",
-        "EJJHAKXUGUHKPYN5HR7RAO2XUUUA2CQYMUR3ZCY",
-        12963
-      ]
-    },
-    "test_002_file_image_cat_png": {
-      "inputs": [
-        "file_image_cat.png"
-      ],
-      "outputs": [
-        "IAA3PLWUS7JNMAR2",
-        "5MXTNADSHJUNNYVR6KDBG6TW4AYZWLLORGFQAOY",
-        53759
-      ]
-    },
-    "test_003_file_image_cat_gif": {
-      "inputs": [
-        "file_image_cat.gif"
-      ],
-      "outputs": [
-        "IAA4SM2PQJ4UZIJ5",
-        "ZFXEDOB5MG52E6RFQDMUVCIJTGUMZSM6BPSVVWQ",
-        18535
-      ]
-    }
-  },
-  "meta_id": {
-    "required": true,
-    "test_001_empty": {
-      "inputs": [
-        "",
-        ""
-      ],
-      "outputs": {
-        "code": "AAA26E2JXH27TING",
-        "title": ""
-      }
-    },
-    "test_002_basic": {
-      "inputs": [
-        "Die Unendliche Geschichte",
-        ""
-      ],
-      "outputs": {
-        "code": "AAA3DZ6UG5MYA7MF",
-        "title": "Die Unendliche Geschichte"
-      }
-    },
-    "test_003_punctuation": {
-      "inputs": [
-        "Die Unendliche, Geschichte",
-        ""
-      ],
-      "outputs": {
-        "code": "AAA3TZ6GX7NYB34F",
-        "title": "Die Unendliche, Geschichte"
-      }
-    },
-    "test_004_white_space": {
-      "inputs": [
-        " Die Unendliche, Geschichte  ",
-        ""
-      ],
-      "outputs": {
-        "code": "AAA3TZ6GX7NYB34F",
-        "title": "Die Unendliche, Geschichte"
-      }
-    },
-    "test_005_non_ascii": {
-      "inputs": [
-        "Die unéndlíche,  Geschichte",
-        ""
-      ],
-      "outputs": {
-        "code": "AAA3TZ6GX7NYB34F",
-        "title": "Die unendliche, Geschichte"
-      }
-    },
-    "test_006_i18n": {
-      "inputs": [
-        "Iñtërnâtiônàlizætiøn☃",
-        ""
-      ],
-      "outputs": {
-        "code": "AAAQPPCUKBYKGY4N",
-        "title": "Internationalizætiøn☃"
-      }
-    },
-    "test_007_extra": {
-      "inputs": [
-        "Die unendliche Geschichte",
-        "The Movie"
-      ],
-      "outputs": {
-        "code": "AAA3DZ6UG4H7BVDF",
-        "extra": "The Movie",
-        "title": "Die unendliche Geschichte"
-      }
-    },
-    "test_008_long": {
-      "inputs": [
-        "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed",
-        ""
-      ],
-      "outputs": {
-        "code": "AAAS72V6FCYNQOJ7",
-        "title": "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquy"
-      }
-    },
-    "test_009_long_i18n": {
-      "inputs": [
-        "Iñtërnâtiônàlizætiøn☃ Iñtërnâtiônàlizætiøn☃ Iñtërnâtiônàlizætiøn☃ Iñtërnâtiônàlizætiøn☃ Iñtërnâtiônàlizætiøn☃ Iñtërnâtiônàlizætiøn☃",
-        ""
-      ],
-      "outputs": {
-        "code": "AAAQPPSUCDYKOQ64",
-        "title": "Internationalizætiøn☃ Internationalizætiøn☃ Internationalizætiøn☃ Internationalizætiøn☃ Internationalizætiøn"
-      }
     }
   },
   "minhash": {

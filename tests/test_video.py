@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import pytest
 from scenedetect import FrameTimecode
-from iscc.core import content_id_video
+from iscc.core import code_video
 from iscc import video, mp7
 from blake3 import blake3
 from tests import HERE
@@ -17,7 +17,7 @@ def test_content_id_video_0_features():
 
 
 def test_content_id_video():
-    result = content_id_video(SAMPLE)
+    result = code_video(SAMPLE)
     assert "code" in result
     # assert "signature" in result
     assert "crop" in result
@@ -26,14 +26,14 @@ def test_content_id_video():
 
 
 def test_content_id_video_no_crop():
-    result = content_id_video(SAMPLE, video_crop=False)
+    result = code_video(SAMPLE, video_crop=False)
     assert result["code"] == "EMAV4DUC6QORW4X4"
     # assert "signature" in result
     assert "crop" not in result
 
 
 def test_content_id_video_granular_scenes():
-    result = content_id_video(SAMPLE, video_granular=True, video_scenes=True)
+    result = code_video(SAMPLE, video_granular=True, video_scenes=True)
     assert result == {
         "code": "EMAVMHMC7RMJF6XZ",
         "crop": "176:96:0:24",
@@ -60,7 +60,7 @@ def test_content_id_video_granular_scenes():
 
 
 def test_content_id_video_granular_rolling():
-    result = content_id_video(SAMPLE, video_granular=True, video_scenes=False)
+    result = code_video(SAMPLE, video_granular=True, video_scenes=False)
     assert result == {
         "code": "EMAVMHMC7RMJF6XZ",
         "crop": "176:96:0:24",
@@ -92,7 +92,7 @@ def test_content_id_video_granular_rolling():
 
 
 def test_content_id_video_include_mp7sig():
-    result = content_id_video(SAMPLE, video_include_mp7sig=True)
+    result = code_video(SAMPLE, video_include_mp7sig=True)
     assert result["mp7sig"].endswith("SZVP2HM")
 
 

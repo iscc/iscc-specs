@@ -1,5 +1,5 @@
 {
-    "meta_id": {
+    "code_meta": {
         "test_001_empty": {
             "inputs": [
                 "",
@@ -55,7 +55,7 @@
             ]
         }
     },
-    "content_id_text": {
+    "code_text": {
         "test_001_empty": {
             "inputs": [
                 ""
@@ -77,7 +77,7 @@
             ]
         }
     },
-    "content_id_image": {
+    "code_image": {
         "test_001_file_image_pixel_png_transp_png": {
             "inputs": [
                 "file_image_pixel_png_transp.png"
@@ -109,7 +109,7 @@
             ]
         }
     },
-    "content_id_audio": {
+    "code_audio": {
         "test_001_audio_empty": {
             "inputs": [
                 []
@@ -131,7 +131,7 @@
             ]
         }
     },
-    "content_id_mixed": {
+    "code_mixed": {
         "test_001_cid_t_one": {
             "inputs": [
                 [
@@ -176,7 +176,7 @@
             ]
         }
     },
-    "data_id": {
+    "code_data": {
         "test_001_file_image_cat_jpg": {
             "inputs": [
                 "file_image_cat.jpg"
@@ -210,7 +210,7 @@
             ]
         }
     },
-    "instance_id": {
+    "code_instance": {
         "test_001_file_image_cat_jpg": {
             "inputs": [
                 "file_image_cat.jpg"
