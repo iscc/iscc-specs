@@ -11,24 +11,16 @@ import math
 from statistics import median
 from PIL import Image, ImageChops, ImageEnhance
 import numpy as np
-from iscc.schema import Opts
+from iscc.schema import Opts, Readable
 from iscc.text import normalize_text
+from iscc import uread
 
 
-def extract_image_metadata(img):
-    # type: (Union[str, Path, bytes, io.BytesIO]) -> Optional[dict]
+def extract_image_metadata(data):
+    # type: (Readable) -> Optional[dict]
+    file = uread.open_data(data)
     try:
-        if isinstance(img, Path):
-            img_obj = pyexiv2.Image(img.as_posix())
-        elif isinstance(img, str):
-            img_obj = pyexiv2.Image(img)
-        elif isinstance(img, bytes):
-            img_obj = pyexiv2.ImageData(img)
-        elif isinstance(img, io.BytesIO):
-            img_obj = pyexiv2.ImageData(img.read())
-        else:
-            raise ValueError("Path to image or bytes required")
-
+        img_obj = pyexiv2.ImageData(file.read())
         meta = {}
         meta.update(img_obj.read_exif())
         meta.update(img_obj.read_iptc())

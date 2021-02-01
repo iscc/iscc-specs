@@ -102,7 +102,7 @@ def test_content_id_image():
     assert len(cid_i["code"]) == 16
     assert cid_i == {"code": "EEAZTRSWFV2THIUW", "height": 512, "width": 512}
 
-    data = BytesIO(open("file_image_lenna.jpg", "rb").read())
+    data = open("file_image_lenna.jpg", "rb").read()
     cid_i = iscc.code_image(data)
     assert len(cid_i["code"]) == 16
     assert cid_i == {"code": "EEAZTRSWFV2THIUW", "height": 512, "width": 512}

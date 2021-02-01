@@ -5,6 +5,7 @@ from iscc_samples import images
 from PIL import Image
 from iscc.core import code_image
 from iscc.codec import Code
+from tests.test_readables import image_readables
 
 
 def test_code_image_plain():
@@ -97,6 +98,11 @@ def test_extract_image_metadata():
     assert image.extract_image_metadata(images()[2].as_posix()) == {
         "title": "Concentrated Cat"
     }
+
+
+def test_extract_image_metadata_readables():
+    for readable in image_readables():
+        assert image.extract_image_metadata(readable) == {"title": "Concentrated Cat"}
 
 
 def test_pi():

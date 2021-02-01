@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
 import os
+import iscc
 from iscc_samples import audios
 from iscc import audio
-from iscc.core import code_audio
 import platform
+from tests.test_readables import audio_readables
 
 
 def test_fpcalc_bin():
@@ -38,11 +39,22 @@ def test_get_version_info():
     assert vi == audio.FPCALC_VERSION
 
 
-def test_extract_chromaprint():
-    result = audio.extract_audio_features(audios()[0].as_posix())
-    assert result["duration"] == 15.5
-    assert result["fingerprint"][:4] == [684003877, 683946551, 1749295639, 2017796679]
-    assert result["fingerprint"][-4:] == [944185926, 2026255094, 2022051494, 2021919654]
+def test_extract_audio_features():
+    for ar in audio_readables():
+        result = audio.extract_audio_features(ar)
+        assert result["duration"] == 15.5
+        assert result["fingerprint"][:4] == [
+            684003877,
+            683946551,
+            1749295639,
+            2017796679,
+        ]
+        assert result["fingerprint"][-4:] == [
+            944185926,
+            2026255094,
+            2022051494,
+            2021919654,
+        ]
 
 
 def test_hash_audio_empty():
@@ -73,8 +85,16 @@ def test_hash_audio_signed():
     )
 
 
-def test_code_audio_audio():
-    assert code_audio(audios()[0].as_posix()) == {
+def test_code_audio_from_file_path():
+    assert iscc.code_audio(audios()[0].as_posix()) == {
+        "code": "EIAWUJFCEZVCJIRG",
+        "duration": 15.5,
+        "title": "Belly Button",
+    }
+
+
+def test_code_audio_from_data():
+    assert iscc.code_audio(audios()[0].open("rb").read()) == {
         "code": "EIAWUJFCEZVCJIRG",
         "duration": 15.5,
         "title": "Belly Button",
@@ -82,7 +102,7 @@ def test_code_audio_audio():
 
 
 def test_code_audio_256():
-    assert code_audio(audios()[0].as_posix(), audio_bits=256) == {
+    assert iscc.code_audio(audios()[0].as_posix(), audio_bits=256) == {
         "code": "EIDWUJFCEZVCJIRGNISKEBTKESRAM2REUIDGUJFCEZVCJIRGNISKEJQ",
         "duration": 15.5,
         "title": "Belly Button",
@@ -90,7 +110,7 @@ def test_code_audio_256():
 
 
 def test_code_audio_granular_short():
-    result = code_audio(
+    result = iscc.code_audio(
         audios()[0].as_posix(), audio_granular=True, audio_max_duration=5
     )
     assert result == {
@@ -113,7 +133,7 @@ def test_code_audio_granular_short():
 
 
 def test_code_audio_granular_default():
-    result = code_audio(audios()[0].as_posix(), audio_granular=True)
+    result = iscc.code_audio(audios()[0].as_posix(), audio_granular=True)
     assert result == {
         "code": "EIAWUJFCEZVCJIRG",
         "duration": 15.5,

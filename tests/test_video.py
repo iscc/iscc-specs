@@ -6,9 +6,50 @@ from iscc import video, mp7
 from blake3 import blake3
 from tests import HERE
 from os.path import join
-
+from tests.test_readables import video_readables
+from iscc_samples import videos
+from iscc.schema import File, Uri
 
 SAMPLE = join(HERE, "test.3gp")
+
+
+def test_extract_video_metadata_readables():
+    for readable in video_readables():
+        meta = video.extract_video_metadata(readable)
+        assert meta == {
+            "duration": 60.042,
+            "fps": 24.0,
+            "height": 144,
+            "language": "en",
+            "title": "Kali by Anokato - Spiral Sessions 2019",
+            "width": 176,
+        }
+
+
+def test_extract_video_metadata_open_file():
+    with open(SAMPLE, "rb") as infile:
+        meta = video.extract_video_metadata(infile)
+        assert infile.tell() == 65536
+        assert meta == {
+            "duration": 60.042,
+            "fps": 24.0,
+            "height": 144,
+            "language": "en",
+            "title": "Kali by Anokato - Spiral Sessions 2019",
+            "width": 176,
+        }
+
+
+def test_extract_video_preview_all_formats():
+    result = video.extract_video_preview(videos()[2].as_posix())
+    assert len(result) > 10
+
+
+def test_extract_video_preview_readables():
+    for r in video_readables():
+        if isinstance(r, Uri.__args__) or hasattr(r, "name"):
+            result = video.extract_video_preview(r)
+            assert result[:10].hex() == "89504e470d0a1a0a0000"
 
 
 def test_hach_video_0_features():
@@ -152,6 +193,16 @@ def test_compute_video_features_scenes():
     )
 
 
+def test_extract_video_signature_readables():
+    for readable in video_readables():
+        if isinstance(readable, Uri.__args__) or hasattr(readable, "name"):
+            result = video.extract_video_signature(readable)
+            assert result[:10].hex() == "00000001800000000057"
+        else:
+            with pytest.raises(ValueError):
+                video.extract_video_signature(readable)
+
+
 def test_extract_video_signature():
     sigh = blake3(
         video.extract_video_signature(SAMPLE, video_scenes=True, video_fps=5)
@@ -237,29 +288,3 @@ def test_detect_video_scenes():
             FrameTimecode(timecode=1441, fps=24.000000),
         ),
     ]
-
-
-def test_extract_video_metadata():
-    meta = video.extract_video_metadata(SAMPLE)
-    assert meta == {
-        "duration": 60.042,
-        "fps": 24.0,
-        "height": 144,
-        "language": "en",
-        "title": "Kali by Anokato - Spiral Sessions 2019",
-        "width": 176,
-    }
-
-
-def test_extract_video_metadata_open_file():
-    with open(SAMPLE, "rb") as infile:
-        meta = video.extract_video_metadata(infile)
-        assert infile.tell() == 65536
-        assert meta == {
-            "duration": 60.042,
-            "fps": 24.0,
-            "height": 144,
-            "language": "en",
-            "title": "Kali by Anokato - Spiral Sessions 2019",
-            "width": 176,
-        }

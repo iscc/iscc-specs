@@ -55,28 +55,6 @@
             ]
         }
     },
-    "code_text": {
-        "test_001_empty": {
-            "inputs": [
-                ""
-            ]
-        },
-        "test_002_short": {
-            "inputs": [
-                "Some short text"
-            ]
-        },
-        "test_003_long": {
-            "inputs": [
-                "Their most significant and usefull property of similarity-preserving fingerprints gets lost in the fragmentation of individual, propietary and use case specific implementations. The real benefit lies in similarity preservation beyond your local data archive on a global scale accross vendors."
-            ]
-        },
-        "test_004_partial": {
-            "inputs": [
-                "Some text for partial content id text"
-            ]
-        }
-    },
     "code_image": {
         "test_001_file_image_pixel_png_transp_png": {
             "inputs": [

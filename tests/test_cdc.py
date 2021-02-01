@@ -2,6 +2,7 @@
 from iscc import cdc
 from blake3 import blake3
 from tests.utils import static_bytes
+from tests.test_readables import audio_readables
 
 
 def test_data_chunks_empty():
@@ -91,3 +92,9 @@ def test_data_chunks_stream():
 def test_get_params():
     assert cdc.get_params(1024) == (256, 8192, 640, 2047, 511)
     assert cdc.get_params(8192) == (2048, 65536, 5120, 16383, 4095)
+
+
+def test_data_chunks_readables():
+    for readable in audio_readables():
+        result = list(cdc.data_chunks(readable))
+        assert len(result) == 2552
