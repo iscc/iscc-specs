@@ -4,9 +4,12 @@ from typing import Any, Generator, Union
 import xxhash
 from iscc.cdc import data_chunks
 from iscc.minhash import compress, minhash, minhash_256
+from iscc import uread
 from iscc.schema import Opts
 from iscc.utils import sliding_window
 from iscc.codec import encode_base64
+from iscc.schema import Readable
+from tika import parser as tika_parser
 
 
 # Common Control Characters considered whitespace
@@ -36,6 +39,17 @@ UNICODE_FILTER = frozenset(
         "Ps",
     }
 )
+
+
+def extract_text(data):
+    # type: (Union[Readable]) -> dict
+    """Extract text and metadata from a 'text'-file via Tika.
+    Result:
+        {"content": "...", "metadata": "..."}
+    """
+    file = uread.open_data(data)
+    buffer = file.read()
+    return tika_parser.from_buffer(buffer)
 
 
 def hash_text(text, **options):
