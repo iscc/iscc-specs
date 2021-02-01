@@ -1,42 +1,31 @@
 # -*- coding: utf-8 -*-
 from loguru import logger
-from pathlib import Path
 from typing import List, Optional, Union
-from os import path
 import mimetypes
 import magic
-import io
 from PIL import Image
+from iscc.schema import GMT, Readable
+from iscc import uread
 
 
-def guess(data):
-    # type: (Union[Path, str, bytes, bytearray, memoryview, io.BufferedReader]) -> str
+def guess_mediatype(data):
+    # type: (Readable) -> str
     """Heuristic guessing of mediatype for different kinds of inputs.
 
     We try matching by file extension. If that fails we match by content sniffing.
     """
 
-    guess_name, guess_data = None, None
+    guess_name, guess_data, file_name = None, None, None
+    file = uread.open_data(data)
+    if hasattr(file, "name"):
+        file_name = file.name
+    elif hasattr(file, "filename"):
+        file_name = file.filename
 
-    if isinstance(data, Path):
-        data = data.as_posix()
+    if file_name:
+        guess_name = from_name(file_name)
 
-    if isinstance(data, str):
-        guess_name = from_name(data)
-        if path.isfile(data):
-            with open(data, "rb") as infile:
-                guess_data = from_data(infile.read(4096))
-
-    if isinstance(data, (bytes, bytearray)):
-        guess_data = from_data(data)
-
-    if isinstance(data, memoryview):
-        guess_data = from_data(bytes(data))
-
-    if isinstance(data, io.BufferedReader) and hasattr(data, "name"):
-        guess_name = from_name(data.name)
-        with open(data.name, "rb") as infile:
-            guess_data = from_data(infile.read(4096))
+    guess_data = from_data(file.read(4096))
 
     return guess_name or guess_data
 
@@ -60,7 +49,7 @@ def clean_mime(mime: Union[str, List]):
     return mime.strip()
 
 
-def mime_to_gmt(mime_type, file_path=None):
+def mime_to_gmt(mime_type: str, file_path=None):
     """Get generic mediatype from mime type"""
     mime_type = clean_mime(mime_type)
     if mime_type == "image/gif" and file_path:
@@ -73,7 +62,7 @@ def mime_to_gmt(mime_type, file_path=None):
     if entry:
         return entry["gmt"]
     gmt = mime_type.split("/")[0]
-    if gmt in ("text", "image", "audio", "video"):
+    if gmt in list(GMT):
         logger.warning(f"Guessing GMT from {mime_type}")
         return gmt
 
@@ -163,7 +152,7 @@ if __name__ == "__main__":
     for fp in samples.all():
         by_name = from_name(fp.as_posix())
         by_data = from_data(fp.open(mode="rb").read(4096))
-        by_guess = guess(fp.as_posix())
+        by_guess = guess_mediatype(fp.as_posix())
         gmt = mime_to_gmt(by_guess)
         print(f"{gmt} " f"{fp.name} " f"{by_guess}")
         # print(fp.name, end= "")
