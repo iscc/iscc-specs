@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """ISCC Reference Implementation"""
 import base64
-from io import BytesIO
+import io
 from PIL.ImageOps import exif_transpose
 from humanize import naturalsize
 from loguru import logger
@@ -11,7 +11,6 @@ import xxhash
 from blake3 import blake3
 from iscc.minhash import minhash_256
 from iscc import text, image, audio, video
-
 from iscc.codec import (
     Code,
     MT,
@@ -22,15 +21,19 @@ from iscc.codec import (
     write_header,
 )
 from iscc.cdc import data_chunks
-from iscc.utils import Streamable
 from iscc.mp7 import read_ffmpeg_signature
-from iscc.meta import meta_hash
-from iscc.schema import Opts
+from iscc.meta import meta_hash, title_from_tika
+from iscc.schema import GMT, Opts, Uri, Data, File, Readable
+from iscc.mediatype import guess_mediatype, mime_to_gmt
 import langdetect
 import langcodes
+from tika import parser as tika_parser
+from iscc import uread
+
 
 # Set for deterministic language detection
 langdetect.DetectorFactory.seed = 0
+
 
 ###############################################################################
 # High-Level ISCC Code generator functions                                   #
@@ -68,23 +71,48 @@ def code_meta(title, extra="", **options):
     return result
 
 
-def code_content():
-    pass
+def code_content(data, **options):
+    # type: (Union[Uri, Data], **Any) -> dict
+    """Detect mediatype and create corresponding Content-Code."""
+    mediatype = guess_mediatype(data)
+    gmt = mime_to_gmt(mediatype)
+    if gmt == GMT.text:
+        return code_text(data, **options)
+    elif gmt == GMT.image:
+        return code_image(data, **options)
+    elif gmt == GMT.audio:
+        return code_audio(data, **options)
+    elif gmt == GMT.video:
+        return code_video(data, **options)
+    else:
+        raise ValueError("Unknown mediatype")
 
 
-def code_text(txt, **options):
-    # type: (Union[str, bytes], **Any) -> dict
+def code_text(data, **options):
+    # type: (Union[Data, Uri], **Any) -> dict
     """Generate Content-ID Text"""
     opts = Opts(**options)
-
     nbits = opts.text_bits
     nbytes = nbits // 8
+    result = {}
+
+    with uread.open_data(data) as f:
+        tika_result = tika_parser.from_buffer(f.read())
+
+    # Metadata
+    title = title_from_tika(tika_result, guess=True)
+    if title:
+        result["title"] = title
+
+    # Content-Code
+    txt = tika_result["content"] or ""
     txt = text.normalize_text(txt, lower=True)
     th = text.hash_text(txt)
     header = write_header(MT.CONTENT, ST_CC.TEXT, VS.V0, nbits)
     code = encode_base32(header + th[:nbytes])
 
-    result = dict(code=code, characters=len(txt))
+    result["code"] = code
+    result["characters"] = len(txt)
 
     try:
         result["language"] = langcodes.standardize_tag(langdetect.detect(txt))
@@ -97,40 +125,44 @@ def code_text(txt, **options):
     return result
 
 
-def code_image(img, **options):
-    # type: (Union[str, BytesIO, Image.Image], **Any) -> dict
+def code_image(data, **options):
+    # type: (Union[Uri, Data, Image.Image], **Any) -> dict
 
     opts = Opts(**options)
     nbits = opts.image_bits
     nbytes = nbits // 8
     assert nbits in (32, 64), "Content-ID Image does not yet support more than 64-bits"
 
-    if not isinstance(img, Image.Image):
-        # We cannot pass PIL Image for metadata extraction
-        result = image.extract_image_metadata(img) or {}
-        img = Image.open(img)
-    else:
-        logger.warning(f"Skipped image metadata extraction {img}")
+    try:
+        result = image.extract_image_metadata(data) or {}
+    except Exception as e:
+        logger.error(f"Failed image metadata extraction: {e}")
         result = {}
 
-    if opts.image_exif_transpose:
-        img = exif_transpose(img)
+    if isinstance(data, Image.Image):
+        img_obj = data
+    else:
+        with uread.open_data(data) as infile:
+            img_obj = Image.open(io.BytesIO(infile.read()))
 
-    width, height = img.size
+    if opts.image_exif_transpose:
+        img_obj = exif_transpose(img_obj)
+
+    width, height = img_obj.size
     result.update(dict(width=width, height=height))
 
     if opts.image_trim:
-        img = image.trim_image(img)
-        if img.size != result.values():
-            tw, th = img.size
+        img_obj = image.trim_image(img_obj)
+        if img_obj.size != result.values():
+            tw, th = img_obj.size
             result["trimmed"] = dict(width=tw, height=th)
 
     if opts.image_preview:
-        preview = image.extract_image_preview(img, **options)
+        preview = image.extract_image_preview(img_obj, **options)
         preview_uri = image.encode_image_to_data_uri(preview, **options)
         result["preview"] = preview_uri
 
-    pixels = image.normalize_image(img)
+    pixels = image.normalize_image(img_obj)
     hash_digest = image.hash_image(pixels)[:nbytes]
     header = write_header(MT.CONTENT, ST_CC.IMAGE, VS.V0, nbits)
     code = encode_base32(header + hash_digest)
@@ -139,19 +171,19 @@ def code_image(img, **options):
     return result
 
 
-def code_audio(f, **options):
-    # type: (Union[str, BinaryIO, List], **Any) -> dict
+def code_audio(data, **options):
+    # type: (Union[Uri, Data, List], **Any) -> dict
     """Generate Audio-ID from file(path) or Chromaprint features"""
     opts = Opts(**options)
     result = dict()
     nbits = opts.audio_bits
     nbytes = nbits // 8
-    if isinstance(f, list):
-        chroma = dict(fingerprint=f)
+    if isinstance(data, list):
+        chroma = dict(fingerprint=data)
     else:
-        chroma = audio.extract_audio_features(f, **options)
+        chroma = audio.extract_audio_features(data, **options)
         result["duration"] = chroma["duration"]
-        result.update(video.extract_video_metadata(f))
+        result.update(video.extract_video_metadata(data))
 
     shash_digest = audio.hash_audio(chroma["fingerprint"])
 
@@ -247,19 +279,18 @@ def code_data(data, **options):
 
 
 def code_instance(data, **options):
-    # type: (Union[str, BinaryIO, bytes], **Any) -> dict
+    # type: (Readable, **Any) -> dict
     opts = Opts(**options)
     nbits = opts.instance_bits
     nbytes = nbits // 8
     filesize = 0
     b3 = blake3()
-    with Streamable(data) as stream:
-        while True:
-            d = stream.stream.read(opts.io_chunk_size)
-            if not d:
-                break
-            b3.update(d)
-            filesize += len(d)
+    stream = uread.open_data(data)
+    buffer = stream.read(opts.io_chunk_size)
+    while buffer:
+        filesize += len(buffer)
+        b3.update(buffer)
+        buffer = stream.read(opts.io_chunk_size)
 
     datahash_digest = b3.digest()
     header = write_header(MT.INSTANCE, ST.NONE, VS.V0, nbits)
