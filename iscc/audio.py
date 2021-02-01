@@ -10,11 +10,12 @@ import zipfile
 import stat
 from more_itertools import chunked, windowed
 import iscc
-from iscc.schema import Opts
+from iscc.schema import Opts, Readable
 from iscc.simhash import similarity_hash
 from iscc.utils import download_file
 from iscc.codec import encode_base64
-from typing import Any, BinaryIO, Union, List
+from typing import Any, List
+from iscc import uread
 
 
 def hash_audio(features):
@@ -30,8 +31,8 @@ def hash_audio(features):
     return shash_digest
 
 
-def extract_audio_features(file, **options):
-    # type: (Union[str, BinaryIO], **Any) -> dict
+def extract_audio_features(data, **options):
+    # type: (Readable, **Any) -> dict
     """Returns Chromaprint fingerprint.
 
     A dictionary with keys:
@@ -40,14 +41,9 @@ def extract_audio_features(file, **options):
     """
     opts = Opts(**options)
     length = str(opts.audio_max_duration)
-    if hasattr(file, "read"):
-        file.seek(0)
-        cmd = [fpcalc_bin(), "-raw", "-json", "-signed", "-length", length, "-"]
-        res = subprocess.run(cmd, stdout=subprocess.PIPE, input=file.read())
-    else:
-        cmd = [fpcalc_bin(), "-raw", "-json", "-signed", "-length", length, file]
-        res = subprocess.run(cmd, stdout=subprocess.PIPE)
-
+    file = uread.open_data(data)
+    cmd = [fpcalc_bin(), "-raw", "-json", "-signed", "-length", length, "-"]
+    res = subprocess.run(cmd, stdout=subprocess.PIPE, input=file.read())
     result = json.loads(res.stdout.decode("utf-8"))
     return result
 
