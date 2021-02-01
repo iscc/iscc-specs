@@ -5,23 +5,18 @@ Content Defined Chunking
 Simple CDC implementation.
 Compatible with https://pypi.org/project/fastcdc/ v1.3.0
 """
-import io
+from iscc import uread
 from math import log2
+from iscc.schema import Readable
 
 AVG_SIZE_DATA = 1024
 READ_SIZE = 262144
 
 
 def data_chunks(data, avg_size=AVG_SIZE_DATA, utf32=False, read_size=READ_SIZE):
-    # type: (Union[str, BinaryIO, bytes, bytearray], int, bool, int) -> Generator
+    # type: (Readable, int, bool, int) -> Generator
 
-    # Ensure we have a readable stream
-    if isinstance(data, str):
-        stream = open(data, "rb")
-    elif not hasattr(data, "read"):
-        stream = io.BytesIO(data)
-    else:
-        stream = data
+    stream = uread.open_data(data)
 
     buffer = stream.read(read_size)
     if not buffer:
