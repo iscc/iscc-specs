@@ -6,12 +6,12 @@ from bitarray.util import count_xor, hex2ba
 from iscc.codec import Code, read_header, decode_base32
 
 
-# ISCC code in various representations
+# ISCC code in various possible representations
 Icode = Union[str, bytes, int, Code]
 
 
 def distance(a, b, mixed=False):
-    # type: (Icode, Icode) -> int
+    # type: (Icode, Icode, bool) -> int
     """Calculate hamming distance for singular ISCC component codes of same type.
 
     I mixed is true, we allow for comparison of hashes with different length and
@@ -38,7 +38,7 @@ def distance(a, b, mixed=False):
 
 
 def distance_code(a, b, mixed=False):
-    # type: (str, str) -> int
+    # type: (str, str, bool) -> int
     """
     Calculate hamming distance for ISCC component codes.
 
