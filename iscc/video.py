@@ -8,12 +8,13 @@ import sys
 from subprocess import Popen, PIPE, DEVNULL
 from os.path import basename, dirname
 from secrets import token_hex
-from typing import Any, Generator, List, Sequence, Tuple, Optional, BinaryIO, Union
+from typing import Any, Generator, List, Sequence, Tuple, Optional, Union
 import imageio_ffmpeg
 from statistics import mode
 from langcodes import standardize_tag
 from scenedetect import ContentDetector, FrameTimecode, SceneManager, VideoManager
-from iscc.schema import Opts
+from iscc import uread
+from iscc.schema import Opts, Readable, File, Uri
 from iscc.codec import encode_base64
 from iscc.utils import cd
 from iscc.wtahash import wtahash
@@ -26,9 +27,10 @@ Scene = Tuple[FrameTimecode, FrameTimecode]
 SceneSig = Tuple[List[str], List[int]]  # feature hashes, scene durations
 
 
-def extract_video_metadata(video):
-    # type: (Union[str, BinaryIO]) -> dict
+def extract_video_metadata(data):
+    # type: (Union[Readable]) -> dict
     """Extract basic metadata from video files."""
+    video = uread.open_data(data)
     with av.open(video) as v:
         metadata = {}
         c_duration = v.duration
@@ -78,11 +80,19 @@ def extract_video_metadata(video):
         return dict(sorted(metadata.items()))
 
 
-def extract_video_preview(file_path, **options):
-    # type: (str, **Any) -> bytes
+def extract_video_preview(file, **options):
+    # type: (Union[File, Uri], **Any) -> Optional[bytes]
     """Extract thumbnail from video and return raw png byte data."""
     opts = Opts(**options)
     size = opts.image_preview_size
+    infile = uread.open_data(file)
+
+    if not hasattr(infile, "name"):
+        logger.warning("Cannot extract preview without file.name")
+        return None
+
+    file_path = infile.name
+
     cmd = [
         FFMPEG,
         "-i",
@@ -101,10 +111,17 @@ def extract_video_preview(file_path, **options):
     return result.stdout
 
 
-def extract_video_signature(file_path, crop=None, **options):
-    # type: (str, Optional[str], **Any) -> bytes
+def extract_video_signature(file, crop=None, **options):
+    # type: (Union[File, Uri], Optional[str], **Any) -> bytes
     """Extracts MP7 Video Signature"""
     opts = Opts(**options)
+
+    infile = uread.open_data(file)
+    if not hasattr(infile, "name"):
+        logger.error("Cannot extract signature without file.name")
+        raise ValueError(f"Cannot extract signature from {type(infile)}")
+
+    file_path = infile.name
     sigfile = basename(file_path) + ".bin"
     folder = dirname(file_path)
 
