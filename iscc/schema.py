@@ -1,7 +1,17 @@
 # -*- coding: utf-8 -*-
 from enum import Enum
-from typing import List, Optional
+import mmap
+from io import BufferedReader, BytesIO
+from pathlib import Path
+from typing import BinaryIO, List, Optional, Union
 from pydantic import BaseSettings, BaseModel, Field
+
+
+Data = Union[bytes, bytearray, memoryview]
+Uri = Union[str, Path]
+File = Union[BinaryIO, mmap.mmap, BytesIO, BufferedReader]
+Readable = Union[Uri, Data, File]
+
 
 DEFAULT_WINDOW = 7
 DEFAULT_OVERLAP = 3
