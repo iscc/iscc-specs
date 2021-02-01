@@ -5,36 +5,9 @@ import hashlib
 import io
 import os
 import re
-from pathlib import Path
-from typing import BinaryIO, Sequence, Generator, Union
+from typing import Sequence, Generator
 from urllib.parse import urlparse
-import iscc
-
-
-File = Union[str, bytes, BinaryIO, Path]
-
-
-class Streamable:
-    """Converts a file path or raw bytes into a managed readable stream."""
-
-    def __init__(self, data: File, close=True):
-        self.do_close = close
-        if isinstance(data, (str, Path)):
-            self.stream = open(data, "rb")
-            self.name = Path(data).name
-        elif not hasattr(data, "read"):
-            self.stream = io.BytesIO(data)
-            self.name = ""
-        else:
-            self.stream = data
-            self.name = ""
-
-    def __enter__(self):
-        return self
-
-    def __exit__(self, exc_type, exc_val, exc_tb):
-        if self.do_close:
-            self.stream.close()
+from iscc import APP_DIR
 
 
 class cd:
@@ -72,7 +45,7 @@ def download_file(url, md5=None, sanitize=False):
     file_name = os.path.basename(url_obj.path)
     if sanitize:
         file_name = safe_filename(file_name)
-    out_path = os.path.join(iscc.APP_DIR, file_name)
+    out_path = os.path.join(APP_DIR, file_name)
     if os.path.exists(out_path):
         logger.debug(f"Already downloaded: {file_name}")
         if md5:
