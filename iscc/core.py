@@ -247,7 +247,7 @@ def code_video(file, **options):
         return result
 
     if opts.video_scenes:
-        cutpoints = video.detect_video_scenes(file)
+        cutpoints = video.detect_video_scenes(file, **options)
         features, durations = video.compute_video_features_scenes(frames, cutpoints)
         result["features"] = features
         result["sizes"] = durations

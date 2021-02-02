@@ -87,7 +87,7 @@ class Opts(BaseSettings):
 
     video_fps: int = Field(
         5,
-        description="Frames per second to process for video hash (ignored when 0 or when scene detection is active)",
+        description="Frames per second to process for video hash (ignored when 0).",
     )
 
     video_crop: bool = Field(
@@ -98,6 +98,23 @@ class Opts(BaseSettings):
 
     video_scenes: bool = Field(
         False, description="Use scene detection for granular features"
+    )
+
+    video_scenes_fs: int = Field(
+        2,
+        description="Number of frames to skip per processing step for scene detection. "
+        "Higher values will increase detection speed and decrease detection"
+        " quality.",
+    )
+
+    video_scenes_th: int = Field(
+        40,
+        description="Threshold for scene detection. Higher values detect less scenes.",
+    )
+
+    video_scenes_min: int = Field(
+        15,
+        description="Minimum number of frames per scene.",
     )
 
     video_window: int = Field(

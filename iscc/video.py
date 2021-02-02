@@ -111,12 +111,20 @@ def extract_video_preview(file, **options):
     return result.stdout
 
 
-def extract_video_signature(file, crop=None, **options):
+def extract_video_signature(uri, crop=None, **options):
     # type: (Union[File, Uri], Optional[str], **Any) -> bytes
-    """Extracts MP7 Video Signature"""
+    """Extract MPEG-7 Video Signature
+
+    :param uri: File to process
+    :param crop: FFMPEG style cropsting "w:h:x:y"
+    :key video_fps: Frames per second for signature processing
+    :key video_hwaccel: Hadware acceleration mode (None or "auto")
+    :return: raw signature data
+    """
+
     opts = Opts(**options)
 
-    infile = uread.open_data(file)
+    infile = uread.open_data(uri)
     if not hasattr(infile, "name"):
         logger.error("Cannot extract signature without file.name")
         raise ValueError(f"Cannot extract signature from {type(infile)}")
@@ -245,16 +253,38 @@ def detect_video_crop(file_path):
     return mode(crops)
 
 
-def detect_video_scenes(video_file):
-    # type: (str) -> List[Tuple[FrameTimecode, FrameTimecode]]
-    """Compute Scenedetection and return cutpoints"""
-    video_manager = VideoManager([video_file])
+def detect_video_scenes(uri, **options):
+    # type: (Union[Uri, File], **Any) -> List[Tuple[FrameTimecode, FrameTimecode]]
+    """Compute Scenedetection and return cutpoints.
+
+    :param uri: Video file to be processed (file path or object)
+    :key video_scenes_th: Threshold for scene detection. Higher value -> less scenes.
+    :key video_scenes_fs: Frame Skip, number of frames to skip per processing step.
+    :key video_scenes_min: Minimum number of frames per scene.
+    :return: List of tuples with start end end FrameTimecode
+    """
+
+    opts = Opts(**options)
+
+    infile = uread.open_data(uri)
+    if not hasattr(infile, "name"):
+        raise ValueError(f"Cannot extract signature for {type(infile)}")
+    file_path = infile.name
+
+    video_manager = VideoManager([file_path])
     scene_manager = SceneManager()
-    scene_manager.add_detector(ContentDetector(threshold=50.0, min_scene_len=15))
+    scene_manager.add_detector(
+        ContentDetector(
+            threshold=opts.video_scenes_th,
+            min_scene_len=opts.video_scenes_min,
+        )
+    )
     base_timecode = video_manager.get_base_timecode()
     video_manager.set_downscale_factor()
     video_manager.start()
-    scene_manager.detect_scenes(frame_source=video_manager, show_progress=False)
+    scene_manager.detect_scenes(
+        frame_source=video_manager, show_progress=False, frame_skip=opts.video_scenes_fs
+    )
     return scene_manager.get_scene_list(base_timecode)
 
 

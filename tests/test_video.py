@@ -74,7 +74,14 @@ def test_code_video_no_crop():
 
 
 def test_code_video_granular_scenes():
-    result = code_video(SAMPLE, video_granular=True, video_scenes=True)
+    result = code_video(
+        SAMPLE,
+        video_granular=True,
+        video_scenes=True,
+        video_scenes_fs=0,
+        video_scenes_th=50,
+        video_scenes_min=15,
+    )
     assert result == {
         "code": "EMAVMHMC7RMJF6XZ",
         "crop": "176:96:0:24",
@@ -171,11 +178,14 @@ def test_compute_video_features_rolling():
 
 
 def test_compute_video_features_scenes():
-    signature = video.extract_video_signature(
-        SAMPLE, video_granular=True, video_scenes=True
-    )
+    signature = video.extract_video_signature(SAMPLE, video_fps=5, video_hwaccel=None)
     frames = mp7.read_ffmpeg_signature(signature)
-    scenes = video.detect_video_scenes(SAMPLE)
+    scenes = video.detect_video_scenes(
+        SAMPLE,
+        video_scenes_fs=0,
+        video_scenes_th=50,
+        video_scenes_min=15,
+    )
     scene_signatures = video.compute_video_features_scenes(frames, scenes)
     assert scene_signatures == (
         [
@@ -246,7 +256,12 @@ def test_detect_video_crop():
 
 
 def test_detect_video_scenes():
-    assert video.detect_video_scenes(SAMPLE) == [
+    assert video.detect_video_scenes(
+        SAMPLE,
+        video_scenes_fs=0,
+        video_scenes_th=50,
+        video_scenes_min=15,
+    ) == [
         (
             FrameTimecode(timecode=0, fps=24.000000),
             FrameTimecode(timecode=183, fps=24.000000),
