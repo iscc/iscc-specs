@@ -3,7 +3,7 @@
 from typing import Union
 from bitarray import bitarray
 from bitarray.util import count_xor, hex2ba
-from iscc.codec import Code, read_header, decode_base32
+from iscc.codec import Code, read_header, decode_base32, decode_base64
 
 
 # ISCC code in various possible representations
@@ -83,3 +83,8 @@ def distance_ba(a, b):
     # type: (bitarray, bitarray) -> int
     """Calculate hamming distance for bitarray objects of equal length."""
     return count_xor(a, b)
+
+
+def distance_b64(a, b):
+    """Calculate hamming distance for base64 encoded integers"""
+    return distance_bytes(decode_base64(a), decode_base64(b))

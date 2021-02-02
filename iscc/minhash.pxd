@@ -8,6 +8,7 @@ cdef uint32_t MAXH
 cdef uint64_t[64] MPA
 cdef uint64_t[64] MPB
 
+cpdef bytes minhash_64(list features)
 
 cpdef bytes minhash_256(list features)
 

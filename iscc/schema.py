@@ -145,12 +145,22 @@ class Opts(BaseSettings):
 
     data_bits: int = Field(64, description="Length of generated Data-Code in bits")
 
+    data_avg_chunk_size: int = Field(
+        1024, description="Average chunk size for data chunking."
+    )
+
+    data_granular: bool = Field(False, description="Return granular data features.")
+
+    data_granular_factor: int = Field(
+        64, description="Size of granular data chunks time average chunk size"
+    )
+
     instance_bits: int = Field(
         64, description="Length of generated Instance-Code in bits"
     )
 
     io_chunk_size: int = Field(
-        524288, description="Number of bytes per io read operation"
+        262144, description="Number of bytes per io read operation"
     )
 
 
@@ -228,6 +238,14 @@ class ISCC(BaseModel):
         description="GMT-specific standardized fingerprint for granular content "
         "recognition and matching purposes."
     )
+
+
+class DataCode(BaseModel):
+    code: str = Field(
+        ..., title="Instance-Code", description="Data-Code in standard representation."
+    )
+    features: Optional[List[str]] = Field(description="List of hashes per datachunk")
+    sizes: Optional[List[int]] = Field(description="Sizes of datachunks")
 
 
 class InstanceCode(BaseModel):

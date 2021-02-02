@@ -5,29 +5,43 @@ Content Defined Chunking
 Simple CDC implementation.
 Compatible with https://pypi.org/project/fastcdc/ v1.3.0
 """
+from typing import Any, Generator
 from iscc import uread
 from math import log2
-from iscc.schema import Readable
+from iscc.schema import Readable, Opts
 
 AVG_SIZE_DATA = 1024
 READ_SIZE = 262144
 
 
-def data_chunks(data, avg_size=AVG_SIZE_DATA, utf32=False, read_size=READ_SIZE):
-    # type: (Readable, int, bool, int) -> Generator
+def data_chunks(data, utf32=False, **options):
+    # type: (Readable, bool, **Any) -> Generator
+    """Split data into data-dependent chunks.
 
+    :param data: File, filepath or raw data to be chunked.
+    :param utf32: If true assume we are chunking text that is utf32 encoded.
+    :key data_avg_chunk_size: Target chunk size in bytes for data chunking.
+    :key text_avg_chunk_size: Target chunk size in bytes for text chunking.
+    :key io_chunk_size: Number of bytes to read per IO operation.
+    :return: A generator that yields chunks of data.
+    """
+
+    opts = Opts(**options)
     stream = uread.open_data(data)
 
-    buffer = stream.read(read_size)
+    buffer = stream.read(opts.io_chunk_size)
     if not buffer:
         yield b""
 
-    mi, ma, cs, mask_s, mask_l = get_params(avg_size)
+    if utf32:
+        mi, ma, cs, mask_s, mask_l = get_params(opts.text_avg_chunk_size)
+    else:
+        mi, ma, cs, mask_s, mask_l = get_params(opts.data_avg_chunk_size)
 
     buffer = memoryview(buffer)
     while buffer:
         if len(buffer) <= ma:
-            buffer = memoryview(bytes(buffer) + stream.read(read_size))
+            buffer = memoryview(bytes(buffer) + stream.read(opts.io_chunk_size))
         cut_point = cdc_offset(buffer, mi, ma, cs, mask_s, mask_l)
 
         # Make sure cut points are at 4-byte character boundaries

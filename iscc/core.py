@@ -9,7 +9,9 @@ from typing import BinaryIO, List, Optional, Union, Any
 from PIL import Image
 import xxhash
 from blake3 import blake3
-from iscc.minhash import minhash_256
+from iscc.minhash import minhash_64, minhash_256
+from more_itertools import chunked
+
 from iscc import text, image, audio, video
 from iscc.codec import (
     Code,
@@ -18,12 +20,13 @@ from iscc.codec import (
     ST_CC,
     VS,
     encode_base32,
+    encode_base64,
     write_header,
 )
 from iscc.cdc import data_chunks
 from iscc.mp7 import read_ffmpeg_signature
 from iscc.meta import meta_hash, title_from_tika
-from iscc.schema import GMT, Opts, Uri, Data, File, Readable
+from iscc.schema import GMT, Opts, Uri, Data, File, Readable, InstanceCode, DataCode
 from iscc.mediatype import guess_mediatype, mime_to_gmt
 import langdetect
 import langcodes
@@ -32,7 +35,6 @@ from iscc import uread
 
 
 # Set for deterministic language detection
-from schema import InstanceCode
 
 
 langdetect.DetectorFactory.seed = 0
@@ -110,7 +112,7 @@ def code_text(data, **options):
     # Content-Code
     txt = tika_result["content"] or ""
     txt = text.normalize_text(txt, lower=True)
-    th = text.hash_text(txt)
+    th = text.hash_text(txt, **options)
     header = write_header(MT.CONTENT, ST_CC.TEXT, VS.V0, nbits)
     code = encode_base32(header + th[:nbytes])
 
@@ -264,31 +266,55 @@ def code_video(file, **options):
 
 
 def code_data(data, **options):
-    # type: (Union[str, BinaryIO, bytes, bytearray], **Any) -> dict
+    # type: (Readable, **Any) -> DataCode
+    """Create ISCC Data-Code.
+
+    The Data-Code is a similarity preserving hash of the input data.
+
+    :param data: File, filepath or raw data used for Data-Code creation.
+    :key data_avg_chunk_size: Target chunk size in bytes for data chunking.
+    :key data_granular: Return granular features (one hash per chunk).
+    :key data_granular_factor: Size of granular data chunks times average chunk size.
+    :key io_chunk_size: Number of bytes to read per IO operation.
+    :return:
+    """
+
     opts = Opts(**options)
     nbits = opts.data_bits
     nbytes = nbits // 8
+    features = []
+    sizes = []
 
-    # 1. & 2. XxHash32 over CDC-Chunks
-    features = [xxhash.xxh32_intdigest(chunk) for chunk in data_chunks(data)]
+    for chunk in data_chunks(data, **options):
+        sizes.append(len(chunk))
+        features.append(xxhash.xxh32_intdigest(chunk))
 
-    # 3. Apply minimum_hash
     data_hash = minhash_256(features)
-
-    # 4. Encode with prepended component header
     header = write_header(MT.DATA, ST.NONE, VS.V0, nbits)
     code = encode_base32(header + data_hash[:nbytes])
-    return dict(code=code)
+    result = DataCode(code=code)
+
+    if opts.data_granular:
+        result.features = [
+            encode_base64(minhash_64(cf))
+            for cf in chunked(features, opts.data_granular_factor)
+        ]
+
+        result.sizes = [sum(fh) for fh in chunked(sizes, opts.data_granular_factor)]
+
+    return result
 
 
 def code_instance(data, **options):
     # type: (Readable, **Any) -> InstanceCode
-    """Create ISCC Instance-Code
+    """Create ISCC Instance-Code.
 
-    :param Readable data: File, filepath or raw data used for Instance-Code creation.
+    The Instance-Code is prefix of a cryptographic hash (blake3) of the input data.
+
+    :param data: File, filepath or raw data used for Instance-Code creation.
     :key instance_bits: Length of generated Instance-Code in bits (default 64).
     :key io_chunk_size: Number of bytes to read per IO operation.
-    :return: A dictionary including keys: code, datahash, filesize
+    :return: An InstanceCode object with attributes: code, datahash, filesize
     """
     opts = Opts(**options)
     nbits = opts.instance_bits

@@ -44,7 +44,7 @@ def compute(filepath, title="", extra=""):
         result.update(vid)
 
     # Data Code
-    result["code_data"] = iscc.code_data(filepath)["code"]
+    result["code_data"] = iscc.code_data(filepath).code
 
     # Instance Code
     instance_result = iscc.code_instance(filepath).dict()

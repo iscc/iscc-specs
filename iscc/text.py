@@ -2,10 +2,10 @@
 import unicodedata
 from typing import Any, Generator, Union
 import xxhash
+from iscc.schema import Opts
 from iscc.cdc import data_chunks
 from iscc.minhash import compress, minhash, minhash_256
 from iscc import uread
-from iscc.schema import Opts
 from iscc.utils import sliding_window
 from iscc.codec import encode_base64
 from iscc.schema import Readable
@@ -101,7 +101,7 @@ def chunk_text(text, **options):
     avg_size = opts.text_avg_chunk_size
     data = text.encode("utf-32-be")
     avg_size *= 4  # 4 bytes per character
-    for chunk in data_chunks(data, avg_size=avg_size, utf32=True):
+    for chunk in data_chunks(data, utf32=True, text_avg_chunk_size=avg_size):
         yield chunk.decode("utf-32-be")
 
 

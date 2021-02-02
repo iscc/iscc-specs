@@ -7,6 +7,12 @@ Minimum Hash
 ########################################################################################
 
 
+def minhash_64(features):
+    # type: (List[int]) -> bytes
+    """Create 64-bit minimum hash digest."""
+    return compress(minhash(features), 1)
+
+
 def minhash_256(features):
     # type: (List[int]) -> bytes
     """Create 256-bit minimum hash digest."""
@@ -14,7 +20,7 @@ def minhash_256(features):
 
 
 def minhash(features):
-    # type: (int) -> List[int]
+    # type: (List[int]) -> List[int]
     """Calculate a 64 dimensional minhash vector."""
     return [
         min([(((a * f + b) & MAXI64) % MPRIME) & MAXH for f in features])
