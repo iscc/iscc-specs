@@ -4,7 +4,7 @@ import mmap
 from io import BufferedReader, BytesIO
 from pathlib import Path
 from typing import BinaryIO, List, Optional, Union
-from pydantic import BaseSettings, BaseModel, Field
+from pydantic import BaseSettings, BaseModel, Field, constr
 
 
 Data = Union[bytes, bytearray, memoryview]
@@ -117,6 +117,12 @@ class Opts(BaseSettings):
         description="Minimum number of frames per scene.",
     )
 
+    video_scenes_previews: bool = Field(
+        False,
+        description="Generate and return per scene preview thumbnails when scene "
+        "detection is used.",
+    )
+
     video_window: int = Field(
         7, description="Seconds of video per granular feature in rolling window mode"
     )
@@ -222,6 +228,12 @@ class ISCC(BaseModel):
         description="GMT-specific standardized fingerprint for granular content "
         "recognition and matching purposes."
     )
+
+
+class InstanceCode(BaseModel):
+    code: str = Field(..., description="Instance-Code in standard representation.")
+    datahash: str = Field(description="Blake3 hash of resource (as hex-string).")
+    filesize: int = Field(description="File size in bytes.")
 
 
 if __name__ == "__main__":

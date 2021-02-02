@@ -32,6 +32,9 @@ from iscc import uread
 
 
 # Set for deterministic language detection
+from schema import InstanceCode
+
+
 langdetect.DetectorFactory.seed = 0
 
 
@@ -279,13 +282,21 @@ def code_data(data, **options):
 
 
 def code_instance(data, **options):
-    # type: (Readable, **Any) -> dict
+    # type: (Readable, **Any) -> InstanceCode
+    """Create ISCC Instance-Code
+
+    :param Readable data: File, filepath or raw data used for Instance-Code creation.
+    :key instance_bits: Length of generated Instance-Code in bits (default 64).
+    :key io_chunk_size: Number of bytes to read per IO operation.
+    :return: A dictionary including keys: code, datahash, filesize
+    """
     opts = Opts(**options)
     nbits = opts.instance_bits
     nbytes = nbits // 8
     filesize = 0
     b3 = blake3()
     stream = uread.open_data(data)
+
     buffer = stream.read(opts.io_chunk_size)
     while buffer:
         filesize += len(buffer)
@@ -297,4 +308,4 @@ def code_instance(data, **options):
     code = encode_base32(header + datahash_digest[:nbytes])
     datahash = datahash_digest.hex()
 
-    return dict(code=code, datahash=datahash, filesize=filesize)
+    return InstanceCode(code=code, datahash=datahash, filesize=filesize)

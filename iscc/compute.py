@@ -47,7 +47,7 @@ def compute(filepath, title="", extra=""):
     result["code_data"] = iscc.code_data(filepath)["code"]
 
     # Instance Code
-    instance_result = iscc.code_instance(filepath)
+    instance_result = iscc.code_instance(filepath).dict()
     instance_result["code_instance"] = instance_result.pop("code")
     result.update(instance_result)
 

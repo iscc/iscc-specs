@@ -13,6 +13,7 @@ import imageio_ffmpeg
 from statistics import mode
 from langcodes import standardize_tag
 from scenedetect import ContentDetector, FrameTimecode, SceneManager, VideoManager
+from scenedetect.scene_manager import save_images
 from iscc import uread
 from iscc.schema import Opts, Readable, File, Uri
 from iscc.codec import encode_base64
@@ -261,7 +262,8 @@ def detect_video_scenes(uri, **options):
     :key video_scenes_th: Threshold for scene detection. Higher value -> less scenes.
     :key video_scenes_fs: Frame Skip, number of frames to skip per processing step.
     :key video_scenes_min: Minimum number of frames per scene.
-    :return: List of tuples with start end end FrameTimecode
+    :key video_scenes_previews: Generate per scene preview thumbnails.
+    :return: List of tuples with start end end FrameTimecode.
     """
 
     opts = Opts(**options)
