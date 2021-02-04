@@ -49,7 +49,7 @@ def extract_audio_features(data, **options):
 
 
 def encode_audio_features(features):
-    # type: (List[int]) -> List[str]
+    # type: (List[int]) -> dict
     """Pack into 64-bit base encoded features.
 
     Note: Last feature will be 32-bit if number of features is uneven.
@@ -60,7 +60,7 @@ def encode_audio_features(features):
         for int_feature in int_features:
             digest += int_feature.to_bytes(4, "big", signed=True)
         fingerprints.append(encode_base64(digest))
-    return fingerprints
+    return dict(features=fingerprints, type="audio")
 
 
 FPCALC_VERSION = "1.5.0"
