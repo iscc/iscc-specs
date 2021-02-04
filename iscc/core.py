@@ -197,8 +197,8 @@ def code_audio(data, **options):
     return result
 
 
-def code_video(file, **options):
-    # type: (File, **Any) -> dict
+def code_video(uri, **options):
+    # type: (Union[Uri, File], **Any) -> dict
     """Compute Content-ID video.
 
     :param file: The video file.
@@ -220,10 +220,12 @@ def code_video(file, **options):
     opts = Opts(**options)
     nbits = opts.video_bits
 
-    result = video.extract_video_metadata(file)
+    result = {}
+    metadata = video.extract_video_metadata(uri)
+    result.update(metadata)
 
-    crop_value = video.detect_video_crop(file) if opts.video_crop else None
-    signature = video.extract_video_signature(file, crop_value, **options)
+    crop_value = video.detect_video_crop(uri) if opts.video_crop else None
+    signature = video.extract_video_signature(uri, crop_value, **options)
     logger.debug(f"mp7 signature size {naturalsize(len(signature))}")
     frames = read_ffmpeg_signature(signature)
     logger.debug(f"mp7 signature frames {len(frames)}")
@@ -240,14 +242,14 @@ def code_video(file, **options):
         result["mp7sig"] = base64.b64encode(signature).decode("ascii")
 
     if opts.video_preview:
-        img_raw = video.extract_video_preview(file)
+        img_raw = video.extract_video_preview(uri)
         result["preview"] = image.encode_image_to_data_uri(img_raw)
 
     if opts.video_granular is False:
         return result
 
     if opts.video_scenes:
-        cutpoints = video.detect_video_scenes(file, **options)
+        cutpoints = video.detect_video_scenes(uri, **options)
         features, durations = video.compute_video_features_scenes(frames, cutpoints)
         result["features"] = features
         result["sizes"] = durations

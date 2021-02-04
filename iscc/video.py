@@ -226,12 +226,18 @@ def compute_video_features_scenes(frames, scenes):
     return features, durations
 
 
-def detect_video_crop(file_path):
-    # type: (str) -> str
+def detect_video_crop(uri):
+    # type: (Union[Uri, File]) -> str
     """
     Detect crop value for video.
     Example result: crop=176:96:0:24
     """
+
+    infile = uread.open_data(uri)
+    if not hasattr(infile, "name"):
+        raise ValueError(f"Cannot extract signature for {type(infile)}")
+    file_path = infile.name
+
     cmd = [
         FFMPEG,
         "-t",
