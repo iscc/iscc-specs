@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 """ISCC Reference Implementation"""
 import iscc
+from os.path import basename
 import base64
 import io
 from PIL.ImageOps import exif_transpose
@@ -11,8 +12,6 @@ from PIL import Image
 import xxhash
 from blake3 import blake3
 from iscc.minhash import minhash_64, minhash_256
-from more_itertools import chunked
-
 from iscc import text, image, audio, video
 from iscc.codec import (
     Code,
@@ -21,7 +20,6 @@ from iscc.codec import (
     ST_CC,
     VS,
     encode_base32,
-    encode_base64,
     write_header,
     compose_iscc,
 )
@@ -48,12 +46,30 @@ from iscc import uread
 def code_iscc(uri, title=None, extra=None, **options):
     # type: (Union[Uri, File], Optional[str], Optional[exec()], **Any) -> dict
     """Create a full ISCC Code"""
+    opts = Opts(**options)
+    result = {}
+    features = []
+
     file_obj = uread.open_data(uri)
     file_name = getattr(file_obj, "name", None)
+    if file_name:
+        result["filename"] = basename(file_name)
 
     instance = code_instance(file_obj, **options)
+    result.update(instance)
+
     data = code_data(file_obj, **options)
+    if "features" in data:
+        features.append(data.pop("features"))
+    result.update(data)
+
     content = code_content(file_obj, **options)
+    if "features" in content:
+        features.append(content.pop("features"))
+    result.update(content)
+
+    if features:
+        result["features"] = features
 
     if title is None:
         title = content.get("title")
@@ -63,17 +79,15 @@ def code_iscc(uri, title=None, extra=None, **options):
     if extra is None:
         extra = ""
     meta = code_meta(title, extra, **options)
+    result.update(meta)
+    del result["code"]
 
     iscc_code_obj = compose_iscc(
         [meta["code"], content["code"], data["code"], instance["code"]]
     )
-    iscc_obj = dict(iscc=iscc_code_obj.code)
-    iscc_obj.update(instance)
-    iscc_obj.update(data)
-    iscc_obj.update(content)
-    iscc_obj.update(meta)
-    del iscc_obj["code"]
-    return iscc_obj
+    result["iscc"] = iscc_code_obj.code
+
+    return result
 
 
 def code_meta(title, extra="", **options):
@@ -323,12 +337,6 @@ def code_data(data, **options):
         sizes, features = iscc.extract_data_features(data, **options)
         features = iscc.encode_data_features(sizes, features)
         result["features"] = features
-        # result["features"] = [
-        #     encode_base64(minhash_64(cf))
-        #     for cf in chunked(features, opts.data_granular_factor)
-        # ]
-        #
-        # result["sizes"] = [sum(fh) for fh in chunked(sizes, opts.data_granular_factor)]
 
     return result
 

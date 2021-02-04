@@ -108,7 +108,7 @@ class Opts(BaseSettings):
     video_granular: bool = Field(False, description="Generate granular features")
 
     video_scenes: bool = Field(
-        False, description="Use scene detection for granular features"
+        True, description="Use scene detection for granular features"
     )
 
     video_scenes_fs: int = Field(
