@@ -22,6 +22,12 @@ class Opts(BaseSettings):
     """Options for ISCC generation"""
 
     meta_bits: int = Field(64, description="Length of generated Meta-ID in bits")
+
+    meta_title_from_uri: bool = Field(
+        True,
+        description="Use normalized filename as title if we have nor explicit title and also no title from metadata extraction.",
+    )
+
     meta_trim_title: int = Field(
         128, description="Trim title length to this mumber of bytes"
     )
@@ -42,6 +48,11 @@ class Opts(BaseSettings):
     text_avg_chunk_size: int = Field(
         1024,
         description="Avg number of characters per text chunk for granular fingerprints",
+    )
+
+    text_guess_title: bool = Field(
+        True,
+        description="Use first line from text as title if we don´t have an explicit title",
     )
 
     image_bits: int = Field(
@@ -238,6 +249,27 @@ class ISCC(BaseModel):
         description="GMT-specific standardized fingerprint for granular content "
         "recognition and matching purposes."
     )
+
+
+class TextCode(BaseModel):
+    code: str = Field(
+        ...,
+        title="Text-Code",
+        description="Content-Code Text in standard representation.",
+    )
+
+    title: Optional[str] = Field(description="The title of the text.")
+
+    characters: Optional[int] = Field(
+        description="Number of text characters (code points after Unicode "
+        "normalization) (GMT Text only)."
+    )
+
+    language: Optional[str] = Field(description="Main language of content (BCP-47)")
+
+    features: Optional[List[str]] = Field(description="List of hashes per text chunk")
+
+    sizes: Optional[List[int]] = Field(description="Sizes of text chunks in characters")
 
 
 class DataCode(BaseModel):

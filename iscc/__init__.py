@@ -21,4 +21,5 @@ from iscc.core import *
 from iscc.metrics import distance
 from iscc.image import normalize_image
 from iscc.minhash import minhash
-from iscc.text import normalize_text, trim_text
+from iscc.text import *
+from iscc.wtahash import *

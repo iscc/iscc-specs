@@ -38,35 +38,3 @@ def meta_hash(title, extra=""):
         )
 
     return simhash_digest[:32]
-
-
-def title_from_tika(tika_result: dict, guess=False, uri=None):
-    """Extract title from tika result. Fallback to uri."""
-    title = ""
-    meta = tika_result.get("metadata")
-    mime_type = clean_mime(meta.get("Content-Type"))
-    gmt = mime_to_gmt(mime_type)
-
-    if meta:
-        title = meta.get("dc:title", "")
-        title = title[0].strip() if isinstance(title, list) else title.strip()
-        if not title:
-            title = meta.get("title", "")
-            title = title[0].strip() if isinstance(title, list) else title.strip()
-
-    # See if string would survive normalization
-    norm_title = normalize_text(title)
-
-    if not norm_title and guess and gmt == "text":
-        content = tika_result.get("content", "")
-        if content is not None:
-            first_line = content.strip().splitlines()[0]
-            title = trim_text(normalize_text(first_line), Opts().meta_trim_title)
-
-    if not title and uri is not None:
-        result = urlparse(uri)
-        base = basename(result.path)
-        title = splitext(base)[0]
-        title = title.replace("-", " ")
-        title = title.replace("_", " ")
-    return title

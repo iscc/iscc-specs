@@ -25,24 +25,16 @@ from iscc.codec import (
 )
 from iscc.cdc import data_chunks
 from iscc.mp7 import read_ffmpeg_signature
-from iscc.meta import meta_hash, title_from_tika
+from iscc.meta import meta_hash
 from iscc.schema import GMT, Opts, Uri, Data, File, Readable, InstanceCode, DataCode
 from iscc.mediatype import guess_mediatype, mime_to_gmt
-import langdetect
-import langcodes
-from tika import parser as tika_parser
 from iscc import uread
-
-
-# Set for deterministic language detection
-
-
-langdetect.DetectorFactory.seed = 0
 
 
 ###############################################################################
 # High-Level ISCC Code generator functions                                   #
 ###############################################################################
+from schema import TextCode
 
 
 def code_iscc():
@@ -59,8 +51,8 @@ def code_meta(title, extra="", **options):
     opts = Opts(**options)
     nbits = opts.meta_bits
     nbytes = nbits // 8
-    title_norm = text.normalize_text(title, lower=False)
-    extra_norm = text.normalize_text(extra, lower=False)
+    title_norm = text.normalize_text(title)
+    extra_norm = text.normalize_text(extra)
     title_trimmed = text.trim_text(title_norm, opts.meta_trim_title)
     extra_trimmed = text.trim_text(extra_norm, opts.meta_trim_extra)
     mhash = meta_hash(title_trimmed, extra_trimmed)
@@ -94,38 +86,35 @@ def code_content(data, **options):
 
 
 def code_text(data, **options):
-    # type: (Union[Data, Uri], **Any) -> dict
-    """Generate Content-ID Text"""
+    # type: (Readable, **Any) -> dict
+    """Generate Content-ID Text
+
+    :param data: Any kind of text document
+    :key text_guess_title: whether to guess the title from the text itself as fallback.
+    :key meta_trim_title: Max number of bytes for utf-8 encoded title.
+    :key text_avg_chunk_size: Avg. number of chars per text chunk to be hashed.
+    :key text_ngram_size: Sliding window size in number of characters.
+    :key text_granular: Wether to extract granular text features
+    """
     opts = Opts(**options)
     nbits = opts.text_bits
     nbytes = nbits // 8
     result = {}
 
-    with uread.open_data(data) as f:
-        tika_result = tika_parser.from_buffer(f.read())
+    f = uread.open_data(data)
+    metadata = text.extract_text_metadata(f, **options)
+    result.update(metadata)
+    text_raw = text.extract_text(f)
+    text_norm = text.normalize_text(text_raw)
+    text_hash = text.hash_text(text_norm, **options)
 
-    # Metadata
-    title = title_from_tika(tika_result, guess=True)
-    if title:
-        result["title"] = title
-
-    # Content-Code
-    txt = tika_result["content"] or ""
-    txt = text.normalize_text(txt, lower=True)
-    th = text.hash_text(txt, **options)
     header = write_header(MT.CONTENT, ST_CC.TEXT, VS.V0, nbits)
-    code = encode_base32(header + th[:nbytes])
-
+    code = encode_base32(header + text_hash[:nbytes])
     result["code"] = code
-    result["characters"] = len(txt)
-
-    try:
-        result["language"] = langcodes.standardize_tag(langdetect.detect(txt))
-    except Exception as e:
-        logger.warning(f"Language detection failed: {e}")
 
     if opts.text_granular:
-        result["features"] = text.compute_text_features(txt, **options)
+        features = text.extract_text_features(text_norm, **options)
+        result.update(features)
 
     return result
 

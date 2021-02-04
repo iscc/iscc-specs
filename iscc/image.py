@@ -34,13 +34,13 @@ def extract_image_metadata(data):
         if k not in IMAGE_META_MAP:
             continue
         if isinstance(v, list):
-            v = tuple(normalize_text(item, lower=False) for item in v)
+            v = tuple(normalize_text(item) for item in v)
             if not v:
                 continue
             v = ";".join(v)
             v = v.replace('lang="xdefault"', "").strip()
         elif isinstance(v, str):
-            v = normalize_text(v, lower=False)
+            v = normalize_text(v)
             v = v.replace('lang="xdefault"', "").strip()
             if not v:
                 continue

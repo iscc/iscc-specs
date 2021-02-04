@@ -3692,19 +3692,19 @@
       "inputs": [
         "Ç 가 Ω ℍ ① ︷ i⁹ ¼ ǆ ⫝̸ ȴ ȷ ɂ ć"
       ],
-      "outputs": "c 가 ω H 1 i9 1⁄4 dž ⫝ ȴ ȷ ɂ c"
+      "outputs": "C 가 Ω H 1 i9 1⁄4 dž ⫝ ȴ ȷ ɂ c"
     },
     "test_002_tricky": {
       "inputs": [
         "  Iñtërnâtiôn\nàlizætiøn☃💩 –  is a tric\t ky   thing!\r"
       ],
-      "outputs": "internation alizætiøn☃💩 is a tric ky thing!"
+      "outputs": "Internation alizætiøn☃💩 is a tric ky thing!"
     },
     "test_002_tricky_ws": {
       "inputs": [
         "  Iñtërnâtiôn\nàlizætiøn☃💩 –  is a tric\t ky   thing!\r"
       ],
-      "outputs": "internation alizætiøn☃💩 is a tric ky thing!"
+      "outputs": "Internation alizætiøn☃💩 is a tric ky thing!"
     }
   },
   "trim_text": {

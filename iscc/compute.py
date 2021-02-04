@@ -2,7 +2,7 @@
 """High Level ISCC Generator"""
 from tika import parser, detector
 from iscc.mediatype import SUPPORTED_MEDIATYPES, mime_to_gmt
-from iscc.meta import title_from_tika
+from iscc.text import _title_from_tika
 from iscc.video import extract_video_metadata
 import iscc
 
@@ -16,7 +16,7 @@ def compute(filepath, title="", extra=""):
     tika_result = parser.from_file(filepath)
 
     if not title:
-        title = title_from_tika(tika_result, guess=True, uri=filepath)
+        title = _title_from_tika(tika_result, text_guess_title=True, uri=filepath)
 
     meta_result = iscc.code_meta(title, extra)
     meta_result["code_meta"] = meta_result.pop("code")
