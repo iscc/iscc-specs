@@ -318,7 +318,8 @@ class Code:
         return cls((mt, st, vs, ln, data))
 
 
-def compose_iscc(codes: List[Code]) -> Code:
+def compose_iscc(codes: List[Union[Code, str]]) -> Code:
+    codes = [Code(c) if isinstance(c, str) else c for c in codes]
     assert len(set(c.version for c in codes)), "Codes must have same version"
     assert len(codes) in (2, 4), "Can only compose ISCC from 2 or 4 codes"
     codes = sorted(codes, key=attrgetter("maintype"))

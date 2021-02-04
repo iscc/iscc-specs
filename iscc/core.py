@@ -22,6 +22,7 @@ from iscc.codec import (
     encode_base32,
     encode_base64,
     write_header,
+    compose_iscc,
 )
 from iscc.cdc import data_chunks
 from iscc.mp7 import read_ffmpeg_signature
@@ -43,8 +44,35 @@ from iscc import uread
 ###############################################################################
 
 
-def code_iscc():
-    pass
+def code_iscc(uri, title=None, extra=None, **options):
+    # type: (Union[Uri, File], Optional[str], Optional[exec()], **Any) -> dict
+    """Create a full ISCC Code"""
+    file_obj = uread.open_data(uri)
+    file_name = getattr(file_obj, "name", None)
+
+    instance = code_instance(file_obj, **options)
+    data = code_data(file_obj, **options)
+    content = code_content(file_obj, **options)
+
+    if title is None:
+        title = content.get("title")
+    if not title and file_name:
+        title = text.name_from_uri(file_name)
+
+    if extra is None:
+        extra = ""
+    meta = code_meta(title, extra, **options)
+
+    iscc_code_obj = compose_iscc(
+        [meta["code"], content["code"], data["code"], instance["code"]]
+    )
+    iscc_obj = dict(iscc=iscc_code_obj.code)
+    iscc_obj.update(instance)
+    iscc_obj.update(data)
+    iscc_obj.update(content)
+    iscc_obj.update(meta)
+    del iscc_obj["code"]
+    return iscc_obj
 
 
 def code_meta(title, extra="", **options):
@@ -75,7 +103,7 @@ def code_meta(title, extra="", **options):
 
 
 def code_content(data, **options):
-    # type: (Union[Uri, Data], **Any) -> dict
+    # type: (Union[Uri, File], **Any) -> dict
     """Detect mediatype and create corresponding Content-Code."""
     mediatype = guess_mediatype(data)
     gmt = mime_to_gmt(mediatype)
