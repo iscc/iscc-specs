@@ -44,4 +44,4 @@ def encode_data_features(sizes, features, **options):
         encode_base64(minhash_64(cf))
         for cf in chunked(features, opts.data_granular_factor)
     ]
-    return dict(sizes=encoded_sizes, features=encoded_features)
+    return dict(features=encoded_features, sizes=encoded_sizes, type="data")

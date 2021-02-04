@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 """ISCC Reference Implementation"""
+import iscc
 import base64
 import io
 from PIL.ImageOps import exif_transpose
@@ -319,12 +320,15 @@ def code_data(data, **options):
     result = dict(code=code)
 
     if opts.data_granular:
-        result["features"] = [
-            encode_base64(minhash_64(cf))
-            for cf in chunked(features, opts.data_granular_factor)
-        ]
-
-        result["sizes"] = [sum(fh) for fh in chunked(sizes, opts.data_granular_factor)]
+        sizes, features = iscc.extract_data_features(data, **options)
+        features = iscc.encode_data_features(sizes, features)
+        result["features"] = features
+        # result["features"] = [
+        #     encode_base64(minhash_64(cf))
+        #     for cf in chunked(features, opts.data_granular_factor)
+        # ]
+        #
+        # result["sizes"] = [sum(fh) for fh in chunked(sizes, opts.data_granular_factor)]
 
     return result
 

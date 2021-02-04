@@ -23,3 +23,4 @@ from iscc.image import *
 from iscc.minhash import minhash
 from iscc.text import *
 from iscc.wtahash import *
+from iscc.data import *
