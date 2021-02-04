@@ -168,7 +168,7 @@ def hash_video(features, **options):
 
 
 def compute_video_features_rolling(frames, **options):
-    # type: (List[Frame], **int) -> List[str]
+    # type: (List[Frame], **int) -> dict
     """
     Compute video signatures based on rolling window.
 
@@ -195,11 +195,11 @@ def compute_video_features_rolling(frames, **options):
             if frame.elapsed > start + window:
                 sigs.append(encode_base64(hash_video(segment_frames)))
                 break
-    return sigs
+    return dict(features=sigs, window=window, overlap=overlap)
 
 
 def compute_video_features_scenes(frames, scenes):
-    # type: (List[Frame], List[Scene]) -> Tuple[List[str], List[float]]
+    # type: (List[Frame], List[Scene]) -> dict
     """Compute video signatures for individual scenes in video.
     Returns features and durations as tuple.
     """
@@ -223,7 +223,7 @@ def compute_video_features_scenes(frames, scenes):
             except IndexError:
                 break
 
-    return features, durations
+    return dict(features=features, sizes=durations, type="video")
 
 
 def detect_video_crop(uri):

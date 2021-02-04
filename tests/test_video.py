@@ -86,22 +86,25 @@ def test_code_video_granular_scenes():
         "code": "EMAVMHMC7RMJF6XZ",
         "crop": "176:96:0:24",
         "duration": 60.042,
-        "features": [
-            "DhuCPB1advw",
-            "OgmyIcqHmyU",
-            "Vo5C1g8Yvu0",
-            "dh2g_g_Sumk",
-            "V5-AvcCOpn8",
-            "lJgzpvjPltM",
-            "Hp4D_XrSdtk",
-            "Qpkise6nWlM",
-            "Vi2i7PwrGvM",
-        ],
+        "features": {
+            "features": [
+                "DhuCPB1advw",
+                "OgmyIcqHmyU",
+                "Vo5C1g8Yvu0",
+                "dh2g_g_Sumk",
+                "V5-AvcCOpn8",
+                "lJgzpvjPltM",
+                "Hp4D_XrSdtk",
+                "Qpkise6nWlM",
+                "Vi2i7PwrGvM",
+            ],
+            "sizes": [7.625, 2.5, 5.083, 1.25, 3.75, 2.792, 15.458, 8.167, 13.042],
+            "type": "video",
+        },
         "fps": 24.0,
         "height": 144,
         "language": "en",
         "signature_fps": 5,
-        "sizes": [7.625, 2.5, 5.083, 1.25, 3.75, 2.792, 15.458, 8.167, 13.042],
         "title": "Kali by Anokato - Spiral Sessions 2019",
         "width": 176,
     }
@@ -113,21 +116,25 @@ def test_code_video_granular_rolling():
         "code": "EMAVMHMC7RMJF6XZ",
         "crop": "176:96:0:24",
         "duration": 60.042,
-        "features": [
-            "ThqCHh1advw",
-            "Hg8iCIgavm0",
-            "Ug5ylg8Yvm0",
-            "Vh-A9gXavm0",
-            "Vp6j59COtlM",
-            "HpoD_3jS8FE",
-            "Xp8D_fjS_NE",
-            "XhcDvfjSXto",
-            "XBiCvX4Ydvg",
-            "Qhgi8c43UtE",
-            "Qpki_fyjmHM",
-            "Vi2iDFg7GoM",
-            "Fo2ibPyjGVM",
-        ],
+        "features": {
+            "features": [
+                "ThqCHh1advw",
+                "Hg8iCIgavm0",
+                "Ug5ylg8Yvm0",
+                "Vh-A9gXavm0",
+                "Vp6j59COtlM",
+                "HpoD_3jS8FE",
+                "Xp8D_fjS_NE",
+                "XhcDvfjSXto",
+                "XBiCvX4Ydvg",
+                "Qhgi8c43UtE",
+                "Qpki_fyjmHM",
+                "Vi2iDFg7GoM",
+                "Fo2ibPyjGVM",
+            ],
+            "overlap": 3,
+            "window": 7,
+        },
         "fps": 24.0,
         "height": 144,
         "language": "en",
@@ -160,21 +167,25 @@ def test_compute_video_features_rolling():
     signature = video.extract_video_signature(SAMPLE)
     frames = mp7.read_ffmpeg_signature(signature)
     rolling_sigs = video.compute_video_features_rolling(frames)
-    assert rolling_sigs == [
-        "XxqT9x1b8nw",
-        "Hi7Wfg0a8u0",
-        "Vg7U8A0e8uw",
-        "Vg6E_AUU8uw",
-        "fhqH3HUQ9vU",
-        "XgoH93VacvE",
-        "Xg4X9N1Sc3g",
-        "Hi4X9P1acng",
-        "H2qRtdwbcvk",
-        "XGoAl8YVcqU",
-        "Xk4A3dQVUqQ",
-        "U06SYFUdUqs",
-        "f06CXFQVUrU",
-    ]
+    assert rolling_sigs == {
+        "features": [
+            "XxqT9x1b8nw",
+            "Hi7Wfg0a8u0",
+            "Vg7U8A0e8uw",
+            "Vg6E_AUU8uw",
+            "fhqH3HUQ9vU",
+            "XgoH93VacvE",
+            "Xg4X9N1Sc3g",
+            "Hi4X9P1acng",
+            "H2qRtdwbcvk",
+            "XGoAl8YVcqU",
+            "Xk4A3dQVUqQ",
+            "U06SYFUdUqs",
+            "f06CXFQVUrU",
+        ],
+        "overlap": 3,
+        "window": 7,
+    }
 
 
 def test_compute_video_features_scenes():
@@ -187,8 +198,8 @@ def test_compute_video_features_scenes():
         video_scenes_min=15,
     )
     scene_signatures = video.compute_video_features_scenes(frames, scenes)
-    assert scene_signatures == (
-        [
+    assert scene_signatures == {
+        "features": [
             "XxqT9x1a8vw",
             "HGqWS0AW8oQ",
             "Vg7U9A0esuw",
@@ -199,8 +210,9 @@ def test_compute_video_features_scenes():
             "XkoAn8YVcqU",
             "V06CXBQdUrU",
         ],
-        [7.625, 2.5, 5.083, 1.25, 3.75, 2.792, 15.458, 8.167, 13.042],
-    )
+        "sizes": [7.625, 2.5, 5.083, 1.25, 3.75, 2.792, 15.458, 8.167, 13.042],
+        "type": "video",
+    }
 
 
 def test_extract_video_signature_readables():

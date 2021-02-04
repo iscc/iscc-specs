@@ -278,9 +278,8 @@ def code_video(uri, **options):
 
     if opts.video_scenes:
         cutpoints = video.detect_video_scenes(uri, **options)
-        features, durations = video.compute_video_features_scenes(frames, cutpoints)
+        features = video.compute_video_features_scenes(frames, cutpoints)
         result["features"] = features
-        result["sizes"] = durations
     else:
         features = video.compute_video_features_rolling(frames, **options)
         result["features"] = features
