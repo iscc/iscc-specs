@@ -1,42 +1,41 @@
 # -*- coding: utf-8 -*-
 import math
-from iscc import image
+import iscc
 from iscc_samples import images
 from PIL import Image
-from iscc.core import code_image
 from iscc.codec import Code
 from tests.test_readables import image_readables
 
 
 def test_code_image_plain():
-    assert code_image(images()[0]) == {
-        "code": "EEA4GQZQTY6J5DTH",
-        "height": 133,
-        "width": 200,
-    }
+    assert iscc.code_image(images()[0]) == dict(
+        code="EEA4GQZQTY6J5DTH",
+        width=200,
+        height=133,
+    )
 
 
 def test_code_image_with_meta():
-    assert code_image(images()[2]) == {
-        "code": "EEA4GQZQTY6J5DTH",
-        "height": 133,
-        "title": "Concentrated Cat",
-        "width": 200,
-    }
+    assert iscc.code_image(images()[2]) == dict(
+        code="EEA4GQZQTY6J5DTH",
+        title="Concentrated Cat",
+        width=200,
+        height=133,
+    )
 
 
 def test_code_image_bits32():
-    cidi32 = code_image(images()[0], image_bits=32)
-    assert cidi32 == {"code": "EEAMGQZQTY", "height": 133, "width": 200}
+    cidi32 = iscc.code_image(images()[0], image_bits=32)
+    assert cidi32 == dict(code="EEAMGQZQTY", width=200, height=133)
     c1 = Code(cidi32["code"])
     assert c1.length == 32
-    cidi64 = code_image(images()[0], image_bits=32)
+    cidi64 = iscc.code_image(images()[0], image_bits=32)
     c2 = Code(cidi64["code"])
     assert c1 ^ c2 == 0
 
 
 def test_code_image_preview():
-    cidi = code_image(images()[0], image_preview=True)
+    cidi = iscc.code_image(images()[0], image_preview=True)
     assert cidi == {
         "code": "EEA4GQZQTY6J5DTH",
         "height": 133,
@@ -65,14 +64,14 @@ def test_code_image_preview():
 
 
 def test_normalize_image_inputs():
-    path_obj = image.normalize_image(images()[0])
-    path_str = image.normalize_image(images()[0].as_posix())
-    pil_obj = image.normalize_image(Image.open(images()[0]))
+    path_obj = iscc.normalize_image(images()[0])
+    path_str = iscc.normalize_image(images()[0].as_posix())
+    pil_obj = iscc.normalize_image(Image.open(images()[0]))
     assert path_obj == path_str == pil_obj
 
 
 def test_normalize_image_dimensions():
-    pixels = image.normalize_image(images()[0])
+    pixels = iscc.normalize_image(images()[0])
     assert len(pixels) == 32
     assert len(pixels[0]) == 32
 
@@ -80,8 +79,8 @@ def test_normalize_image_dimensions():
 def test_hash_image_reference():
     image_hashes = []
     for img_path in images():
-        pixels = image.normalize_image(img_path)
-        image_hash = image.hash_image(pixels)
+        pixels = iscc.normalize_image(img_path)
+        image_hash = iscc.hash_image(pixels)
         image_hashes.append(image_hash.hex())
     assert image_hashes == [
         "c343309e3c9e8e67",
@@ -94,15 +93,15 @@ def test_hash_image_reference():
 
 
 def test_extract_image_metadata():
-    assert image.extract_image_metadata(images()[0].as_posix()) is None
-    assert image.extract_image_metadata(images()[2].as_posix()) == {
+    assert iscc.extract_image_metadata(images()[0].as_posix()) is None
+    assert iscc.extract_image_metadata(images()[2].as_posix()) == {
         "title": "Concentrated Cat"
     }
 
 
 def test_extract_image_metadata_readables():
     for readable in image_readables():
-        assert image.extract_image_metadata(readable) == {"title": "Concentrated Cat"}
+        assert iscc.extract_image_metadata(readable) == {"title": "Concentrated Cat"}
 
 
 def test_pi():
@@ -111,7 +110,7 @@ def test_pi():
 
 
 def test_normalize_image():
-    assert image.normalize_image("file_image_cat.jpg") == [
+    assert iscc.normalize_image("file_image_cat.jpg") == [
         [
             25,
             18,

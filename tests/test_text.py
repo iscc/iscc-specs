@@ -56,41 +56,40 @@ def test_extract_text_metadata():
 
 def test_code_text_empty():
     r64 = iscc.code_text(b"")
-    assert r64.dict(exclude_unset=True) == dict(code="EAASL4F2WZY7KBXB", characters=0)
+    assert TextCode(**r64)
+    assert r64 == dict(code="EAASL4F2WZY7KBXB", characters=0)
     r128 = iscc.code_text(b"", text_bits=128)
-    assert r128.dict(exclude_unset=True) == dict(
-        code="EABSL4F2WZY7KBXBYUZPREWZ26IXU", characters=0
-    )
+    assert r128 == dict(code="EABSL4F2WZY7KBXBYUZPREWZ26IXU", characters=0)
 
     with pytest.raises(AssertionError):
-        distance(r64.code, r128.code)
+        distance(r64["code"], r128["code"])
 
-    assert distance(Code(r64.code), Code(r128.code), mixed=True) == 0
+    assert distance(Code(r64["code"]), Code(r128["code"]), mixed=True) == 0
 
 
 def test_code_text_default():
     a = iscc.code_text(TEXT_A.encode("utf-8"))
-    assert a.dict(exclude_unset=True) == {
+    assert a == {
         "characters": 291,
         "code": "EAAR7BVKOFMBVNE4",
         "language": "en",
         "title": "Their most significant and usefull property of similaritypreserving",
     }
     b = iscc.code_text(TEXT_B.encode("utf-8"))
-    assert b.dict(exclude_unset=True) == {
+    assert b == {
         "characters": 289,
         "code": "EAAR7BVKOFMBVNGM",
         "language": "en",
         "title": "The most significant and usefull property of similaritypreserving",
     }
-    assert distance(a.code, b.code) == 2
+    assert distance(a["code"], b["code"]) == 2
 
 
 def test_code_text_granular():
     a = iscc.code_text(
         TEXT_A.encode("utf-8"), text_granular=True, text_avg_chunk_size=100
     )
-    assert a.dict(exclude_unset=True) == {
+    assert a == {
         "characters": 291,
         "code": "EAAR7BVKOFMBVNE4",
         "features": ["XYy_cVAdfP8", "7LaIeVSCsaA", "_pZVWTpBYOY", "kSem2vF2HOo"],
@@ -101,7 +100,7 @@ def test_code_text_granular():
     b = iscc.code_text(
         TEXT_B.encode("utf-8"), text_granular=True, text_avg_chunk_size=100
     )
-    assert b.dict(exclude_unset=True) == {
+    assert b == {
         "characters": 289,
         "code": "EAAR7BVKOFMBVNGM",
         "features": ["XY29cVA9fO4", "7LaIeVSCsaA", "_pZVWTpBYOY", "kSem2vF2HOo"],
@@ -109,7 +108,7 @@ def test_code_text_granular():
         "sizes": [76, 91, 66, 56],
         "title": "The most significant and usefull property of similaritypreserving",
     }
-    assert distance(a.code, b.code) == 2
+    assert distance(a["code"], b["code"]) == 2
 
 
 def test_hash_text():

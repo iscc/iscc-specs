@@ -33,10 +33,6 @@ from iscc.schema import (
     Data,
     File,
     Readable,
-    InstanceCode,
-    DataCode,
-    TextCode,
-    CodeResult,
 )
 from iscc.mediatype import guess_mediatype, mime_to_gmt
 from iscc import uread
@@ -79,7 +75,7 @@ def code_meta(title, extra="", **options):
 
 
 def code_content(data, **options):
-    # type: (Union[Uri, Data], **Any) -> CodeResult
+    # type: (Union[Uri, Data], **Any) -> dict
     """Detect mediatype and create corresponding Content-Code."""
     mediatype = guess_mediatype(data)
     gmt = mime_to_gmt(mediatype)
@@ -96,7 +92,7 @@ def code_content(data, **options):
 
 
 def code_text(data, **options):
-    # type: (Readable, **Any) -> TextCode
+    # type: (Readable, **Any) -> dict
     """Generate Content-ID Text
 
     :param data: Any kind of text document
@@ -126,7 +122,7 @@ def code_text(data, **options):
         features = text.extract_text_features(text_norm, **options)
         result.update(features)
 
-    return TextCode(**result)
+    return result
 
 
 def code_image(data, **options):
@@ -265,7 +261,7 @@ def code_video(file, **options):
 
 
 def code_data(data, **options):
-    # type: (Readable, **Any) -> DataCode
+    # type: (Readable, **Any) -> dict
     """Create ISCC Data-Code.
 
     The Data-Code is a similarity preserving hash of the input data.
@@ -291,21 +287,21 @@ def code_data(data, **options):
     data_hash = minhash_256(features)
     header = write_header(MT.DATA, ST.NONE, VS.V0, nbits)
     code = encode_base32(header + data_hash[:nbytes])
-    result = DataCode(code=code)
+    result = dict(code=code)
 
     if opts.data_granular:
-        result.features = [
+        result["features"] = [
             encode_base64(minhash_64(cf))
             for cf in chunked(features, opts.data_granular_factor)
         ]
 
-        result.sizes = [sum(fh) for fh in chunked(sizes, opts.data_granular_factor)]
+        result["sizes"] = [sum(fh) for fh in chunked(sizes, opts.data_granular_factor)]
 
     return result
 
 
 def code_instance(data, **options):
-    # type: (Readable, **Any) -> InstanceCode
+    # type: (Readable, **Any) -> dict
     """Create ISCC Instance-Code.
 
     The Instance-Code is prefix of a cryptographic hash (blake3) of the input data.
@@ -333,4 +329,4 @@ def code_instance(data, **options):
     code = encode_base32(header + datahash_digest[:nbytes])
     datahash = datahash_digest.hex()
 
-    return InstanceCode(code=code, datahash=datahash, filesize=filesize)
+    return dict(code=code, datahash=datahash, filesize=filesize)

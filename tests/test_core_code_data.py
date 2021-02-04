@@ -9,11 +9,11 @@ from iscc.metrics import distance_b64
 
 
 def test_code_data_empty():
-    assert iscc.code_data(b"").code == "GAASL4F2WZY7KBXB"
+    assert iscc.code_data(b"") == {"code": "GAASL4F2WZY7KBXB"}
 
 
 def test_code_data_1byte():
-    assert iscc.code_data(b"\x00").code == "GAAXOD4P2IS6YHS2"
+    assert iscc.code_data(b"\x00") == {"code": "GAAXOD4P2IS6YHS2"}
 
 
 def test_code_data_1mib_robustness():
@@ -25,43 +25,42 @@ def test_code_data_1mib_robustness():
     rpos = lambda: random.randint(0, mib)
 
     # random single byte changes in data
-    c1 = iscc.code_data(data).code
-    assert c1 == "GAA6LM626EIYZ4E4"
+    c1 = iscc.code_data(data)
+    assert c1 == {"code": "GAA6LM626EIYZ4E4"}
     for x in range(9):
         data.insert(rpos(), rbyte())
-        assert iscc.code_data(data).code == c1
+        assert iscc.code_data(data) == c1
 
     # 1-bit difference on 10th byte change
     data.insert(rpos(), rbyte())
-    c2 = iscc.code_data(data).code
-    assert iscc.distance(c1, c2) == 1
+    c2 = iscc.code_data(data)
+    assert iscc.distance(c1["code"], c2["code"]) == 1
 
 
 def test_code_data_extends():
     data = bytearray(static_bytes(1024 * 64))
-    assert iscc.code_data(data).code == "GAA74QF35A7CJLWA"
-    assert (
-        iscc.code_data(data, data_bits=256).code
-        == "GAD74QF35A7CJLWAU6XWQYN4K2YMV7KGDXMVXMYHOJFKRGJ7HUFLFUY"
-    )
+    assert iscc.code_data(data) == {"code": "GAA74QF35A7CJLWA"}
+    assert iscc.code_data(data, data_bits=256) == {
+        "code": "GAD74QF35A7CJLWAU6XWQYN4K2YMV7KGDXMVXMYHOJFKRGJ7HUFLFUY"
+    }
 
 
 def test_code_data_random_changes():
     random.seed(1)
     data = bytearray([random.getrandbits(8) for _ in range(1000000)])  # 1 mb
-    did_a = iscc.code_data(data).code
-    assert did_a == "GAA65ZWUJOQX2QVK"
+    did_a = iscc.code_data(data)
+    assert did_a == {"code": "GAA65ZWUJOQX2QVK"}
     for x in range(10):  # insert 10 bytes random noise
         data.insert(random.randint(0, 1000000), random.randint(0, 255))
-    did_b = iscc.code_data(data).code
-    assert did_b == "GAA65ZWUJOQXYAVK"
-    assert iscc.distance(did_a, did_b) == 2
+    did_b = iscc.code_data(data)
+    assert did_b == {"code": "GAA65ZWUJOQXYAVK"}
+    assert iscc.distance(did_a["code"], did_b["code"]) == 2
 
 
 def test_code_data_inputs():
     for rb in text_readables():
         result = iscc.code_data(rb)
-        assert result.code == "GAA5GIWQSMYYKTBO"
+        assert result == {"code": "GAA5GIWQSMYYKTBO"}
 
 
 def test_code_data_granular_1mib():
@@ -70,10 +69,10 @@ def test_code_data_granular_1mib():
     b = iscc.code_data(
         data, data_granular=True, data_avg_chunk_size=1024, data_granular_factor=64
     )
-    assert a.code == "GAA6LM626EIYZ4E4"
-    assert a.code == b.code
-    assert sum(b.sizes) == len(data)
-    assert b.sizes == [
+    assert a == {"code": "GAA6LM626EIYZ4E4"}
+    assert a["code"] == b["code"]
+    assert sum(b["sizes"]) == len(data)
+    assert b["sizes"] == [
         71849,
         62221,
         69584,
@@ -91,7 +90,7 @@ def test_code_data_granular_1mib():
         61343,
         61123,
     ]
-    assert b.features == [
+    assert b["features"] == [
         "_kS7wD4kvsA",
         "_3GTQp7AlgQ",
         "-TjPB2hxj00",
@@ -115,17 +114,17 @@ def test_code_data_granular_robust():
     random.seed(1)
     data = bytearray([random.getrandbits(8) for _ in range(1000000)])  # 1 mb
     code_a = iscc.code_data(data, data_granular=True)
-    assert code_a.code == "GAA65ZWUJOQX2QVK"
+    assert code_a["code"] == "GAA65ZWUJOQX2QVK"
     for x in range(100):  # insert 100 bytes random noise
         data.insert(random.randint(0, 1000000), random.randint(0, 255))
     code_b = iscc.code_data(data, data_granular=True)
-    assert code_b.code == "GAA65ZWUJOQXYBVK"
-    assert iscc.distance(code_a.code, code_b.code) == 3
-    assert len(code_a.features) == len(code_b.features)
+    assert code_b["code"] == "GAA65ZWUJOQXYBVK"
+    assert iscc.distance(code_a["code"], code_b["code"]) == 3
+    assert len(code_a["features"]) == len(code_b["features"])
 
     # Pairwise granular hashes should have low average distance
     distances = []
-    for gfa, gfb in zip(code_a.features, code_b.features):
+    for gfa, gfb in zip(code_a["features"], code_b["features"]):
         dist = distance_b64(gfa, gfb)
         assert dist < 15
         distances.append(dist)

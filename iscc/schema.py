@@ -251,11 +251,7 @@ class ISCC(BaseModel):
     )
 
 
-class CodeResult(BaseModel):
-    pass
-
-
-class TextCode(CodeResult):
+class TextCode(BaseModel):
     code: str = Field(
         ...,
         title="Text-Code",
@@ -276,7 +272,22 @@ class TextCode(CodeResult):
     sizes: Optional[List[int]] = Field(description="Sizes of text chunks in characters")
 
 
-class DataCode(CodeResult):
+class ImageCode(BaseModel):
+
+    code: str = Field(
+        ...,
+        title="Image-Code",
+        description="Content-Code Image in standard representation.",
+    )
+
+    title: Optional[str] = Field(description="The title of the image.")
+
+    width: Optional[int] = Field(description="Width of original image in pixels.")
+    height: Optional[int] = Field(description="Height of original image in pixels.")
+    preview: Optional[str] = Field(description="Data-Uri of image preview thumbnail.")
+
+
+class DataCode(BaseModel):
     code: str = Field(
         ..., title="Instance-Code", description="Data-Code in standard representation."
     )
@@ -284,7 +295,7 @@ class DataCode(CodeResult):
     sizes: Optional[List[int]] = Field(description="Sizes of datachunks")
 
 
-class InstanceCode(CodeResult):
+class InstanceCode(BaseModel):
     code: str = Field(..., description="Instance-Code in standard representation.")
     datahash: str = Field(description="Blake3 hash of resource (as hex-string).")
     filesize: int = Field(description="File size in bytes.")
