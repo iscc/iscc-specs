@@ -251,7 +251,11 @@ class ISCC(BaseModel):
     )
 
 
-class TextCode(BaseModel):
+class CodeResult(BaseModel):
+    pass
+
+
+class TextCode(CodeResult):
     code: str = Field(
         ...,
         title="Text-Code",
@@ -272,7 +276,7 @@ class TextCode(BaseModel):
     sizes: Optional[List[int]] = Field(description="Sizes of text chunks in characters")
 
 
-class DataCode(BaseModel):
+class DataCode(CodeResult):
     code: str = Field(
         ..., title="Instance-Code", description="Data-Code in standard representation."
     )
@@ -280,7 +284,7 @@ class DataCode(BaseModel):
     sizes: Optional[List[int]] = Field(description="Sizes of datachunks")
 
 
-class InstanceCode(BaseModel):
+class InstanceCode(CodeResult):
     code: str = Field(..., description="Instance-Code in standard representation.")
     datahash: str = Field(description="Blake3 hash of resource (as hex-string).")
     filesize: int = Field(description="File size in bytes.")

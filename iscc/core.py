@@ -5,7 +5,7 @@ import io
 from PIL.ImageOps import exif_transpose
 from humanize import naturalsize
 from loguru import logger
-from typing import BinaryIO, List, Optional, Union, Any
+from typing import List, Optional, Union, Any
 from PIL import Image
 import xxhash
 from blake3 import blake3
@@ -26,7 +26,18 @@ from iscc.codec import (
 from iscc.cdc import data_chunks
 from iscc.mp7 import read_ffmpeg_signature
 from iscc.meta import meta_hash
-from iscc.schema import GMT, Opts, Uri, Data, File, Readable, InstanceCode, DataCode
+from iscc.schema import (
+    GMT,
+    Opts,
+    Uri,
+    Data,
+    File,
+    Readable,
+    InstanceCode,
+    DataCode,
+    TextCode,
+    CodeResult,
+)
 from iscc.mediatype import guess_mediatype, mime_to_gmt
 from iscc import uread
 
@@ -34,7 +45,6 @@ from iscc import uread
 ###############################################################################
 # High-Level ISCC Code generator functions                                   #
 ###############################################################################
-from schema import TextCode
 
 
 def code_iscc():
@@ -69,7 +79,7 @@ def code_meta(title, extra="", **options):
 
 
 def code_content(data, **options):
-    # type: (Union[Uri, Data], **Any) -> dict
+    # type: (Union[Uri, Data], **Any) -> CodeResult
     """Detect mediatype and create corresponding Content-Code."""
     mediatype = guess_mediatype(data)
     gmt = mime_to_gmt(mediatype)
@@ -86,7 +96,7 @@ def code_content(data, **options):
 
 
 def code_text(data, **options):
-    # type: (Readable, **Any) -> dict
+    # type: (Readable, **Any) -> TextCode
     """Generate Content-ID Text
 
     :param data: Any kind of text document
@@ -116,7 +126,7 @@ def code_text(data, **options):
         features = text.extract_text_features(text_norm, **options)
         result.update(features)
 
-    return result
+    return TextCode(**result)
 
 
 def code_image(data, **options):

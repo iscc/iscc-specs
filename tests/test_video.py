@@ -8,7 +8,7 @@ from tests import HERE
 from os.path import join
 from tests.test_readables import video_readables
 from iscc_samples import videos
-from iscc.schema import File, Uri
+from iscc.schema import Uri
 
 SAMPLE = join(HERE, "test.3gp")
 
