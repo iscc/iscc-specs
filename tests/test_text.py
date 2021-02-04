@@ -92,9 +92,12 @@ def test_code_text_granular():
     assert a == {
         "characters": 291,
         "code": "EAAR7BVKOFMBVNE4",
-        "features": ["XYy_cVAdfP8", "7LaIeVSCsaA", "_pZVWTpBYOY", "kSem2vF2HOo"],
+        "features": {
+            "features": ["XYy_cVAdfP8", "7LaIeVSCsaA", "_pZVWTpBYOY", "kSem2vF2HOo"],
+            "sizes": [78, 91, 66, 56],
+            "type": "text",
+        },
         "language": "en",
-        "sizes": [78, 91, 66, 56],
         "title": "Their most significant and usefull property of similaritypreserving",
     }
     b = iscc.code_text(
@@ -103,9 +106,12 @@ def test_code_text_granular():
     assert b == {
         "characters": 289,
         "code": "EAAR7BVKOFMBVNGM",
-        "features": ["XY29cVA9fO4", "7LaIeVSCsaA", "_pZVWTpBYOY", "kSem2vF2HOo"],
+        "features": {
+            "features": ["XY29cVA9fO4", "7LaIeVSCsaA", "_pZVWTpBYOY", "kSem2vF2HOo"],
+            "sizes": [76, 91, 66, 56],
+            "type": "text",
+        },
         "language": "en",
-        "sizes": [76, 91, 66, 56],
         "title": "The most significant and usefull property of similaritypreserving",
     }
     assert distance(a["code"], b["code"]) == 2
@@ -136,6 +142,7 @@ def test_extract_text_features_ta():
             "fCr9n6iDBWo",
         ],
         "sizes": [88, 43, 52, 70, 41, 20],
+        "type": "text",
     }
 
 
@@ -156,6 +163,7 @@ def test_extract_text_features_tb():
             "fCr9n6iDBWo",
         ],
         "sizes": [20, 66, 43, 52, 70, 41, 20],
+        "type": "text",
     }
 
 
@@ -163,6 +171,14 @@ def test_chunk_text():
     txt = gen_utf8(1024 * 100)
     chunks = list(iscc.chunk_text(txt, text_avg_chunk_size=1024))
     assert "".join(chunks) == txt
+
+
+def test_chunkt_text_options():
+    txt = iscc.extract_text(texts()[0])
+    ntxt = iscc.normalize_text(txt)
+    assert len(ntxt) == 6077
+    chunks = list(iscc.chunk_text(ntxt, text_avg_chunk_size=512))
+    assert len(chunks) == 7
 
 
 def test_trim_text():

@@ -120,7 +120,7 @@ def extract_text_features(text, **options):
         minimum_hash_digest = minhash_64(features)
         sizes.append(len(chunk))
         feats.append(encode_base64(minimum_hash_digest))
-    return dict(features=feats, sizes=sizes)
+    return dict(features=feats, type="text", sizes=sizes)
 
 
 def normalize_text(text):

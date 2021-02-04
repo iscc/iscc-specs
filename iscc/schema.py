@@ -175,6 +175,16 @@ class Opts(BaseSettings):
     )
 
 
+class GMT(str, Enum):
+    """Generic Metdia Type"""
+
+    text = "text"
+    image = "image"
+    audio = "audio"
+    video = "video"
+    unknown = "unknown"
+
+
 class Features(BaseModel):
     """Granular feature codes.
 
@@ -202,16 +212,6 @@ class Features(BaseModel):
         description="Sizes of segmets used for feature calculation",
         min_items=1,
     )
-
-
-class GMT(str, Enum):
-    """Generic Metdia Type"""
-
-    text = "text"
-    image = "image"
-    audio = "audio"
-    video = "video"
-    unknown = "unknown"
 
 
 class ISCC(BaseModel):

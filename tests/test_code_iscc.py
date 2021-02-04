@@ -52,14 +52,27 @@ def test_code_iscc_video():
 
 
 def test_code_iscc_text_granular():
-    assert iscc.code_iscc(s.texts()[0], text_granular=True) == {
+    assert iscc.code_iscc(
+        s.texts()[0], text_granular=True, text_avg_chunk_size=512
+    ) == {
         "characters": 6077,
         "datahash": "273cbd70856fad155db4c5fddbe6a73fc51b935bafe8251ebad03b83e29eebc7",
-        "features": ["KW3uKq1_qGk"],
+        "features": {
+            "features": [
+                "JUzOuCoesHA",
+                "6eo7KI3_4e8",
+                "aWurLq366Ok",
+                "pWzei6kfs3E",
+                "6eo7KI3_4e8",
+                "aWurLq366Ok",
+                "jp3dJyg55jo",
+            ],
+            "sizes": [1023, 455, 667, 2809, 455, 667, 1],
+            "type": "text",
+        },
         "filesize": 39936,
         "iscc": "KADQAAK6XRS3QV7TEAASS3POFKWX6MAB2MRNBEZRQVAACJZ4XVYIK3Y",
         "language": "ca",
-        "sizes": [6077],
         "title": "Demo DOC Title from Metadata",
     }
 

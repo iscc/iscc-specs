@@ -148,7 +148,7 @@ def code_text(data, **options):
 
     if opts.text_granular:
         features = text.extract_text_features(text_norm, **options)
-        result.update(features)
+        result["features"] = features
 
     return result
 
