@@ -169,6 +169,16 @@ def test_compose_iscc():
     assert c.compose_iscc([did, mid, cid, iid]) == ic
 
 
+def test_compose_iscc_body():
+    data = b"\x00" * 8
+    mid = c.Code.rnd(c.MT.META, data=data)
+    cid = c.Code.rnd(c.MT.CONTENT, data=data)
+    did = c.Code.rnd(c.MT.DATA, data=data)
+    iid = c.Code.rnd(c.MT.INSTANCE, data=data)
+    ic = c.compose_iscc([mid, cid, did, iid])
+    assert ic.hash_bytes == data * 4
+
+
 def test_compose_iscc_sum():
     did = c.Code.rnd(c.MT.DATA, 128)
     iid = c.Code.rnd(c.MT.INSTANCE, 256)

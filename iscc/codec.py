@@ -308,13 +308,13 @@ class Code:
         return self.code == other.code
 
     @classmethod
-    def rnd(cls, mt=None, bits=64):
+    def rnd(cls, mt=None, bits=64, data=None):
         """Returns a syntactically correct random code"""
         mt = choice(list(MT)) if mt is None else mt
         st = choice(list(ST_CC)) if mt == MT.CONTENT else choice(list(ST))
         vs = choice(list(VS))
         ln = bits or choice(list(LN)).value
-        data = os.urandom(ln // 8)
+        data = data or os.urandom(ln // 8)
         return cls((mt, st, vs, ln, data))
 
 
@@ -336,5 +336,5 @@ def compose_iscc(codes: List[Union[Code, str]]) -> Code:
             assert code.length >= LN.L64, "ISCC requires min 64-bit codes"
             chash = b""
             for c in codes:
-                chash += c.bytes[:8]
+                chash += c.hash_bytes[:8]
             return Code((MT.ISCC, codes[1].subtype, codes[1].version, LN.L256, chash))
