@@ -20,11 +20,14 @@ classifiers=[
     "Programming Language :: Python :: 3.9",
 ]
 
+[tool.poetry.scripts]
+igen = 'iscc.cli:app'
+
 [tool.poetry.dependencies]
 python = "^3.6"
 xxhash = "^2"
 Pillow = "^8"
-blake3 = "^0.1.8"
+blake3 = "^0.1"
 cython = { version = "^0.29", optional = true }
 more-itertools = "^8.6"
 bitarray-hardbyte = "^1.6"
@@ -32,19 +35,19 @@ bech32 = "^1.2"
 numpy = "<=1.19.3"
 numba = { version = "0.52", python = ">=3.6,<3.9", optional = true}
 loguru = "^0.5"
-imageio-ffmpeg = "^0.4.2"
-pydantic = "^1.7.3"
-scenedetect = {extras = ["opencv-headless"], version = "^0.5.4"}
-av = "^8.0.3"
+imageio-ffmpeg = "^0.4"
+pydantic = "^1.7"
+scenedetect = {extras = ["opencv-headless"], version = "^0.5"}
+av = "^8.0"
 python-magic-bin = { version = "^0.4.14", markers = "sys_platform == 'win32' or sys_platform == 'darwin'" }
 python-magic = { version = "^0.4.18", markers = "sys_platform == 'linux'" }
 tika = "^1.24"
-langcodes = "^2.1.0"
-langdetect = "^1.0.8"
-pyexiv2 = "^2.4.1"
-click = "^7.1.2"
-requests = "^2.25.1"
+langcodes = "^2.1"
+langdetect = "^1.0"
+pyexiv2 = "^2.4"
+requests = "^2.25"
 humanize = "^3.2"
+typer = "^0.3.2"
 
 [tool.poetry.extras]
 turbo = ["cython", "numba"]
