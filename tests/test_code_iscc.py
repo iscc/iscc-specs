@@ -9,8 +9,10 @@ def test_code_iscc_text():
         "datahash": "273cbd70856fad155db4c5fddbe6a73fc51b935bafe8251ebad03b83e29eebc7",
         "filename": "demo.doc",
         "filesize": 39936,
+        "gmt": "text",
         "iscc": "KADQAAK6XRS3QV7TEAASS3POFKWX6MAB2MRNBEZRQVAACJZ4XVYIK3Y",
         "language": "ca",
+        "mediatype": "application/msword",
         "title": "Demo DOC Title from Metadata",
     }
 
@@ -20,8 +22,10 @@ def test_code_iscc_image():
         "datahash": "9db4c0d9e68c5203dc8c2fefe52fa5d54671be3a3253e06888cace7c60e5a743",
         "filename": "demo.bmp",
         "filesize": 53256,
+        "gmt": "image",
         "height": 133,
         "iscc": "KEDQAAPH5L7RP5X7EEA4GQZQTY6J4MABMAQDAW3M75AADHNUYDM6NDA",
+        "mediatype": "image/bmp",
         "title": "demo",
         "width": 200,
     }
@@ -33,7 +37,9 @@ def test_code_iscc_audio():
         "duration": 15.5,
         "filename": "demo.aif",
         "filesize": 2734784,
+        "gmt": "audio",
         "iscc": "KIDQAALN53L77D6XEIAWUJFCEZVCIMABYBKLHJ3YWVAACFYQSQ5HSJA",
+        "mediatype": "audio/aiff",
         "title": "Belly Button",
     }
 
@@ -46,9 +52,11 @@ def test_code_iscc_video():
         "filename": "demo.3g2",
         "filesize": 1797418,
         "fps": 24.0,
+        "gmt": "video",
         "height": 288,
         "iscc": "KMDQAAPH5L7RP5X7EMAVNGMC7RMJEMAB5UMGGB7JRVAADSNIYCAGARQ",
         "language": "en",
+        "mediatype": "video/3gpp2",
         "signature_fps": 5,
         "title": "demo",
         "width": 352,
@@ -78,8 +86,10 @@ def test_code_iscc_text_granular():
         ],
         "filename": "demo.doc",
         "filesize": 39936,
+        "gmt": "text",
         "iscc": "KADQAAK6XRS3QV7TEAASS3POFKWX6MAB2MRNBEZRQVAACJZ4XVYIK3Y",
         "language": "ca",
+        "mediatype": "application/msword",
         "title": "Demo DOC Title from Metadata",
     }
 
@@ -149,7 +159,9 @@ def test_code_iscc_audio_granular():
         ],
         "filename": "demo.aif",
         "filesize": 2734784,
+        "gmt": "audio",
         "iscc": "KIDQAALN53L77D6XEIAWUJFCEZVCIMABYBKLHJ3YWVAACFYQSQ5HSJA",
+        "mediatype": "audio/aiff",
         "title": "Belly Button",
     }
 
@@ -217,9 +229,11 @@ def test_code_iscc_video_granular():
         "filename": "demo.3g2",
         "filesize": 1797418,
         "fps": 24.0,
+        "gmt": "video",
         "height": 288,
         "iscc": "KMDQAAPH5L7RP5X7EMAVNGMC7RMJEMAB5UMGGB7JRVAADSNIYCAGARQ",
         "language": "en",
+        "mediatype": "video/3gpp2",
         "signature_fps": 5,
         "title": "demo",
         "width": 352,

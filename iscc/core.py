@@ -122,16 +122,22 @@ def code_content(data, **options):
     """Detect mediatype and create corresponding Content-Code."""
     mediatype = guess_mediatype(data)
     gmt = mime_to_gmt(mediatype)
+
     if gmt == GMT.text:
-        return code_text(data, **options)
+        cc = code_text(data, **options)
     elif gmt == GMT.image:
-        return code_image(data, **options)
+        cc = code_image(data, **options)
     elif gmt == GMT.audio:
-        return code_audio(data, **options)
+        cc = code_audio(data, **options)
     elif gmt == GMT.video:
-        return code_video(data, **options)
+        cc = code_video(data, **options)
     else:
         raise ValueError("Unknown mediatype")
+
+    cc["mediatype"] = mediatype
+    cc["gmt"] = gmt
+
+    return cc
 
 
 def code_text(data, **options):
