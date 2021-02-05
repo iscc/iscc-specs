@@ -6,7 +6,7 @@ from tempfile import mkdtemp
 import os
 import sys
 from subprocess import Popen, PIPE, DEVNULL
-from os.path import basename, dirname
+from os.path import basename, dirname, normpath
 from secrets import token_hex
 from typing import Any, Generator, List, Sequence, Tuple, Optional, Union
 import imageio_ffmpeg
@@ -148,7 +148,7 @@ def extract_video_signature(uri, crop=None, **options):
 
     cmd.extend(["-i", file_path, "-vf", vf, "-f", "null", "-"])
 
-    with cd(folder):
+    with cd(normpath(folder)):
         logger.debug(f"Extracting signature with {cmd}")
         subprocess.run(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
         with open(sigfile, "rb") as infile:
