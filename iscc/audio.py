@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from json import JSONDecodeError
 from loguru import logger
 import json
 import os
@@ -43,8 +44,15 @@ def extract_audio_features(data, **options):
     length = str(opts.audio_max_duration)
     file = uread.open_data(data)
     cmd = [fpcalc_bin(), "-raw", "-json", "-signed", "-length", length, "-"]
-    res = subprocess.run(cmd, stdout=subprocess.PIPE, input=file.read())
-    result = json.loads(res.stdout.decode("utf-8"))
+    res = subprocess.run(
+        cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, input=file.read()
+    )
+    output = res.stdout.decode("utf-8")
+    try:
+        result = json.loads(output)
+    except JSONDecodeError:
+        raise RuntimeError(f'Fpcalc error: {res.stderr.decode("utf-8")}')
+
     return result
 
 

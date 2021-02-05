@@ -15,13 +15,6 @@ Debug = typer.Option(False, "--debug", "-d", help="Show debug output.")
 Verbose = typer.Option(0, "--verbose", "-v", count=True)
 
 
-@app.callback()
-def init(debug: bool = Debug):
-    if debug:
-        log.add(sys.stderr)
-        log.info("Debug messages activated!")
-
-
 @app.command()
 def explain(icode: str):
     """Decode ISCC to human readable format."""
@@ -30,11 +23,17 @@ def explain(icode: str):
 
 
 @app.command("iscc")
-def main(path: Path, verbose: int = Verbose):
+def main(path: Path, verbose: int = Verbose, debug: bool = Debug):
     """Generate ISCC for file(s)."""
+    if debug:
+        log.add(sys.stderr)
+        log.info("Debug messages activated!")
     for file in files(path):
         try:
             result = iscc.code_iscc(file)
+            if not isinstance(result, dict):
+                typer.echo(f"no result for {file.name} ({result})")
+                continue
             if verbose == 0:
                 typer.echo(f"ISCC:{result['iscc']}")
             elif verbose == 1:
@@ -44,7 +43,7 @@ def main(path: Path, verbose: int = Verbose):
             else:
                 typer.echo(json.dumps(result, indent=2))
         except Exception as e:
-            log.error(e)
+            log.error(f"{file.name} failed with: {str(e).strip()}")
 
 
 def files(path: Optional[Path]):
