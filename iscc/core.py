@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 """ISCC Reference Implementation"""
-import iscc
 from os.path import basename
 import base64
 import io
@@ -36,6 +35,7 @@ from iscc.schema import (
 )
 from iscc.mediatype import guess_mediatype, mime_to_gmt
 from iscc import uread
+from iscc.data import extract_data_features, encode_data_features
 
 
 ###############################################################################
@@ -340,8 +340,8 @@ def code_data(data, **options):
     result = dict(code=code)
 
     if opts.data_granular:
-        sizes, features = iscc.extract_data_features(data, **options)
-        features = iscc.encode_data_features(sizes, features)
+        sizes, features = extract_data_features(data, **options)
+        features = encode_data_features(sizes, features)
         result["features"] = features
 
     return result
