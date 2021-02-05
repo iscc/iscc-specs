@@ -27,6 +27,10 @@ def guess_mediatype(data):
 
     guess_data = from_data(file.read(4096))
 
+    # Normalize
+    guess_data = MEDIATYPE_NORM.get(guess_data, guess_data)
+    guess_name = MEDIATYPE_NORM.get(guess_name, guess_name)
+
     return guess_name or guess_data
 
 
@@ -135,6 +139,8 @@ SUPPORTED_MEDIATYPES = {
     "video/h264": {"gmt": "video", "ext": "h264"},
     "video/x-ms-wmv": {"gmt": "video", "ext": "wmv"},
 }
+
+MEDIATYPE_NORM = {"audio/x-aiff": "audio/aiff"}
 
 SUPPORTED_EXTENSIONS = []
 for v in SUPPORTED_MEDIATYPES.values():
