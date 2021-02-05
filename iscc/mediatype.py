@@ -140,7 +140,10 @@ SUPPORTED_MEDIATYPES = {
     "video/x-ms-wmv": {"gmt": "video", "ext": "wmv"},
 }
 
-MEDIATYPE_NORM = {"audio/x-aiff": "audio/aiff"}
+MEDIATYPE_NORM = {
+    "audio/x-aiff": "audio/aiff",
+    "image/x-ms-bmp": "image/bmp",
+}
 
 SUPPORTED_EXTENSIONS = []
 for v in SUPPORTED_MEDIATYPES.values():
