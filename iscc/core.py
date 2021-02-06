@@ -20,7 +20,7 @@ from iscc.codec import (
     VS,
     encode_base32,
     write_header,
-    compose_iscc,
+    compose,
 )
 from iscc.cdc import data_chunks
 from iscc.mp7 import read_ffmpeg_signature
@@ -82,7 +82,7 @@ def code_iscc(uri, title=None, extra=None, **options):
     result.update(meta)
     del result["code"]
 
-    iscc_code_obj = compose_iscc(
+    iscc_code_obj = compose(
         [meta["code"], content["code"], data["code"], instance["code"]]
     )
     result["iscc"] = iscc_code_obj.code

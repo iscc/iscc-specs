@@ -6,6 +6,40 @@ from iscc.core import code_meta
 from bitarray import bitarray as ba
 
 
+@pytest.fixture
+def mco():
+    """Random meta code"""
+    return c.Code.rnd(c.MT.META).code
+
+
+@pytest.fixture
+def cco():
+    """Random content code"""
+    return c.Code.rnd(c.MT.CONTENT).code
+
+
+@pytest.fixture
+def dco():
+    """Random data code"""
+    return c.Code.rnd(c.MT.DATA).code
+
+
+@pytest.fixture
+def ico():
+    """Random data code"""
+    return c.Code.rnd(c.MT.INSTANCE).code
+
+
+@pytest.fixture
+def iscc_sequence(mco, cco, dco, ico):
+    return f"{mco}-{cco}-{dco}-{ico}"
+
+
+@pytest.fixture
+def iscc_canonical(mco, cco, dco, ico):
+    return c.compose([mco, cco, dco, ico])
+
+
 def test_main_type():
     assert isinstance(c.MT.META, int)
     assert c.MT.META == 0
@@ -157,33 +191,61 @@ def test_code_properties():
     assert code == c.Code(tuple(code))
 
 
-def test_compose_iscc():
+def test_compose():
     mid = c.Code.rnd(c.MT.META, 64)
     cid = c.Code.rnd(c.MT.CONTENT, 64)
     did = c.Code.rnd(c.MT.DATA, 128)
     iid = c.Code.rnd(c.MT.INSTANCE, 256)
-    ic = c.compose_iscc([mid, cid, did, iid])
+    ic = c.compose([mid, cid, did, iid])
     assert ic.maintype == c.MT.ISCC
     assert ic.length == 256
     assert ic.explain.startswith("ISCC-")
-    assert c.compose_iscc([did, mid, cid, iid]) == ic
+    assert c.compose([did, mid, cid, iid]) == ic
 
 
-def test_compose_iscc_body():
+def test_compose_body():
     data = b"\x00" * 8
     mid = c.Code.rnd(c.MT.META, data=data)
     cid = c.Code.rnd(c.MT.CONTENT, data=data)
     did = c.Code.rnd(c.MT.DATA, data=data)
     iid = c.Code.rnd(c.MT.INSTANCE, data=data)
-    ic = c.compose_iscc([mid, cid, did, iid])
+    ic = c.compose([mid, cid, did, iid])
     assert ic.hash_bytes == data * 4
 
 
-def test_compose_iscc_sum():
+def test_compose_sum():
     did = c.Code.rnd(c.MT.DATA, 128)
     iid = c.Code.rnd(c.MT.INSTANCE, 256)
-    isum = c.compose_iscc([did, iid])
+    isum = c.compose([did, iid])
     assert isum.maintype == c.MT.SUM
     assert isum.length == 256
     assert isum.explain.startswith("SUM-NONE")
-    assert c.compose_iscc([iid, did]) == isum
+    assert c.compose([iid, did]) == isum
+
+
+def test_decompose_str_of_codes():
+    mco = c.Code.rnd(c.MT.META)
+    cco = c.Code.rnd(c.MT.CONTENT)
+    dco = c.Code.rnd(c.MT.DATA)
+    ico = c.Code.rnd(c.MT.INSTANCE)
+    iscc = f"ISCC:{mco.code}-{cco.code}-{dco.code}-{ico.code}"
+    codes = c.decompose(iscc)
+    assert codes == [mco, cco, dco, ico]
+
+
+def test_decompose_canonical_iscc(iscc_canonical):
+    codes = c.decompose(iscc_canonical)
+    assert len(codes) == 4
+    for code in codes:
+        assert code.length == 64
+    assert codes[0].maintype == c.MT.META
+    assert codes[1].maintype == c.MT.CONTENT
+    assert codes[2].maintype == c.MT.DATA
+    assert codes[3].maintype == c.MT.INSTANCE
+
+
+def test_iscc_clean():
+    assert c.clean("somecode") == "somecode"
+    assert c.clean("ISCC: SOME-CODE") == "SOMECODE"
+    assert c.clean(" SOMECODE ") == "SOMECODE"
+    assert c.clean("ISCC:") == ""

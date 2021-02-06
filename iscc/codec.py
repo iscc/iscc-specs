@@ -193,7 +193,7 @@ class Code:
     """
 
     def __init__(self, code):
-        # type: (Union[str, Tuple[MT, Union[ST, ST_CC], VS, Union(LN, int), bytes], bytes]) -> None
+        # type: (Union[str, Tuple[MT, Union[ST, ST_CC], VS, Union[LN, int], bytes], bytes]) -> None
         if isinstance(code, str):
             code_fields = read_header(decode_base32(code))
         elif isinstance(code, tuple):
@@ -312,13 +312,15 @@ class Code:
         """Returns a syntactically correct random code"""
         mt = choice(list(MT)) if mt is None else mt
         st = choice(list(ST_CC)) if mt == MT.CONTENT else choice(list(ST))
-        vs = choice(list(VS))
+        # vs = choice(list(VS))
+        vs = 0
         ln = bits or choice(list(LN)).value
         data = data or os.urandom(ln // 8)
         return cls((mt, st, vs, ln, data))
 
 
-def compose_iscc(codes: List[Union[Code, str]]) -> Code:
+def compose(codes: List[Union[Code, str]]) -> Code:
+    """Combine componets codes to a full ISCC code in its canonical form."""
     codes = [Code(c) if isinstance(c, str) else c for c in codes]
     assert len(set(c.version for c in codes)), "Codes must have same version"
     assert len(codes) in (2, 4), "Can only compose ISCC from 2 or 4 codes"
@@ -338,3 +340,46 @@ def compose_iscc(codes: List[Union[Code, str]]) -> Code:
             for c in codes:
                 chash += c.hash_bytes[:8]
             return Code((MT.ISCC, codes[1].subtype, codes[1].version, LN.L256, chash))
+
+
+def decompose(iscc):
+    # type: (Union[str, bytes, Code]) -> List[Code]
+    """Decompose an ISCC into a list of singular componet codes"""
+
+    # Convert iscc into raw bytes
+    if isinstance(iscc, bytes):
+        raw = iscc
+    elif isinstance(iscc, str):
+        cleaned = clean(iscc)
+        raw = decode_base32(cleaned)
+    elif isinstance(iscc, Code):
+        raw = iscc.bytes
+    else:
+        raise ValueError("ISCC must be str, bytes, or Code object")
+
+    # Read sequence of components from raw bytes:
+    components = []
+    while raw:
+        t, s, v, l, d = read_header(raw)
+        if t == MT.ISCC:
+            assert l == 256
+            mco = Code((MT.META, ST.NONE, v, LN.L64, d[:8]))
+            cco = Code((MT.CONTENT, s, v, LN.L64, d[8:16]))
+            dco = Code((MT.DATA, ST.NONE, v, LN.L64, d[16:24]))
+            ico = Code((MT.INSTANCE, ST.NONE, v, LN.L64, d[24:32]))
+            components.extend([mco, cco, dco, ico])
+            raw = d[32:]
+        else:
+            nbytes = l // 8
+            body, raw = d[:nbytes], d[nbytes:]
+            components.append(Code((t, s, v, l, body)))
+
+    return components
+
+
+def clean(iscc: str) -> str:
+    """Cleanup ISCC String.
+
+    Removes leading scheme and dashes.
+    """
+    return iscc.split(":")[-1].strip().replace("-", "")
