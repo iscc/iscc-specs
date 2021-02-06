@@ -300,12 +300,10 @@ def code_video(uri, **options):
     if opts.video_scenes:
         cutpoints = video.detect_video_scenes(uri, **options)
         features = video.compute_video_features_scenes(frames, cutpoints)
-        result["features"] = features
     else:
         features = video.compute_video_features_rolling(frames, **options)
-        result["features"] = features
-        result["window"] = opts.video_window
-        result["overlap"] = opts.video_overlap
+
+    result["features"] = features
 
     return result
 

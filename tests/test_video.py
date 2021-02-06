@@ -138,11 +138,9 @@ def test_code_video_granular_rolling():
         "fps": 24.0,
         "height": 144,
         "language": "en",
-        "overlap": 3,
         "signature_fps": 5,
         "title": "Kali by Anokato - Spiral Sessions 2019",
         "width": 176,
-        "window": 7,
     }
 
 
