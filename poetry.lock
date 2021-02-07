@@ -67,6 +67,21 @@ optional = false
 python-versions = ">=3.5"
 
 [[package]]
+name = "bidict"
+version = "0.21.2"
+description = "The bidirectional mapping library for Python."
+category = "main"
+optional = false
+python-versions = ">=3.6"
+
+[package.extras]
+coverage = ["coverage (<6)", "pytest-cov (<3)"]
+dev = ["setuptools-scm", "hypothesis (<6)", "py (<2)", "pytest (<7)", "pytest-benchmark (>=3.2.0,<4)", "sortedcollections (<2)", "sortedcontainers (<3)", "Sphinx (<4)", "sphinx-autodoc-typehints (<2)", "coverage (<6)", "pytest-cov (<3)", "pre-commit (<3)", "tox (<4)"]
+docs = ["Sphinx (<4)", "sphinx-autodoc-typehints (<2)"]
+precommit = ["pre-commit (<3)"]
+test = ["hypothesis (<6)", "py (<2)", "pytest (<7)", "pytest-benchmark (>=3.2.0,<4)", "sortedcollections (<2)", "sortedcontainers (<3)", "Sphinx (<4)", "sphinx-autodoc-typehints (<2)"]
+
+[[package]]
 name = "bitarray-hardbyte"
 version = "1.6.2"
 description = "efficient arrays of booleans -- C extension"
@@ -917,7 +932,7 @@ turbo = ["cython", "numba"]
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.6"
-content-hash = "16a7fa94d273b7849b91043d16f7d775771a31bea655a8d6035edd387647eb62"
+content-hash = "8ba95640e760a52fbcf302bc580dccfc7d93a4ec1be05826a28efc47075af403"
 
 [metadata.files]
 aiocontextvars = [
@@ -976,6 +991,10 @@ babel = [
 bech32 = [
     {file = "bech32-1.2.0-py3-none-any.whl", hash = "sha256:990dc8e5a5e4feabbdf55207b5315fdd9b73db40be294a19b3752cde9e79d981"},
     {file = "bech32-1.2.0.tar.gz", hash = "sha256:7d6db8214603bd7871fcfa6c0826ef68b85b0abd90fa21c285a9c5e21d2bd899"},
+]
+bidict = [
+    {file = "bidict-0.21.2-py2.py3-none-any.whl", hash = "sha256:929d056e8d0d9b17ceda20ba5b24ac388e2a4d39802b87f9f4d3f45ecba070bf"},
+    {file = "bidict-0.21.2.tar.gz", hash = "sha256:4fa46f7ff96dc244abfc437383d987404ae861df797e2fd5b190e233c302be09"},
 ]
 bitarray-hardbyte = [
     {file = "bitarray-hardbyte-1.6.2.tar.gz", hash = "sha256:d4dd77ee51ebf3ebf5fa6520231388365a1888006acab9c0f98f29bbc3aa5658"},

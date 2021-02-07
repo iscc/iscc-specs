@@ -191,6 +191,11 @@ def test_code_properties():
     assert code == c.Code(tuple(code))
 
 
+def test_code_hashable():
+    code = c.Code.rnd()
+    assert code in {code}
+
+
 def test_compose():
     mid = c.Code.rnd(c.MT.META, 64)
     cid = c.Code.rnd(c.MT.CONTENT, 64)
@@ -211,6 +216,13 @@ def test_compose_body():
     iid = c.Code.rnd(c.MT.INSTANCE, data=data)
     ic = c.compose([mid, cid, did, iid])
     assert ic.hash_bytes == data * 4
+
+
+def test_decompose_single_component():
+    code = c.Code.rnd()
+    assert c.decompose(code)[0] == code
+    assert c.decompose(code.code)[0] == code
+    assert c.decompose(code.bytes)[0] == code
 
 
 def test_compose_sum():

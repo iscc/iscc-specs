@@ -15,7 +15,7 @@ import os
 from operator import attrgetter
 from random import choice
 from typing import List, Tuple, Union
-from bitarray import bitarray
+from bitarray import bitarray, frozenbitarray
 from bitarray.util import ba2hex, int2ba, ba2int, count_xor
 from bech32 import convertbits
 
@@ -193,20 +193,22 @@ class Code:
     """
 
     def __init__(self, code):
-        # type: (Union[str, Tuple[MT, Union[ST, ST_CC], VS, Union[LN, int], bytes], bytes]) -> None
-        if isinstance(code, str):
+        # type: (Union[str, Tuple[MT, Union[ST, ST_CC], VS, Union[LN, int], bytes, Code], bytes]) -> None
+        if isinstance(code, Code):
+            code_fields = code._head + (code.hash_bytes,)
+        elif isinstance(code, str):
             code_fields = read_header(decode_base32(code))
         elif isinstance(code, tuple):
             code_fields = code
         elif isinstance(code, bytes):
             code_fields = read_header(code)
         else:
-            raise ValueError("Code must be str, bytes, or tuple")
+            raise ValueError("Code must be str, bytes, tuple or Code")
 
         self._head = code_fields[:-1]
         body = bitarray()
         body.frombytes(code_fields[-1])
-        self._body = body
+        self._body = frozenbitarray(body)
 
     def __str__(self):
         return self.code
@@ -236,6 +238,11 @@ class Code:
     def hex(self) -> str:
         """Hex representation of code (including header)."""
         return self.bytes.hex()
+
+    @property
+    def uint(self) -> int:
+        """Integer representation of code (including header)"""
+        return int.from_bytes(self.bytes, "big", signed=False)
 
     @property
     def type_id(self) -> str:
@@ -278,6 +285,11 @@ class Code:
         return ba2int(self._body, signed=False)
 
     @property
+    def hash_ba(self) -> frozenbitarray:
+        """Bitarray object of the code (without header)."""
+        return self._body
+
+    @property
     def maintype(self) -> MT:
         """Enum maintype of code."""
         return MT(self._head[0])
@@ -306,6 +318,9 @@ class Code:
     def __eq__(self, other):
         # type: (Code) -> bool
         return self.code == other.code
+
+    def __hash__(self):
+        return self.uint
 
     @classmethod
     def rnd(cls, mt=None, bits=64, data=None):
@@ -344,7 +359,7 @@ def compose(codes: List[Union[Code, str]]) -> Code:
 
 def decompose(iscc):
     # type: (Union[str, bytes, Code]) -> List[Code]
-    """Decompose an ISCC into a list of singular componet codes"""
+    """Decompose an ISCC into a list of singular componet codes."""
 
     # Convert iscc into raw bytes
     if isinstance(iscc, bytes):
