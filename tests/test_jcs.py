@@ -10,7 +10,7 @@ def test_jcs_roundtrip():
         fraction=65654.57354,
     )
     rt = iscc.roundtrip(data)
-    assert list(rt.keys()) == ['fraction', 'number', 'text']
+    assert list(rt.keys()) == ["fraction", "number", "text"]
 
 
 def test_jsc_text_normalized():
