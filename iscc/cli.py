@@ -6,6 +6,7 @@ import typer
 import iscc
 from pathlib import Path
 from typing import Optional
+from codetiming import Timer
 
 
 app = typer.Typer()
@@ -22,6 +23,24 @@ def explain(icode: str):
     typer.echo(code.explain)
 
 
+@app.command()
+def distance(a: str, b: str):
+    """Calculate hamming distance of codes"""
+    codes_a = iscc.decompose(a)
+    codes_b = iscc.decompose(b)
+    for a, b in zip(codes_a, codes_b):
+        typer.echo(
+            f"Distance {a.maintype.name}: {a.code} - {b.code} = {iscc.distance(a, b)} bits"
+        )
+
+
+@app.command()
+def decompose(icode: str):
+    """Decompose ISCC into its components"""
+    codes = iscc.decompose(icode)
+    typer.echo(f'ISCC:{"-".join(c.code for c in codes)}')
+
+
 @app.command("iscc")
 def main(path: Path, verbose: int = Verbose, debug: bool = Debug):
     """Generate ISCC for file(s)."""
@@ -30,7 +49,8 @@ def main(path: Path, verbose: int = Verbose, debug: bool = Debug):
         log.info("Debug messages activated!")
     for file in files(path):
         try:
-            result = iscc.code_iscc(file)
+            with Timer(text="ISCC generation time: {:0.4f} seconds", logger=log.info):
+                result = iscc.code_iscc(file)
             if not isinstance(result, dict):
                 typer.echo(f"no result for {file.name} ({result})")
                 continue

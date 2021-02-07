@@ -133,7 +133,7 @@ python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*"
 name = "codetiming"
 version = "1.2.0"
 description = "A flexible, customizable timer for your Python code"
-category = "dev"
+category = "main"
 optional = false
 python-versions = ">=3.6"
 
@@ -917,7 +917,7 @@ turbo = ["cython", "numba"]
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.6"
-content-hash = "69f6270a51b1826a81fcf1615e7e4d88189178d33d7cee6a68383b4faf52281e"
+content-hash = "16a7fa94d273b7849b91043d16f7d775771a31bea655a8d6035edd387647eb62"
 
 [metadata.files]
 aiocontextvars = [

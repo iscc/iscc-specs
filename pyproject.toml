@@ -48,6 +48,7 @@ pyexiv2 = "^2.4"
 requests = "^2.25"
 humanize = "^3.2"
 typer = "^0.3.2"
+codetiming = "^1.2"
 
 [tool.poetry.extras]
 turbo = ["cython", "numba"]
@@ -61,7 +62,6 @@ mkdocs-minify-plugin = "^0"
 mkdocs-git-revision-date-localized-plugin = "^0"
 black = { version = "*", allow-prereleases = true }
 lxml = "^4.6"
-codetiming = "^1.2"
 fauxfactory = "^3.1"
 iscc-samples = "^0.2.0"
 
