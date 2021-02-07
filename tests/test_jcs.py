@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 import json
-from iscc import jcs
 import iscc
 
 
@@ -10,9 +9,8 @@ def test_jcs_roundtrip():
         number=361665416,
         fraction=65654.57354,
     )
-    canonical = jcs.canonicalize(data)
-    roundtripped = json.loads(canonical)
-    assert data == roundtripped
+    rt = iscc.roundtrip(data)
+    assert list(rt.keys()) == ['fraction', 'number', 'text']
 
 
 def test_jsc_text_normalized():
@@ -21,7 +19,7 @@ def test_jsc_text_normalized():
         number=361665416,
         fraction=65654.57354,
     )
-    canonical = jcs.canonicalize(data)
+    canonical = iscc.canonicalize(data)
     assert (
         canonical.decode("utf-8")
         == '{"fraction":65654.57354,"number":361665416,"text":"Hello World!"}'
