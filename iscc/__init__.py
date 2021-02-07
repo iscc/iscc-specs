@@ -27,3 +27,4 @@ from iscc.data import *
 from iscc.codec import *
 from iscc.video import *
 from iscc.jcs import *
+from iscc.match import SimpleIndex
