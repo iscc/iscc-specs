@@ -8,14 +8,12 @@ cdef uint32_t MAXH
 cdef uint64_t[64] MPA
 cdef uint64_t[64] MPB
 
-cpdef bytes minhash_64(list features)
-
-cpdef bytes minhash_256(list features)
-
-
 @cython.locals(a=uint64_t, b=uint64_t, f=uint64_t)
 cpdef list minhash(list features)
 
+cpdef bytes minhash_64(list features)
+
+cpdef bytes minhash_256(list features)
 
 @cython.locals(bits=str, bitpos=uint8_t, h=uint64_t)
 cpdef bytes compress(list mhash, int lsb=*)

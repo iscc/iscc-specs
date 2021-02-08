@@ -14,7 +14,7 @@ from iscc import uread
 from iscc.utils import sliding_window
 from iscc.codec import encode_base64
 from iscc.schema import Readable
-from iscc.mediatype import clean_mime, mime_to_gmt
+from iscc.mediatype import mime_clean, mime_to_gmt
 from iscc.minhash import minhash_64, minhash_256
 from tika import parser as tika_parser
 
@@ -219,7 +219,7 @@ def _title_from_tika(tika_result, **options):
     opts = Opts(**options)
     title = ""
     meta = tika_result.get("metadata")
-    mime_type = clean_mime(meta.get("Content-Type"))
+    mime_type = mime_clean(meta.get("Content-Type"))
     gmt = mime_to_gmt(mime_type)
 
     if meta:

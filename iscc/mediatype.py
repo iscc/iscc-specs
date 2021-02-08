@@ -8,7 +8,10 @@ from iscc.schema import GMT, Readable
 from iscc import uread
 
 
-def guess_mediatype(data):
+__all__ = ["mine_guess", "mime_clean", "mime_to_gmt"]
+
+
+def mine_guess(data):
     # type: (Readable) -> str
     """Heuristic guessing of mediatype for different kinds of inputs.
 
@@ -23,9 +26,9 @@ def guess_mediatype(data):
         file_name = file.filename
 
     if file_name:
-        guess_name = from_name(file_name)
+        guess_name = mime_from_name(file_name)
 
-    guess_data = from_data(file.read(4096))
+    guess_data = mime_from_data(file.read(4096))
 
     # Normalize
     guess_data = MEDIATYPE_NORM.get(guess_data, guess_data)
@@ -34,17 +37,17 @@ def guess_mediatype(data):
     return guess_name or guess_data
 
 
-def from_name(name: str) -> Optional[str]:
+def mime_from_name(name: str) -> Optional[str]:
     """Guess mediatype from filename or url."""
     return mimetypes.guess_type(name)[0]
 
 
-def from_data(data: bytes) -> Optional[str]:
+def mime_from_data(data: bytes) -> Optional[str]:
     """Guess mediatype by sniffing raw header data."""
     return magic.from_buffer(data, mime=True)
 
 
-def clean_mime(mime: Union[str, List]):
+def mime_clean(mime: Union[str, List]):
     """Returns first entry in mime and removes semicolon separated encoding info"""
     if mime and isinstance(mime, List):
         mime = mime[0]
@@ -55,7 +58,7 @@ def clean_mime(mime: Union[str, List]):
 
 def mime_to_gmt(mime_type: str, file_path=None):
     """Get generic mediatype from mime type"""
-    mime_type = clean_mime(mime_type)
+    mime_type = mime_clean(mime_type)
     if mime_type == "image/gif" and file_path:
         img = Image.open(file_path)
         if img.is_animated:
@@ -153,22 +156,3 @@ for v in SUPPORTED_MEDIATYPES.values():
     else:
         for e in ext:
             SUPPORTED_EXTENSIONS.append(e)
-
-
-if __name__ == "__main__":
-    import iscc_samples as samples
-
-    for fp in samples.all():
-        by_name = from_name(fp.as_posix())
-        by_data = from_data(fp.open(mode="rb").read(4096))
-        by_guess = guess_mediatype(fp.as_posix())
-        gmt = mime_to_gmt(by_guess)
-        print(f"{gmt} " f"{fp.name} " f"{by_guess}")
-        # print(fp.name, end= "")
-        # print(gmt, end=" ")
-        # print(fp.name, end=" ")
-        # print(by_name, end=" ")
-        # print(by_data, end=" ")
-        # print(by_guess, end=" ")
-
-        # print()

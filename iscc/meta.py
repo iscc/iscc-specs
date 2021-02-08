@@ -1,13 +1,8 @@
 # -*- coding: utf-8 -*-
-from os.path import basename, splitext
-from urllib.parse import urlparse
 from more_itertools import interleave, sliced
-from iscc.text import normalize_text, trim_text
-from iscc.schema import Opts
 from iscc.utils import sliding_window
 from iscc.simhash import similarity_hash
 from blake3 import blake3
-from iscc.mediatype import clean_mime, mime_to_gmt
 
 
 WINDOW_SIZE_MID = 3
