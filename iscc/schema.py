@@ -21,6 +21,10 @@ FEATURE_REGEX = "^[-A-Za-z0-9_]{11}"
 class Opts(BaseSettings):
     """Options for ISCC generation"""
 
+    class Config:
+        env_file = ".env"
+        env_file_encoding = "utf-8"
+
     meta_bits: int = Field(64, description="Length of generated Meta-Code in bits")
 
     meta_title_from_uri: bool = Field(
