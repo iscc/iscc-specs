@@ -33,6 +33,10 @@ class Opts(BaseSettings):
     )
     meta_trim_extra: int = Field(4096, description="Trim extra to this number of bytes")
 
+    meta_ngram_size: int = Field(
+        3, description="Number of characters for sliding window over metadata text."
+    )
+
     text_bits: int = Field(
         64, description="Length of generated Content-ID-Text in bits"
     )
