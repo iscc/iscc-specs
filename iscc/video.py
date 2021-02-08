@@ -130,11 +130,11 @@ def extract_video_signature(uri, crop=None, **options):
         logger.error("Cannot extract signature without file.name")
         raise ValueError(f"Cannot extract signature from {type(infile)}")
 
-    file_path = infile.name
-    sigfile = basename(file_path) + ".bin"
-    folder = dirname(file_path)
+    infile_path = infile.name
+    sigfile_path = Path(mkdtemp(), token_hex(16) + ".bin")
+    sigfile_path_escaped = sigfile_path.as_posix().replace(":", "\\\\:")
 
-    vf = f"signature=format=binary:filename={sigfile}"
+    vf = f"signature=format=binary:filename={sigfile_path_escaped}"
     if crop:
         vf = f"{crop}," + vf
 
@@ -146,14 +146,13 @@ def extract_video_signature(uri, crop=None, **options):
     if opts.video_hwaccel is not None:
         cmd.extend(["-hwaccel", opts.video_hwaccel])
 
-    cmd.extend(["-i", file_path, "-vf", vf, "-f", "null", "-"])
+    cmd.extend(["-i", infile_path, "-vf", vf, "-f", "null", "-"])
 
-    with cd(normpath(folder)):
-        logger.debug(f"Extracting signature with {cmd}")
-        subprocess.run(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-        with open(sigfile, "rb") as infile:
-            sigdata = infile.read()
-        os.remove(sigfile)
+    logger.debug(f"Extracting signature with {cmd}")
+    subprocess.run(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    with open(sigfile_path, "rb") as sig:
+        sigdata = sig.read()
+    os.remove(sigfile_path)
     return sigdata
 
 
