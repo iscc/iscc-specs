@@ -35,7 +35,7 @@ from iscc.schema import (
     File,
     Readable,
 )
-from iscc.mediatype import mine_guess, mime_to_gmt
+from iscc.mediatype import mime_guess, mime_to_gmt
 from iscc import uread
 from iscc.data import extract_data_features, encode_data_features
 
@@ -141,7 +141,7 @@ def code_meta(title, extra=None, **options):
 def code_content(data, **options):
     # type: (Union[Uri, File], **Any) -> dict
     """Detect mediatype and create corresponding Content-Code."""
-    mediatype = mine_guess(data)
+    mediatype = mime_guess(data)
     gmt = mime_to_gmt(mediatype)
 
     if gmt == GMT.text:

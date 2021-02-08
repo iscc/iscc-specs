@@ -8,10 +8,16 @@ from iscc.schema import GMT, Readable
 from iscc import uread
 
 
-__all__ = ["mine_guess", "mime_clean", "mime_to_gmt"]
+__all__ = [
+    "mime_guess",
+    "mime_clean",
+    "mime_to_gmt",
+    "SUPPORTED_MEDIATYPES",
+    "SUPPORTED_EXTENSIONS",
+]
 
 
-def mine_guess(data):
+def mime_guess(data):
     # type: (Readable) -> str
     """Heuristic guessing of mediatype for different kinds of inputs.
 

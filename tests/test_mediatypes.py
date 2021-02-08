@@ -20,12 +20,12 @@ ids = uris.keys()
 
 @pytest.mark.parametrize("uri", values, ids=ids)
 def test_guess_mediatype(uri):
-    assert mediatype.mine_guess(uri) == "image/jpeg"
+    assert mediatype.mime_guess(uri) == "image/jpeg"
 
 
 def test_guess_mediatype_readables():
     for readable in image_readables():
-        assert mediatype.mine_guess(readable) == "image/jpeg"
+        assert mediatype.mime_guess(readable) == "image/jpeg"
 
 
 def test_from_name():
@@ -39,7 +39,7 @@ def test_from_data():
 def test_guess_samples():
     for path in samples.all():
         file_header = path.open(mode="rb").read(4096)
-        mt = mediatype.mine_guess(file_header)
+        mt = mediatype.mime_guess(file_header)
         assert isinstance(mt, str)
         assert "/" in mt
 
@@ -47,6 +47,6 @@ def test_guess_samples():
 def test_mime_to_gmt():
     for path in samples.all():
         file_header = path.open(mode="rb").read(4096)
-        mt = mediatype.mine_guess(file_header)
+        mt = mediatype.mime_guess(file_header)
         gmt = mediatype.mime_to_gmt(mt)
         assert gmt in ("text", "image", "audio", "video", None)
