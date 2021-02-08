@@ -8,7 +8,7 @@
 
 The **International Standard Content Code** is a proposal for an [open standard](https://en.wikipedia.org/wiki/Open_standard) for decentralized content identification. This repository contains the specification of the proposed **ISCC Standard** and a reference implementation in Python3. The latest published version of the specification can be found at [iscc.codes](https://iscc.codes)
 
-| NOTE: This is a low level reference implementation. For easy generation of ISCC codes see: [iscc-cli](https://github.com/iscc/iscc-cli) |
+| NOTE: This is ISCC Version 1.1 work in progress!!! |
 | --- |
 
 ## Installing the reference code
@@ -24,27 +24,30 @@ pip install iscc
 A short example on how to create an ISCC Code with the reference implementation.
 
 ``` python
-import iscc
-
-# Generate ISCC Component Codes
-mid, title, extra = iscc.meta_id('Title of Content')
-cid = iscc.content_id_text('some text')
-did = iscc.data_id('path/to/mediafile.doc')
-iid, tophash = iscc.instance_id('path/to/mediafile.doc')
-
-# Join ISCC Components to fully qualified ISCC Code
-iscc_code = '-'.join([mid, cid, did, iid])
-print('ISCC:{}'.format(iscc_code))
+>>> import iscc
+>>> iscc.code_iscc("README.md")
+{
+    'characters': 2918,
+    'datahash': 'd30edda59fd4803ad0d2754fcbda1ec4097d12bd790b10cd610a24764cfcef16',
+    'filename': 'README.md',
+    'filesize': 3075,
+    'gmt': 'text',
+    'iscc': 'KADYHLZUJ43U3LX7C6P5LSJ7JHAETKCYHYCQ5YX4C3JQ5XNFT7KIAOQ',
+    'language': 'en',
+    'mediatype': 'text/markdown',
+    'metahash': '828dd01bf76b78fc448f6d2ab25008835d2993c6acde205235dc942083c4677d',
+    'title': '# ISCC Spec and Reference Code'
+ }
 ```
 
 ## Working with the specification
 
-The entire **ISCC Specification** is written in plain text [Markdown](https://en.wikipedia.org/wiki/Markdown). The markdown content is than built and published with the excellent [mkdocs](http://www.mkdocs.org/) documetation tool. If you have some basic command line skills you can build and run the specification site on your own computer. Make sure you have the [git](https://git-scm.com/) and [Python](https://www.python.org/) installed on your system and follow these steps on the command line:
+The entire **ISCC Specification** is written in plain text [Markdown](https://en.wikipedia.org/wiki/Markdown). The markdown content is than built and published with the excellent [mkdocs](http://www.mkdocs.org/) documetation tool. If you have some basic command line skills you can build and run the specification site on your own computer. Make sure you have the [git](https://git-scm.com/) and [Python](https://www.python.org/) and [Poetry](https://pypi.org/project/poetry/) installed on your system and follow these steps on the command line:
 
 ``` bash
 git clone https://github.com/iscc/iscc-specs.git
 cd iscc-specs
-pip install -r requirements.txt
+poetry install
 mkdocs serve
 ```
 
