@@ -10,7 +10,7 @@ from typing import List, Optional, Union, Any
 from PIL import Image
 import xxhash
 from blake3 import blake3
-from iscc.minhash import minhash_64, minhash_256
+from iscc.minhash import minhash_256
 from iscc import text, image, audio, video
 from iscc.codec import (
     Code,
@@ -248,24 +248,7 @@ def code_audio(data, **options):
 
 def code_video(uri, **options):
     # type: (Union[Uri, File], **Any) -> dict
-    """Compute Content-ID video.
-
-    :param file: The video file.
-
-    Returns a dictionary with the following fields:
-        code: the calculated ISCC video code
-        signature: raw bytes of extracted mp7 signature
-
-    Optinally depending on settings these additional fields are provided:
-        crop: the crop value that has been applied (if any) before signature extraction.
-        features: list of base64 encoded granular video features.
-        sizes: list of scene durations corresponding to features (only if scenes=True).
-        window: window size of segements in seconds (only provided if scenes is False).
-        overlap: overlap of segments in seconds (only provided if scenes is False).
-
-    The window and overlap parameters are ignored if 0 or if scenes is False.
-    Set crop=False if you know your video has no black borders to improve performance.
-    """
+    """Compute Content-ID video."""
     opts = Opts(**options)
     nbits = opts.video_bits
 
@@ -287,8 +270,8 @@ def code_video(uri, **options):
     if crop_value:
         result["crop"] = crop_value.lstrip("crop=")
 
-    if opts.video_include_mp7sig:
-        result["mp7sig"] = base64.b64encode(signature).decode("ascii")
+    if opts.video_include_fingerprint:
+        result["fingerprint"] = base64.b64encode(signature).decode("ascii")
 
     if opts.video_preview:
         img_raw = video.extract_video_preview(uri)
