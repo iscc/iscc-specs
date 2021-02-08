@@ -142,7 +142,7 @@ class Opts(BaseSettings):
         3, description="Seconds of video that overlap in roling window mode"
     )
 
-    video_include_mp7sig: bool = Field(
+    video_include_fingerprint: bool = Field(
         False, description="Include raw MPEG-7 Video Signature in output"
     )
 
@@ -248,6 +248,10 @@ class ISCC(BaseModel):
     features: Optional[Features] = Field(
         description="GMT-specific standardized fingerprint for granular content "
         "recognition and matching purposes."
+    )
+    fingerprint: Optional[str] = Field(
+        description="Base64 encoded original raw fingerprint (MPEG-7, Chromaprint) "
+        "from which the Content Code has been derived."
     )
 
 

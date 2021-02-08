@@ -145,8 +145,8 @@ def test_code_video_granular_rolling():
 
 
 def test_code_video_include_mp7sig():
-    result = code_video(SAMPLE, video_include_mp7sig=True)
-    assert result["mp7sig"].endswith("SZVP2HM")
+    result = code_video(SAMPLE, video_include_fingerprint=True)
+    assert result["fingerprint"].endswith("SZVP2HM")
 
 
 def test_code_video_preview():
