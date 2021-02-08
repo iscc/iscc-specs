@@ -50,6 +50,7 @@ humanize = "^3.2"
 typer = "^0.3.2"
 codetiming = "^1.2"
 bidict = "^0.21.2"
+PyLD = "^2.0.3"
 
 [tool.poetry.extras]
 turbo = ["cython", "numba"]

@@ -11,6 +11,8 @@ from PIL import Image
 import xxhash
 from blake3 import blake3
 from iscc.minhash import minhash_256
+from pyld import jsonld
+from iscc import jcs
 from iscc import text, image, audio, video
 from iscc.codec import (
     Code,
@@ -37,6 +39,9 @@ from iscc.mediatype import mine_guess, mime_to_gmt
 from iscc import uread
 from iscc.data import extract_data_features, encode_data_features
 
+from iscc.jldloader import requests_document_loader
+
+jsonld.set_document_loader(requests_document_loader())
 
 ###############################################################################
 # High-Level ISCC Code generator functions                                   #
@@ -76,8 +81,6 @@ def code_iscc(uri, title=None, extra=None, **options):
     if not title and file_name:
         title = text.name_from_uri(file_name)
 
-    if extra is None:
-        extra = ""
     meta = code_meta(title, extra, **options)
     result.update(meta)
     del result["code"]
@@ -90,23 +93,39 @@ def code_iscc(uri, title=None, extra=None, **options):
     return result
 
 
-def code_meta(title, extra="", **options):
-    # type: (Union[str, bytes], Optional[Union[str, bytes]], **Any) -> dict
+def code_meta(title, extra=None, **options):
+    # type: (Union[str, bytes], Optional[Union[str, bytes, dict]], **Any) -> dict
     """Generate Meta Code from title and extra metadata.
 
-    :param str title: Used as input for first half of meta code
-    :param str extra: Used as input for second half of meta code
+    :param title: Used as input for first half of Meta-Code (or full if no extra)
+    :param extra: Extended (str or dict) metadata used as input for second half of code.
+    :key meta_bits: Length of generated Meta-Code in bits
+    :key meta_ngram_size: Number of characters for sliding window over metadata text.
+    :key meta_trim_title: Trim title length to this mumber of bytes
+    :key meta_trim_extra: Trim extra data to this number of bytes
+    :returns: Dict keys: code, title, matahash, (extra)
     """
     opts = Opts(**options)
     nbits = opts.meta_bits
     nbytes = nbits // 8
     title_norm = text.normalize_text(title)
+
+    if extra is None:
+        extra = ""
+    elif isinstance(extra, dict):
+        if "@context" in extra:
+            extra = jsonld.normalize(
+                extra, {"algorithm": "URDNA2015", "format": "application/n-quads"}
+            )
+        else:
+            extra = jcs.canonicalize(extra)
+
     extra_norm = text.normalize_text(extra)
     title_trimmed = text.trim_text(title_norm, opts.meta_trim_title)
     extra_trimmed = text.trim_text(extra_norm, opts.meta_trim_extra)
-    mhash = meta_hash(title_trimmed, extra_trimmed)
+    meta_simhash = meta_hash(title_trimmed, extra_trimmed, **options)
     header = write_header(MT.META, ST.NONE, VS.V0, nbits)
-    digest = header + mhash[:nbytes]
+    digest = header + meta_simhash[:nbytes]
     code = encode_base32(digest)
     result = dict(
         code=code,
@@ -114,6 +133,8 @@ def code_meta(title, extra="", **options):
     )
     if extra_trimmed:
         result["extra"] = extra_trimmed
+    payload = title_trimmed + extra_trimmed
+    result["metahash"] = blake3(payload.encode("utf-8")).hexdigest()
     return result
 
 

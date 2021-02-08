@@ -41,7 +41,8 @@ def test_meta_id():
     mid1 = iscc.code_meta(b"ISCC Content Identifiers")["code"]
     assert mid1 == "AAA47ZR5JWZ6E7Q3"
 
-    mid1, title = iscc.code_meta("Die Unendliche Geschichte").values()
+    r = iscc.code_meta("Die Unendliche Geschichte")
+    mid1, title = r["code"], r["title"]
     assert mid1 == "AAA3DZ6UG5MYA7MF"
     assert title == "Die Unendliche Geschichte"
 

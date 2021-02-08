@@ -13,6 +13,7 @@ def test_code_iscc_text():
         "iscc": "KADV5PDFXBL7HGBXFFW64KVNP6UGTUZC2CJTDBKMFYTTZPLQQVX22FI",
         "language": "ca",
         "mediatype": "application/msword",
+        "metahash": "f972dfbbcc2cff382910145073539169cc7e3ebc8032f75dfe4d4b23c4bb3614",
         "title": "Demo DOC Title from Metadata",
     }
 
@@ -26,6 +27,7 @@ def test_code_iscc_image():
         "height": 133,
         "iscc": "KED6P2X7C73P72Z4YNBTBHR4T2HGOYBAGBNWZ767PKO3JQGZ42GFEAY",
         "mediatype": "image/bmp",
+        "metahash": "811717648744df4f18656c5f4a833b7b09a90be78205a0e0eeff8b9dbb0202fe",
         "title": "demo",
         "width": 200,
     }
@@ -40,6 +42,7 @@ def test_code_iscc_audio():
         "gmt": "audio",
         "iscc": "KIDW33WX76H5PBHFNISKEJTKESRCNQCUWOTXRNJRMMLRBFB2PESLXZA",
         "mediatype": "audio/aiff",
+        "metahash": "c4933dc8c03ea58568159a1cbfb04132c7db93b6b4cd025ffd4db37f52a4756f",
         "title": "Belly Button",
     }
 
@@ -57,6 +60,7 @@ def test_code_iscc_video():
         "iscc": "KMD6P2X7C73P72Z4K2MYF7CYSK5NT3IYMMD6TDPH3PE2RQEAMBDN4MA",
         "language": "en",
         "mediatype": "video/3gpp2",
+        "metahash": "811717648744df4f18656c5f4a833b7b09a90be78205a0e0eeff8b9dbb0202fe",
         "signature_fps": 5,
         "title": "demo",
         "width": 352,
@@ -90,6 +94,7 @@ def test_code_iscc_text_granular():
         "iscc": "KADV5PDFXBL7HGBXFFW64KVNP6UGTUZC2CJTDBKMFYTTZPLQQVX22FI",
         "language": "ca",
         "mediatype": "application/msword",
+        "metahash": "f972dfbbcc2cff382910145073539169cc7e3ebc8032f75dfe4d4b23c4bb3614",
         "title": "Demo DOC Title from Metadata",
     }
 
@@ -162,6 +167,7 @@ def test_code_iscc_audio_granular():
         "gmt": "audio",
         "iscc": "KIDW33WX76H5PBHFNISKEJTKESRCNQCUWOTXRNJRMMLRBFB2PESLXZA",
         "mediatype": "audio/aiff",
+        "metahash": "c4933dc8c03ea58568159a1cbfb04132c7db93b6b4cd025ffd4db37f52a4756f",
         "title": "Belly Button",
     }
 
@@ -234,6 +240,7 @@ def test_code_iscc_video_granular():
         "iscc": "KMD6P2X7C73P72Z4K2MYF7CYSK5NT3IYMMD6TDPH3PE2RQEAMBDN4MA",
         "language": "en",
         "mediatype": "video/3gpp2",
+        "metahash": "811717648744df4f18656c5f4a833b7b09a90be78205a0e0eeff8b9dbb0202fe",
         "signature_fps": 5,
         "title": "demo",
         "width": 352,
