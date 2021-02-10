@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 """ISCC Reference Implementation"""
+import json
+from json import JSONDecodeError
 from os.path import basename
 import base64
 import io
@@ -120,6 +122,12 @@ def code_meta(title, extra=None, **options):
     nbits = opts.meta_bits
     nbytes = nbits // 8
     title_norm = text.normalize_text(title)
+
+    if isinstance(extra, (str, bytes, bytearray)):
+        try:
+            extra = json.loads(extra)
+        except JSONDecodeError:
+            pass
 
     if extra is None:
         extra = ""
