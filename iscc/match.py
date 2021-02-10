@@ -1,25 +1,85 @@
 # -*- coding: utf-8 -*-
 """Basic example for ISCC code matching"""
-from enum import Enum
+from operator import itemgetter
+from typing import Optional
+from typing import Hashable
 from bitarray.util import count_xor
-from dataclasses import dataclass
+from iscc.schema import IsccMatch
 import iscc
 from bidict import bidict
 from collections import defaultdict
 
 
-__all__ = ["SimpleIndex"]
-
-
-@dataclass
-class Match:
-    ident: int
-    iscc: str
-    type: str
-    distance: int
+__all__ = ["SimpleIndex", "SimpleSplitIndex"]
 
 
 class SimpleIndex:
+    """Brute force nearest neighbour search for full iscc codes."""
+
+    def __init__(self, name: str = "default"):
+        self.name = name
+        # Maps keys (internal or external) to ISCC codes
+        self.isccs = bidict()
+        # Mapps similarity components of ISCCs as bitarrays to main index entries.
+        self.sim_hashes = defaultdict(set)
+
+    def add(self, code: str, key: Optional[Hashable] = None):
+        """Add an ISCC to the index. Returns the key of the new ISCC entry.
+
+        :param code: ISCC code to be added to the index.
+        :param key: An optional external key (auto-incremented int if not set).
+        """
+        norm_code_obj = self.normalize(code)
+
+        # We only support adding new codes with unique keys
+        if norm_code_obj.code in self.isccs.inverse:
+            raise ValueError(f"{norm_code_obj.code} already in index.")
+        if key in self.isccs:
+            raise ValueError(f"Entry with key {key} already in index.")
+
+        # Create auto-incremented key if necessary
+        if key is None:
+            key = len(self.isccs)
+
+        self.isccs[key] = norm_code_obj.code
+
+        # Bitarray of first 3 components
+        prefix = norm_code_obj.hash_ba[:192]
+        self.sim_hashes[prefix].add(key)
+
+        return key
+
+    def query(self, code: str, k=10, t=128):
+        """Return k nearest neighbors below bit-distance threshold t."""
+        norm_code_obj = self.normalize(code)
+        query_prefix = norm_code_obj.hash_ba[:192]
+
+        distances = {}
+        for candidate_prefix in self.sim_hashes.keys():
+            distance = count_xor(query_prefix, candidate_prefix)
+            if distance <= t:
+                distances[candidate_prefix] = distance
+        top_k = sorted(distances.items(), key=itemgetter(1))[:k]
+        result = []
+        for hash_ba, total_dist in top_k:
+            for key in self.sim_hashes[hash_ba]:
+                candidate = self.isccs[key]
+                matchdata = iscc.compare(norm_code_obj.code, candidate)
+                matchdata["key"] = key
+                matchdata["iscc"] = candidate
+                result.append(IsccMatch(**matchdata))
+
+        return result
+
+    @staticmethod
+    def normalize(code):
+        return iscc.compose(iscc.decompose(code))
+
+    def __contains__(self, item):
+        return self.normalize(item).code in self.isccs.inverse
+
+
+class SimpleSplitIndex:
     def __init__(self, name: str = "default"):
         self.name = name
         # Full ISCCs
@@ -57,19 +117,15 @@ class SimpleIndex:
             for index_ba in index.keys():
                 distance = count_xor(comp_code.hash_ba, index_ba)
                 if distance <= threshold:
-                    if comp_code.maintype != iscc.MT.INSTANCE or distance == 0:
-                        for ident in index[index_ba]:
-                            full_code = self.isccs[ident]
-                            if full_code not in seen:
-                                result.append(
-                                    Match(
-                                        ident=ident,
-                                        iscc=self.isccs[ident],
-                                        type=comp_code.type_id,
-                                        distance=distance,
-                                    )
-                                )
-                                seen.add(full_code)
+                    for key in index[index_ba]:
+                        candidate = self.isccs[key]
+                        if candidate in seen:
+                            continue
+                        matchdata = iscc.compare(query_code.code, candidate)
+                        matchdata["key"] = key
+                        matchdata["iscc"] = candidate
+                        result.append(IsccMatch(**matchdata))
+                        seen.add(candidate)
         return result
 
     @staticmethod

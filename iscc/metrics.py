@@ -3,8 +3,10 @@
 from typing import Union
 from bitarray import bitarray
 from bitarray.util import count_xor, hex2ba
-from iscc.codec import Code, read_header, decode_base32, decode_base64
+from iscc.codec import Code, read_header, decode_base32, decode_base64, decompose, MT
 
+
+__all__ = ["distance", "compare"]
 
 # ISCC code in various possible representations
 Icode = Union[str, bytes, int, Code]
@@ -86,5 +88,29 @@ def distance_ba(a, b):
 
 
 def distance_b64(a, b):
+    # type: (str, str) -> int
     """Calculate hamming distance for base64 encoded integers"""
     return distance_bytes(decode_base64(a), decode_base64(b))
+
+
+def compare(a, b):
+    # type: (str, str) -> dict
+    """Calculate separate hamming distances of compatible components of two ISCCs
+
+    :returns: A dict with mdist, cdist, ddist, imatch keys
+    """
+    ac = decompose(a)
+    bc = decompose(b)
+    result = {}
+    for ca in ac:
+        for cb in bc:
+            cat = (ca.maintype, ca.subtype, ca.version)
+            cbt = (cb.maintype, cb.subtype, ca.version)
+            if cat == cbt:
+                if ca.maintype != MT.INSTANCE:
+                    result[ca.type_id[0].lower() + "dist"] = distance(
+                        ca, cb, mixed=True
+                    )
+                else:
+                    result["imatch"] = ca.hash_bytes == cb.hash_bytes
+    return result
