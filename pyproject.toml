@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "iscc"
-version = "1.1.0a1"
+version = "1.1.0-alpha.2"
 build = "build.py"
 description = "ISCC: Reference Implementation"
 authors = ["Titusz Pan <tp@py7.de>"]
