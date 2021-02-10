@@ -145,7 +145,7 @@ def decode_base64(code: str) -> bytes:
 
 def _write_varnibble(n: int) -> bitarray:
     """
-    Writes integer to variable length 4-bit sequence.
+    Writes integer to variable length sequence of 4-bit chunks.
     Variable-length encoding scheme:
     ------------------------------------------------------
     | prefix bits | nibbles | data bits | unsigned range |
