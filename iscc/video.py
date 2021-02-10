@@ -6,18 +6,15 @@ from tempfile import mkdtemp
 import os
 import sys
 from subprocess import Popen, PIPE, DEVNULL
-from os.path import basename, dirname, normpath
 from secrets import token_hex
 from typing import Any, Generator, List, Sequence, Tuple, Optional, Union
 import imageio_ffmpeg
 from statistics import mode
 from langcodes import standardize_tag
 from scenedetect import ContentDetector, FrameTimecode, SceneManager, VideoManager
-from scenedetect.scene_manager import save_images
 from iscc import uread
 from iscc.schema import Opts, Readable, File, Uri
 from iscc.codec import encode_base64
-from iscc.utils import cd
 from iscc.wtahash import wtahash
 from iscc.mp7 import Frame
 import av
