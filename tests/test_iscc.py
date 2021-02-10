@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 import os
 import json
-from io import BytesIO
 import pytest
 from PIL import Image, ImageFilter, ImageEnhance
 import iscc
@@ -10,6 +9,10 @@ from iscc.codec import decode_base32
 
 TESTS_PATH = os.path.dirname(os.path.realpath(__file__))
 os.chdir(TESTS_PATH)
+
+
+def test_iscc_version():
+    assert iscc.__version__.split("1.1")
 
 
 def test_test_data():
