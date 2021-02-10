@@ -10,20 +10,6 @@ from urllib.parse import urlparse
 from iscc import APP_DIR
 
 
-class cd:
-    """Context manager for changing the current working directory"""
-
-    def __init__(self, new_path):
-        self.new_path = os.path.expanduser(new_path)
-
-    def __enter__(self):
-        self.saved_path = os.getcwd()
-        os.chdir(self.new_path)
-
-    def __exit__(self, etype, value, traceback):
-        os.chdir(self.saved_path)
-
-
 def sliding_window(seq, width):
     # type: (Sequence, int) -> Generator[Sequence[Sequence]]
     """
