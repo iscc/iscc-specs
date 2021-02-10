@@ -49,46 +49,57 @@ jsonld.set_document_loader(requests_document_loader())
 
 
 def code_iscc(uri, title=None, extra=None, **options):
-    # type: (Union[Uri, File], Optional[str], Optional[exec()], **Any) -> dict
-    """Create a full ISCC Code"""
-    opts = Opts(**options)
+    # type: (Union[Uri, File], Optional[str, dict], Optional[exec()], **Any) -> dict
+    """Create a full ISCC.
+
+    The full ISCC is a composite of Meta, Content, Data and Instance Codes.
+
+    :param uri: File or filepath used for ISCC creation.
+    :param title: Title of media asset (defaults to extracted metadata or filename)
+    :param extra: Metadata to be used for Meta-Code generation
+    :param options: See iscc.schema.Opts for detailed ISCC generator options.
+    """
+
     result = {}
     features = []
 
     file_obj = uread.open_data(uri)
-    file_name = getattr(file_obj, "name", None)
-    if file_name:
-        result["filename"] = basename(file_name)
+    try:
+        file_name = getattr(file_obj, "name", None)
+        if file_name:
+            result["filename"] = basename(file_name)
 
-    instance = code_instance(file_obj, **options)
-    result.update(instance)
+        instance = code_instance(file_obj, **options)
+        result.update(instance)
 
-    data = code_data(file_obj, **options)
-    if "features" in data:
-        features.append(data.pop("features"))
-    result.update(data)
+        data = code_data(file_obj, **options)
+        if "features" in data:
+            features.append(data.pop("features"))
+        result.update(data)
 
-    content = code_content(file_obj, **options)
-    if "features" in content:
-        features.append(content.pop("features"))
-    result.update(content)
+        content = code_content(file_obj, **options)
+        if "features" in content:
+            features.append(content.pop("features"))
+        result.update(content)
 
-    if features:
-        result["features"] = features
+        if features:
+            result["features"] = features
 
-    if title is None:
-        title = content.get("title")
-    if not title and file_name:
-        title = text.name_from_uri(file_name)
+        if title is None:
+            title = content.get("title")
+        if not title and file_name:
+            title = text.name_from_uri(file_name)
 
-    meta = code_meta(title, extra, **options)
-    result.update(meta)
-    del result["code"]
+        meta = code_meta(title, extra, **options)
+        result.update(meta)
+        del result["code"]
 
-    iscc_code_obj = compose(
-        [meta["code"], content["code"], data["code"], instance["code"]]
-    )
-    result["iscc"] = iscc_code_obj.code
+        iscc_code_obj = compose(
+            [meta["code"], content["code"], data["code"], instance["code"]]
+        )
+        result["iscc"] = iscc_code_obj.code
+    finally:
+        file_obj.close()
 
     return result
 
