@@ -193,6 +193,17 @@ class GMT(str, Enum):
     unknown = "unknown"
 
 
+class IsccMatch(BaseModel):
+    """Metics of comparing two ISCCs"""
+
+    iscc: str = Field(description="The ISCC found to match with a query.")
+    key: Optional[Union[str, int]] = Field(description="An optional external key.")
+    mdist: Optional[int] = Field(description="Hamming distance of Meta-Code.")
+    cdist: Optional[int] = Field(description="Hamming distance of Content-Code.")
+    ddist: Optional[int] = Field(description="Hamming distance of Data-Code.")
+    imatch: Optional[bool] = Field(description="Wether Instance-Code is identical.")
+
+
 class Features(BaseModel):
     """Granular feature codes.
 

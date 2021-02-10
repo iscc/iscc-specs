@@ -78,3 +78,16 @@ def test_distance_ba():
     assert metrics.distance_ba(A_BA, B_BA) == 4
     with pytest.raises(ValueError):
         assert metrics.distance_ba(A_BA, C_BA)
+
+
+def test_compare():
+    a = "KADTF57DEXU74AIAAA76KJQ5AQTHALDO5JXPCRCRC422GN2RKUYCZ3A"
+    b = "KMD6P2X7C73P72Z4K2MYF7CYSK5NT3IYMMD6TDPH3PE2RQEAMBDN4MA"
+    assert metrics.compare(a, b) == {"ddist": 30, "imatch": False, "mdist": 30}
+    c = "KMD73CA6R4XJLI5CKYOYF7CYSL5PSBWQO33FNHPQNNCY4KHZALJ54JA"
+    assert metrics.compare(b, c) == {
+        "cdist": 4,
+        "ddist": 32,
+        "imatch": False,
+        "mdist": 28,
+    }
