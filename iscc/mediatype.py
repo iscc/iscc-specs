@@ -10,10 +10,12 @@ from iscc import uread
 
 __all__ = [
     "mime_guess",
+    "mime_normalize",
+    "mime_supported",
     "mime_clean",
     "mime_to_gmt",
-    "SUPPORTED_MEDIATYPES",
-    "SUPPORTED_EXTENSIONS",
+    "mime_from_name",
+    "mime_from_data",
 ]
 
 
@@ -37,10 +39,20 @@ def mime_guess(data):
     guess_data = mime_from_data(file.read(4096))
 
     # Normalize
-    guess_data = MEDIATYPE_NORM.get(guess_data, guess_data)
-    guess_name = MEDIATYPE_NORM.get(guess_name, guess_name)
+    guess_data = mime_normalize(guess_data)
+    guess_name = mime_normalize(guess_name)
 
     return guess_name or guess_data
+
+
+def mime_normalize(mime: str) -> str:
+    """Return normalized version of a mediatype."""
+    return MEDIATYPE_NORM.get(mime, mime)
+
+
+def mime_supported(mime: str) -> bool:
+    """Check if mediatype is supported"""
+    return mime_normalize(mime) in SUPPORTED_MEDIATYPES
 
 
 def mime_from_name(name: str) -> Optional[str]:
@@ -54,7 +66,10 @@ def mime_from_data(data: bytes) -> Optional[str]:
 
 
 def mime_clean(mime: Union[str, List]):
-    """Returns first entry in mime and removes semicolon separated encoding info"""
+    """
+    Clean mimetype/content-type string or first entry of a list of mimetype strings.
+    Also removes semicolon separated encoding information.
+    """
     if mime and isinstance(mime, List):
         mime = mime[0]
     if mime:
@@ -63,7 +78,7 @@ def mime_clean(mime: Union[str, List]):
 
 
 def mime_to_gmt(mime_type: str, file_path=None):
-    """Get generic mediatype from mime type"""
+    """Get generic mediatype from mimetype."""
     mime_type = mime_clean(mime_type)
     if mime_type == "image/gif" and file_path:
         img = Image.open(file_path)
@@ -109,10 +124,11 @@ SUPPORTED_MEDIATYPES = {
         "ext": "xlsx",
     },
     "application/vnd.ms-excel": {"gmt": "text", "ext": "xls"},
-    "application/x-mobipocket-ebook": {
-        "gmt": "text",
-        "ext": ["mobi", "prc", "azw", "azw3", "azw4"],
-    },
+    # TODO add mobi support
+    # "application/x-mobipocket-ebook": {
+    #     "gmt": "text",
+    #     "ext": ["mobi", "prc", "azw", "azw3", "azw4"],
+    # },
     # Image Formats
     "image/bmp": {"gmt": "image", "ext": "bmp"},
     "image/gif": {"gmt": "image", "ext": "gif"},
