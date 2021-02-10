@@ -193,7 +193,7 @@ class Code:
     """
 
     def __init__(self, code):
-        # type: (Union[str, Tuple[MT, Union[ST, ST_CC], VS, Union[LN, int], bytes, Code], bytes]) -> None
+        # type: (Union[str, Tuple[MT, Union[ST, ST_CC], VS, Union[LN, int], bytes], bytes, Code]) -> None
         if isinstance(code, Code):
             code_fields = code._head + (code.hash_bytes,)
         elif isinstance(code, str):
