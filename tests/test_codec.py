@@ -164,7 +164,7 @@ def test_code_properties():
     assert c256.code == "AAD77PPFVS6JDUQBWZDBIUGOUNAGIZYGCQ75ICNLH5QV73OXGWZV5CQ"
     assert c64.bytes == unhexlify(c64.hex)
     assert c64.type_id == "META-NONE-V0-64"
-    assert c64.explain == "META-NONE-V0-64-" + c64.hex
+    assert c64.explain == "META-NONE-V0-64-" + c64.hash_hex
     assert isinstance(c64.hash_ints[0], int)
     assert c64.hash_bits == "".join(str(i) for i in c64.hash_ints)
     assert c256.hash_bits == "".join(str(i) for i in c256.hash_ints)

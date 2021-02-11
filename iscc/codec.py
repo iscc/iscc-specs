@@ -257,7 +257,7 @@ class Code:
     @property
     def explain(self) -> str:
         """Human readble representation of code header."""
-        return f"{self.type_id}-{self.hex}"
+        return f"{self.type_id}-{self.hash_hex}"
 
     @property
     def hash_bytes(self) -> bytes:

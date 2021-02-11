@@ -241,8 +241,8 @@ class Features(BaseModel):
         regex=FEATURE_REGEX,
         min_items=1,
     )
-    sizes: Optional[List[int]] = Field(
-        description="Sizes of segmets used for feature calculation",
+    sizes: Optional[List[float]] = Field(
+        description="Sizes of segmets used for feature calculation.",
         min_items=1,
     )
     window: Optional[int] = Field(
