@@ -95,7 +95,7 @@ def test_code_text_granular():
         "features": {
             "features": ["XYy_cVAdfP8", "7LaIeVSCsaA", "_pZVWTpBYOY", "kSem2vF2HOo"],
             "sizes": [78, 91, 66, 56],
-            "type": "text",
+            "kind": "text",
         },
         "language": "en",
         "title": "Their most significant and usefull property of similaritypreserving",
@@ -109,7 +109,7 @@ def test_code_text_granular():
         "features": {
             "features": ["XY29cVA9fO4", "7LaIeVSCsaA", "_pZVWTpBYOY", "kSem2vF2HOo"],
             "sizes": [76, 91, 66, 56],
-            "type": "text",
+            "kind": "text",
         },
         "language": "en",
         "title": "The most significant and usefull property of similaritypreserving",
@@ -142,7 +142,7 @@ def test_extract_text_features_ta():
             "fCr9n6iDBWo",
         ],
         "sizes": [88, 43, 52, 70, 41, 20],
-        "type": "text",
+        "kind": "text",
     }
 
 
@@ -163,7 +163,7 @@ def test_extract_text_features_tb():
             "fCr9n6iDBWo",
         ],
         "sizes": [20, 66, 43, 52, 70, 41, 20],
-        "type": "text",
+        "kind": "text",
     }
 
 

@@ -4,7 +4,7 @@ import mmap
 from io import BufferedReader, BytesIO
 from pathlib import Path
 from typing import BinaryIO, List, Optional, Union
-from pydantic import BaseSettings, BaseModel, Field, constr
+from pydantic import BaseSettings, BaseModel, Field
 
 
 Data = Union[bytes, bytearray, memoryview]
@@ -25,11 +25,23 @@ class Options(BaseSettings):
         env_file = ".env"
         env_file_encoding = "utf-8"
 
+    all_granular: bool = Field(
+        False,
+        description="Generate granular fingerprints for all code types "
+        "(overides individual options).",
+    )
+    all_preview: bool = Field(
+        False,
+        description="Generate previews for all code types"
+        "(overrides individual options).",
+    )
+
     meta_bits: int = Field(64, description="Length of generated Meta-Code in bits")
 
     meta_title_from_uri: bool = Field(
         True,
-        description="Use normalized filename as title if we have nor explicit title and also no title from metadata extraction.",
+        description="Use normalized filename as title if we have nor explicit title "
+        "and also no title from metadata extraction.",
     )
 
     meta_trim_title: int = Field(
@@ -204,6 +216,15 @@ class IsccMatch(BaseModel):
     imatch: Optional[bool] = Field(description="Wether Instance-Code is identical.")
 
 
+class FeatureType(str, Enum):
+    """Type of granular features."""
+
+    text = "text"
+    audio = "audio"
+    video = "video"
+    data = "data"
+
+
 class Features(BaseModel):
     """Granular feature codes.
 
@@ -214,9 +235,14 @@ class Features(BaseModel):
     based on content aware chunking.
     """
 
+    kind: Optional[FeatureType] = Field(description="Type of granular features")
     features: List[str] = Field(
         description="Segmentwise 64-bit features (base64url encoded).",
         regex=FEATURE_REGEX,
+        min_items=1,
+    )
+    sizes: Optional[List[int]] = Field(
+        description="Sizes of segmets used for feature calculation",
         min_items=1,
     )
     window: Optional[int] = Field(
@@ -227,15 +253,17 @@ class Features(BaseModel):
         DEFAULT_OVERLAP,
         description="Overlap size of feature segments",
     )
-    sizes: Optional[List[int]] = Field(
-        description="Sizes of segmets used for feature calculation",
-        min_items=1,
-    )
 
 
 class ISCC(BaseModel):
+    class Config:
+        extra = "forbid"
+        validate_assignment = True
+
     version: int = Field(0, description="ISCC Schema Version")
     iscc: str = Field(description="ISCC code of the identified digital asset.")
+
+    # Essential Metadata
     title: Optional[str] = Field(
         description="The title or name of the intangible creation manifested by the"
         " identified digital asset"
@@ -243,35 +271,54 @@ class ISCC(BaseModel):
     extra: Optional[str] = Field(
         description="Descriptive, industry-sector or use-case specific metadata (used "
         "as immutable input for Meta-Code generation). Any text string "
-        "(structured or unstructured) indicative of the identity of the "
+        "(including json or json-ld) indicative of the identity of the "
         "referent may be used."
     )
+
+    # File Properties
     filename: Optional[str] = Field(
         description="Filename of the referenced digital asset (automatically used as "
         "fallback if no seed_title element is specified)"
     )
-    identifier: Optional[str] = Field(
-        description="Other identifier(s) such as those defined by ISO/TC 46/SC 9 "
-        "referencing the work, product or other abstraction of which the "
-        "referenced digital asset is a full or partial manifestation "
-        "(automatically used as fallback if no extra element is specified)."
-    )
+    filesize: Optional[int] = Field(description="File size of media asset in bytes.")
+    mediatype: Optional[str] = Field(description="IANA Media Type (MIME type)")
+
+    # Cryptographic hashes
+    metahash: Optional[str] = Field(description="Blake3 hash of metadata.")
+    datahash: Optional[str] = Field(description="Blake3 hash of media file.")
+
     gmt: GMT = Field(GMT.unknown, description="Generic Media Type")
-    language: Optional[List[str]] = Field(
-        description="Language(s) of content (BCP-47) in weighted order."
+
+    # Audio Visual Media
+    duration: Optional[float] = Field(
+        description="Duration of audio-visual media in secondes."
     )
+    fps: Optional[float] = Field(description="Frames per second of video assets.")
+    width: Optional[int] = Field(description="Width of visual media in pixels.")
+    height: Optional[int] = Field(description="Height of visual media in pixels.")
+
+    # Textual Media
     characters: Optional[int] = Field(
         description="Number of text characters (code points after Unicode "
         "normalization) (GMT Text only)."
     )
-    features: Optional[Features] = Field(
-        description="GMT-specific standardized fingerprint for granular content "
+
+    language: Optional[Union[str, List[str]]] = Field(
+        description="Language(s) of content (BCP-47) in weighted order."
+    )
+
+    # Granular Features
+    features: Optional[List[Features]] = Field(
+        description="Standardized fingerprints for granular content "
         "recognition and matching purposes."
     )
     fingerprint: Optional[str] = Field(
         description="Base64 encoded original raw fingerprint (MPEG-7, Chromaprint) "
         "from which the Content Code has been derived."
     )
+
+    # Presentational Metadata
+    preview: Optional[str] = Field(description="Uri of media asset preview.")
 
 
 class TextCode(BaseModel):

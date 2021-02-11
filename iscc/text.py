@@ -8,7 +8,7 @@ import langdetect
 import xxhash
 from functools import lru_cache
 import langcodes
-from iscc.schema import Options
+from iscc.schema import FeatureType, Options
 from iscc.cdc import data_chunks
 from iscc import uread
 from iscc.utils import sliding_window
@@ -120,7 +120,7 @@ def extract_text_features(text, **options):
         minimum_hash_digest = minhash_64(features)
         sizes.append(len(chunk))
         feats.append(encode_base64(minimum_hash_digest))
-    return dict(features=feats, type="text", sizes=sizes)
+    return dict(kind=FeatureType.text, features=feats, sizes=sizes)
 
 
 def normalize_text(text):

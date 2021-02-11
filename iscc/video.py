@@ -13,7 +13,7 @@ from statistics import mode
 from langcodes import standardize_tag
 from scenedetect import ContentDetector, FrameTimecode, SceneManager, VideoManager
 from iscc import uread
-from iscc.schema import Options, Readable, File, Uri
+from iscc.schema import FeatureType, Options, Readable, File, Uri
 from iscc.codec import encode_base64
 from iscc.wtahash import wtahash
 from iscc.mp7 import Frame
@@ -191,7 +191,7 @@ def compute_video_features_rolling(frames, **options):
             if frame.elapsed > start + window:
                 sigs.append(encode_base64(hash_video(segment_frames)))
                 break
-    return dict(features=sigs, window=window, overlap=overlap)
+    return dict(kind=FeatureType.video, features=sigs, window=window, overlap=overlap)
 
 
 def compute_video_features_scenes(frames, scenes):
@@ -219,7 +219,7 @@ def compute_video_features_scenes(frames, scenes):
             except IndexError:
                 break
 
-    return dict(features=features, sizes=durations, type="video")
+    return dict(kind=FeatureType.video, features=features, sizes=durations)
 
 
 def detect_video_crop(uri):

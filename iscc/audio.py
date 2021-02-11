@@ -11,7 +11,7 @@ import zipfile
 import stat
 from more_itertools import chunked, windowed
 import iscc
-from iscc.schema import Options, Readable
+from iscc.schema import FeatureType, Options, Readable
 from iscc.simhash import similarity_hash
 from iscc.utils import download_file
 from iscc.codec import encode_base64
@@ -68,7 +68,7 @@ def encode_audio_features(features):
         for int_feature in int_features:
             digest += int_feature.to_bytes(4, "big", signed=True)
         fingerprints.append(encode_base64(digest))
-    return dict(features=fingerprints, type="audio")
+    return dict(kind=FeatureType.audio, features=fingerprints)
 
 
 FPCALC_VERSION = "1.5.0"

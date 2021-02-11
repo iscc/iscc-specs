@@ -59,7 +59,7 @@ def code_iscc(uri, title=None, extra=None, **options):
     :param uri: File or filepath used for ISCC creation.
     :param title: Title of media asset (defaults to extracted metadata or filename)
     :param extra: Metadata to be used for Meta-Code generation
-    :param options: See iscc.schema.Opts for detailed ISCC generator options.
+    :param options: See iscc.schema.Options for detailed ISCC generator options.
     """
 
     result = {}
@@ -207,7 +207,7 @@ def code_text(data, **options):
     code = encode_base32(header + text_hash[:nbytes])
     result["code"] = code
 
-    if opts.text_granular:
+    if opts.text_granular or opts.all_granular:
         features = text.extract_text_features(text_norm, **options)
         result["features"] = features
 
@@ -246,7 +246,7 @@ def code_image(data, **options):
             tw, th = img_obj.size
             result["trimmed"] = dict(width=tw, height=th)
 
-    if opts.image_preview:
+    if opts.image_preview or opts.all_preview:
         preview = image.extract_image_preview(img_obj, **options)
         preview_uri = image.encode_image_to_data_uri(preview, **options)
         result["preview"] = preview_uri
@@ -276,7 +276,7 @@ def code_audio(data, **options):
 
     shash_digest = audio.hash_audio(chroma["fingerprint"])
 
-    if opts.audio_granular:
+    if opts.audio_granular or opts.all_granular:
         features = audio.encode_audio_features(chroma["fingerprint"])
         result["features"] = features
 
@@ -305,19 +305,20 @@ def code_video(uri, **options):
     video_hash = video.hash_video(features, **options)
     video_code = Code((MT.CONTENT, ST_CC.VIDEO, VS.V0, nbits, video_hash))
     result["code"] = video_code.code
-    result["signature_fps"] = opts.video_fps
 
-    if crop_value:
-        result["crop"] = crop_value.lstrip("crop=")
+    # Not yet part of schema
+    # result["signature_fps"] = opts.video_fps
+    # if crop_value:
+    #     result["crop"] = crop_value.lstrip("crop=")
 
     if opts.video_include_fingerprint:
         result["fingerprint"] = base64.b64encode(signature).decode("ascii")
 
-    if opts.video_preview:
+    if opts.video_preview or opts.all_preview:
         img_raw = video.extract_video_preview(uri)
         result["preview"] = image.encode_image_to_data_uri(img_raw)
 
-    if opts.video_granular is False:
+    if opts.video_granular is False and opts.all_granular is False:
         return result
 
     if opts.video_scenes:
@@ -360,7 +361,7 @@ def code_data(data, **options):
     code = encode_base32(header + data_hash[:nbytes])
     result = dict(code=code)
 
-    if opts.data_granular:
+    if opts.data_granular or opts.all_granular:
         sizes, features = extract_data_features(data, **options)
         features = encode_data_features(sizes, features)
         result["features"] = features

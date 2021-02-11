@@ -42,13 +42,13 @@ def test_content_code_with_video_defaults():
     tc = iscc.code_content(s.videos()[0])
     assert tc == {
         "code": "EMAVNGMC7RMJFOWZ",
-        "crop": "352:192:0:46",
+        # "crop": "352:192:0:46",
         "duration": 60.042,
         "fps": 24.0,
         "gmt": "video",
         "height": 288,
         "language": "en",
         "mediatype": "video/3gpp2",
-        "signature_fps": 5,
+        # "signature_fps": 5,
         "width": 352,
     }

@@ -1,9 +1,11 @@
 # -*- coding: utf-8 -*-
+import iscc
 import pytest
 import os
 from pydantic import ValidationError
 from iscc import schema
 from iscc.codec import encode_base64
+import iscc_samples
 
 
 def test_video_features_only():

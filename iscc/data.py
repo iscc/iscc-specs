@@ -6,7 +6,7 @@ from more_itertools import chunked
 from iscc.cdc import data_chunks
 from iscc.minhash import minhash_64, minhash_256
 from iscc.codec import encode_base64
-from iscc.schema import Readable, Options
+from iscc.schema import FeatureType, Readable, Options
 
 
 def hash_data(data):
@@ -44,4 +44,8 @@ def encode_data_features(sizes, features, **options):
         encode_base64(minhash_64(cf))
         for cf in chunked(features, opts.data_granular_factor)
     ]
-    return dict(features=encoded_features, sizes=encoded_sizes, type="data")
+    return dict(
+        kind=FeatureType.data,
+        features=encoded_features,
+        sizes=encoded_sizes,
+    )

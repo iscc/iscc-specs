@@ -61,9 +61,9 @@ def test_code_video():
     result = code_video(SAMPLE)
     assert "code" in result
     # assert "signature" in result
-    assert "crop" in result
+    # assert "crop" in result
     assert result["code"] == "EMAVMHMC7RMJF6XZ"
-    assert result["crop"] == "176:96:0:24"
+    # assert result["crop"] == "176:96:0:24"
 
 
 def test_code_video_no_crop():
@@ -84,7 +84,7 @@ def test_code_video_granular_scenes():
     )
     assert result == {
         "code": "EMAVMHMC7RMJF6XZ",
-        "crop": "176:96:0:24",
+        # "crop": "176:96:0:24",
         "duration": 60.042,
         "features": {
             "features": [
@@ -99,12 +99,12 @@ def test_code_video_granular_scenes():
                 "Vi2i7PwrGvM",
             ],
             "sizes": [7.625, 2.5, 5.083, 1.25, 3.75, 2.792, 15.458, 8.167, 13.042],
-            "type": "video",
+            "kind": "video",
         },
         "fps": 24.0,
         "height": 144,
         "language": "en",
-        "signature_fps": 5,
+        # "signature_fps": 5,
         "title": "Kali by Anokato - Spiral Sessions 2019",
         "width": 176,
     }
@@ -114,7 +114,7 @@ def test_code_video_granular_rolling():
     result = code_video(SAMPLE, video_granular=True, video_scenes=False)
     assert result == {
         "code": "EMAVMHMC7RMJF6XZ",
-        "crop": "176:96:0:24",
+        # "crop": "176:96:0:24",
         "duration": 60.042,
         "features": {
             "features": [
@@ -134,11 +134,12 @@ def test_code_video_granular_rolling():
             ],
             "overlap": 3,
             "window": 7,
+            "kind": "video",
         },
         "fps": 24.0,
         "height": 144,
         "language": "en",
-        "signature_fps": 5,
+        # "signature_fps": 5,
         "title": "Kali by Anokato - Spiral Sessions 2019",
         "width": 176,
     }
@@ -183,6 +184,7 @@ def test_compute_video_features_rolling():
         ],
         "overlap": 3,
         "window": 7,
+        "kind": "video",
     }
 
 
@@ -209,7 +211,7 @@ def test_compute_video_features_scenes():
             "V06CXBQdUrU",
         ],
         "sizes": [7.625, 2.5, 5.083, 1.25, 3.75, 2.792, 15.458, 8.167, 13.042],
-        "type": "video",
+        "kind": "video",
     }
 
 

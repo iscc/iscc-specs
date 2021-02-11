@@ -1,10 +1,12 @@
 # -*- coding: utf-8 -*-
 import iscc
+from iscc.schema import ISCC
 import iscc_samples as s
 
 
 def test_code_iscc_text():
-    assert iscc.code_iscc(s.texts()[0]) == {
+    result = iscc.code_iscc(s.texts()[0])
+    assert result == {
         "characters": 6077,
         "datahash": "273cbd70856fad155db4c5fddbe6a73fc51b935bafe8251ebad03b83e29eebc7",
         "filename": "demo.doc",
@@ -16,10 +18,12 @@ def test_code_iscc_text():
         "metahash": "f972dfbbcc2cff382910145073539169cc7e3ebc8032f75dfe4d4b23c4bb3614",
         "title": "Demo DOC Title from Metadata",
     }
+    assert ISCC(**result)
 
 
 def test_code_iscc_image():
-    assert iscc.code_iscc(s.images()[0]) == {
+    result = iscc.code_iscc(s.images()[0])
+    assert result == {
         "datahash": "9db4c0d9e68c5203dc8c2fefe52fa5d54671be3a3253e06888cace7c60e5a743",
         "filename": "demo.bmp",
         "filesize": 53256,
@@ -31,10 +35,12 @@ def test_code_iscc_image():
         "title": "demo",
         "width": 200,
     }
+    assert ISCC(**result)
 
 
 def test_code_iscc_audio():
-    assert iscc.code_iscc(s.audios()[0]) == {
+    result = iscc.code_iscc(s.audios()[0])
+    assert result == {
         "datahash": "1710943a7924bbe4ab67995308742b973e9e452a32277fa8fb077ca024fdee02",
         "duration": 15.5,
         "filename": "demo.aif",
@@ -45,11 +51,13 @@ def test_code_iscc_audio():
         "metahash": "c4933dc8c03ea58568159a1cbfb04132c7db93b6b4cd025ffd4db37f52a4756f",
         "title": "Belly Button",
     }
+    assert ISCC(**result)
 
 
 def test_code_iscc_video():
-    assert iscc.code_iscc(s.videos()[0]) == {
-        "crop": "352:192:0:46",
+    result = iscc.code_iscc(s.videos()[0])
+    assert result == {
+        # "crop": "352:192:0:46",
         "datahash": "c9a8c0806046de30261e3b31c12e8e8a8392c73e2faae3f822f8913dc6ba0931",
         "duration": 60.042,
         "filename": "demo.3g2",
@@ -61,16 +69,16 @@ def test_code_iscc_video():
         "language": "en",
         "mediatype": "video/3gpp2",
         "metahash": "811717648744df4f18656c5f4a833b7b09a90be78205a0e0eeff8b9dbb0202fe",
-        "signature_fps": 5,
         "title": "demo",
         "width": 352,
     }
+    assert ISCC(**result)
 
 
 def test_code_iscc_text_granular():
-    assert iscc.code_iscc(
-        s.texts()[0], text_granular=True, text_avg_chunk_size=512
-    ) == {
+
+    result = iscc.code_iscc(s.texts()[0], text_granular=True, text_avg_chunk_size=512)
+    assert result == {
         "characters": 6077,
         "datahash": "273cbd70856fad155db4c5fddbe6a73fc51b935bafe8251ebad03b83e29eebc7",
         "features": [
@@ -85,7 +93,7 @@ def test_code_iscc_text_granular():
                     "jp3dJyg55jo",
                 ],
                 "sizes": [1023, 455, 667, 2809, 455, 667, 1],
-                "type": "text",
+                "kind": "text",
             }
         ],
         "filename": "demo.doc",
@@ -97,10 +105,12 @@ def test_code_iscc_text_granular():
         "metahash": "f972dfbbcc2cff382910145073539169cc7e3ebc8032f75dfe4d4b23c4bb3614",
         "title": "Demo DOC Title from Metadata",
     }
+    assert ISCC(**result)
 
 
 def test_code_iscc_audio_granular():
-    assert iscc.code_iscc(s.audios()[0], audio_granular=True) == {
+    result = iscc.code_iscc(s.audios()[0], audio_granular=True)
+    assert result == {
         "datahash": "1710943a7924bbe4ab67995308742b973e9e452a32277fa8fb077ca024fdee02",
         "duration": 15.5,
         "features": [
@@ -159,7 +169,7 @@ def test_code_iscc_audio_granular():
                     "OEciRnjGMvY",
                     "eIYOpniEC6Y",
                 ],
-                "type": "audio",
+                "kind": "audio",
             }
         ],
         "filename": "demo.aif",
@@ -170,11 +180,13 @@ def test_code_iscc_audio_granular():
         "metahash": "c4933dc8c03ea58568159a1cbfb04132c7db93b6b4cd025ffd4db37f52a4756f",
         "title": "Belly Button",
     }
+    assert ISCC(**result)
 
 
 def test_code_iscc_video_granular():
-    assert iscc.code_iscc(s.videos()[0], video_granular=True) == {
-        "crop": "352:192:0:46",
+    result = iscc.code_iscc(s.videos()[0], video_granular=True)
+    assert result == {
+        # "crop": "352:192:0:46",
         "datahash": "c9a8c0806046de30261e3b31c12e8e8a8392c73e2faae3f822f8913dc6ba0931",
         "duration": 60.042,
         "features": [
@@ -229,7 +241,7 @@ def test_code_iscc_video_granular():
                     7.625,
                     2.625,
                 ],
-                "type": "video",
+                "kind": "video",
             }
         ],
         "filename": "demo.3g2",
@@ -241,7 +253,7 @@ def test_code_iscc_video_granular():
         "language": "en",
         "mediatype": "video/3gpp2",
         "metahash": "811717648744df4f18656c5f4a833b7b09a90be78205a0e0eeff8b9dbb0202fe",
-        "signature_fps": 5,
         "title": "demo",
         "width": 352,
     }
+    assert ISCC(**result)

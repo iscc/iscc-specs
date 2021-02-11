@@ -71,7 +71,7 @@ def extract_image_preview(img, **options):
         # Pillow thumbnail operates inplace - avoid side effects.
         img = img.copy()
     img.thumbnail((size, size), resample=Image.LANCZOS)
-    return ImageEnhance.Sharpness(img).enhance(1.4)
+    return ImageEnhance.Sharpness(img.convert("RGB")).enhance(1.4)
 
 
 def encode_image_to_data_uri(img, **options):
