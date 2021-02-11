@@ -19,19 +19,21 @@ __all__ = [
 ]
 
 
-def mime_guess(data):
-    # type: (Readable) -> str
+def mime_guess(data, file_name=None):
+    # type: (Readable, str) -> str
     """Heuristic guessing of mediatype for different kinds of inputs.
 
     We try matching by file extension. If that fails we match by content sniffing.
     """
 
-    guess_name, guess_data, file_name = None, None, None
+    guess_name, guess_data = None, None
     file = uread.open_data(data)
-    if hasattr(file, "name"):
-        file_name = file.name
-    elif hasattr(file, "filename"):
-        file_name = file.filename
+
+    if file_name is None:
+        if hasattr(file, "name"):
+            file_name = file.name
+        elif hasattr(file, "filename"):
+            file_name = file.filename
 
     if file_name:
         guess_name = mime_from_name(file_name)
