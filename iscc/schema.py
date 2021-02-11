@@ -18,7 +18,7 @@ DEFAULT_OVERLAP = 3
 FEATURE_REGEX = "^[-A-Za-z0-9_]{11}"
 
 
-class Opts(BaseSettings):
+class Options(BaseSettings):
     """Options for ISCC generation"""
 
     class Config:

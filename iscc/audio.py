@@ -11,7 +11,7 @@ import zipfile
 import stat
 from more_itertools import chunked, windowed
 import iscc
-from iscc.schema import Opts, Readable
+from iscc.schema import Options, Readable
 from iscc.simhash import similarity_hash
 from iscc.utils import download_file
 from iscc.codec import encode_base64
@@ -40,7 +40,7 @@ def extract_audio_features(data, **options):
     - duration: total duration of extracted fingerprint in seconds
     - fingerprint: 32-bit (4 byte) integers as features
     """
-    opts = Opts(**options)
+    opts = Options(**options)
     length = str(opts.audio_max_duration)
     file = uread.open_data(data)
     cmd = [fpcalc_bin(), "-raw", "-json", "-signed", "-length", length, "-"]

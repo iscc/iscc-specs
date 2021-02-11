@@ -11,7 +11,7 @@ import math
 from statistics import median
 from PIL import Image, ImageChops, ImageEnhance
 import numpy as np
-from iscc.schema import Opts, Readable
+from iscc.schema import Options, Readable
 from iscc.text import normalize_text
 from iscc import uread
 
@@ -63,7 +63,7 @@ def extract_image_metadata(data):
 def extract_image_preview(img, **options):
     # type: (Union[str, Path, Image.Image], **Any) -> Image.Image
     """Create a thumbnail for an image."""
-    opts = Opts(**options)
+    opts = Options(**options)
     size = opts.image_preview_size
     if not isinstance(img, Image.Image):
         img = Image.open(img)
@@ -77,7 +77,7 @@ def extract_image_preview(img, **options):
 def encode_image_to_data_uri(img, **options):
     # type: (Union[str, Path, Image.Image, bytes, io.BytesIO], **Any) -> str
     """Converts image to WebP data-uri."""
-    opts = Opts(**options)
+    opts = Options(**options)
     quality = opts.image_preview_quality
 
     if isinstance(img, bytes):

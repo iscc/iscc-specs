@@ -31,7 +31,7 @@ from iscc.mp7 import read_ffmpeg_signature
 from iscc.meta import meta_hash
 from iscc.schema import (
     GMT,
-    Opts,
+    Options,
     Uri,
     Data,
     File,
@@ -118,7 +118,7 @@ def code_meta(title, extra=None, **options):
     :key meta_trim_extra: Trim extra data to this number of bytes
     :returns: Dict keys: code, title, matahash, (extra)
     """
-    opts = Opts(**options)
+    opts = Options(**options)
     nbits = opts.meta_bits
     nbytes = nbits // 8
     title_norm = text.normalize_text(title)
@@ -191,7 +191,7 @@ def code_text(data, **options):
     :key text_ngram_size: Sliding window size in number of characters.
     :key text_granular: Wether to extract granular text features
     """
-    opts = Opts(**options)
+    opts = Options(**options)
     nbits = opts.text_bits
     nbytes = nbits // 8
     result = {}
@@ -217,7 +217,7 @@ def code_text(data, **options):
 def code_image(data, **options):
     # type: (Union[Uri, Data, Image.Image], **Any) -> dict
 
-    opts = Opts(**options)
+    opts = Options(**options)
     nbits = opts.image_bits
     nbytes = nbits // 8
     assert nbits in (32, 64), "Content-ID Image does not yet support more than 64-bits"
@@ -263,7 +263,7 @@ def code_image(data, **options):
 def code_audio(data, **options):
     # type: (Union[Uri, Data, List], **Any) -> dict
     """Generate Audio-ID from file(path) or Chromaprint features"""
-    opts = Opts(**options)
+    opts = Options(**options)
     result = dict()
     nbits = opts.audio_bits
     nbytes = nbits // 8
@@ -289,7 +289,7 @@ def code_audio(data, **options):
 def code_video(uri, **options):
     # type: (Union[Uri, File], **Any) -> dict
     """Compute Content-ID video."""
-    opts = Opts(**options)
+    opts = Options(**options)
     nbits = opts.video_bits
 
     result = {}
@@ -345,7 +345,7 @@ def code_data(data, **options):
     :return:
     """
 
-    opts = Opts(**options)
+    opts = Options(**options)
     nbits = opts.data_bits
     nbytes = nbits // 8
     features = []
@@ -379,7 +379,7 @@ def code_instance(data, **options):
     :key io_chunk_size: Number of bytes to read per IO operation.
     :return: An InstanceCode object with attributes: code, datahash, filesize
     """
-    opts = Opts(**options)
+    opts = Options(**options)
     nbits = opts.instance_bits
     nbytes = nbits // 8
     filesize = 0

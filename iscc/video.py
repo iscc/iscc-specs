@@ -13,7 +13,7 @@ from statistics import mode
 from langcodes import standardize_tag
 from scenedetect import ContentDetector, FrameTimecode, SceneManager, VideoManager
 from iscc import uread
-from iscc.schema import Opts, Readable, File, Uri
+from iscc.schema import Options, Readable, File, Uri
 from iscc.codec import encode_base64
 from iscc.wtahash import wtahash
 from iscc.mp7 import Frame
@@ -81,7 +81,7 @@ def extract_video_metadata(data):
 def extract_video_preview(file, **options):
     # type: (Union[File, Uri], **Any) -> Optional[bytes]
     """Extract thumbnail from video and return raw png byte data."""
-    opts = Opts(**options)
+    opts = Options(**options)
     size = opts.image_preview_size
     infile = uread.open_data(file)
 
@@ -120,7 +120,7 @@ def extract_video_signature(uri, crop=None, **options):
     :return: raw signature data
     """
 
-    opts = Opts(**options)
+    opts = Options(**options)
 
     infile = uread.open_data(uri)
     if not hasattr(infile, "name"):
@@ -156,7 +156,7 @@ def extract_video_signature(uri, crop=None, **options):
 def hash_video(features, **options):
     # type: (Sequence[Tuple[int]], **int) -> bytes
     """Compute wta-hash for a list of frame signature vectors"""
-    opts = Opts(**options)
+    opts = Options(**options)
     sigs = set(features)
     vecsum = [sum(col) for col in zip(*sigs)]
     video_hash = wtahash(vecsum, hl=opts.video_bits)
@@ -171,7 +171,7 @@ def compute_video_features_rolling(frames, **options):
     Generates segment-wise features where 'window' is the duration of segments in
     seconds and 'overlap' is the number of seconds that overlap for each segment.
     """
-    opts = Opts(**options)
+    opts = Options(**options)
     window = opts.video_window
     overlap = opts.video_overlap
     assert overlap < window, "Overlap must be shorter than window"
@@ -268,7 +268,7 @@ def detect_video_scenes(uri, **options):
     :return: List of tuples with start end end FrameTimecode.
     """
 
-    opts = Opts(**options)
+    opts = Options(**options)
 
     infile = uread.open_data(uri)
     if not hasattr(infile, "name"):

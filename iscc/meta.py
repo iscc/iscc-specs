@@ -2,7 +2,7 @@
 from more_itertools import interleave, sliced
 from iscc.utils import sliding_window
 from iscc.simhash import similarity_hash
-from iscc.schema import Opts
+from iscc.schema import Options
 from blake3 import blake3
 
 
@@ -14,7 +14,7 @@ def meta_hash(title, extra="", **options):
     is supplied we create separate hashes for title and extra and interleave them
     in 32-bit chunks.
     """
-    opts = Opts(**options)
+    opts = Options(**options)
     title = title.lower()
     title_n_grams = sliding_window(title, width=opts.meta_ngram_size)
     title_hash_digests = [blake3(s.encode("utf-8")).digest() for s in title_n_grams]

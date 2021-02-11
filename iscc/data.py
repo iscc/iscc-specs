@@ -6,7 +6,7 @@ from more_itertools import chunked
 from iscc.cdc import data_chunks
 from iscc.minhash import minhash_64, minhash_256
 from iscc.codec import encode_base64
-from iscc.schema import Readable, Opts
+from iscc.schema import Readable, Options
 
 
 def hash_data(data):
@@ -23,7 +23,7 @@ def hash_data_features(features):
 def extract_data_features(data, **options):
     # type: (Readable, **Any) -> Tuple[List[int], List[int]]
     """Extract low level data features (chunk-sizes, int32-hashes)"""
-    opts = Opts(**options)
+    opts = Options(**options)
     features = []
     sizes = []
     for chunk in data_chunks(data, **opts.dict()):
@@ -38,7 +38,7 @@ def encode_data_features(sizes, features, **options):
 
     :return: dicttionary with {"sizes": ..., "features": ...}
     """
-    opts = Opts(**options)
+    opts = Options(**options)
     encoded_sizes = [sum(fh) for fh in chunked(sizes, opts.data_granular_factor)]
     encoded_features = [
         encode_base64(minhash_64(cf))

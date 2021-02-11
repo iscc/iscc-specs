@@ -8,7 +8,7 @@ Compatible with https://pypi.org/project/fastcdc/ v1.3.0
 from typing import Any, Generator
 from iscc import uread
 from math import log2
-from iscc.schema import Readable, Opts
+from iscc.schema import Readable, Options
 
 AVG_SIZE_DATA = 1024
 READ_SIZE = 262144
@@ -26,7 +26,7 @@ def data_chunks(data, utf32=False, **options):
     :return: A generator that yields chunks of data.
     """
 
-    opts = Opts(**options)
+    opts = Options(**options)
     stream = uread.open_data(data)
 
     buffer = stream.read(opts.io_chunk_size)
