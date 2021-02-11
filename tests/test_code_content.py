@@ -31,7 +31,7 @@ def test_content_code_with_audio_defaults():
     tc = iscc.code_content(s.audios()[0])
     assert tc == {
         "code": "EIAWUJFCEZVCJIRG",
-        "duration": 15.5,
+        "duration": 15.503,
         "gmt": "audio",
         "mediatype": "audio/aiff",
         "title": "Belly Button",

@@ -271,7 +271,6 @@ def code_audio(data, **options):
         chroma = dict(fingerprint=data)
     else:
         chroma = audio.extract_audio_features(data, **options)
-        result["duration"] = chroma["duration"]
         result.update(video.extract_video_metadata(data))
 
     shash_digest = audio.hash_audio(chroma["fingerprint"])

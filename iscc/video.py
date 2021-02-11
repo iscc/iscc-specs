@@ -70,6 +70,12 @@ def extract_video_metadata(data):
                 # Add languages of audio streams
                 if stream.language and stream.language != "und":
                     languages.add(standardize_tag(stream.language))
+                if "duration" not in metadata:
+                    # Stream Duration
+                    duration = stream.duration or c_duration
+                    ds = round(float(duration * stream.time_base), ndigits=3)
+                    if ds > 0:
+                        metadata["duration"] = ds
 
         lng = languages.pop() if len(languages) == 1 else list(languages)
         if lng:

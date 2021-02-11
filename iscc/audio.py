@@ -37,7 +37,7 @@ def extract_audio_features(data, **options):
     """Returns Chromaprint fingerprint.
 
     A dictionary with keys:
-    - duration: total duration of extracted fingerprint in seconds
+    - duration: total duration of extracted fingerprint in seconds (Broken with pipe)
     - fingerprint: 32-bit (4 byte) integers as features
     """
     opts = Options(**options)

@@ -42,7 +42,7 @@ def test_code_iscc_audio():
     result = iscc.code_iscc(s.audios()[0])
     assert result == {
         "datahash": "1710943a7924bbe4ab67995308742b973e9e452a32277fa8fb077ca024fdee02",
-        "duration": 15.5,
+        "duration": 15.503,
         "filename": "demo.aif",
         "filesize": 2734784,
         "gmt": "audio",
@@ -112,7 +112,7 @@ def test_code_iscc_audio_granular():
     result = iscc.code_iscc(s.audios()[0], audio_granular=True)
     assert result == {
         "datahash": "1710943a7924bbe4ab67995308742b973e9e452a32277fa8fb077ca024fdee02",
-        "duration": 15.5,
+        "duration": 15.503,
         "features": [
             {
                 "features": [
