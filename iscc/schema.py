@@ -260,7 +260,12 @@ class ISCC(BaseModel):
         extra = "forbid"
         validate_assignment = True
 
-    version: int = Field(0, description="ISCC Schema Version")
+    version: str = Field(
+        "0-0-0",
+        title="ISCC Schema Version",
+        description="Version of ISCC Metadata Schema (SchemaVer).",
+        const=True,
+    )
     iscc: str = Field(description="ISCC code of the identified digital asset.")
 
     # Essential Metadata
@@ -284,8 +289,16 @@ class ISCC(BaseModel):
     mediatype: Optional[str] = Field(description="IANA Media Type (MIME type)")
 
     # Cryptographic hashes
-    metahash: Optional[str] = Field(description="Blake3 hash of metadata.")
-    datahash: Optional[str] = Field(description="Blake3 hash of media file.")
+    tophash: Optional[str] = Field(
+        title="tophash",
+        description="Blake3 hash over concatenation of metahash and datahash",
+    )
+    metahash: Optional[str] = Field(
+        title="metahash", description="Blake3 hash of metadata."
+    )
+    datahash: Optional[str] = Field(
+        title="datahash", description="Blake3 hash of media file."
+    )
 
     gmt: GMT = Field(GMT.unknown, description="Generic Media Type")
 
@@ -312,13 +325,15 @@ class ISCC(BaseModel):
         description="Standardized fingerprints for granular content "
         "recognition and matching purposes."
     )
-    fingerprint: Optional[str] = Field(
-        description="Base64 encoded original raw fingerprint (MPEG-7, Chromaprint) "
-        "from which the Content Code has been derived."
-    )
 
     # Presentational Metadata
     preview: Optional[str] = Field(description="Uri of media asset preview.")
+
+    # Todo: fingerprint should be a repeatable complex object (maybe part of features)
+    fingerprint: Optional[str] = Field(
+        description="Base64 encoded original raw fingerprint (MPEG-7, Chromaprint) "
+        "from which features and/or codes have been derived."
+    )
 
 
 class TextCode(BaseModel):

@@ -197,7 +197,9 @@ def compute_video_features_rolling(frames, **options):
             if frame.elapsed > start + window:
                 sigs.append(encode_base64(hash_video(segment_frames)))
                 break
-    return dict(kind=FeatureType.video, features=sigs, window=window, overlap=overlap)
+    return dict(
+        kind=FeatureType.video.value, features=sigs, window=window, overlap=overlap
+    )
 
 
 def compute_video_features_scenes(frames, scenes):
@@ -225,7 +227,7 @@ def compute_video_features_scenes(frames, scenes):
             except IndexError:
                 break
 
-    return dict(kind=FeatureType.video, features=features, sizes=durations)
+    return dict(kind=FeatureType.video.value, features=features, sizes=durations)
 
 
 def detect_video_crop(uri):

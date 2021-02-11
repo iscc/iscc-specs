@@ -7,7 +7,9 @@ import iscc_samples as s
 def test_code_iscc_text():
     result = iscc.code_iscc(s.texts()[0])
     assert result == {
+        "version": "0-0-0",
         "characters": 6077,
+        "tophash": "ee14ed804845ecf081ad6fab7d7acb0102d4a86974608c2cdbbe5af3cbd6554c",
         "datahash": "273cbd70856fad155db4c5fddbe6a73fc51b935bafe8251ebad03b83e29eebc7",
         "filename": "demo.doc",
         "filesize": 39936,
@@ -24,6 +26,8 @@ def test_code_iscc_text():
 def test_code_iscc_image():
     result = iscc.code_iscc(s.images()[0])
     assert result == {
+        "version": "0-0-0",
+        "tophash": "63f6e48bd32d55abe6f05b8d5b99bb2eaf162c47410bcffb7010de00385b71fd",
         "datahash": "9db4c0d9e68c5203dc8c2fefe52fa5d54671be3a3253e06888cace7c60e5a743",
         "filename": "demo.bmp",
         "filesize": 53256,
@@ -41,6 +45,8 @@ def test_code_iscc_image():
 def test_code_iscc_audio():
     result = iscc.code_iscc(s.audios()[0])
     assert result == {
+        "version": "0-0-0",
+        "tophash": "d20388f25f31bee40baa4895f67b282b68597580edecbb3bcd6c970a934bee7e",
         "datahash": "1710943a7924bbe4ab67995308742b973e9e452a32277fa8fb077ca024fdee02",
         "duration": 15.503,
         "filename": "demo.aif",
@@ -58,6 +64,8 @@ def test_code_iscc_video():
     result = iscc.code_iscc(s.videos()[0])
     assert result == {
         # "crop": "352:192:0:46",
+        "version": "0-0-0",
+        "tophash": "27afa05e42a2bfd756317f31713b01bd4cad1b768d49c2644dbee53ef0030e5b",
         "datahash": "c9a8c0806046de30261e3b31c12e8e8a8392c73e2faae3f822f8913dc6ba0931",
         "duration": 60.042,
         "filename": "demo.3g2",
@@ -79,7 +87,9 @@ def test_code_iscc_text_granular():
 
     result = iscc.code_iscc(s.texts()[0], text_granular=True, text_avg_chunk_size=512)
     assert result == {
+        "version": "0-0-0",
         "characters": 6077,
+        "tophash": "ee14ed804845ecf081ad6fab7d7acb0102d4a86974608c2cdbbe5af3cbd6554c",
         "datahash": "273cbd70856fad155db4c5fddbe6a73fc51b935bafe8251ebad03b83e29eebc7",
         "features": [
             {
@@ -111,6 +121,8 @@ def test_code_iscc_text_granular():
 def test_code_iscc_audio_granular():
     result = iscc.code_iscc(s.audios()[0], audio_granular=True)
     assert result == {
+        "version": "0-0-0",
+        "tophash": "d20388f25f31bee40baa4895f67b282b68597580edecbb3bcd6c970a934bee7e",
         "datahash": "1710943a7924bbe4ab67995308742b973e9e452a32277fa8fb077ca024fdee02",
         "duration": 15.503,
         "features": [
@@ -186,6 +198,7 @@ def test_code_iscc_audio_granular():
 def test_code_iscc_video_granular():
     result = iscc.code_iscc(s.videos()[0], video_granular=True)
     assert result == {
+        "version": "0-0-0",
         # "crop": "352:192:0:46",
         "datahash": "c9a8c0806046de30261e3b31c12e8e8a8392c73e2faae3f822f8913dc6ba0931",
         "duration": 60.042,
@@ -252,8 +265,18 @@ def test_code_iscc_video_granular():
         "iscc": "KMD6P2X7C73P72Z4K2MYF7CYSK5NT3IYMMD6TDPH3PE2RQEAMBDN4MA",
         "language": "en",
         "mediatype": "video/3gpp2",
+        "tophash": "27afa05e42a2bfd756317f31713b01bd4cad1b768d49c2644dbee53ef0030e5b",
         "metahash": "811717648744df4f18656c5f4a833b7b09a90be78205a0e0eeff8b9dbb0202fe",
         "title": "demo",
         "width": 352,
     }
     assert ISCC(**result)
+
+
+def test_code_iscc_video_include_fingerprint():
+    r = iscc.code_iscc(s.videos()[0], video_include_fingerprint=True)
+    iscc_result_obj = ISCC(**r)
+    assert iscc_result_obj.fingerprint.startswith("AAAAAYAAAAAAr4BfgAAAAAAAAJYAAs")
+    assert iscc_result_obj.fingerprint.endswith(
+        "+vME5VGQ9B5/WvdU+Zjurj60Mkyl0SjSwTWXgks3KxyiL45fM"
+    )

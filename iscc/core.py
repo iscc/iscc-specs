@@ -62,7 +62,7 @@ def code_iscc(uri, title=None, extra=None, **options):
     :param options: See iscc.schema.Options for detailed ISCC generator options.
     """
 
-    result = {}
+    result = {"version": "0-0-0"}
     features = []
 
     file_obj = uread.open_data(uri)
@@ -100,6 +100,8 @@ def code_iscc(uri, title=None, extra=None, **options):
             [meta["code"], content["code"], data["code"], instance["code"]]
         )
         result["iscc"] = iscc_code_obj.code
+        concat = bytes.fromhex(result["metahash"]) + bytes.fromhex(result["datahash"])
+        result["tophash"] = blake3(concat).hexdigest()
     finally:
         file_obj.close()
 
