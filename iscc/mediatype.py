@@ -125,6 +125,11 @@ SUPPORTED_MEDIATYPES = {
         "gmt": "text",
         "ext": "xlsx",
     },
+    # Note: pptx only detected by file extension. Sniffing gives 'application/zip'
+    "application/vnd.openxmlformats-officedocument.presentationml.presentation": {
+        "gmt": "text",
+        "ext": "pptx",
+    },
     "application/vnd.ms-excel": {"gmt": "text", "ext": "xls"},
     # TODO add mobi support
     # "application/x-mobipocket-ebook": {
@@ -170,6 +175,7 @@ SUPPORTED_MEDIATYPES = {
 MEDIATYPE_NORM = {
     "audio/x-aiff": "audio/aiff",
     "image/x-ms-bmp": "image/bmp",
+    "video/x-msvideo": "video/avi",
 }
 
 SUPPORTED_EXTENSIONS = []
