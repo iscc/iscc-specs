@@ -311,7 +311,7 @@ testing = ["packaging", "pep517", "importlib-resources (>=1.3)"]
 
 [[package]]
 name = "iscc-samples"
-version = "0.2.0"
+version = "0.3.0"
 description = "A collection of media files as sample data for ISCC testing."
 category = "dev"
 optional = false
@@ -672,7 +672,7 @@ typing_extensions = ["typing-extensions (>=3.7.2)"]
 
 [[package]]
 name = "pyexiv2"
-version = "2.4.1"
+version = "2.5.0"
 description = "Read/Write metadata(including EXIF, IPTC, XMP), comment and ICC Profile embedded in digital images."
 category = "main"
 optional = false
@@ -680,7 +680,7 @@ python-versions = ">=3.5"
 
 [[package]]
 name = "pygments"
-version = "2.7.4"
+version = "2.8.0"
 description = "Pygments is a syntax highlighting package written in Python."
 category = "dev"
 optional = false
@@ -760,7 +760,7 @@ cli = ["click (>=5.0)"]
 
 [[package]]
 name = "python-magic"
-version = "0.4.20"
+version = "0.4.22"
 description = "File type identification using libmagic"
 category = "main"
 optional = false
@@ -879,7 +879,7 @@ python-versions = ">= 3.5"
 
 [[package]]
 name = "tqdm"
-version = "4.56.2"
+version = "4.57.0"
 description = "Fast, Extensible Progress Meter"
 category = "main"
 optional = false
@@ -980,7 +980,7 @@ turbo = ["cython", "numba"]
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.6"
-content-hash = "bd45552cd6a0e8e95a3c00093e6ee3291fcccc078ad723a2c6e1ad4ed2548f63"
+content-hash = "3203d88d59bc212936620ea8f4895f457dbc7e1279863849d6fb2a0aca1696a5"
 
 [metadata.files]
 aiocontextvars = [
@@ -1233,7 +1233,7 @@ importlib-metadata = [
     {file = "importlib_metadata-1.7.0.tar.gz", hash = "sha256:90bb658cdbbf6d1735b6341ce708fc7024a3e14e99ffdc5783edea9f9b077f83"},
 ]
 iscc-samples = [
-    {file = "iscc-samples-0.2.0.tar.gz", hash = "sha256:7d47fa971bac77fd4bb435f5ed147d8aea969c01e45caad83043c69c6a5db5e8"},
+    {file = "iscc-samples-0.3.0.tar.gz", hash = "sha256:27beb1454fc9edd2c8da536f033b7b2e91739047c67b1ce340072d8acb4765f5"},
 ]
 jinja2 = [
     {file = "Jinja2-2.11.3-py2.py3-none-any.whl", hash = "sha256:03e47ad063331dd6a3f04a43eddca8a966a26ba0c5b7207a9a9e4e08f1b29419"},
@@ -1584,26 +1584,26 @@ pydantic = [
     {file = "pydantic-1.7.3.tar.gz", hash = "sha256:213125b7e9e64713d16d988d10997dabc6a1f73f3991e1ff8e35ebb1409c7dc9"},
 ]
 pyexiv2 = [
-    {file = "pyexiv2-2.4.1-cp35-none-macosx_10_14_x86_64.whl", hash = "sha256:c78e594b50546a5d4f699ee7fc2063300bc6489ddb524f07eb6c764e2cc35e92"},
-    {file = "pyexiv2-2.4.1-cp35-none-manylinux1_x86_64.whl", hash = "sha256:3663b7d01ceb9823265099dc3856b5f073fffeb28d28b6eb143fb7581739c22d"},
-    {file = "pyexiv2-2.4.1-cp35-none-win_amd64.whl", hash = "sha256:4e4a84201bd0e30479c41bc2c8b97e46d1aa96171dce3db64542b5b527659973"},
-    {file = "pyexiv2-2.4.1-cp36-none-macosx_10_14_x86_64.whl", hash = "sha256:a8e610f163a0389d3042d846b6f87efa6983de7ed394538e44dec3e309e67039"},
-    {file = "pyexiv2-2.4.1-cp36-none-manylinux1_x86_64.whl", hash = "sha256:e009912d9a7b695f891d1ce60a9ae7ecfee630c452b9efc171cb5975d04965cc"},
-    {file = "pyexiv2-2.4.1-cp36-none-win_amd64.whl", hash = "sha256:f19d4aa80a4627f2c6af4dc89f579ef172ed1f441bef8933c82ec7bed85a4885"},
-    {file = "pyexiv2-2.4.1-cp37-none-macosx_10_14_x86_64.whl", hash = "sha256:924091e5a7cb7a7bc4695a48d336b290bc5b27931410e7bc8dcbdf78ce0d0631"},
-    {file = "pyexiv2-2.4.1-cp37-none-manylinux1_x86_64.whl", hash = "sha256:dfb2bc01a9190ee640f47dd2789db541a66f968a82a81325184a1bc4da01daca"},
-    {file = "pyexiv2-2.4.1-cp37-none-win_amd64.whl", hash = "sha256:2669b1c4f4b7ba02ec3364ffc3b8374995bb2ccfcfd77fd3c46c3a4690973f61"},
-    {file = "pyexiv2-2.4.1-cp38-none-macosx_10_14_x86_64.whl", hash = "sha256:f67c7f476bfb70d1bc18d518554a3081d4c8ce7cfdfc3e1e1666ef98877141d2"},
-    {file = "pyexiv2-2.4.1-cp38-none-manylinux1_x86_64.whl", hash = "sha256:d2bed813f251d766d1efb29f8795b176c89cc50008664e30714f17134d091ebc"},
-    {file = "pyexiv2-2.4.1-cp38-none-win_amd64.whl", hash = "sha256:fb155e797b5da2c2cd5f0faa752ebd07668923eda16922ffa988e752a655c82d"},
-    {file = "pyexiv2-2.4.1-cp39-none-macosx_10_14_x86_64.whl", hash = "sha256:9747b62274f7d967aa4201d5a6393c38a8763b8676d0cc84a492524e545490ed"},
-    {file = "pyexiv2-2.4.1-cp39-none-manylinux1_x86_64.whl", hash = "sha256:b42e14c8dff57e14ab64b47100628db30137e20965c7ac81447296b53e0dd0a0"},
-    {file = "pyexiv2-2.4.1-cp39-none-win_amd64.whl", hash = "sha256:414afbc71ce093c4abf3d4d35b6dcd21b995ed38af75c090ccbf41f02d0dd9c3"},
-    {file = "pyexiv2-2.4.1.tar.gz", hash = "sha256:733a331d6a1ae2e2ccb3348f2ea387b08f028c188a56fc796951d71e286e6eaa"},
+    {file = "pyexiv2-2.5.0-cp35-none-macosx_10_14_x86_64.whl", hash = "sha256:7fab947b7b6a34947573db845b2d5637e214df6413e05f0c6eb016c768537787"},
+    {file = "pyexiv2-2.5.0-cp35-none-manylinux1_x86_64.whl", hash = "sha256:cdab46bc5fa148244d3158f3777cb78970cb043bc9b69eba78953bf1d558b1e3"},
+    {file = "pyexiv2-2.5.0-cp35-none-win_amd64.whl", hash = "sha256:c4ff751432f8fef3f4f2eb3617ded7fc6e3cdd280ed1f69fa1d4b24f03a46115"},
+    {file = "pyexiv2-2.5.0-cp36-none-macosx_10_14_x86_64.whl", hash = "sha256:85cefeb70012dd2ba19da0aa0bb571aad03146af3cae06d7ea681555d562547d"},
+    {file = "pyexiv2-2.5.0-cp36-none-manylinux1_x86_64.whl", hash = "sha256:af469af90115cb4223f896144f5b5d7aad7388a6382f7c16468a6f6da32782ec"},
+    {file = "pyexiv2-2.5.0-cp36-none-win_amd64.whl", hash = "sha256:d685427dd2d67bb5bebe68fca2e3e06287b3b39bded4a130e1f30cc04b2a59ea"},
+    {file = "pyexiv2-2.5.0-cp37-none-macosx_10_14_x86_64.whl", hash = "sha256:d4298ae5285f20190f64ebed8be805f86ab88fb332af7f356f8cc3fd16207b2e"},
+    {file = "pyexiv2-2.5.0-cp37-none-manylinux1_x86_64.whl", hash = "sha256:5a7613e776a8af28106ae092a84b9e0c7da915511f4891c27ec7a670842d6468"},
+    {file = "pyexiv2-2.5.0-cp37-none-win_amd64.whl", hash = "sha256:9d98964a24cee893383f547982a759641e0e8a3f3500f88abaf2eb15bf33f5c6"},
+    {file = "pyexiv2-2.5.0-cp38-none-macosx_10_14_x86_64.whl", hash = "sha256:3800979355e7c289d34dee04bdce03a0cdb2d1c929052a541201730dd1ff49a3"},
+    {file = "pyexiv2-2.5.0-cp38-none-manylinux1_x86_64.whl", hash = "sha256:5fddf62391c20a57664e2c3d927e60ef984c65c1437767fa5135f1b9efd14400"},
+    {file = "pyexiv2-2.5.0-cp38-none-win_amd64.whl", hash = "sha256:44af25456aeff9d48a1c382ea9c6ed8229baa9450619cc5e288203aa5c717403"},
+    {file = "pyexiv2-2.5.0-cp39-none-macosx_10_14_x86_64.whl", hash = "sha256:1197e1b4837676a98f1df2bd1c297b3040baa88a0caee569cfe48b808d585d9d"},
+    {file = "pyexiv2-2.5.0-cp39-none-manylinux1_x86_64.whl", hash = "sha256:fa42317be8500599b81dda983a0527ab9895b890a924f6d593b63e177c087f64"},
+    {file = "pyexiv2-2.5.0-cp39-none-win_amd64.whl", hash = "sha256:1ffa7c599a121671ce3984f86f20fa4a30fbc37713cfbca00ba450017a4a475e"},
+    {file = "pyexiv2-2.5.0.tar.gz", hash = "sha256:a86e68de0706da6402609bc8be1c643344efe8807c85ecb6779abc219afa1e5e"},
 ]
 pygments = [
-    {file = "Pygments-2.7.4-py3-none-any.whl", hash = "sha256:bc9591213a8f0e0ca1a5e68a479b4887fdc3e75d0774e5c71c31920c427de435"},
-    {file = "Pygments-2.7.4.tar.gz", hash = "sha256:df49d09b498e83c1a73128295860250b0b7edd4c723a32e9bc0d295c7c2ec337"},
+    {file = "Pygments-2.8.0-py3-none-any.whl", hash = "sha256:b21b072d0ccdf29297a82a2363359d99623597b8a265b8081760e4d0f7153c88"},
+    {file = "Pygments-2.8.0.tar.gz", hash = "sha256:37a13ba168a02ac54cc5891a42b1caec333e59b66addb7fa633ea8a6d73445c0"},
 ]
 pyld = [
     {file = "PyLD-2.0.3.tar.gz", hash = "sha256:287445f888c3a332ccbd20a14844c66c2fcbaeab3c99acd506a0788e2ebb2f82"},
@@ -1625,8 +1625,8 @@ python-dotenv = [
     {file = "python_dotenv-0.15.0-py2.py3-none-any.whl", hash = "sha256:0c8d1b80d1a1e91717ea7d526178e3882732420b03f08afea0406db6402e220e"},
 ]
 python-magic = [
-    {file = "python-magic-0.4.20.tar.gz", hash = "sha256:0cc52ccad086c377b9194014e3dbf98d94b194344630172510a6a3e716b47801"},
-    {file = "python_magic-0.4.20-py2.py3-none-any.whl", hash = "sha256:33ce94d9395aa269a9c5fac10ae124a5fb328ebe248f36efc5a43922edee662e"},
+    {file = "python-magic-0.4.22.tar.gz", hash = "sha256:ca884349f2c92ce830e3f498c5b7c7051fe2942c3ee4332f65213b8ebff15a62"},
+    {file = "python_magic-0.4.22-py2.py3-none-any.whl", hash = "sha256:8551e804c09a3398790bd9e392acb26554ae2609f29c72abb0b9dee9a5571eae"},
 ]
 python-magic-bin = [
     {file = "python_magic_bin-0.4.14-py2.py3-none-macosx_10_6_intel.whl", hash = "sha256:7b1743b3dbf16601d6eedf4e7c2c9a637901b0faaf24ad4df4d4527e7d8f66a4"},
@@ -1770,8 +1770,8 @@ tornado = [
     {file = "tornado-6.1.tar.gz", hash = "sha256:33c6e81d7bd55b468d2e793517c909b139960b6c790a60b7991b9b6b76fb9791"},
 ]
 tqdm = [
-    {file = "tqdm-4.56.2-py2.py3-none-any.whl", hash = "sha256:a89be573bfddb81bb0b395a416d5e55e3ecc73ce95a368a4f6360bedea33195e"},
-    {file = "tqdm-4.56.2.tar.gz", hash = "sha256:11d544652edbdfc9cc41aa4c8a5c166513e279f3f2d9f1a9e1c89935b51de6ff"},
+    {file = "tqdm-4.57.0-py2.py3-none-any.whl", hash = "sha256:70657337ec104eb4f3fb229285358f23f045433f6aea26846cdd55f0fd68945c"},
+    {file = "tqdm-4.57.0.tar.gz", hash = "sha256:65185676e9fdf20d154cffd1c5de8e39ef9696ff7e59fe0156b1b08e468736af"},
 ]
 typed-ast = [
     {file = "typed_ast-1.4.2-cp35-cp35m-manylinux1_i686.whl", hash = "sha256:7703620125e4fb79b64aa52427ec192822e9f45d37d4b6625ab37ef403e1df70"},
