@@ -33,3 +33,4 @@ from iscc.video import *
 from iscc.jcs import *
 from iscc.match import *
 from iscc.mediatype import *
+from iscc.index import *
