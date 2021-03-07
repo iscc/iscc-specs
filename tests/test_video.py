@@ -152,7 +152,9 @@ def test_code_video_include_mp7sig():
 
 def test_code_video_preview():
     result = code_video(SAMPLE, video_preview=True)
-    assert result["preview"].endswith("Z4h6t54UOnUxIAA")
+    preview = result["preview"]
+    assert preview.startswith("data:image/webp;base64,UklGRpoCAABXRUJQVlA4II4CAACQDQCd")
+    assert preview.endswith("GvkEq8A/EtLg6gfFTFgDZr++JWCKAbvgD3Qmv6NBCua61VsXvvDGIAAA=")
 
 
 def test_hash_video():
