@@ -38,6 +38,13 @@ class Index:
     def add(self, code, features=None):
         # type: (str, Optional[List[Dict]]) -> int
         """Add an ISCC to the index."""
+
+        # Check for duplicate
+        exists = self.get_id(code)
+        if exists is not None:
+            return exists
+
+        # Normalize
         components = iscc.decompose(code)
         iscc_obj = iscc.compose(components)
 
@@ -59,6 +66,25 @@ class Index:
             self.putmulti(db, items)
 
         return unpack(mainkey)
+
+    def get_id(self, code) -> Optional[int]:
+        """Get internal ID of for ISCC"""
+        # Find per component matches
+        components = iscc.decompose(code)
+        db = self.db_components()
+        idxs = []
+        with self.env.begin(db=db) as txn:
+            for code in components:
+                idx = txn.get(code.bytes)
+                if idx is not None:
+                    idxs.append(idx)
+        # Check if any of the full code entries is an exact match
+        full_code_bytes = iscc.compose(components).bytes
+        db = self.db_isccs()
+        with self.env.begin(db=db) as txn:
+            for idx in idxs:
+                if txn.get(idx) == full_code_bytes:
+                    return unpack(idx)
 
     def next_key(self) -> bytes:
         """Next free autoincrement id as 4-byte key"""
@@ -160,25 +186,8 @@ class Index:
 
     def __contains__(self, item):
         """Check if full iscc code is in index."""
-        # Find per component matches
-        components = iscc.decompose(item)
-        db = self.db_components()
-        idxs = []
-        with self.env.begin(db=db) as txn:
-            for code in components:
-                idx = txn.get(code.bytes)
-                if idx is None:
-                    return False
-                idxs.append(idx)
-        # Check if any of the full code entries is an exact match
-        full_code_bytes = iscc.compose(components).bytes
-        db = self.db_isccs()
-        with self.env.begin(db=db) as txn:
-            for idx in idxs:
-                if txn.get(idx) == full_code_bytes:
-                    return True
-        # No exact match found
-        return False
+        id_ = self.get_id(item)
+        return False if id_ is None else True
 
 
 if __name__ == "__main__":

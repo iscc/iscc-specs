@@ -17,6 +17,11 @@ def full_iscc():
 
 
 @pytest.fixture
+def ten_isccs():
+    return [iscc.Code.rnd(mt=iscc.MT.ISCC, bits=256) for _ in range(10)]
+
+
+@pytest.fixture
 def iscc_result():
     return iscc.code_iscc(iscc_samples.videos()[0], video_granular=True)
 
@@ -29,6 +34,26 @@ def test_index_len(idx, full_iscc):
     assert len(idx) == 0
     idx.add(full_iscc.code)
     assert len(idx) == 1
+
+
+def test_index_add_returns_id(idx, full_iscc):
+    assert idx.add(full_iscc) == 0
+    assert idx.add(iscc.Code.rnd(iscc.MT.ISCC, bits=256)) == 1
+
+
+def test_index_add_no_dupes(idx, full_iscc):
+    idx.add(full_iscc.code)
+    assert len(idx) == 1
+    idx.add(full_iscc.code)
+    assert len(idx) == 1
+
+
+def test_index_get_id(idx, ten_isccs):
+    for code in ten_isccs:
+        idx.add(code.code)
+    assert idx.get_id(ten_isccs[0].code) == 0
+    assert idx.get_id(ten_isccs[-1].code) == 9
+    assert idx.get_id(iscc.Code.rnd(iscc.MT.ISCC, bits=256)) is None
 
 
 def test_index_map_size(idx):
