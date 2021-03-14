@@ -1,5 +1,24 @@
 # -*- coding: utf-8 -*-
-"""Persistent inverted index for ISCCs, components and granular features."""
+"""Persistent inverted index for ISCCs, components and granular features.
+
+Subdatabases
+1.  iscc_none_v0_256
+----------------------------
+2.  meta_code_v0_64
+3.  content_text_v0_64
+4.  content_image_v0_64
+4.  content audio_v0_64
+5.  content video_v0_64
+6.  data_code_v0_64
+8.  instance_code_v0_64
+----------------------------
+9.  feat_text_v0_64
+10. feat_image_v0_64
+11. feat_audio_v0_64
+12. feat_video_v0_64
+----------------------------
+13. metdata
+"""
 from os.path import join
 from typing import List, Optional, Dict
 from loguru import logger as log
@@ -15,14 +34,22 @@ unpack = lambda b: struct.unpack("I", b)[0]
 
 
 class Index:
-    def __init__(self, name="iscc-db"):
+    def __init__(self, name="iscc-db", **options):
+        """Create or open existing index.
+
+        :param str name: Name of index.
+        :param bool index_components: Create inverted index of components -> iscc
+        :param bool index_features: Create inverted index of features -> iscc
+        :param bool store_metadata: Store metadata in index.
+        """
+
         self.name = name
         self.dbpath = join(iscc.APP_DIR, self.name)
         log.info(f"init storage at {self.dbpath}")
         self.env = lmdb.open(
             path=self.dbpath,
             map_size=2 ** 20,
-            max_dbs=10,
+            max_dbs=24,
             metasync=False,
             sync=False,
             readahead=False,
@@ -85,6 +112,11 @@ class Index:
             for idx in idxs:
                 if txn.get(idx) == full_code_bytes:
                     return unpack(idx)
+
+    def add_component(self, code, pk):
+        # type: (iscc.Code, bytes) -> None
+        db = self.db(code.type_id.encode('ascii'))
+        self.put(db, code.hash_bytes, pk)
 
     def next_key(self) -> bytes:
         """Next free autoincrement id as 4-byte key"""
