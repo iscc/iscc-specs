@@ -27,17 +27,25 @@ A short example on how to create an ISCC Code with the reference implementation.
 >>> import iscc
 >>> iscc.code_iscc("README.md")
 {
-    'characters': 2918,
-    'datahash': 'd30edda59fd4803ad0d2754fcbda1ec4097d12bd790b10cd610a24764cfcef16',
+    'characters': 3289,
+    'datahash': '2bf48bdd82a7ac977acf39a3a70514793cce7ad0b347db4a8eb93a00670a83dd',
+    'features': [{'features': ['VoYV6zlLw1I',
+                            'gx7N7I0tjCE',
+                            'lNlHLTp74x0',
+                            'M8aTn6atuB0'],
+               'kind': <FeatureType.text: 'text'>,
+               'sizes': [1596, 824, 353, 516]}],
     'filename': 'README.md',
-    'filesize': 3075,
+    'filesize': 3605,
     'gmt': 'text',
-    'iscc': 'KADYHLZUJ43U3LX7C6P5LSJ7JHAETKCYHYCQ5YX4C3JQ5XNFT7KIAOQ',
+    'iscc': 'KADYHLZUJ43U3LX7C6LMLSZ7JHAUXHKNWECRZZS4NYV7JC65QKT2ZFY',
     'language': 'en',
     'mediatype': 'text/markdown',
     'metahash': '828dd01bf76b78fc448f6d2ab25008835d2993c6acde205235dc942083c4677d',
-    'title': '# ISCC Spec and Reference Code'
- }
+    'title': '# ISCC Spec and Reference Code',
+    'tophash': '44a61d49189868b584d72c44e97a505090ca55eda2ad03f1578f6a58383a1023',
+    'version': '0-0-0'
+}
 ```
 
 ## Working with the specification
