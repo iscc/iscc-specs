@@ -7,18 +7,18 @@ import iscc_samples as s
 def test_code_iscc_text():
     result = iscc.code_iscc(s.texts()[0])
     assert result == {
-        "version": "0-0-0",
-        "characters": 6077,
-        "tophash": "ee14ed804845ecf081ad6fab7d7acb0102d4a86974608c2cdbbe5af3cbd6554c",
-        "datahash": "273cbd70856fad155db4c5fddbe6a73fc51b935bafe8251ebad03b83e29eebc7",
+        "characters": 6068,
+        "datahash": "46d1ebd64f515371c88d1df5bc0d43893b1fa1e58654b2c4244e491d06007a61",
         "filename": "demo.doc",
-        "filesize": 39936,
+        "filesize": 40448,
         "gmt": "text",
-        "iscc": "KADV5PDFXBL7HGBXFFW64KVNP6UGTUZC2CJTDBKMFYTTZPLQQVX22FI",
+        "iscc": "KADV4NDFVBLGHAJXFFU64KVNP6UGTAZALCN3HBKABNDND26WJ5IVG4I",
         "language": "ca",
         "mediatype": "application/msword",
-        "metahash": "f972dfbbcc2cff382910145073539169cc7e3ebc8032f75dfe4d4b23c4bb3614",
-        "title": "Demo DOC Title from Metadata",
+        "metahash": "1da548c5285ed35f293c3e22c2f050e037643aae8cf9244b532a162ff5031f52",
+        "title": "title from metadata",
+        "tophash": "70413571d021a1e0e31ad18d6f8d5b6b0829b0308189ff772e258a0158a70adb",
+        "version": "0-0-0",
     }
     assert ISCC(**result)
 
@@ -87,10 +87,8 @@ def test_code_iscc_text_granular():
 
     result = iscc.code_iscc(s.texts()[0], text_granular=True, text_avg_chunk_size=512)
     assert result == {
-        "version": "0-0-0",
-        "characters": 6077,
-        "tophash": "ee14ed804845ecf081ad6fab7d7acb0102d4a86974608c2cdbbe5af3cbd6554c",
-        "datahash": "273cbd70856fad155db4c5fddbe6a73fc51b935bafe8251ebad03b83e29eebc7",
+        "characters": 6068,
+        "datahash": "46d1ebd64f515371c88d1df5bc0d43893b1fa1e58654b2c4244e491d06007a61",
         "features": [
             {
                 "features": [
@@ -102,18 +100,20 @@ def test_code_iscc_text_granular():
                     "aWurLq366Ok",
                     "jp3dJyg55jo",
                 ],
-                "sizes": [1023, 455, 667, 2809, 455, 667, 1],
                 "kind": "text",
+                "sizes": [1014, 455, 667, 2809, 455, 667, 1],
             }
         ],
         "filename": "demo.doc",
-        "filesize": 39936,
+        "filesize": 40448,
         "gmt": "text",
-        "iscc": "KADV5PDFXBL7HGBXFFW64KVNP6UGTUZC2CJTDBKMFYTTZPLQQVX22FI",
+        "iscc": "KADV4NDFVBLGHAJXFFU64KVNP6UGTAZALCN3HBKABNDND26WJ5IVG4I",
         "language": "ca",
         "mediatype": "application/msword",
-        "metahash": "f972dfbbcc2cff382910145073539169cc7e3ebc8032f75dfe4d4b23c4bb3614",
-        "title": "Demo DOC Title from Metadata",
+        "metahash": "1da548c5285ed35f293c3e22c2f050e037643aae8cf9244b532a162ff5031f52",
+        "title": "title from metadata",
+        "tophash": "70413571d021a1e0e31ad18d6f8d5b6b0829b0308189ff772e258a0158a70adb",
+        "version": "0-0-0",
     }
     assert ISCC(**result)
 
@@ -280,3 +280,7 @@ def test_code_iscc_video_include_fingerprint():
     assert iscc_result_obj.fingerprint.endswith(
         "+vME5VGQ9B5/WvdU+Zjurj60Mkyl0SjSwTWXgks3KxyiL45fM"
     )
+
+
+# def test_code_iscc_text_title_extraction():
+#     r = iscc.code_iscc(s.texts('.pdf'))

@@ -115,7 +115,7 @@ class Index:
 
     def add_component(self, code, pk):
         # type: (iscc.Code, bytes) -> None
-        db = self.db(code.type_id.encode('ascii'))
+        db = self.db(code.type_id.encode("ascii"))
         self.put(db, code.hash_bytes, pk)
 
     def next_key(self) -> bytes:

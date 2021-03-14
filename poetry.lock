@@ -311,7 +311,7 @@ testing = ["packaging", "pep517", "importlib-resources (>=1.3)"]
 
 [[package]]
 name = "iscc-samples"
-version = "0.3.0"
+version = "0.4.0"
 description = "A collection of media files as sample data for ISCC testing."
 category = "dev"
 optional = false
@@ -989,7 +989,7 @@ turbo = ["cython", "numba"]
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.6"
-content-hash = "407c0c4d2979ec4e69b5b5e4918c73c00925c21766cbb1a7f3145df95aee6dfd"
+content-hash = "68b07acdffaa2fb50f9902ef30795e1f14f48872bb4414ed1f445352d4008ec4"
 
 [metadata.files]
 aiocontextvars = [
@@ -1240,7 +1240,7 @@ importlib-metadata = [
     {file = "importlib_metadata-1.7.0.tar.gz", hash = "sha256:90bb658cdbbf6d1735b6341ce708fc7024a3e14e99ffdc5783edea9f9b077f83"},
 ]
 iscc-samples = [
-    {file = "iscc-samples-0.3.0.tar.gz", hash = "sha256:27beb1454fc9edd2c8da536f033b7b2e91739047c67b1ce340072d8acb4765f5"},
+    {file = "iscc-samples-0.4.0.tar.gz", hash = "sha256:98925bec8adcc8c843ddd42b32d0c7972ed1c2ff635cb44144fd7c08929d2a2f"},
 ]
 jinja2 = [
     {file = "Jinja2-2.11.3-py2.py3-none-any.whl", hash = "sha256:03e47ad063331dd6a3f04a43eddca8a966a26ba0c5b7207a9a9e4e08f1b29419"},

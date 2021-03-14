@@ -65,7 +65,7 @@ def test_code_instance_inputs():
     for rb in text_readables():
         result = iscc.code_instance(rb)
         assert result == {
-            "code": "IAASOPF5OCCW7LIV",
-            "datahash": "273cbd70856fad155db4c5fddbe6a73fc51b935bafe8251ebad03b83e29eebc7",
-            "filesize": 39936,
+            "code": "IAAUNUPL2ZHVCU3R",
+            "datahash": "46d1ebd64f515371c88d1df5bc0d43893b1fa1e58654b2c4244e491d06007a61",
+            "filesize": 40448,
         }

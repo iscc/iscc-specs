@@ -37,7 +37,7 @@ def test_extract_text_readables():
         if not isinstance(readable, bytearray):
             result = iscc.extract_text(readable)
             assert type(result) == str
-            assert len(result) == 6146
+            assert len(result) == 6135
 
 
 def test_extract_text_filetypes():
@@ -176,7 +176,7 @@ def test_chunk_text():
 def test_chunkt_text_options():
     txt = iscc.extract_text(texts()[0])
     ntxt = iscc.normalize_text(txt)
-    assert len(ntxt) == 6077
+    assert len(ntxt) == 6068
     chunks = list(iscc.chunk_text(ntxt, text_avg_chunk_size=512))
     assert len(chunks) == 7
 

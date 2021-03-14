@@ -6,12 +6,12 @@ import iscc_samples as s
 def test_content_code_with_text_defaults():
     tc = iscc.code_content(s.texts()[0])
     assert tc == {
-        "characters": 6077,
-        "code": "EAASS3POFKWX7KDJ",
+        "characters": 6068,
+        "code": "EAASS2POFKWX7KDJ",
         "gmt": "text",
         "language": "ca",
         "mediatype": "application/msword",
-        "title": "Demo DOC (Title from Metadata)",
+        "title": "title from metadata",
     }
 
 

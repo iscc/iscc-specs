@@ -60,7 +60,7 @@ def test_code_data_random_changes():
 def test_code_data_inputs():
     for rb in text_readables():
         result = iscc.code_data(rb)
-        assert result == {"code": "GAA5GIWQSMYYKTBO"}
+        assert result == {"code": "GAAYGICYTOZYKQAL"}
 
 
 def test_code_data_granular():
