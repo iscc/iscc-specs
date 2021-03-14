@@ -87,7 +87,7 @@ def code_iscc(uri, title=None, extra=None, **options):
         if features:
             result["features"] = features
 
-        if title is None:
+        if not title:
             title = content.get("title")
         if not title and file_name:
             title = text.name_from_uri(file_name)
