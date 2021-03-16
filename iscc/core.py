@@ -66,44 +66,42 @@ def code_iscc(uri, title=None, extra=None, **options):
     features = []
 
     file_obj = uread.open_data(uri)
-    try:
-        file_name = getattr(file_obj, "name", None)
-        if file_name:
-            result["filename"] = basename(file_name)
 
-        instance = code_instance(file_obj, **options)
-        result.update(instance)
+    file_name = getattr(file_obj, "name", None)
+    if file_name:
+        result["filename"] = basename(file_name)
 
-        data = code_data(file_obj, **options)
-        if "features" in data:
-            features.append(data.pop("features"))
-        result.update(data)
+    instance = code_instance(file_obj, **options)
+    result.update(instance)
 
-        content = code_content(file_obj, **options)
-        if "features" in content:
-            features.append(content.pop("features"))
-        result.update(content)
+    data = code_data(file_obj, **options)
+    if "features" in data:
+        features.append(data.pop("features"))
+    result.update(data)
 
-        if features:
-            result["features"] = features
+    content = code_content(file_obj, **options)
+    if "features" in content:
+        features.append(content.pop("features"))
+    result.update(content)
 
-        if not title:
-            title = content.get("title")
-        if not title and file_name:
-            title = text.name_from_uri(file_name)
+    if features:
+        result["features"] = features
 
-        meta = code_meta(title, extra, **options)
-        result.update(meta)
-        del result["code"]
+    if not title:
+        title = content.get("title")
+    if not title and file_name:
+        title = text.name_from_uri(file_name)
 
-        iscc_code_obj = compose(
-            [meta["code"], content["code"], data["code"], instance["code"]]
-        )
-        result["iscc"] = iscc_code_obj.code
-        concat = bytes.fromhex(result["metahash"]) + bytes.fromhex(result["datahash"])
-        result["tophash"] = blake3(concat).hexdigest()
-    finally:
-        file_obj.close()
+    meta = code_meta(title, extra, **options)
+    result.update(meta)
+    del result["code"]
+
+    iscc_code_obj = compose(
+        [meta["code"], content["code"], data["code"], instance["code"]]
+    )
+    result["iscc"] = iscc_code_obj.code
+    concat = bytes.fromhex(result["metahash"]) + bytes.fromhex(result["datahash"])
+    result["tophash"] = blake3(concat).hexdigest()
 
     return result
 
