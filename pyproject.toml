@@ -43,7 +43,7 @@ av = "^8.0"
 python-magic-bin = { version = "^0.4.14", markers = "sys_platform == 'win32' or sys_platform == 'darwin'" }
 python-magic = { version = "^0.4.18", markers = "sys_platform == 'linux'" }
 tika = "^1.24"
-langcodes = "^2.1"
+langcodes = "^3.1.0"
 langdetect = "^1.0"
 pyexiv2 = "^2.4"
 requests = "^2.25"
