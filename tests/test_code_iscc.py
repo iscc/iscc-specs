@@ -283,7 +283,7 @@ def test_code_iscc_video_include_fingerprint():
 
 
 def test_code_iscc_text_title_extraction():
-    r = iscc.code_iscc(s.texts('.pdf')[0].as_posix())
-    assert r['title'] == 'title from metadata'
-    r = iscc.code_iscc(s.texts('.pdf')[0].as_posix(), title="")
-    assert r['title'] == 'title from metadata'
+    r = iscc.code_iscc(s.texts(".pdf")[0].as_posix())
+    assert r["title"] == "title from metadata"
+    r = iscc.code_iscc(s.texts(".pdf")[0].as_posix(), title="")
+    assert r["title"] == "title from metadata"
