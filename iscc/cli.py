@@ -42,7 +42,9 @@ def decompose(icode: str):
 
 
 @app.command("iscc")
-def main(path: Path, verbose: int = Verbose, debug: bool = Debug):
+def main(
+    path: Path, verbose: int = Verbose, debug: bool = Debug, granular: bool = False
+):
     """Generate ISCC for file(s)."""
     if debug:
         log.add(sys.stderr)
@@ -50,7 +52,7 @@ def main(path: Path, verbose: int = Verbose, debug: bool = Debug):
     for file in files(path):
         try:
             with Timer(text="ISCC generation time: {:0.4f} seconds", logger=log.info):
-                result = iscc.code_iscc(file)
+                result = iscc.code_iscc(file, all_granular=granular)
             if not isinstance(result, dict):
                 typer.echo(f"no result for {file.name} ({result})")
                 continue
