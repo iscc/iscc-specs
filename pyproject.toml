@@ -24,7 +24,7 @@ classifiers=[
 igen = 'iscc.cli:app'
 
 [tool.poetry.dependencies]
-python = "^3.6"
+python = "^3.6.1"
 importlib-metadata = {version = "^1.0", python = "<3.8"}
 xxhash = "^2"
 Pillow = "^8"
@@ -37,7 +37,7 @@ numpy = "<=1.19.3"
 numba = { version = "0.52", python = ">=3.6,<3.9", optional = true}
 loguru = "^0.5"
 imageio-ffmpeg = "^0.4"
-pydantic = "^1.7"
+pydantic = "^1.8"
 scenedetect = {extras = ["opencv-headless"], version = "^0.5"}
 av = "^8.0"
 python-magic-bin = { version = "^0.4.14", markers = "sys_platform == 'win32' or sys_platform == 'darwin'" }
