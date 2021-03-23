@@ -67,12 +67,33 @@ def test_index_in(idx, full_iscc):
     assert iscc.Code.rnd(mt=iscc.MT.ISCC, bits=256).code not in idx
 
 
-def test_index_dbs(idx, full_iscc, iscc_result):
+def test_index_dbs_default(idx, iscc_result):
+    # Default index
     assert idx.dbs() == []
-    idx.add(full_iscc.code)
+    idx.add(iscc_result)
     assert idx.dbs() == [b"components", b"isccs"]
-    idx.add(iscc_result["iscc"], iscc_result["features"])
-    assert idx.dbs() == [b"components", b"isccs", b"video"]
+
+
+def test_index_dbs_features():
+    # Index with freatures
+    idx = iscc.Index("test-db-features", index_features=True)
+    iscc_result = iscc.code_iscc(iscc_samples.videos()[0], video_granular=True)
+    idx.add(iscc_result)
+    try:
+        assert idx.dbs() == [b"components", b"isccs", b"video"]
+    finally:
+        idx.destory()
+
+
+def test_index_dbs_metadata():
+    # Index with metadata
+    idx = iscc.Index("test-db-metadata", index_metadata=True)
+    iscc_result = iscc.code_iscc(iscc_samples.videos()[0], video_granular=True)
+    idx.add(iscc_result)
+    try:
+        assert idx.dbs() == [b"components", b"isccs", b"metadata"]
+    finally:
+        idx.destory()
 
 
 def test_index_iscc(idx, full_iscc):

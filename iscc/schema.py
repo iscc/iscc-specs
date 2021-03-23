@@ -5,6 +5,8 @@ from io import BufferedReader, BytesIO
 from pathlib import Path
 from typing import BinaryIO, List, Optional, Union
 from pydantic import BaseSettings, BaseModel, Field
+from iscc import APP_DIR
+from os.path import join
 
 
 Data = Union[bytes, bytearray, memoryview]
@@ -193,6 +195,18 @@ class Options(BaseSettings):
     io_chunk_size: int = Field(
         262144, description="Number of bytes per io read operation"
     )
+
+    index_root: Path = Field(join(APP_DIR, "db"), description="Storage root path")
+
+    index_components: bool = Field(
+        True, description="Create inverted index of component to ISCCs"
+    )
+
+    index_features: bool = Field(
+        False, description="Create inverted index of features to ISCCs"
+    )
+
+    index_metadata: bool = Field(False, description="Store metadata in index")
 
 
 class GMT(str, Enum):

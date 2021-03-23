@@ -19,15 +19,16 @@ Subdatabases
 ----------------------------
 13. metdata
 """
+import os
 from os.path import join
-from typing import List, Optional, Dict
+from typing import List, Optional, Dict, Any, Union
 from loguru import logger as log
 import iscc
 import lmdb
 import struct
 import shutil
 from humanize import naturalsize
-
+from iscc.schema import Options, ISCC
 
 pack = lambda n: struct.pack("I", n)
 unpack = lambda b: struct.unpack("I", b)[0]
@@ -35,17 +36,22 @@ unpack = lambda b: struct.unpack("I", b)[0]
 
 class Index:
     def __init__(self, name="iscc-db", **options):
+        # type: (str, **Any) -> Index
         """Create or open existing index.
 
         :param str name: Name of index.
-        :param bool index_components: Create inverted index of components -> iscc
-        :param bool index_features: Create inverted index of features -> iscc
-        :param bool store_metadata: Store metadata in index.
+        :param str index_root: The root path for databases.
+        :param bool index_components: Create inverted index of components -> iscc.
+        :param bool index_features: Create inverted index of features -> iscc.
+        :param bool index_metadata: Store metadata in index.
         """
 
+        self.opts = Options(**options)
+
         self.name = name
-        self.dbpath = join(iscc.APP_DIR, self.name)
-        log.info(f"init storage at {self.dbpath}")
+        self.dbpath = join(self.opts.index_root, self.name)
+        log.debug(f"init index storage at {self.dbpath}")
+        os.makedirs(self.dbpath, exist_ok=True)
         self.env = lmdb.open(
             path=self.dbpath,
             map_size=2 ** 20,
@@ -62,35 +68,62 @@ class Index:
     def map_size(self) -> int:
         return self.env.info()["map_size"]
 
-    def add(self, code, features=None):
-        # type: (str, Optional[List[Dict]]) -> int
-        """Add an ISCC to the index."""
+    def add(self, iscc_obj):
+        # type: (Union[str, Dict, iscc.Code, ISCC]) -> int
+        """Add an ISCC to the index.
+
+        :param iscc_obj: ISCC str, Code or schema.ISCC object or conforming dict.
+        """
+
+        if isinstance(iscc_obj, str):
+            iscc_code = iscc.Code(iscc_obj)
+            metadata = None
+        elif isinstance(iscc_obj, iscc.Code):
+            iscc_code = iscc_obj
+            metadata = None
+        elif isinstance(iscc_obj, ISCC):
+            iscc_code = iscc.Code(iscc_obj.iscc)
+            metadata = iscc_obj
+        elif isinstance(iscc_obj, dict):
+            iscc_code = iscc.Code(iscc_obj["iscc"])
+            metadata = ISCC(**iscc_obj)
+        else:
+            raise ValueError(
+                f"'iscc_obj' must be str or dict with 'iscc' key not {type(iscc_obj)}."
+            )
 
         # Check for duplicate
-        exists = self.get_id(code)
+        exists = self.get_id(iscc_code)
         if exists is not None:
             return exists
 
         # Normalize
-        components = iscc.decompose(code)
-        iscc_obj = iscc.compose(components)
+        components = iscc.decompose(iscc_code)
+        iscc_code = iscc.compose(components)
 
-        # Add full code sequence to main index
+        # Add canonical full code sequence to main index
         db = self.db_isccs()
         mainkey = self.next_key()
-        self.put(db, mainkey, iscc_obj.bytes)
+        self.put(db, mainkey, iscc_code.bytes)
 
         # Add components to components index
-        db = self.db_components()
-        items = [(code.bytes, mainkey) for code in components]
-        self.putmulti(db, items)
+        if self.opts.index_components:
+            db = self.db_components()
+            items = [(code.bytes, mainkey) for code in components]
+            self.putmulti(db, items)
 
         # Add feature hashes
-        features = [] if features is None else features
-        for fobj in features:
-            db = self.db_features(kind=fobj["kind"])
-            items = [(iscc.decode_base64(f), mainkey) for f in fobj["features"]]
-            self.putmulti(db, items)
+        if self.opts.index_features:
+            features = [] if metadata.features is None else metadata.features
+            for fobj in features:
+                db = self.db_features(kind=fobj.kind)
+                items = [(iscc.decode_base64(f), mainkey) for f in fobj.features]
+                self.putmulti(db, items)
+
+        # Add metadata
+        if self.opts.index_metadata and metadata is not None:
+            db = self.db_metadata()
+            self.put(db, mainkey, metadata.json(exclude_unset=True).encode("utf-8"))
 
         return unpack(mainkey)
 
@@ -185,6 +218,7 @@ class Index:
     def destory(self):
         """Close and delete index from disk."""
         self.env.close()
+        log.debug(f"delete index storage at {self.dbpath}")
         shutil.rmtree(self.dbpath)
 
     def close(self):
@@ -209,6 +243,9 @@ class Index:
             dupfixed=True,
         )
 
+    def db_metadata(self):
+        return self.env.open_db(b"metadata", integerkey=True, create=True)
+
     def __len__(self):
         """Number of indexed ISCCs"""
         db = self.db_isccs()
@@ -225,3 +262,4 @@ class Index:
 if __name__ == "__main__":
     idx = Index()
     len(idx)
+    idx.destory()
