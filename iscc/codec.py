@@ -370,7 +370,7 @@ def decompose(iscc):
     elif isinstance(iscc, Code):
         raw = iscc.bytes
     else:
-        raise ValueError("ISCC must be str, bytes, or Code object")
+        raise ValueError(f"ISCC must be str, bytes, or Code object not {type(iscc)}")
 
     # Read sequence of components from raw bytes:
     components = []
