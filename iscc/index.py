@@ -121,7 +121,7 @@ class Index:
 
         keyb = msgpack.dumps(key)
 
-        self.put(db, keyb, iscc_code.bytes)
+        self._put(db, keyb, iscc_code.bytes)
 
         # Add components to components index
         if self.opts.index_components:
@@ -146,7 +146,7 @@ class Index:
         # Add metadata
         if self.opts.index_metadata and metadata is not None:
             db = self.db_metadata()
-            self.put(db, keyb, msgpack.dumps(metadata))
+            self._put(db, keyb, msgpack.dumps(metadata))
 
         return key
 
@@ -178,16 +178,17 @@ class Index:
                 key = msgpack.loads(c.key()) + 1 if not empty else 0
         return key
 
-    def put(self, db, key: bytes, value: bytes):
+    def _put(self, db, key: bytes, value: bytes, dupdata=True, overwrite=True):
+        """Wrap LMDB put in a transaction and autorisize db if required."""
         try:
             with self.env.begin(db, write=True) as txn:
-                txn.put(key, value)
+                txn.put(key, value, dupdata=dupdata, overwrite=overwrite)
         except lmdb.MapFullError:
             new_size = self.map_size * 2
             log.info(f"Resizing {self.dbpath} to {naturalsize(new_size)}")
             self.env.set_mapsize(self.map_size * 2)
             with self.env.begin(db, write=True) as txn:
-                txn.put(key, value)
+                txn.put(key, value, dupdata=dupdata, overwrite=overwrite)
 
     def putmulti(self, db, items, dupdata=True, overwrite=True):
         try:
@@ -265,6 +266,11 @@ class Index:
 
     def db_metadata(self):
         return self.env.open_db(b"metadata", integerkey=True, create=True)
+
+    def _add_component(self, code: bytes, fkey: bytes):
+        """Add a component to the index with a pointer to its source ISCC."""
+        db = self.db_components()
+        self._put(db, code, fkey)
 
     def __len__(self):
         """Number of indexed ISCCs"""
