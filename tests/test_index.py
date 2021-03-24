@@ -30,10 +30,29 @@ def test_index_name(idx):
     assert idx.name == "test-db"
 
 
-def test_index_len(idx, full_iscc):
+def test_index_len_autoid(idx, full_iscc):
     assert len(idx) == 0
-    idx.add(full_iscc.code)
+    idx.add(full_iscc)
     assert len(idx) == 1
+
+
+def test_index_contains(idx, full_iscc):
+    idx.add(full_iscc)
+    assert full_iscc.code in idx
+
+
+def test_index_key_int(idx, full_iscc):
+    assert len(idx) == 0
+    idx.add(full_iscc.code, 666)
+    assert len(idx) == 1
+    assert idx.get_iscc(666) == full_iscc
+
+
+def test_index_key_str(idx, full_iscc):
+    assert len(idx) == 0
+    idx.add(full_iscc.code, "some-key")
+    assert len(idx) == 1
+    assert idx.get_iscc("some-key") == full_iscc
 
 
 def test_index_add_returns_id(idx, full_iscc):
@@ -48,12 +67,12 @@ def test_index_add_no_dupes(idx, full_iscc):
     assert len(idx) == 1
 
 
-def test_index_get_id(idx, ten_isccs):
+def test_index_get_key(idx, ten_isccs):
     for code in ten_isccs:
         idx.add(code.code)
-    assert idx.get_id(ten_isccs[0].code) == 0
-    assert idx.get_id(ten_isccs[-1].code) == 9
-    assert idx.get_id(iscc.Code.rnd(iscc.MT.ISCC, bits=256)) is None
+    assert idx.get_key(ten_isccs[0].code) == 0
+    assert idx.get_key(ten_isccs[-1].code) == 9
+    assert idx.get_key(iscc.Code.rnd(iscc.MT.ISCC, bits=256)) is None
 
 
 def test_index_map_size(idx):
@@ -98,8 +117,8 @@ def test_index_dbs_metadata():
 
 def test_index_iscc(idx, full_iscc):
     idx.add(full_iscc.code)
-    assert idx.iscc(0) == full_iscc.bytes
-    assert idx.iscc(1) is None
+    assert idx.get_iscc(0) == full_iscc
+    assert idx.get_iscc(1) is None
 
 
 def test_index_isccs(idx):

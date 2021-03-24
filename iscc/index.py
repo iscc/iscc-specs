@@ -25,13 +25,14 @@ from typing import List, Optional, Dict, Any, Union
 from loguru import logger as log
 import iscc
 import lmdb
-import struct
 import shutil
 from humanize import naturalsize
 from iscc.schema import Options, ISCC
+import msgpack
 
-pack = lambda n: struct.pack("I", n)
-unpack = lambda b: struct.unpack("I", b)[0]
+
+IsccObj = Union[str, Dict, iscc.Code, ISCC]
+Key = Union[int, str]
 
 
 class Index:
@@ -68,32 +69,44 @@ class Index:
     def map_size(self) -> int:
         return self.env.info()["map_size"]
 
-    def add(self, iscc_obj):
-        # type: (Union[str, Dict, iscc.Code, ISCC]) -> int
+    def add(self, iscc_obj, key=None):
+        # type: (IsccObj, Optional[Key]) -> Key
         """Add an ISCC to the index.
 
-        :param iscc_obj: ISCC str, Code or schema.ISCC object or conforming dict.
+        The ISCC can be provided as a string or Code object. Alternatively you can pass
+        the ISCC wrapped in a schema.ISCC object or conforming dict. This is required
+        if granular features should be indexed or if you want to store ISCC metadata
+        in the index.
+
+        Optionally you may provide a unique key (str or int) to map entries to your
+        external database. If no key is provided the index will create and return
+        an autoincremented integer id. Do not mix both aproaches.
+
+        :param IsccObj iscc_obj: ISCC str, Code, schema.ISCC or conforming dict.
+        :param Key key: Optional primary key (int or str).
         """
+        metadata = None
+        features = None
 
         if isinstance(iscc_obj, str):
             iscc_code = iscc.Code(iscc_obj)
-            metadata = None
         elif isinstance(iscc_obj, iscc.Code):
             iscc_code = iscc_obj
-            metadata = None
         elif isinstance(iscc_obj, ISCC):
             iscc_code = iscc.Code(iscc_obj.iscc)
-            metadata = iscc_obj
+            metadata = iscc_obj.dict(exclude_unset=True)
+            features = metadata.get("features")
         elif isinstance(iscc_obj, dict):
             iscc_code = iscc.Code(iscc_obj["iscc"])
-            metadata = ISCC(**iscc_obj)
+            metadata = iscc_obj
+            features = metadata.get("features")
         else:
             raise ValueError(
                 f"'iscc_obj' must be str or dict with 'iscc' key not {type(iscc_obj)}."
             )
 
-        # Check for duplicate
-        exists = self.get_id(iscc_code)
+        # Check for duplicate ISCC
+        exists = self.get_key(iscc_code)
         if exists is not None:
             return exists
 
@@ -101,34 +114,44 @@ class Index:
         components = iscc.decompose(iscc_code)
         iscc_code = iscc.compose(components)
 
-        # Add canonical full code sequence to main index
+        # Add canonical ISCC to main index
         db = self.db_isccs()
-        mainkey = self.next_key()
-        self.put(db, mainkey, iscc_code.bytes)
+        if key is None:
+            key = self.next_key()
+
+        keyb = msgpack.dumps(key)
+
+        self.put(db, keyb, iscc_code.bytes)
 
         # Add components to components index
         if self.opts.index_components:
             db = self.db_components()
-            items = [(code.bytes, mainkey) for code in components]
+            items = [(code.bytes, keyb) for code in components]
             self.putmulti(db, items)
 
         # Add feature hashes
-        if self.opts.index_features:
-            features = [] if metadata.features is None else metadata.features
+        if self.opts.index_features and features is not None:
             for fobj in features:
-                db = self.db_features(kind=fobj.kind)
-                items = [(iscc.decode_base64(f), mainkey) for f in fobj.features]
+                # feat -> (pk, pos)
+                # itmes -> [(feat, (pk,pos)), ... ]
+                items = []
+                pos = 0
+                for feat, size in zip(fobj["features"], fobj["sizes"]):
+                    item = iscc.decode_base64(feat), msgpack.dumps((key, pos))
+                    items.append(item)
+                    pos += size
+                db = self.db_features(kind=fobj["kind"])
                 self.putmulti(db, items)
 
         # Add metadata
         if self.opts.index_metadata and metadata is not None:
             db = self.db_metadata()
-            self.put(db, mainkey, metadata.json(exclude_unset=True).encode("utf-8"))
+            self.put(db, keyb, msgpack.dumps(metadata))
 
-        return unpack(mainkey)
+        return key
 
-    def get_id(self, code) -> Optional[int]:
-        """Get internal ID of for ISCC"""
+    def get_key(self, code) -> Optional[int]:
+        """Get first internal key for an ISCC if any."""
         # Find per component matches
         components = iscc.decompose(code)
         db = self.db_components()
@@ -144,21 +167,16 @@ class Index:
         with self.env.begin(db=db) as txn:
             for idx in idxs:
                 if txn.get(idx) == full_code_bytes:
-                    return unpack(idx)
-
-    def add_component(self, code, pk):
-        # type: (iscc.Code, bytes) -> None
-        db = self.db(code.type_id.encode("ascii"))
-        self.put(db, code.hash_bytes, pk)
+                    return msgpack.loads(idx)
 
     def next_key(self) -> bytes:
-        """Next free autoincrement id as 4-byte key"""
+        """Next free autoincrement key"""
         db = self.db_isccs()
         with self.env.begin(db) as txn:
             with txn.cursor(db) as c:
                 empty = not c.last()
-                idx = unpack(c.key()) + 1 if not empty else 0
-        return pack(idx)
+                key = msgpack.loads(c.key()) + 1 if not empty else 0
+        return key
 
     def put(self, db, key: bytes, value: bytes):
         try:
@@ -192,11 +210,13 @@ class Index:
                 while c.next():
                     yield c.value()
 
-    def iscc(self, idx: int) -> bytes:
-        """Get ISCC by index id"""
+    def get_iscc(self, key: Key) -> iscc.Code:
+        """Get ISCC by index key"""
         db = self.db_isccs()
         with self.env.begin(db) as txn:
-            return txn.get(pack(idx))
+            iscc_bytes = txn.get(msgpack.dumps(key))
+            if iscc_bytes:
+                return iscc.Code(iscc_bytes)
 
     def components(self):
         """Itereates over indexed components."""
@@ -207,7 +227,7 @@ class Index:
                     yield key
 
     def dbs(self) -> List[str]:
-        """Return a list of existing sub-databases in the index."""
+        """Return a list of existing sub-databases in the main index."""
         dbnames = []
         with self.env.begin() as txn:
             c = txn.cursor()
@@ -226,7 +246,7 @@ class Index:
         self.env.close()
 
     def db_isccs(self):
-        return self.env.open_db(b"isccs", integerkey=True, create=True)
+        return self.env.open_db(b"isccs", integerkey=False, create=True)
 
     def db_components(self):
         return self.env.open_db(
@@ -238,9 +258,9 @@ class Index:
             kind.encode("utf-8"),
             dupsort=True,
             integerkey=True,
-            integerdup=True,
+            integerdup=False,
             create=True,
-            dupfixed=True,
+            dupfixed=False,
         )
 
     def db_metadata(self):
@@ -255,8 +275,8 @@ class Index:
 
     def __contains__(self, item):
         """Check if full iscc code is in index."""
-        id_ = self.get_id(item)
-        return False if id_ is None else True
+        key = self.get_key(item)
+        return False if key is None else True
 
 
 if __name__ == "__main__":

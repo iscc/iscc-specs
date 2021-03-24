@@ -203,7 +203,7 @@ class Code:
         elif isinstance(code, bytes):
             code_fields = read_header(code)
         else:
-            raise ValueError("Code must be str, bytes, tuple or Code")
+            raise ValueError(f"Code must be str, bytes, tuple or Code not {type(code)}")
 
         self._head = code_fields[:-1]
         body = bitarray()

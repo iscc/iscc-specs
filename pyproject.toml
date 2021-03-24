@@ -54,6 +54,7 @@ bidict = "^0.21.2"
 PyLD = "^2.0.3"
 python-dotenv = "^0.15.0"
 lmdb = "^1.1.1"
+msgpack = "^1.0.2"
 
 [tool.poetry.extras]
 turbo = ["cython", "numba"]
