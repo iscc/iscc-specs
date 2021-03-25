@@ -1,7 +1,28 @@
 # -*- coding: utf-8 -*-
+import os
+
 import pytest
 import iscc
 import iscc_samples
+
+
+TEST_CODES = [
+    "KADTF57DEXU74AIAAA76KJQ5AQTHALDO5JXPCRCRC422GN2RKUYCZ3A",
+    "KMD6P2X7C73P72Z4K2MYF7CYSK5NT3IYMMD6TDPH3PE2RQEAMBDN4MA",
+    "KMD6P2X7C73P72Z4K2MYF7CYSK5NT3IYMMD6TDPH3NPWULHXP5BXSJI",
+    "KMD6P2X7C73P72Z4KYOYF7CYTL5PS5LXYSDEZPZMX65SY36REOETL6Q",
+    "KMD73CA6R4XJLI5CKYOYF7CYSL5PSBWQO33FNHPQNNCY4KHZALJ54JA",
+    "KMD6P2X7C73P72Z4KYOYF7CYSL5PTEZDYWYEPFJMWAWTF7WHOUTKTJI",
+    "KID6P2X7C73P72Z4QA6KKL4AHSSS6PIUKCFGDEBNBO7U5R4OANSFPAQ",
+    "KMD6P2X7C73P72Z4K2PIHNCYLLZPSPNWOCVGDFJNCNDFLFA4BBFYOVY",
+    "KMD6P2X7C73P72Z4KYOYF7CYSL5PTRJEQGQ3C2MDKRES4YQH223CMQA",
+    "KMD6P2X7C73P72Z4KYOYF7CYSL5PSBV2FQQ6IPDDX566E4CQO55IENY",
+    "KMD73CA6R4XJLI5CKYOYF7CYSL5PS7G6RNNCWVCAXZFOBG5J3UAB4EA",
+    "KMD73CA6R4XJLI5CKYOYF7CYTL5PSDTGHO52LVRXAELT2LOWOCGSFEQ",
+    "KMD73CA6R4XJLI5CKYOYF7CYSL5PTKDOPDEUETYGNGGUADC5E5GWOBA",
+]
+
+QUERY_CODE = "KMD73CA6R4XJLI5CKYOYF7CYSL5PSJGVYXJVMT4PF3CSTGC4KNJ4ILI"
 
 
 @pytest.fixture
@@ -55,7 +76,7 @@ def test_index_key_str(idx, full_iscc):
     assert idx.get_iscc("some-key") == full_iscc
 
 
-def test_index_add_returns_id(idx, full_iscc):
+def test_index_add_returns_key(idx, full_iscc):
     assert idx.add(full_iscc) == 0
     assert idx.add(iscc.Code.rnd(iscc.MT.ISCC, bits=256)) == 1
 
@@ -135,3 +156,81 @@ def test_index_components(idx, full_iscc):
     components_orig = set([c.bytes for c in iscc.decompose(full_iscc)])
     compenents_idx = set(idx.components())
     assert compenents_idx == components_orig
+
+
+def test__add_component(idx):
+    comp, fkey = os.urandom(10), os.urandom(8)
+    idx._add_component(comp, fkey)
+    assert idx._get_component(comp) == [fkey]
+
+    # is idempotent?
+    idx._add_component(comp, fkey)
+    assert idx._get_component(comp) == [fkey]
+
+    # dupe component with different fkey gets appended
+    fkey2 = os.urandom(8)
+    idx._add_component(comp, fkey2)
+    assert set(idx._get_component(comp)) == {fkey, fkey2}
+
+    # dupe fkey for same component is ignored
+    idx._add_component(comp, fkey)
+    assert set(idx._get_component(comp)) == {fkey, fkey2}
+
+
+def test__add_feature(idx):
+    kind, feature, fkey, pos = "video", os.urandom(8), os.urandom(6), 666
+    idx._add_feature(kind, feature, fkey, pos)
+    assert idx._get_feature_fkeys(kind, feature) == [(fkey, pos)]
+
+    # id idempotent?
+    idx._add_feature(kind, feature, fkey, pos)
+    assert idx._get_feature_fkeys(kind, feature) == [(fkey, pos)]
+
+    # same key with different position
+    idx._add_feature(kind, feature, fkey, pos + 1)
+    assert set(idx._get_feature_fkeys(kind, feature)) == {(fkey, pos), (fkey, pos + 1)}
+
+    # different key with same position
+    fkey2 = os.urandom(8)
+    idx._add_feature(kind, feature, fkey2, pos)
+    assert set(idx._get_feature_fkeys(kind, feature)) == {
+        (fkey, pos),
+        (fkey, pos + 1),
+        (fkey2, pos),
+    }
+
+
+def test_query():
+    idx = iscc.Index()
+    for code in TEST_CODES:
+        idx.add(code)
+    idx.add(QUERY_CODE)
+    assert idx.query(QUERY_CODE, k=3) == [
+        iscc.IsccMatch(
+            iscc="KMD73CA6R4XJLI5CKYOYF7CYSL5PSJGVYXJVMT4PF3CSTGC4KNJ4ILI",
+            key=13,
+            dist=0,
+            mdist=0,
+            cdist=0,
+            ddist=0,
+            imatch=True,
+        ),
+        iscc.IsccMatch(
+            iscc="KMD73CA6R4XJLI5CKYOYF7CYSL5PSBWQO33FNHPQNNCY4KHZALJ54JA",
+            key=4,
+            dist=48,
+            mdist=0,
+            cdist=0,
+            ddist=26,
+            imatch=False,
+        ),
+        iscc.IsccMatch(
+            iscc="KMD73CA6R4XJLI5CKYOYF7CYSL5PTKDOPDEUETYGNGGUADC5E5GWOBA",
+            key=12,
+            dist=52,
+            mdist=0,
+            cdist=0,
+            ddist=27,
+            imatch=False,
+        ),
+    ]
