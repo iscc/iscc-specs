@@ -94,7 +94,7 @@ def distance_b64(a, b):
 
 
 def compare(a, b):
-    # type: (str, str) -> dict
+    # type: (Union[str, bytes, Code], Union[str, bytes, Code]) -> dict
     """Calculate separate hamming distances of compatible components of two ISCCs
 
     :returns: A dict with mdist, cdist, ddist, imatch keys
