@@ -219,15 +219,34 @@ class GMT(str, Enum):
     unknown = "unknown"
 
 
-class IsccMatch(BaseModel):
-    """Metics of comparing two ISCCs"""
+class FeatureMatch(BaseModel):
+    """Metrics of a single granular feature match."""
 
-    iscc: str = Field(description="The ISCC found to match with a query.")
-    key: Optional[Union[str, int]] = Field(description="An optional external key.")
+    kind: str = Field(
+        description="The kind of feature that has been matched.",
+    )
+    source_hash: str = Field(description="The feature hash from the query source.")
+    source_pos: Union[int, float] = Field(
+        description="The position of the feature in the source content."
+    )
+    target_hash: str = Field(description="The feature hash of the matched entry.")
+    target_pos: Union[int, float] = Field(
+        description="The position of the feature in the matched content."
+    )
+    distance: int = Field(description="The hamming distance of the match")
+
+
+class IsccMatch(BaseModel):
+    """Metrics of a matched ISCC."""
+
+    iscc: str = Field(description="The ISCC found to match with the query.")
+    key: Optional[Union[str, int]] = Field(description="Unique key of ISCC entry.")
+    dist: Optional[int] = Field(description="Hamming distance of the full code")
     mdist: Optional[int] = Field(description="Hamming distance of Meta-Code.")
     cdist: Optional[int] = Field(description="Hamming distance of Content-Code.")
     ddist: Optional[int] = Field(description="Hamming distance of Data-Code.")
     imatch: Optional[bool] = Field(description="Wether Instance-Code is identical.")
+    fmatch: Optional[List[FeatureMatch]] = Field(description="List of feature matches")
 
 
 class FeatureType(str, Enum):
