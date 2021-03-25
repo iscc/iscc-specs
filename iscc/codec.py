@@ -232,7 +232,7 @@ class Code:
     @property
     def bytes(self) -> bytes:
         """Raw bytes of code (including header)."""
-        return write_header(*self._head) + self._body.tobytes()
+        return self.header_bytes + self._body.tobytes()
 
     @property
     def hex(self) -> str:
@@ -288,6 +288,11 @@ class Code:
     def hash_ba(self) -> frozenbitarray:
         """Bitarray object of the code (without header)."""
         return self._body
+
+    @property
+    def header_bytes(self) -> bytes:
+        """Byte representation of header prefix of the code"""
+        return write_header(*self._head)
 
     @property
     def maintype(self) -> MT:
