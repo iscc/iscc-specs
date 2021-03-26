@@ -4,9 +4,11 @@ import mmap
 from io import BufferedReader, BytesIO
 from pathlib import Path
 from typing import BinaryIO, List, Optional, Union
-from pydantic import BaseSettings, BaseModel, Field
+from pydantic import BaseSettings, BaseModel, Field, validator
 from iscc import APP_DIR
 from os.path import join
+
+from iscc.metrics import distance_b64
 
 
 Data = Union[bytes, bytearray, memoryview]
@@ -233,7 +235,13 @@ class FeatureMatch(BaseModel):
     target_pos: Union[int, float] = Field(
         description="The position of the feature in the matched content."
     )
-    distance: int = Field(description="The hamming distance of the match")
+    distance: Optional[int] = Field(description="The hamming distance of the match")
+
+    @validator("distance", always=True)
+    def calculate_distance(cls, v, values):
+        if v is None:
+            v = distance_b64(values["source_hash"], values["target_hash"])
+        return v
 
 
 class IsccMatch(BaseModel):
@@ -246,7 +254,9 @@ class IsccMatch(BaseModel):
     cdist: Optional[int] = Field(description="Hamming distance of Content-Code.")
     ddist: Optional[int] = Field(description="Hamming distance of Data-Code.")
     imatch: Optional[bool] = Field(description="Wether Instance-Code is identical.")
-    fmatch: Optional[List[FeatureMatch]] = Field(description="List of feature matches")
+    fmatch: Optional[List[FeatureMatch]] = Field(
+        default_factory=list, description="List of feature matches"
+    )
 
 
 class FeatureType(str, Enum):

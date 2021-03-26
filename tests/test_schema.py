@@ -30,3 +30,12 @@ def test_video_features_checks_codes():
     features = ["AAAAAAAAAA="]
     with pytest.raises(ValidationError):
         schema.Features(features=features)
+
+
+def test_feature_match_distance():
+    s = encode_base64(b"\x00\x00\x00\x00\x00\x00\x00\x00")
+    t = encode_base64(b"\x00\x00\x00\x00\x00\x00\x00\x03")
+    fm = schema.FeatureMatch(
+        kind="text", source_hash=s, source_pos=0, target_hash=t, target_pos=0
+    )
+    assert fm.distance == 2
