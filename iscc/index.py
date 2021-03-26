@@ -28,7 +28,7 @@ import iscc
 import lmdb
 import shutil
 from humanize import naturalsize
-from iscc.schema import IsccMatch, Options, ISCC
+from iscc.schema import FeatureMatch, IsccMatch, Options, ISCC
 from iscc.metrics import distance_bytes
 import msgpack
 
@@ -42,11 +42,11 @@ class Index:
         # type: (str, **Any) -> Index
         """Create or open existing index.
 
-        :param str name: Name of index.
-        :param str index_root: The root path for databases.
-        :param bool index_components: Create inverted index of components -> iscc.
-        :param bool index_features: Create inverted index of features -> iscc.
-        :param bool index_metadata: Store metadata in index.
+        name (str): Name of the index (default iscc-db).
+        index_root (str): The root path for databases (default APP_DIR).
+        index_components (bool): Create inverted index of components (default True).
+        index_features (bool): Create inverted index of features (default False).
+        index_metadata (bool): Store metadata in index (default False).
         """
 
         self.opts = Options(**options)
@@ -75,6 +75,9 @@ class Index:
         # type: (IsccObj, Optional[Key]) -> Key
         """Add an ISCC to the index.
 
+        iscc_obj: ISCC str, Code, schema.ISCC or conforming dict.
+        key: Optional primary key (int or str).
+
         The ISCC can be provided as a string or Code object. Alternatively you can pass
         the ISCC wrapped in a schema.ISCC object or conforming dict. This is required
         if granular features should be indexed or if you want to store ISCC metadata
@@ -83,9 +86,6 @@ class Index:
         Optionally you may provide a unique key (str or int) to map entries to your
         external database. If no key is provided the index will create and return
         an autoincremented integer id. Do not mix both aproaches.
-
-        :param IsccObj iscc_obj: ISCC str, Code, schema.ISCC or conforming dict.
-        :param Key key: Optional primary key (int or str).
         """
 
         iscc_code, features, metadata = self._parse_iscc_obj(iscc_obj)
@@ -128,26 +128,53 @@ class Index:
 
         return key
 
-    def query(self, iscc_obj, k=10, ct=10, ft=6):
+    def query(self, iscc_obj, k=10, ct=10, ft=4):
         # type: (IsccObj, int, int, int) -> List[IsccMatch]
         """Return nearest neighbours."""
-        iscc_code, features, metadata = self._parse_iscc_obj(iscc_obj)
+        source_iscc, features, metadata = self._parse_iscc_obj(iscc_obj)
         matches = {}
-        for comp_obj in iscc.decompose(iscc_code):
+
+        # Collect ISCC component level matches
+        for comp_obj in iscc.decompose(source_iscc):
             for fkey in self._match_component(comp_obj, ct=ct):
                 if fkey not in matches:
-                    matched_iscc: iscc.Code = self.get_iscc(fkey)
-                    matchdata = iscc.compare(iscc_code, matched_iscc)
-                    matchdata["key"] = msgpack.loads(fkey)
-                    matchdata["iscc"] = matched_iscc.code
-                    matchdata["dist"] = distance_bytes(
-                        iscc_code.bytes, matched_iscc.bytes
+                    matches[fkey] = self._build_match(source_iscc, fkey)
+
+        # Collect ISCC feature level matches
+        for feat_obj in features:
+            src_pos = 0
+            # TODO handle features without sizes or make sizes mandatory
+            for src_feat, src_size in zip(feat_obj["features"], feat_obj["sizes"]):
+                kind, src_feat_raw = feat_obj["kind"], iscc.decode_base64(src_feat)
+                fmatches = self._match_feature(kind, src_feat_raw, ft)
+                for target_feature, fkey, target_position, dist in fmatches:
+                    match_obj = matches.get(fkey)
+                    if match_obj is None:
+                        match_obj = self._build_match(source_iscc, fkey)
+                        matches[fkey] = match_obj
+                    fmatch_obj = FeatureMatch(
+                        kind=kind,
+                        source_hash=src_feat,
+                        source_pos=src_pos,
+                        target_hash=iscc.encode_base64(target_feature),
+                        target_pos=target_position,
+                        distance=dist,
                     )
-                    matches[fkey] = IsccMatch(**matchdata)
+                    match_obj.fmatch.append(fmatch_obj)
+                src_pos += src_size
+
         top_k = sorted(matches.values(), key=attrgetter("dist"))[:k]
         return top_k
 
-    def _match_component(self, code, ct=10):
+    def _build_match(self, source_iscc: iscc.Code, matched_key: bytes):
+        matched_iscc: iscc.Code = self.get_iscc(matched_key)
+        matchdata = iscc.compare(source_iscc, matched_iscc)
+        matchdata["key"] = msgpack.loads(matched_key)
+        matchdata["iscc"] = matched_iscc.code
+        matchdata["dist"] = distance_bytes(source_iscc.bytes, matched_iscc.bytes)
+        return IsccMatch(**matchdata)
+
+    def _match_component(self, code, ct):
         # type: (iscc.Code, int) -> List[bytes]
         """Collect iscc-fkeys for similar codes with maximum bit distance 'ct'.
 
@@ -155,8 +182,8 @@ class Index:
         Override for optimized ANN search.
         """
 
-        # Simple get if instance code
-        if code.maintype == iscc.MT.INSTANCE:
+        # Simple get if instance code or threshold is 0
+        if code.maintype == iscc.MT.INSTANCE or ct == 0:
             return self._get_component(code.bytes)
 
         # Scan for nearest neighbors
@@ -168,26 +195,53 @@ class Index:
                 found_type = c.set_range(code.header_bytes)
                 if not found_type:
                     return []
-                raw_code = c.key()
-                if iscc.distance(code.bytes, raw_code) <= ct:
-                    fkeys.add(c.value())
-                    while c.next_dup():
-                        fkeys.add(c.value())
-                while c.next_dup():
-                    raw_code = c.key()
-                    if iscc.distance(code.bytes, raw_code) <= ct:
-                        fkeys.add(c.value())
-                        while c.next_dup():
-                            fkeys.add(c.value())
+                for candidate_component in c.iternext_nodup(keys=True, values=False):
+                    if iscc.distance(code.bytes, candidate_component) > ct:
+                        continue
+                    for value in c.iternext_dup(keys=False, values=True):
+                        fkeys.add(value)
+
         return list(fkeys)
+
+    def _match_feature(self, kind, feature, ft):
+        # type: (str, bytes, int) -> List[Tuple[bytes, bytes, Union[int, float], int]]
+        """
+        Collect iscc-fkeys and positions for features with max bit distance 'ft'.
+        Returns list of tuples: target_feature, fkey, target_position, dist
+        """
+
+        results = []
+        source_hash = iscc.encode_base64(feature)
+
+        # Simple get with 0 threshold
+        if ft == 0:
+            lookup = self._get_feature(kind, feature)
+            for fkey, target_position in lookup:
+                results.append((feature, fkey, target_position, 0))
+            return results
+
+        # Exhaustive scan
+        db = self._db_features(kind)
+
+        with self.env.begin(db) as txn:
+            with txn.cursor(db) as c:
+                c.first()
+                for candidate_feature in c.iternext_nodup(keys=True, values=False):
+                    dist = iscc.distance_bytes(feature, candidate_feature)
+                    if dist > ft:
+                        continue
+                    for value in c.iternext_dup(keys=False, values=True):
+                        fkey, target_position = msgpack.loads(value)
+                        results.append((candidate_feature, fkey, target_position, dist))
+        return results
 
     @staticmethod
     def _parse_iscc_obj(iscc_obj):
-        # type: (IsccObj) -> Tuple[iscc.Code, Optional[dict], Optional[dict]]
+        # type: (IsccObj) -> Tuple[iscc.Code, List[dict], Optional[dict]]
         """Unpack different types of ISCC inputs."""
 
         metadata = None
-        features = None
+        features = []
 
         if isinstance(iscc_obj, str):
             iscc_code = iscc.Code(iscc_obj)
@@ -196,11 +250,11 @@ class Index:
         elif isinstance(iscc_obj, ISCC):
             iscc_code = iscc.Code(iscc_obj.iscc)
             metadata = iscc_obj.dict(exclude_unset=True)
-            features = metadata.get("features")
+            features = metadata.get("features", [])
         elif isinstance(iscc_obj, dict):
             iscc_code = iscc.Code(iscc_obj["iscc"])
             metadata = iscc_obj
-            features = metadata.get("features")
+            features = metadata.get("features", [])
         else:
             raise ValueError(
                 f"'iscc_obj' must be one of {IsccObj} not {type(iscc_obj)}."
@@ -365,7 +419,7 @@ class Index:
         value = msgpack.packb((fkey, position))
         return self._put(db, feature, value, dupdata=True, overwrite=True)
 
-    def _get_feature_fkeys(self, kind, feature):
+    def _get_feature(self, kind, feature):
         # type: (str, bytes) -> List[Tuple[bytes, Union[int, float]]]
         """Get a list of (fkey, position) results for a given feature"""
         db = self._db_features(kind)

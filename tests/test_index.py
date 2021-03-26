@@ -4,6 +4,7 @@ import os
 import pytest
 import iscc
 import iscc_samples
+from iscc.schema import IsccMatch, FeatureMatch
 
 
 TEST_CODES = [
@@ -180,20 +181,20 @@ def test__add_component(idx):
 def test__add_feature(idx):
     kind, feature, fkey, pos = "video", os.urandom(8), os.urandom(6), 666
     idx._add_feature(kind, feature, fkey, pos)
-    assert idx._get_feature_fkeys(kind, feature) == [(fkey, pos)]
+    assert idx._get_feature(kind, feature) == [(fkey, pos)]
 
     # id idempotent?
     idx._add_feature(kind, feature, fkey, pos)
-    assert idx._get_feature_fkeys(kind, feature) == [(fkey, pos)]
+    assert idx._get_feature(kind, feature) == [(fkey, pos)]
 
     # same key with different position
     idx._add_feature(kind, feature, fkey, pos + 1)
-    assert set(idx._get_feature_fkeys(kind, feature)) == {(fkey, pos), (fkey, pos + 1)}
+    assert set(idx._get_feature(kind, feature)) == {(fkey, pos), (fkey, pos + 1)}
 
     # different key with same position
     fkey2 = os.urandom(8)
     idx._add_feature(kind, feature, fkey2, pos)
-    assert set(idx._get_feature_fkeys(kind, feature)) == {
+    assert set(idx._get_feature(kind, feature)) == {
         (fkey, pos),
         (fkey, pos + 1),
         (fkey2, pos),
@@ -201,7 +202,9 @@ def test__add_feature(idx):
 
 
 def test_query():
-    idx = iscc.Index()
+    idx = iscc.Index(
+        "test-db",
+    )
     for code in TEST_CODES:
         idx.add(code)
     idx.add(QUERY_CODE)
@@ -234,3 +237,71 @@ def test_query():
             imatch=False,
         ),
     ]
+    idx.destory()
+
+
+def test_query_features():
+    idx = iscc.Index(index_features=True)
+    v0 = iscc.code_iscc(iscc_samples.videos()[0], video_granular=True)
+    v1 = iscc.code_iscc(iscc_samples.videos()[1], video_granular=True)
+    v3 = iscc.code_iscc(iscc_samples.videos()[2], video_granular=True)
+    idx.add(v0)
+    idx.add(v1)
+    r = idx.query(v3, k=10, ct=10, ft=2)
+    assert r == [
+        IsccMatch(
+            iscc="KMD6P2X7C73P72Z4K2MYF7CYSK5NT3IYMMD6TDPH3PE2RQEAMBDN4MA",
+            key="0",
+            dist=100,
+            mdist=28,
+            cdist=5,
+            ddist=36,
+            imatch=False,
+            fmatch=[
+                FeatureMatch(
+                    kind="video",
+                    source_hash="LhoVc18f0Nk",
+                    source_pos=23,
+                    target_hash="LhoVc1sf0Nk",
+                    target_pos=23,
+                    distance=1,
+                ),
+                FeatureMatch(
+                    kind="video",
+                    source_hash="Dp4H_frQ8FE",
+                    source_pos=24,
+                    target_hash="Dp4H_fvQ8FE",
+                    target_pos=24,
+                    distance=1,
+                ),
+            ],
+        ),
+        IsccMatch(
+            iscc="KMD6P2X7C73P72Z4K2MYF7CYSK5NT3IYMMD6TDPH3NPWULHXP5BXSJI",
+            key="1",
+            dist=105,
+            mdist=28,
+            cdist=5,
+            ddist=36,
+            imatch=False,
+            fmatch=[
+                FeatureMatch(
+                    kind="video",
+                    source_hash="LhoVc18f0Nk",
+                    source_pos=23,
+                    target_hash="LhoVc1sf0Nk",
+                    target_pos=23,
+                    distance=1,
+                ),
+                FeatureMatch(
+                    kind="video",
+                    source_hash="Dp4H_frQ8FE",
+                    source_pos=24,
+                    target_hash="Dp4H_fvQ8FE",
+                    target_pos=24,
+                    distance=1,
+                ),
+            ],
+        ),
+    ]
+    idx.destory()
