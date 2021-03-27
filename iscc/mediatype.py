@@ -101,6 +101,7 @@ mimetypes.add_type("text/markdown", ".md")
 mimetypes.add_type("text/markdown", ".markdown")
 mimetypes.add_type("application/x-mobipocket-ebook", ".mobi")
 mimetypes.add_type("application/x-sqlite3", ".sqlite")
+mimetypes.add_type("video/mp4", ".f4v")
 
 
 SUPPORTED_MEDIATYPES = {
