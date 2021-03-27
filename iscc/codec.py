@@ -11,16 +11,13 @@ Body:
 """
 import base64
 import enum
+import math
 import os
 from operator import attrgetter
 from random import choice
 from typing import List, Tuple, Union
 from bitarray import bitarray, frozenbitarray
 from bitarray.util import ba2hex, int2ba, ba2int, count_xor
-from bech32 import convertbits
-
-
-BASE32_CHARSET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567"
 
 
 class MT(enum.IntEnum):
@@ -112,18 +109,18 @@ def encode_base32(data: bytes) -> str:
     """
     Standard RFC4648 base32 encoding without padding.
     """
-    b32 = convertbits(data, 8, 5, True)
-    return "".join([BASE32_CHARSET[c] for c in b32])
+    return base64.b32encode(data).decode("ascii").rstrip("=")
 
 
 def decode_base32(code: str) -> bytes:
     """
     Standard RFC4648 base32 decoding without padding and with casefolding.
     """
-    code = code.upper()
-    data = [BASE32_CHARSET.find(c) for c in code]
-    dec = convertbits(data, 5, 8, False)
-    return bytes(dec)
+    # python stdlib does not support base32 without padding, so we have to re-pad.
+    cl = len(code)
+    pad_length = math.ceil(cl / 8) * 8 - cl
+
+    return bytes(base64.b32decode(code + "=" * pad_length, casefold=True))
 
 
 def encode_base64(data: bytes) -> str:
