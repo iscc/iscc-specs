@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
-from loguru import logger
+from codetiming import Timer
+from loguru import logger as log
 import subprocess
 from pathlib import Path
 from tempfile import mkdtemp
@@ -92,7 +93,7 @@ def extract_video_preview(file, **options):
     infile = uread.open_data(file)
 
     if not hasattr(infile, "name"):
-        logger.warning("Cannot extract preview without file.name")
+        log.warning("Cannot extract preview without file.name")
         return None
 
     file_path = infile.name
@@ -130,7 +131,7 @@ def extract_video_signature(uri, crop=None, **options):
 
     infile = uread.open_data(uri)
     if not hasattr(infile, "name"):
-        logger.error("Cannot extract signature without file.name")
+        log.error("Cannot extract signature without file.name")
         raise ValueError(f"Cannot extract signature from {type(infile)}")
 
     infile_path = infile.name
@@ -151,8 +152,9 @@ def extract_video_signature(uri, crop=None, **options):
 
     cmd.extend(["-i", infile_path, "-vf", vf, "-f", "null", "-"])
 
-    logger.debug(f"Extracting signature with {cmd}")
-    subprocess.run(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    log.debug(f"video sig extraction with {cmd}")
+    with Timer(text="video sig extraction took {:0.4f}s", logger=log.debug):
+        subprocess.run(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
     with open(sigfile_path, "rb") as sig:
         sigdata = sig.read()
     os.remove(sigfile_path)
@@ -294,9 +296,13 @@ def detect_video_scenes(uri, **options):
     base_timecode = video_manager.get_base_timecode()
     video_manager.set_downscale_factor()
     video_manager.start()
-    scene_manager.detect_scenes(
-        frame_source=video_manager, show_progress=False, frame_skip=opts.video_scenes_fs
-    )
+
+    with Timer(text="video scene detection took {:0.4f}s", logger=log.debug):
+        scene_manager.detect_scenes(
+            frame_source=video_manager,
+            show_progress=False,
+            frame_skip=opts.video_scenes_fs,
+        )
     return scene_manager.get_scene_list(base_timecode)
 
 

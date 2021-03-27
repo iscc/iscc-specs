@@ -297,9 +297,9 @@ def code_video(uri, **options):
 
     crop_value = video.detect_video_crop(uri) if opts.video_crop else None
     signature = video.extract_video_signature(uri, crop_value, **options)
-    logger.debug(f"mp7 signature size {naturalsize(len(signature))}")
+    logger.debug(f"video sig size {naturalsize(len(signature))}")
     frames = read_ffmpeg_signature(signature)
-    logger.debug(f"mp7 signature frames {len(frames)}")
+    logger.debug(f"video sig frames {len(frames)}")
     features = [tuple(sig.vector.tolist()) for sig in frames]
     video_hash = video.hash_video(features, **options)
     video_code = Code((MT.CONTENT, ST_CC.VIDEO, VS.V0, nbits, video_hash))
