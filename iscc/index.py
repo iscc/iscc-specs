@@ -38,8 +38,8 @@ Key = Union[int, str, bytes]
 
 
 class Index:
-    def __init__(self, name="iscc-db", **options):
-        # type: (str, **Any) -> Index
+    def __init__(self, name="iscc-db", readonly=False, **options):
+        # type: (str, bool, **Any) -> Index
         """Create or open existing index.
 
         name (str): Name of the index (default iscc-db).
@@ -58,6 +58,7 @@ class Index:
         self.env = lmdb.open(
             path=self.dbpath,
             map_size=2 ** 20,
+            readonly=readonly,
             max_dbs=24,
             metasync=False,
             sync=False,
@@ -195,6 +196,7 @@ class Index:
                 found_type = c.set_range(code.header_bytes)
                 if not found_type:
                     return []
+                # TODO: requires secondary cursor
                 for candidate_component in c.iternext_nodup(keys=True, values=False):
                     if iscc.distance(code.bytes, candidate_component) > ct:
                         continue
@@ -230,6 +232,7 @@ class Index:
                     dist = iscc.distance_bytes(feature, candidate_feature)
                     if dist > ft:
                         continue
+                    # TODO: requires secondary cursor
                     for value in c.iternext_dup(keys=False, values=True):
                         fkey, target_position = msgpack.loads(value)
                         results.append((candidate_feature, fkey, target_position, dist))
@@ -326,13 +329,24 @@ class Index:
     def get_iscc(self, key):
         # type: (Key) -> iscc.Code
         """Get ISCC by index key"""
-        db = self._db_isccs()
         if not isinstance(key, bytes):
             key = msgpack.dumps(key)
+        db = self._db_isccs()
         with self.env.begin(db) as txn:
             iscc_bytes = txn.get(key)
             if iscc_bytes:
                 return iscc.Code(iscc_bytes)
+
+    def get_metadata(self, key):
+        # type: (Key) -> iscc.ISCC
+        """Get ISCC metadata by index key"""
+        if not isinstance(key, bytes):
+            key = msgpack.dumps(key)
+        db = self._db_metadata()
+        with self.env.begin(db) as txn:
+            iscc_bytes = txn.get(key)
+            if iscc_bytes:
+                return msgpack.loads(iscc_bytes)
 
     def components(self):
         """Itereates over indexed components."""
@@ -386,7 +400,7 @@ class Index:
         )
 
     def _db_metadata(self) -> lmdb._Database:
-        return self.env.open_db(b"metadata", integerkey=True, create=True)
+        return self.env.open_db(b"metadata", integerkey=False, create=True)
 
     def _add_component(self, code: bytes, fkey: bytes) -> bool:
         """
@@ -434,6 +448,48 @@ class Index:
                     results.append(msgpack.unpackb(c.value(), use_list=False))
         return results
 
+    def dump(self):
+        """Dump """
+        for idx, value in enumerate(self.isccs()):
+            print("ISCC", idx, iscc.Code(value).code)
+        if self.opts.index_components:
+            db = self._db_components()
+            with self.env.begin(db) as txn:
+                with txn.cursor(db) as c:
+                    c.first()
+                    for k in c.iternext_nodup():
+                        print("COMPONENT", iscc.Code(k), end=" ")
+                        c2 = txn.cursor(db)
+                        c2.set_key(k)
+                        for v in c2.iternext_dup(keys=False, values=True):
+                            print(msgpack.loads(v), end=" ")
+                        print()
+        if self.opts.index_features:
+            kinds = ["text", "image", "audio", "video", "data"]
+            for kind in kinds:
+                try:
+                    db = self._db_features(kind)
+                except lmdb.ReadonlyError:
+                    continue
+                with self.env.begin(db) as txn:
+                    with txn.cursor(db) as c:
+                        c.first()
+                        for k in c.iternext_nodup():
+                            print(kind.upper(), end=" ")
+                            print(iscc.encode_base64(k), end=" ")
+                            c2 = txn.cursor(db)
+                            c2.set_key(k)
+                            for v in c2.iternext_dup(keys=False, values=True):
+                                fkey, pos = msgpack.loads(v)
+                                value = [msgpack.loads(fkey), round(pos, 3)]
+                                print(value, end=" ")
+                            print()
+        if self.opts.index_metadata:
+            db = self._db_metadata()
+            with self.env.begin(db) as txn:
+                for k, v in txn.cursor(db):
+                    print("METADATA", msgpack.loads(k), msgpack.loads(v))
+
     def __len__(self):
         """Number of indexed ISCCs"""
         db = self._db_isccs()
@@ -445,12 +501,3 @@ class Index:
         """Check if full iscc code is in index."""
         key = self.get_key(item)
         return False if key is None else True
-
-    def __del__(self):
-        self.close()
-
-
-if __name__ == "__main__":
-    idx = Index()
-    len(idx)
-    idx.destory()
