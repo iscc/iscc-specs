@@ -4,7 +4,6 @@ import iscc
 from iscc.text import _extract_with_tika
 from iscc.codec import Code
 from iscc.schema import TextCode
-from iscc.metrics import distance, distance_hex
 from fauxfactory.factories.strings import gen_utf8
 from iscc_samples import texts
 from tests.test_readables import text_readables
@@ -62,9 +61,9 @@ def test_code_text_empty():
     assert r128 == dict(code="EABSL4F2WZY7KBXBYUZPREWZ26IXU", characters=0)
 
     with pytest.raises(AssertionError):
-        distance(r64["code"], r128["code"])
+        iscc.distance(r64["code"], r128["code"])
 
-    assert distance(Code(r64["code"]), Code(r128["code"]), mixed=True) == 0
+    assert iscc.distance(Code(r64["code"]), Code(r128["code"]), mixed=True) == 0
 
 
 def test_code_text_default():
@@ -82,7 +81,7 @@ def test_code_text_default():
         "language": "en",
         "title": "The most significant and usefull property of similaritypreserving",
     }
-    assert distance(a["code"], b["code"]) == 2
+    assert iscc.distance(a["code"], b["code"]) == 2
 
 
 def test_code_text_granular():
@@ -114,7 +113,7 @@ def test_code_text_granular():
         "language": "en",
         "title": "The most significant and usefull property of similaritypreserving",
     }
-    assert distance(a["code"], b["code"]) == 2
+    assert iscc.distance(a["code"], b["code"]) == 2
 
 
 def test_hash_text():
@@ -124,7 +123,7 @@ def test_hash_text():
     assert a == "1f869a735c10bf9c32107ab4114e13d2bf93614cda99513ee9f989faf3d6983f"
     assert b == "1f869a735c18bfcc32107ab4114e13d2bf9b614cda91513ee9f189faf3d6987f"
     assert c == "366f2f1b08ba65efbbb48acf4b9953d144be674fa0af8802e7a6f1769b19c576"
-    assert distance_hex(a, b) == 7
+    assert iscc.distance_hex(a, b) == 7
 
 
 def test_extract_text_features_ta():

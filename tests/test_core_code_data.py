@@ -5,7 +5,6 @@ from statistics import mean
 import iscc
 from tests.test_readables import text_readables
 from tests.utils import static_bytes
-from iscc.metrics import distance_b64
 
 
 def test_code_data_empty():
@@ -174,7 +173,7 @@ def test_code_data_granular_robust():
     # Pairwise granular hashes should have low average distance
     distances = []
     for gfa, gfb in zip(code_a["features"]["features"], code_b["features"]["features"]):
-        dist = distance_b64(gfa, gfb)
+        dist = iscc.distance_b64(gfa, gfb)
         assert dist < 15
         distances.append(dist)
     assert mean(distances) < 7

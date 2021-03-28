@@ -6,7 +6,16 @@ from bitarray.util import count_xor, hex2ba
 from iscc.codec import Code, read_header, decode_base32, decode_base64, decompose, MT
 
 
-__all__ = ["distance", "compare"]
+__all__ = [
+    "distance",
+    "distance_code",
+    "distance_int",
+    "distance_bytes",
+    "distance_hex",
+    "distance_ba",
+    "distance_b64",
+    "compare",
+]
 
 # ISCC code in various possible representations
 Icode = Union[str, bytes, int, Code]

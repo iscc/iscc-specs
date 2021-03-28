@@ -7,7 +7,6 @@ from typing import BinaryIO, List, Optional, Union
 from pydantic import BaseSettings, BaseModel, Field, validator
 from iscc import APP_DIR
 from os.path import join
-
 from iscc.metrics import distance_b64
 
 
