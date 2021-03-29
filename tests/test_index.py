@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
 import os
 
+import msgpack
 import pytest
 import iscc
 import iscc_samples
-from iscc.schema import IsccMatch, FeatureMatch
+from iscc.schema import IsccMatch, FeatureMatch, QueryResult
 
 
 TEST_CODES = [
@@ -148,34 +149,35 @@ def test_index_isccs(idx):
     b = iscc.Code.rnd(mt=iscc.MT.ISCC, bits=256)
     idx.add(a.code)
     idx.add(b.code)
-    codes = [iscc.Code(c) for c in idx.isccs()]
+    codes = [iscc.Code(c) for c in idx.iter_isccs()]
     assert codes == [a, b]
 
 
 def test_index_components(idx, full_iscc):
     idx.add(full_iscc.code)
     components_orig = set([c.bytes for c in iscc.decompose(full_iscc)])
-    compenents_idx = set(idx.components())
+    compenents_idx = set(idx.iter_components())
     assert compenents_idx == components_orig
 
 
 def test__add_component(idx):
     comp, fkey = os.urandom(10), os.urandom(8)
     idx._add_component(comp, fkey)
-    assert idx._get_component(comp) == [fkey]
+    db = idx._db_components()
+    assert idx._get_values(db, comp) == [fkey]
 
     # is idempotent?
     idx._add_component(comp, fkey)
-    assert idx._get_component(comp) == [fkey]
+    assert idx._get_values(db, comp) == [fkey]
 
     # dupe component with different fkey gets appended
     fkey2 = os.urandom(8)
     idx._add_component(comp, fkey2)
-    assert set(idx._get_component(comp)) == {fkey, fkey2}
+    assert set(idx._get_values(db, comp)) == {fkey, fkey2}
 
     # dupe fkey for same component is ignored
     idx._add_component(comp, fkey)
-    assert set(idx._get_component(comp)) == {fkey, fkey2}
+    assert set(idx._get_values(db, comp)) == {fkey, fkey2}
 
 
 def test__add_feature(idx):
@@ -208,100 +210,127 @@ def test_query():
     for code in TEST_CODES:
         idx.add(code)
     idx.add(QUERY_CODE)
-    assert idx.query(QUERY_CODE, k=3) == [
-        iscc.IsccMatch(
-            iscc="KMD73CA6R4XJLI5CKYOYF7CYSL5PSJGVYXJVMT4PF3CSTGC4KNJ4ILI",
-            key=13,
-            dist=0,
-            mdist=0,
-            cdist=0,
-            ddist=0,
-            imatch=True,
-        ),
-        iscc.IsccMatch(
-            iscc="KMD73CA6R4XJLI5CKYOYF7CYSL5PSBWQO33FNHPQNNCY4KHZALJ54JA",
-            key=4,
-            dist=48,
-            mdist=0,
-            cdist=0,
-            ddist=26,
-            imatch=False,
-        ),
-        iscc.IsccMatch(
-            iscc="KMD73CA6R4XJLI5CKYOYF7CYSL5PTKDOPDEUETYGNGGUADC5E5GWOBA",
-            key=12,
-            dist=52,
-            mdist=0,
-            cdist=0,
-            ddist=27,
-            imatch=False,
-        ),
-    ]
+    assert idx.query(QUERY_CODE, k=3) == QueryResult(
+        iscc_matches=[
+            IsccMatch(
+                key="13",
+                matched_iscc="KMD73CA6R4XJLI5CKYOYF7CYSL5PSJGVYXJVMT4PF3CSTGC4KNJ4ILI",
+                distance=0,
+                mdist=0,
+                cdist=0,
+                ddist=0,
+                imatch=True,
+            ),
+            IsccMatch(
+                key="4",
+                matched_iscc="KMD73CA6R4XJLI5CKYOYF7CYSL5PSBWQO33FNHPQNNCY4KHZALJ54JA",
+                distance=48,
+                mdist=0,
+                cdist=0,
+                ddist=26,
+                imatch=False,
+            ),
+            IsccMatch(
+                key="12",
+                matched_iscc="KMD73CA6R4XJLI5CKYOYF7CYSL5PTKDOPDEUETYGNGGUADC5E5GWOBA",
+                distance=52,
+                mdist=0,
+                cdist=0,
+                ddist=27,
+                imatch=False,
+            ),
+        ],
+        feature_matches=[],
+    )
     idx.destory()
 
 
-def test_query_features():
-    idx = iscc.Index(index_features=True)
+def test_index_match_component_exact():
+    idx = iscc.Index("test-match-component", index_components=True)
+    for i in TEST_CODES:
+        idx.add(i)
+    components = iscc.decompose(TEST_CODES[-1])
+    fkeys = [msgpack.loads(fk) for fk in idx.match_component(components[0])]
+    assert fkeys == [4, 10, 11, 12]
+    idx.destory()
+
+
+def test_index_match_feature_exact():
+    idx = iscc.Index("test-match-feature", index_features=True)
+    feature = os.urandom(8)
+    for i in TEST_CODES:
+        idx.add(i)
+    idx._add_feature("video", feature, msgpack.dumps(0), 100)
+    r = idx.match_feature("video", feature, ft=0)
+    assert len(r) == 1
+    assert r[0].matched_iscc == TEST_CODES[0]
+    idx.destory()
+
+
+def test_index_match_feature_similar():
+    idx = iscc.Index("test-match-feature", index_features=True)
+    feata = b"\x00\x00\x00\x00\x00\x00\x00\x00"
+    featb = b"\x00\x00\x00\x00\x00\x00\x00\x03"
+    assert iscc.distance_bytes(feata, featb) == 2
+    for i in TEST_CODES:
+        idx.add(i)
+    idx._add_feature("video", feata, msgpack.dumps(0), 100)
+    r = idx.match_feature("video", featb, ft=2)
+    assert len(r) == 1
+    assert r[0].matched_iscc == TEST_CODES[0]
+    idx.destory()
+
+
+def test_index_query_features():
+    idx = iscc.Index("test-query-features", index_components=True, index_features=True)
     v0 = iscc.code_iscc(iscc_samples.videos()[0], video_granular=True)
     v1 = iscc.code_iscc(iscc_samples.videos()[1], video_granular=True)
-    v3 = iscc.code_iscc(iscc_samples.videos()[2], video_granular=True)
+    v2 = iscc.code_iscc(iscc_samples.videos()[2], video_granular=True)
+    v3 = iscc.code_iscc(iscc_samples.videos()[3], video_granular=True)
     idx.add(v0)
     idx.add(v1)
-    r = idx.query(v3, k=10, ct=10, ft=2)
-    assert r == [
-        IsccMatch(
-            iscc="KMD6P2X7C73P72Z4K2MYF7CYSK5NT3IYMMD6TDPH3PE2RQEAMBDN4MA",
-            key="0",
-            dist=100,
-            mdist=28,
-            cdist=5,
-            ddist=36,
-            imatch=False,
-            fmatch=[
-                FeatureMatch(
-                    kind="video",
-                    source_hash="LhoVc18f0Nk",
-                    source_pos=23,
-                    target_hash="LhoVc1sf0Nk",
-                    target_pos=23,
-                    distance=1,
-                ),
-                FeatureMatch(
-                    kind="video",
-                    source_hash="Dp4H_frQ8FE",
-                    source_pos=24,
-                    target_hash="Dp4H_fvQ8FE",
-                    target_pos=24,
-                    distance=1,
-                ),
-            ],
-        ),
-        IsccMatch(
-            iscc="KMD6P2X7C73P72Z4K2MYF7CYSK5NT3IYMMD6TDPH3NPWULHXP5BXSJI",
-            key="1",
-            dist=105,
-            mdist=28,
-            cdist=5,
-            ddist=36,
-            imatch=False,
-            fmatch=[
-                FeatureMatch(
-                    kind="video",
-                    source_hash="LhoVc18f0Nk",
-                    source_pos=23,
-                    target_hash="LhoVc1sf0Nk",
-                    target_pos=23,
-                    distance=1,
-                ),
-                FeatureMatch(
-                    kind="video",
-                    source_hash="Dp4H_frQ8FE",
-                    source_pos=24,
-                    target_hash="Dp4H_fvQ8FE",
-                    target_pos=24,
-                    distance=1,
-                ),
-            ],
-        ),
-    ]
+    idx.add(v2)
+    r = idx.query(v3, k=3, ct=1, ft=5)
+    assert r == QueryResult(
+        iscc_matches=[
+            IsccMatch(
+                key="2",
+                matched_iscc="KMD73CA6R4XJLI5CKYOYF7CYTL5PSDTGHO52LVRXEGNXO4RA672UNMQ",
+                distance=66,
+                mdist=0,
+                cdist=1,
+                ddist=33,
+                imatch=False,
+            )
+        ],
+        feature_matches=[
+            FeatureMatch(
+                matched_iscc="KMD6P2X7C73P72Z4K2MYF7CYSK5NT3IYMMD6TDPH3NPWULHXP5BXSJI",
+                kind="video",
+                source_feature="Vq5CVg8cvu0",
+                source_pos=None,
+                matched_feature="Vo5CVg8cvu0",
+                matched_position=10,
+                distance=1,
+            ),
+            FeatureMatch(
+                matched_iscc="KMD6P2X7C73P72Z4K2MYF7CYSK5NT3IYMMD6TDPH3PE2RQEAMBDN4MA",
+                kind="video",
+                source_feature="Vq5CVg8cvu0",
+                source_pos=None,
+                matched_feature="Vo5CVg8cvu0",
+                matched_position=10,
+                distance=1,
+            ),
+            FeatureMatch(
+                matched_iscc="KMD6P2X7C73P72Z4K2MYF7CYSK5NT3IYMMD6TDPH3NPWULHXP5BXSJI",
+                kind="video",
+                source_feature="Dp4H_PrQ8FE",
+                source_pos=None,
+                matched_feature="Dp4H_fvQ8FE",
+                matched_position=24,
+                distance=2,
+            ),
+        ],
+    )
     idx.destory()

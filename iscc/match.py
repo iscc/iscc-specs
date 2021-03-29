@@ -66,7 +66,7 @@ class SimpleIndex:
                 candidate = self.isccs[key]
                 matchdata = iscc.compare(norm_code_obj.code, candidate)
                 matchdata["key"] = key
-                matchdata["iscc"] = candidate
+                matchdata["matched_iscc"] = candidate
                 result.append(IsccMatch(**matchdata))
 
         return result
@@ -123,7 +123,7 @@ class SimpleSplitIndex:
                             continue
                         matchdata = iscc.compare(query_code.code, candidate)
                         matchdata["key"] = key
-                        matchdata["iscc"] = candidate
+                        matchdata["matched_iscc"] = candidate
                         result.append(IsccMatch(**matchdata))
                         seen.add(candidate)
         return result

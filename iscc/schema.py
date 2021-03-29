@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import operator
 from enum import Enum
 import mmap
 from io import BufferedReader, BytesIO
@@ -221,17 +222,22 @@ class GMT(str, Enum):
 
 
 class FeatureMatch(BaseModel):
-    """Metrics of a single granular feature match."""
+    """A single granular feature match result."""
+
+    class Config:
+        frozen = True
+
+    matched_iscc: str = Field(description="The matched (candidate) ISCC")
 
     kind: str = Field(
         description="The kind of feature that has been matched.",
     )
-    source_hash: str = Field(description="The feature hash from the query source.")
-    source_pos: Union[int, float] = Field(
-        description="The position of the feature in the source content."
+    source_feature: str = Field(description="The original feature that was queried.")
+    source_pos: Optional[Union[int, float]] = Field(
+        description="The position of of the original feature"
     )
-    target_hash: str = Field(description="The feature hash of the matched entry.")
-    target_pos: Union[int, float] = Field(
+    matched_feature: str = Field(description="The feature hash of the matched entry.")
+    matched_position: Union[int, float] = Field(
         description="The position of the feature in the matched content."
     )
     distance: Optional[int] = Field(description="The hamming distance of the match")
@@ -239,22 +245,54 @@ class FeatureMatch(BaseModel):
     @validator("distance", always=True)
     def calculate_distance(cls, v, values):
         if v is None:
-            v = distance_b64(values["source_hash"], values["target_hash"])
+            v = distance_b64(values["source_feature"], values["matched_feature"])
         return v
+
+    def __lt__(self, other):
+        """Adds support for deterministic sorting by distance."""
+        a = (
+            self.distance,
+            self.matched_iscc,
+            self.matched_position,
+            self.matched_feature,
+        )
+        b = (
+            other.distance,
+            other.matched_iscc,
+            other.matched_position,
+            other.matched_feature,
+        )
+        return operator.lt(a, b)
 
 
 class IsccMatch(BaseModel):
     """Metrics of a matched ISCC."""
 
-    iscc: str = Field(description="The ISCC found to match with the query.")
+    class Config:
+        frozen = True
+
     key: Optional[Union[str, int]] = Field(description="Unique key of ISCC entry.")
-    dist: Optional[int] = Field(description="Hamming distance of the full code")
+    matched_iscc: str = Field(description="The ISCC found to match with the query.")
+    distance: Optional[int] = Field(description="Hamming distance of the full code")
     mdist: Optional[int] = Field(description="Hamming distance of Meta-Code.")
     cdist: Optional[int] = Field(description="Hamming distance of Content-Code.")
     ddist: Optional[int] = Field(description="Hamming distance of Data-Code.")
     imatch: Optional[bool] = Field(description="Wether Instance-Code is identical.")
-    fmatch: Optional[List[FeatureMatch]] = Field(
-        default_factory=list, description="List of feature matches"
+
+    def __lt__(self, other):
+        """Adds support for deterministic sorting by distance."""
+        a = self.distance, self.matched_iscc
+        b = other.distance, other.matched_iscc
+        return operator.lt(a, b)
+
+
+class QueryResult(BaseModel):
+
+    iscc_matches: Optional[List[IsccMatch]] = Field(
+        default_factory=list, description="Matched ISCCs with distance metrics"
+    )
+    feature_matches: Optional[List[FeatureMatch]] = Field(
+        default_factory=list, description="ISCCs matched by granular features."
     )
 
 

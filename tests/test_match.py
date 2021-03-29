@@ -41,7 +41,7 @@ def test_simple_index_query():
     assert idx.query(QUERY_CODE, 3) == [
         IsccMatch(
             key=13,
-            iscc="KMD73CA6R4XJLI5CKYOYF7CYSL5PSJGVYXJVMT4PF3CSTGC4KNJ4ILI",
+            matched_iscc="KMD73CA6R4XJLI5CKYOYF7CYSL5PSJGVYXJVMT4PF3CSTGC4KNJ4ILI",
             mdist=0,
             cdist=0,
             ddist=0,
@@ -49,7 +49,7 @@ def test_simple_index_query():
         ),
         IsccMatch(
             key=4,
-            iscc="KMD73CA6R4XJLI5CKYOYF7CYSL5PSBWQO33FNHPQNNCY4KHZALJ54JA",
+            matched_iscc="KMD73CA6R4XJLI5CKYOYF7CYSL5PSBWQO33FNHPQNNCY4KHZALJ54JA",
             mdist=0,
             cdist=0,
             ddist=26,
@@ -57,7 +57,7 @@ def test_simple_index_query():
         ),
         IsccMatch(
             key=12,
-            iscc="KMD73CA6R4XJLI5CKYOYF7CYSL5PTKDOPDEUETYGNGGUADC5E5GWOBA",
+            matched_iscc="KMD73CA6R4XJLI5CKYOYF7CYSL5PTKDOPDEUETYGNGGUADC5E5GWOBA",
             mdist=0,
             cdist=0,
             ddist=27,
@@ -90,7 +90,7 @@ def test_simple_split_index_query():
     result = idx.query(QUERY_CODE)
     assert result == [
         IsccMatch(
-            iscc="KMD73CA6R4XJLI5CKYOYF7CYSL5PSBWQO33FNHPQNNCY4KHZALJ54JA",
+            matched_iscc="KMD73CA6R4XJLI5CKYOYF7CYSL5PSBWQO33FNHPQNNCY4KHZALJ54JA",
             key=4,
             mdist=0,
             cdist=0,
@@ -98,7 +98,7 @@ def test_simple_split_index_query():
             imatch=False,
         ),
         IsccMatch(
-            iscc="KMD73CA6R4XJLI5CKYOYF7CYSL5PS7G6RNNCWVCAXZFOBG5J3UAB4EA",
+            matched_iscc="KMD73CA6R4XJLI5CKYOYF7CYSL5PS7G6RNNCWVCAXZFOBG5J3UAB4EA",
             key=10,
             mdist=0,
             cdist=0,
@@ -106,7 +106,7 @@ def test_simple_split_index_query():
             imatch=False,
         ),
         IsccMatch(
-            iscc="KMD73CA6R4XJLI5CKYOYF7CYTL5PSDTGHO52LVRXAELT2LOWOCGSFEQ",
+            matched_iscc="KMD73CA6R4XJLI5CKYOYF7CYTL5PSDTGHO52LVRXAELT2LOWOCGSFEQ",
             key=11,
             mdist=0,
             cdist=1,
@@ -114,7 +114,7 @@ def test_simple_split_index_query():
             imatch=False,
         ),
         IsccMatch(
-            iscc="KMD73CA6R4XJLI5CKYOYF7CYSL5PTKDOPDEUETYGNGGUADC5E5GWOBA",
+            matched_iscc="KMD73CA6R4XJLI5CKYOYF7CYSL5PTKDOPDEUETYGNGGUADC5E5GWOBA",
             key=12,
             mdist=0,
             cdist=0,
@@ -122,7 +122,7 @@ def test_simple_split_index_query():
             imatch=False,
         ),
         IsccMatch(
-            iscc="KMD6P2X7C73P72Z4K2MYF7CYSK5NT3IYMMD6TDPH3PE2RQEAMBDN4MA",
+            matched_iscc="KMD6P2X7C73P72Z4K2MYF7CYSK5NT3IYMMD6TDPH3PE2RQEAMBDN4MA",
             key=1,
             mdist=28,
             cdist=4,
@@ -130,7 +130,7 @@ def test_simple_split_index_query():
             imatch=False,
         ),
         IsccMatch(
-            iscc="KMD6P2X7C73P72Z4K2MYF7CYSK5NT3IYMMD6TDPH3NPWULHXP5BXSJI",
+            matched_iscc="KMD6P2X7C73P72Z4K2MYF7CYSK5NT3IYMMD6TDPH3NPWULHXP5BXSJI",
             key=2,
             mdist=28,
             cdist=4,
@@ -138,7 +138,7 @@ def test_simple_split_index_query():
             imatch=False,
         ),
         IsccMatch(
-            iscc="KMD6P2X7C73P72Z4KYOYF7CYTL5PS5LXYSDEZPZMX65SY36REOETL6Q",
+            matched_iscc="KMD6P2X7C73P72Z4KYOYF7CYTL5PS5LXYSDEZPZMX65SY36REOETL6Q",
             key=3,
             mdist=28,
             cdist=1,
@@ -146,7 +146,7 @@ def test_simple_split_index_query():
             imatch=False,
         ),
         IsccMatch(
-            iscc="KMD6P2X7C73P72Z4KYOYF7CYSL5PTEZDYWYEPFJMWAWTF7WHOUTKTJI",
+            matched_iscc="KMD6P2X7C73P72Z4KYOYF7CYSL5PTEZDYWYEPFJMWAWTF7WHOUTKTJI",
             key=5,
             mdist=28,
             cdist=0,
@@ -154,7 +154,7 @@ def test_simple_split_index_query():
             imatch=False,
         ),
         IsccMatch(
-            iscc="KMD6P2X7C73P72Z4KYOYF7CYSL5PTRJEQGQ3C2MDKRES4YQH223CMQA",
+            matched_iscc="KMD6P2X7C73P72Z4KYOYF7CYSL5PTRJEQGQ3C2MDKRES4YQH223CMQA",
             key=8,
             mdist=28,
             cdist=0,
@@ -162,7 +162,7 @@ def test_simple_split_index_query():
             imatch=False,
         ),
         IsccMatch(
-            iscc="KMD6P2X7C73P72Z4KYOYF7CYSL5PSBV2FQQ6IPDDX566E4CQO55IENY",
+            matched_iscc="KMD6P2X7C73P72Z4KYOYF7CYSL5PSBV2FQQ6IPDDX566E4CQO55IENY",
             key=9,
             mdist=28,
             cdist=0,
@@ -170,7 +170,7 @@ def test_simple_split_index_query():
             imatch=False,
         ),
         IsccMatch(
-            iscc="KMD6P2X7C73P72Z4K2PIHNCYLLZPSPNWOCVGDFJNCNDFLFA4BBFYOVY",
+            matched_iscc="KMD6P2X7C73P72Z4K2PIHNCYLLZPSPNWOCVGDFJNCNDFLFA4BBFYOVY",
             key=7,
             mdist=28,
             cdist=10,

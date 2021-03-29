@@ -1,35 +1,40 @@
 # -*- coding: utf-8 -*-
-"""Persistent inverted index for ISCCs, components and granular features.
+"""Persistent inverted index for ISCC components and granular features.
 
-Subdatabases
-1.  iscc_none_v0_256
-----------------------------
-2.  meta_code_v0_64
-3.  content_text_v0_64
-4.  content_image_v0_64
-4.  content audio_v0_64
-5.  content video_v0_64
-6.  data_code_v0_64
-8.  instance_code_v0_64
-----------------------------
-9.  feat_text_v0_64
-10. feat_image_v0_64
-11. feat_audio_v0_64
-12. feat_video_v0_64
-----------------------------
-13. metdata
+ISCCs are stored in their raw-bytes representation. All other keys and values are
+serialized to bytes with MessagePack.
+
+We use LMDB `dupsort` to store multiple values per key and `set_range` to iterate
+compatible (matchable) components by prefix. Features are indexed in separate
+sub-databases per feature-type and version.
+
+
+Database Structure:
+
+    isccs:
+        key -> iscc
+
+    components:
+        component -> key1..keyx
+
+    features-<type>-<version>:
+        feature .>  (key1, pos1)..(key1, pos1)
+
+    metadata:
+        key -> metadata
+
+The `components` inverted index can be rebuild from the `isccs`-table.
+The `features` inverted indexes can be rebuild from the `metadata`-table if available.
 """
 import os
-from operator import attrgetter
 from os.path import join
-from typing import List, Optional, Dict, Any, Tuple, Union
+from typing import List, Optional, Dict, Any, Tuple, Union, Set, Generator
 from loguru import logger as log
 import iscc
 import lmdb
 import shutil
 from humanize import naturalsize
-from iscc.schema import FeatureMatch, IsccMatch, Options, ISCC
-from iscc.metrics import distance_bytes
+from iscc.schema import FeatureMatch, IsccMatch, QueryResult, Options, ISCC
 import msgpack
 
 
@@ -40,10 +45,13 @@ Key = Union[int, str, bytes]
 class Index:
     def __init__(self, name="iscc-db", readonly=False, **options):
         # type: (str, bool, **Any) -> Index
-        """Create or open existing index.
+        """Open a named index or create a new one with `name`.
+
+        A given index can only have one concurrent writer. Multiple readers are
+        allowed (open with readonly=True).
 
         name (str): Name of the index (default iscc-db).
-        index_root (str): The root path for databases (default APP_DIR).
+        index_root (str): The root path for index databases (default APP_DIR).
         index_components (bool): Create inverted index of components (default True).
         index_features (bool): Create inverted index of features (default False).
         index_metadata (bool): Store metadata in index (default False).
@@ -60,17 +68,7 @@ class Index:
             map_size=2 ** 20,
             readonly=readonly,
             max_dbs=24,
-            metasync=False,
-            sync=False,
-            readahead=False,
-            writemap=False,
-            meminit=False,
-            map_async=True,
         )
-
-    @property
-    def map_size(self) -> int:
-        return self.env.info()["map_size"]
 
     def add(self, iscc_obj, key=None):
         # type: (IsccObj, Optional[Key]) -> Key
@@ -103,7 +101,7 @@ class Index:
         # Add canonical ISCC to main index
         db = self._db_isccs()
         if key is None:
-            key = self.next_key()
+            key = self._next_key()
 
         keyb = msgpack.dumps(key)
 
@@ -130,139 +128,134 @@ class Index:
         return key
 
     def query(self, iscc_obj, k=10, ct=10, ft=4):
-        # type: (IsccObj, int, int, int) -> List[IsccMatch]
-        """Return nearest neighbours."""
+        # type: (IsccObj, int, int, int) -> QueryResult
+        """Find nearest neighbours for ISCCs.
+
+        Query strategy:
+            We first match ISCCs by per-component similarity with a threshold of
+            of maximum `ct` bits of hamming distance. IsccMatch results are sorted
+            by distance (lowest distance first) and the top-`k` results are returned.
+
+            Additionally granular features are also matched with a maximum threshold
+            of `ft` bits if features are indexed and included in the query-`IsccObj`.
+            The top-`k` `FeatureMatch` results are sorted by distance and will not
+            include ISCCs that have already been matched by the previous component
+            matching.
+        """
+
         source_iscc, features, metadata = self._parse_iscc_obj(iscc_obj)
-        matches = {}
+        iscc_matches = set()
+        seen_fkeys = set()
 
         # Collect ISCC component level matches
-        for comp_obj in iscc.decompose(source_iscc):
-            for fkey in self._match_component(comp_obj, ct=ct):
-                if fkey not in matches:
-                    matches[fkey] = self._build_match(source_iscc, fkey)
+        for comp_obj in reversed(iscc.decompose(source_iscc)):
+            for fkey in self.match_component(comp_obj, ct=ct):
+                if fkey not in seen_fkeys:
+                    iscc_matches.add(self._build_match(source_iscc, fkey))
+                    seen_fkeys.add(fkey)
 
         # Collect ISCC feature level matches
+        feature_matches = set()
         for feat_obj in features:
-            src_pos = 0
-            # TODO handle features without sizes or make sizes mandatory
-            for src_feat, src_size in zip(feat_obj["features"], feat_obj["sizes"]):
-                kind, src_feat_raw = feat_obj["kind"], iscc.decode_base64(src_feat)
-                fmatches = self._match_feature(kind, src_feat_raw, ft)
-                for target_feature, fkey, target_position, dist in fmatches:
-                    match_obj = matches.get(fkey)
-                    if match_obj is None:
-                        match_obj = self._build_match(source_iscc, fkey)
-                        matches[fkey] = match_obj
-                    fmatch_obj = FeatureMatch(
-                        kind=kind,
-                        source_hash=src_feat,
-                        source_pos=src_pos,
-                        target_hash=iscc.encode_base64(target_feature),
-                        target_pos=target_position,
-                        distance=dist,
-                    )
-                    match_obj.fmatch.append(fmatch_obj)
-                src_pos += src_size
+            kind = feat_obj["kind"]
+            for src_feat in feat_obj["features"]:
+                for fm in self.match_feature(kind, src_feat, ft=ft, ignore=seen_fkeys):
+                    feature_matches.add(fm)
 
-        top_k = sorted(matches.values(), key=attrgetter("dist"))[:k]
-        return top_k
+        return QueryResult(
+            iscc_matches=sorted(iscc_matches)[:k],
+            feature_matches=sorted(feature_matches)[:k],
+        )
 
-    def _build_match(self, source_iscc: iscc.Code, matched_key: bytes):
-        matched_iscc: iscc.Code = self.get_iscc(matched_key)
-        matchdata = iscc.compare(source_iscc, matched_iscc)
-        matchdata["key"] = msgpack.loads(matched_key)
-        matchdata["iscc"] = matched_iscc.code
-        matchdata["dist"] = distance_bytes(source_iscc.bytes, matched_iscc.bytes)
-        return IsccMatch(**matchdata)
-
-    def _match_component(self, code, ct):
+    def match_component(self, code, ct=0):
         # type: (iscc.Code, int) -> List[bytes]
-        """Collect iscc-fkeys for similar codes with maximum bit distance 'ct'.
-
-        Scans full range of component entries of given type.
-        Override for optimized ANN search.
         """
-
-        # Simple get if instance code or threshold is 0
-        if code.maintype == iscc.MT.INSTANCE or ct == 0:
-            return self._get_component(code.bytes)
-
-        # Scan for nearest neighbors
+        Match ISCCs (fkeys) by given commponent with threshold `ct` (max distance).
+        """
         db = self._db_components()
-        fkeys = set()
 
-        with self.env.begin(db) as txn:
-            with txn.cursor(db) as c:
-                found_type = c.set_range(code.header_bytes)
-                if not found_type:
-                    return []
-                # TODO: requires secondary cursor
-                for candidate_component in c.iternext_nodup(keys=True, values=False):
-                    if iscc.distance(code.bytes, candidate_component) > ct:
-                        continue
-                    for value in c.iternext_dup(keys=False, values=True):
-                        fkeys.add(value)
-
-        return list(fkeys)
-
-    def _match_feature(self, kind, feature, ft):
-        # type: (str, bytes, int) -> List[Tuple[bytes, bytes, Union[int, float], int]]
-        """
-        Collect iscc-fkeys and positions for features with max bit distance 'ft'.
-        Returns list of tuples: target_feature, fkey, target_position, dist
-        """
-
-        results = []
-        source_hash = iscc.encode_base64(feature)
-
-        # Simple get with 0 threshold
-        if ft == 0:
-            lookup = self._get_feature(kind, feature)
-            for fkey, target_position in lookup:
-                results.append((feature, fkey, target_position, 0))
-            return results
-
-        # Exhaustive scan
-        db = self._db_features(kind)
-
-        with self.env.begin(db) as txn:
-            with txn.cursor(db) as c:
-                c.first()
-                for candidate_feature in c.iternext_nodup(keys=True, values=False):
-                    dist = iscc.distance_bytes(feature, candidate_feature)
-                    if dist > ft:
-                        continue
-                    # TODO: requires secondary cursor
-                    for value in c.iternext_dup(keys=False, values=True):
-                        fkey, target_position = msgpack.loads(value)
-                        results.append((candidate_feature, fkey, target_position, dist))
-        return results
-
-    @staticmethod
-    def _parse_iscc_obj(iscc_obj):
-        # type: (IsccObj) -> Tuple[iscc.Code, List[dict], Optional[dict]]
-        """Unpack different types of ISCC inputs."""
-
-        metadata = None
-        features = []
-
-        if isinstance(iscc_obj, str):
-            iscc_code = iscc.Code(iscc_obj)
-        elif isinstance(iscc_obj, iscc.Code):
-            iscc_code = iscc_obj
-        elif isinstance(iscc_obj, ISCC):
-            iscc_code = iscc.Code(iscc_obj.iscc)
-            metadata = iscc_obj.dict(exclude_unset=True)
-            features = metadata.get("features", [])
-        elif isinstance(iscc_obj, dict):
-            iscc_code = iscc.Code(iscc_obj["iscc"])
-            metadata = iscc_obj
-            features = metadata.get("features", [])
+        if code.maintype == iscc.MT.INSTANCE or ct == 0:
+            # Simple get if instance code or threshold is 0
+            return self._get_values(db, code.bytes)
         else:
-            raise ValueError(
-                f"'iscc_obj' must be one of {IsccObj} not {type(iscc_obj)}."
-            )
-        return iscc_code, features, metadata
+            # TODO: pluck ANNS search here if available
+            # Scan for nearest neighbors
+            fkeys = set()
+            prefix = code.header_bytes
+            with self.env.begin(db) as txn:
+                with txn.cursor(db) as c:
+                    c.set_range(prefix)
+                    for k in c.iternext_nodup(keys=True, values=False):
+                        if not k.startswith(prefix):
+                            break
+                        candidate = iscc.Code(k)
+                        distance = iscc.distance_ba(code.hash_ba, candidate.hash_ba)
+                        if distance > ct:
+                            continue
+                        c2 = txn.cursor(db)
+                        c2.set_key(k)
+                        for v in c2.iternext_dup(keys=False, values=True):
+                            fkeys.add(v)
+                        c2.close()
+            return list(fkeys)
+
+    def match_feature(self, kind, feature, ft=0, ignore=None):
+        # type: (str, Union[str,bytes], int, Set[bytes]) -> List[FeatureMatch]
+        """
+        Match ISCCs by a given feature with feature threshold `ft` (max distance).
+        Ignore matches for fkeys in `ignore`.
+        """
+
+        if isinstance(feature, str):
+            feature_raw, feature_str = iscc.decode_base64(feature), feature
+        elif isinstance(feature, bytes):
+            feature_raw, feature_str = feature, iscc.encode_base64(feature)
+        else:
+            raise ValueError(f"feature must be str or bytes, not {type(feature)}")
+
+        ignore = ignore or set()
+
+        matches = set()
+
+        if ft == 0:
+            # Simple lookup with zero threshold
+            lookup = self._get_feature(kind, feature_raw)
+            for fkey, match_pos in lookup:
+                if fkey in ignore:
+                    continue
+                fm = FeatureMatch(
+                    matched_iscc=self.get_iscc(fkey).code,
+                    kind=kind,
+                    source_feature=feature_str,
+                    matched_feature=feature_str,
+                    matched_position=match_pos,
+                )
+                matches.add(fm)
+        else:
+            # TODO: pluck ANNS search here if available
+            # Fallback full scan with non-zero threshold an no ANNS index
+            db = self._db_features(kind)
+            with self.env.begin(db) as txn:
+                with txn.cursor(db) as c:
+                    while c.next_nodup():
+                        candidate_feature = c.key()
+                        distance = iscc.distance_bytes(feature_raw, candidate_feature)
+                        if distance > ft:
+                            continue
+                        for value in c.iternext_dup(keys=False, values=True):
+                            fkey, matched_position = msgpack.loads(value)
+                            if fkey in ignore:
+                                continue
+                            fm = FeatureMatch(
+                                matched_iscc=self.get_iscc(fkey).code,
+                                kind=kind,
+                                source_feature=feature_str,
+                                matched_feature=iscc.encode_base64(candidate_feature),
+                                matched_position=matched_position,
+                            )
+                            matches.add(fm)
+
+        return sorted(matches)
 
     def get_key(self, code) -> Optional[int]:
         """Get first internal key for an ISCC if any."""
@@ -282,49 +275,6 @@ class Index:
             for idx in idxs:
                 if txn.get(idx) == full_code_bytes:
                     return msgpack.loads(idx)
-
-    def next_key(self) -> bytes:
-        """Next free autoincrement key"""
-        db = self._db_isccs()
-        with self.env.begin(db) as txn:
-            with txn.cursor(db) as c:
-                empty = not c.last()
-                key = msgpack.loads(c.key()) + 1 if not empty else 0
-        return key
-
-    def _put(self, db, key: bytes, value: bytes, dupdata=True, overwrite=True) -> bool:
-        """Wrap LMDB put in a transaction and auto-resize db if required."""
-        try:
-            with self.env.begin(db, write=True) as txn:
-                return txn.put(key, value, dupdata=dupdata, overwrite=overwrite)
-        except lmdb.MapFullError:
-            new_size = self.map_size * 2
-            log.info(f"Resizing {self.dbpath} to {naturalsize(new_size)}")
-            self.env.set_mapsize(self.map_size * 2)
-            with self.env.begin(db, write=True) as txn:
-                return txn.put(key, value, dupdata=dupdata, overwrite=overwrite)
-
-    def _putmulti(self, db, items, dupdata=True, overwrite=True) -> Tuple[int, int]:
-        """Wrap LMDB putmulti in a transaction and auto-resize db if required."""
-        try:
-            with self.env.begin(db, write=True) as txn:
-                with txn.cursor(db) as c:
-                    return c.putmulti(items, dupdata=dupdata, overwrite=overwrite)
-        except lmdb.MapFullError:
-            new_size = self.map_size * 2
-            log.info(f"Resizing {self.dbpath} to {naturalsize(new_size)}")
-            self.env.set_mapsize(self.map_size * 2)
-            with self.env.begin(db, write=True) as txn:
-                with txn.cursor(db) as c:
-                    return c.putmulti(items, dupdata=dupdata, overwrite=overwrite)
-
-    def isccs(self):
-        """Iterates over indexed ISCC codes in insertion order."""
-        db = self._db_isccs()
-        with self.env.begin(db) as txn:
-            with txn.cursor(db) as c:
-                while c.next():
-                    yield c.value()
 
     def get_iscc(self, key):
         # type: (Key) -> iscc.Code
@@ -348,8 +298,16 @@ class Index:
             if iscc_bytes:
                 return msgpack.loads(iscc_bytes)
 
-    def components(self):
-        """Itereates over indexed components."""
+    def iter_isccs(self) -> Generator[bytes, None, None]:
+        """Iterates over all indexed ISCC codes in insertion order."""
+        db = self._db_isccs()
+        with self.env.begin(db) as txn:
+            with txn.cursor(db) as c:
+                while c.next():
+                    yield c.value()
+
+    def iter_components(self) -> Generator[bytes, None, None]:
+        """Itereates over all indexed components in lexicographic order."""
         db = self._db_components()
         with self.env.begin(db) as txn:
             with txn.cursor(db) as c:
@@ -374,6 +332,10 @@ class Index:
     def close(self):
         """Close index."""
         self.env.close()
+
+    @property
+    def map_size(self) -> int:
+        return self.env.info()["map_size"]
 
     def _db_isccs(self) -> lmdb._Database:
         return self.env.open_db(b"isccs", integerkey=False, create=True)
@@ -410,20 +372,6 @@ class Index:
         db = self._db_components()
         return self._put(db, code, fkey, dupdata=True, overwrite=True)
 
-    def _get_component(self, code: bytes) -> List[bytes]:
-        """Get foreign-key pointers for a given ISCC component."""
-        db = self._db_components()
-        fkeys = []
-        with self.env.begin() as txn:
-            with txn.cursor(db) as c:
-                fkey = c.get(code)
-                if fkey is None:
-                    return []
-                fkeys.append(fkey)
-                while c.next_dup():
-                    fkeys.append(c.value())
-        return fkeys
-
     def _add_feature(self, kind, feature, fkey, position):
         # type: (str, bytes, bytes, Union[int, float]) -> bool
         """Add a feature to the index with a pointer to its source ISCC and position.
@@ -432,6 +380,20 @@ class Index:
         db = self._db_features(kind)
         value = msgpack.packb((fkey, position))
         return self._put(db, feature, value, dupdata=True, overwrite=True)
+
+    def _get_values(self, db, key):
+        # type: (lmdb._Database, bytes) -> List[bytes]
+        """Collect all values for a given `key` from LMDB dupsort database."""
+        values = []
+        with self.env.begin(db) as txn:
+            with txn.cursor(db) as c:
+                value = c.get(key)
+                if value is None:
+                    return []
+                values.append(value)
+                while c.next_dup():
+                    values.append(c.value())
+        return values
 
     def _get_feature(self, kind, feature):
         # type: (str, bytes) -> List[Tuple[bytes, Union[int, float]]]
@@ -448,9 +410,82 @@ class Index:
                     results.append(msgpack.unpackb(c.value(), use_list=False))
         return results
 
-    def dump(self):
-        """Dump """
-        for idx, value in enumerate(self.isccs()):
+    def _next_key(self) -> bytes:
+        """Next free autoincrement key"""
+        db = self._db_isccs()
+        with self.env.begin(db) as txn:
+            with txn.cursor(db) as c:
+                empty = not c.last()
+                key = msgpack.loads(c.key()) + 1 if not empty else 0
+        return key
+
+    def _put(self, db, key: bytes, value: bytes, dupdata=True, overwrite=True) -> bool:
+        """Wrap LMDB put in a transaction and auto-resize db if required."""
+        try:
+            with self.env.begin(db, write=True) as txn:
+                return txn.put(key, value, dupdata=dupdata, overwrite=overwrite)
+        except lmdb.MapFullError:
+            new_size = self.map_size * 2
+            log.info(f"Resizing {self.dbpath} to {naturalsize(new_size)}")
+            self.env.set_mapsize(self.map_size * 2)
+            with self.env.begin(db, write=True) as txn:
+                return txn.put(key, value, dupdata=dupdata, overwrite=overwrite)
+
+    def _putmulti(self, db, items, dupdata=True, overwrite=True) -> Tuple[int, int]:
+        """Wrap LMDB putmulti in a transaction and auto-resize db if required."""
+        try:
+            with self.env.begin(db, write=True) as txn:
+                with txn.cursor(db) as c:
+                    return c.putmulti(items, dupdata=dupdata, overwrite=overwrite)
+        except lmdb.MapFullError:
+            new_size = self.map_size * 2
+            log.info(f"Resizing {self.dbpath} to {naturalsize(new_size)}")
+            self.env.set_mapsize(self.map_size * 2)
+            with self.env.begin(db, write=True) as txn:
+                with txn.cursor(db) as c:
+                    return c.putmulti(items, dupdata=dupdata, overwrite=overwrite)
+
+    def _build_match(self, source_iscc, matched_key):
+        # type: (iscc.Code, bytes) -> IsccMatch
+        """Build IsccMatch for source_iscc and iscc of a matched foreign key."""
+        matched_iscc: iscc.Code = self.get_iscc(matched_key)
+        matchdata = iscc.compare(source_iscc, matched_iscc)
+        matchdata["matched_iscc"] = matched_iscc.code
+        matchdata["key"] = msgpack.loads(matched_key)
+        matchdata["distance"] = iscc.distance_ba(
+            source_iscc.hash_ba, matched_iscc.hash_ba
+        )
+        return IsccMatch(**matchdata)
+
+    @staticmethod
+    def _parse_iscc_obj(iscc_obj):
+        # type: (IsccObj) -> Tuple[iscc.Code, List[dict], Optional[dict]]
+        """Unpack different types of ISCC inputs."""
+
+        metadata = None
+        features = []
+
+        if isinstance(iscc_obj, str):
+            iscc_code = iscc.Code(iscc_obj)
+        elif isinstance(iscc_obj, iscc.Code):
+            iscc_code = iscc_obj
+        elif isinstance(iscc_obj, ISCC):
+            iscc_code = iscc.Code(iscc_obj.iscc)
+            metadata = iscc_obj.dict(exclude_unset=True)
+            features = metadata.get("features", [])
+        elif isinstance(iscc_obj, dict):
+            iscc_code = iscc.Code(iscc_obj["iscc"])
+            metadata = iscc_obj
+            features = metadata.get("features", [])
+        else:
+            raise ValueError(
+                f"'iscc_obj' must be one of {IsccObj} not {type(iscc_obj)}."
+            )
+        return iscc_code, features, metadata
+
+    def _dump(self):
+        """Dump DB to console"""
+        for idx, value in enumerate(self.iter_isccs()):
             print("ISCC", idx, iscc.Code(value).code)
         if self.opts.index_components:
             db = self._db_components()
