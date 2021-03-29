@@ -50,11 +50,12 @@ class Index:
         A given index can only have one concurrent writer. Multiple readers are
         allowed (open with readonly=True).
 
-        name (str): Name of the index (default iscc-db).
-        index_root (str): The root path for index databases (default APP_DIR).
-        index_components (bool): Create inverted index of components (default True).
-        index_features (bool): Create inverted index of features (default False).
-        index_metadata (bool): Store metadata in index (default False).
+        :param str name: Name of the index (default iscc-db).
+        :param bool readonly: Open index in readonly mode.
+        :key str index_root: The root path for index databases (default APP_DIR).
+        :key bool index_components: Create inverted index of components (default True).
+        :key bool index_features: Create inverted index of features (default False).
+        :key bool index_metadata: Store metadata in index (default False).
         """
 
         self.opts = Options(**options)
@@ -74,9 +75,6 @@ class Index:
         # type: (IsccObj, Optional[Key]) -> Key
         """Add an ISCC to the index.
 
-        iscc_obj: ISCC str, Code, schema.ISCC or conforming dict.
-        key: Optional primary key (int or str).
-
         The ISCC can be provided as a string or Code object. Alternatively you can pass
         the ISCC wrapped in a schema.ISCC object or conforming dict. This is required
         if granular features should be indexed or if you want to store ISCC metadata
@@ -85,6 +83,10 @@ class Index:
         Optionally you may provide a unique key (str or int) to map entries to your
         external database. If no key is provided the index will create and return
         an autoincremented integer id. Do not mix both aproaches.
+
+        :param IsccObj iscc_obj: ISCC str, Code, schema.ISCC or conforming dict.
+        :param Key key: Optional custom primary key (int or str).
+        :returns: Primary key of added (or pre-existing) iscc_obj.
         """
 
         iscc_code, features, metadata = self._parse_iscc_obj(iscc_obj)
@@ -127,20 +129,25 @@ class Index:
 
         return key
 
-    def query(self, iscc_obj, k=10, ct=10, ft=4):
+    def query(self, iscc_obj, k=10, ct=8, ft=4):
         # type: (IsccObj, int, int, int) -> QueryResult
         """Find nearest neighbours for ISCCs.
 
-        Query strategy:
-            We first match ISCCs by per-component similarity with a threshold of
-            of maximum `ct` bits of hamming distance. IsccMatch results are sorted
-            by distance (lowest distance first) and the top-`k` results are returned.
+        We first match ISCCs by per-component similarity with a threshold of
+        of maximum `ct` bits of hamming distance. IsccMatch results are sorted
+        by distance (lowest distance first) and the top-`k` results are returned.
 
-            Additionally granular features are also matched with a maximum threshold
-            of `ft` bits if features are indexed and included in the query-`IsccObj`.
-            The top-`k` `FeatureMatch` results are sorted by distance and will not
-            include ISCCs that have already been matched by the previous component
-            matching.
+        Additionally granular features are also matched with a maximum threshold
+        of `ft` bits if features are indexed and included in the query-`IsccObj`.
+        The top-`k` `FeatureMatch` results are sorted by distance and will not
+        include ISCCs that have already been matched by the previous component
+        matching.
+
+        :param IsccObj iscc_obj: ISCC string or ISCC metadata to be matched.
+        :param int k: Return maximum top-k IsccMatches and top-k FeatureMatches.
+        :param int ct: Match components with max hamming distance `ct`.
+        :param int ft: Match features with max hamming distance `ft`
+        :return: QueryResult
         """
 
         source_iscc, features, metadata = self._parse_iscc_obj(iscc_obj)
@@ -171,6 +178,10 @@ class Index:
         # type: (iscc.Code, int) -> List[bytes]
         """
         Match ISCCs (fkeys) by given commponent with threshold `ct` (max distance).
+
+        :param iscc.Code code: ISCC Code component object to be matched.
+        :param int ct: Component threshold (max hamming distance for match).
+        :return: List[bytes] - foreign keys to ISCC table.
         """
         db = self._db_components()
 
@@ -204,6 +215,11 @@ class Index:
         """
         Match ISCCs by a given feature with feature threshold `ft` (max distance).
         Ignore matches for fkeys in `ignore`.
+
+        :param str kind: Feature type to be matched.
+        :param str|bytes feature: Raw or base64 encoded granular feature.
+        :param int ft: Feature threshold (max hamming distance to match feature)
+        :param set ignore: Set of ISCC table primarky keys to ignore.
         """
 
         if isinstance(feature, str):
