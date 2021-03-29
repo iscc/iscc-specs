@@ -81,7 +81,10 @@ def distance_int(a, b):
 def distance_bytes(a, b):
     # type: (bytes, bytes) -> int
     """Calculate hamming distance for bytes hash digests of equal length."""
-    return count_xor(hex2ba(a.hex()), hex2ba(b.hex()))
+    ba, bb = bitarray(), bitarray()
+    ba.frombytes(a)
+    bb.frombytes(b)
+    return count_xor(ba, bb)
 
 
 def distance_hex(a, b):
