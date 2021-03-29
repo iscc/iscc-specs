@@ -297,18 +297,12 @@ def code_video(uri, **options):
 
     crop_value = video.detect_video_crop(uri) if opts.video_crop else None
     signature = video.extract_video_signature(uri, crop_value, **options)
-    logger.debug(f"video sig size {naturalsize(len(signature))}")
     frames = read_ffmpeg_signature(signature)
-    logger.debug(f"video sig frames {len(frames)}")
+    logger.debug(f"video sig {naturalsize(len(signature))} with {len(frames)} frames")
     features = [tuple(sig.vector.tolist()) for sig in frames]
     video_hash = video.hash_video(features, **options)
     video_code = Code((MT.CONTENT, ST_CC.VIDEO, VS.V0, nbits, video_hash))
     result["code"] = video_code.code
-
-    # Not yet part of schema
-    # result["signature_fps"] = opts.video_fps
-    # if crop_value:
-    #     result["crop"] = crop_value.lstrip("crop=")
 
     if opts.video_include_fingerprint:
         result["fingerprint"] = base64.b64encode(signature).decode("ascii")
@@ -342,7 +336,7 @@ def code_data(data, **options):
     :key data_granular: Return granular features (one hash per chunk).
     :key data_granular_factor: Size of granular data chunks times average chunk size.
     :key io_chunk_size: Number of bytes to read per IO operation.
-    :return:
+    :return: dict
     """
 
     opts = Options(**options)
