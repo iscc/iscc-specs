@@ -31,7 +31,7 @@ QUERY_CODE = "KMD73CA6R4XJLI5CKYOYF7CYSL5PSJGVYXJVMT4PF3CSTGC4KNJ4ILI"
 def idx():
     idx = iscc.Index("test-db")
     yield idx
-    idx.destory()
+    idx.destroy()
 
 
 @pytest.fixture
@@ -129,7 +129,7 @@ def test_index_dbs_features():
     try:
         assert idx.dbs() == [b"components", b"isccs", b"video"]
     finally:
-        idx.destory()
+        idx.destroy()
 
 
 def test_index_dbs_metadata():
@@ -140,7 +140,7 @@ def test_index_dbs_metadata():
     try:
         assert idx.dbs() == [b"components", b"isccs", b"metadata"]
     finally:
-        idx.destory()
+        idx.destroy()
 
 
 def test_index_iscc(idx, full_iscc):
@@ -247,7 +247,7 @@ def test_query():
         ],
         feature_matches=[],
     )
-    idx.destory()
+    idx.destroy()
 
 
 def test_index_match_component_exact():
@@ -257,7 +257,7 @@ def test_index_match_component_exact():
     components = iscc.decompose(TEST_CODES[-1])
     fkeys = [msgpack.loads(fk) for fk in idx.match_component(components[0])]
     assert fkeys == [4, 10, 11, 12]
-    idx.destory()
+    idx.destroy()
 
 
 def test_index_match_feature_exact():
@@ -269,7 +269,7 @@ def test_index_match_feature_exact():
     r = idx.match_feature("video", feature, ft=0)
     assert len(r) == 1
     assert r[0].matched_iscc == TEST_CODES[0]
-    idx.destory()
+    idx.destroy()
 
 
 def test_index_match_feature_similar():
@@ -283,7 +283,7 @@ def test_index_match_feature_similar():
     r = idx.match_feature("video", featb, ft=2)
     assert len(r) == 1
     assert r[0].matched_iscc == TEST_CODES[0]
-    idx.destory()
+    idx.destroy()
 
 
 def test_index_query_features():
@@ -338,4 +338,4 @@ def test_index_query_features():
             ),
         ],
     )
-    idx.destory()
+    idx.destroy()

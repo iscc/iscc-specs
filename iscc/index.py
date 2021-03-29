@@ -345,7 +345,7 @@ class Index:
                 dbnames.append(c.key())
         return dbnames
 
-    def destory(self):
+    def destroy(self):
         """Close and delete index from disk."""
         self.env.close()
         log.debug(f"delete index storage at {self.dbpath}")
