@@ -69,6 +69,12 @@ class Index:
             map_size=2 ** 20,
             readonly=readonly,
             max_dbs=24,
+            metasync=False,
+            sync=False,
+            readahead=False,
+            writemap=False,
+            meminit=False,
+            map_async=True,
         )
 
     def add(self, iscc_obj, key=None):
