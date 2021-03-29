@@ -54,6 +54,7 @@ PyLD = "^2.0.3"
 python-dotenv = "^0.16.0"
 lmdb = "^1.1.1"
 msgpack = "^1.0.2"
+annoy = "^1.17.0"
 
 [tool.poetry.extras]
 turbo = ["cython", "numba"]
