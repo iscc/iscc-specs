@@ -330,7 +330,7 @@ class Index:
                 for key in c.iternext_nodup():
                     yield key
 
-    def dbs(self) -> List[str]:
+    def dbs(self) -> List[bytes]:
         """Return a list of existing sub-databases in the main index."""
         dbnames = []
         with self.env.begin() as txn:
@@ -352,6 +352,17 @@ class Index:
     @property
     def map_size(self) -> int:
         return self.env.info()["map_size"]
+
+    @property
+    def stats(self):
+        result = {}
+        dbs = self.dbs()
+        for db_name in dbs:
+            db = self.env.open_db(db_name)
+            with self.env.begin() as txn:
+                entries = txn.stat(db)["entries"]
+                result[db_name.decode("ascii")] = entries
+        return result
 
     def _db_isccs(self) -> lmdb._Database:
         return self.env.open_db(b"isccs", integerkey=False, create=True)

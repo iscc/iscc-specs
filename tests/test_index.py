@@ -64,6 +64,11 @@ def test_index_contains(idx, full_iscc):
     assert full_iscc.code in idx
 
 
+def test_index_stats(idx, full_iscc):
+    idx.add(full_iscc)
+    assert idx.stats == {"components": 4, "isccs": 1}
+
+
 def test_index_key_int(idx, full_iscc):
     assert len(idx) == 0
     idx.add(full_iscc.code, 666)
