@@ -97,14 +97,18 @@ class Index:
 
         iscc_code, features, metadata = self._parse_iscc_obj(iscc_obj)
 
+        # Normalize
+        components = iscc.decompose(iscc_code)
+        iscc_code = iscc.compose(components)
+
+        # Init component databases
+        for c in components:
+            self._db_components(c.type_id)
+
         # Check for duplicate ISCC
         exists = self.get_key(iscc_code)
         if exists is not None:
             return exists
-
-        # Normalize
-        components = iscc.decompose(iscc_code)
-        iscc_code = iscc.compose(components)
 
         # Add canonical ISCC to main index
         db = self._db_isccs()
@@ -118,7 +122,7 @@ class Index:
         # Add components to components index
         if self.opts.index_components:
             for code in components:
-                self._add_component(code.bytes, keyb)
+                self._add_component(code, keyb)
 
         # Add feature hashes
         if self.opts.index_features and features is not None:
@@ -192,23 +196,21 @@ class Index:
         :param int ct: Component threshold (max hamming distance for match).
         :return: List[bytes] - foreign keys to ISCC table.
         """
-        db = self._db_components()
+        db = self._db_components(code.type_id)
 
         if code.maintype == iscc.MT.INSTANCE or ct == 0:
             # Simple get if instance code or threshold is 0
-            return self._get_values(db, code.bytes)
+            return self._get_values(db, code.hash_bytes)
         else:
             # TODO: pluck ANNS search here if available
             # Scan for nearest neighbors
             fkeys = set()
+
             prefix = code.header_bytes
             with self.env.begin(db) as txn:
                 with txn.cursor(db) as c:
-                    c.set_range(prefix)
                     for k in c.iternext_nodup(keys=True, values=False):
-                        if not k.startswith(prefix):
-                            break
-                        candidate = iscc.Code(k)
+                        candidate = iscc.Code(prefix + k)
                         distance = iscc.distance_ba(code.hash_ba, candidate.hash_ba)
                         if distance > ct:
                             continue
@@ -282,23 +284,23 @@ class Index:
 
         return sorted(matches)
 
-    def get_key(self, code) -> Optional[int]:
-        """Get first internal key for an ISCC if any."""
+    def get_key(self, code: iscc.Code) -> Optional[int]:
+        """Resolve internal ISCC key via components."""
         # Find per component matches
         components = iscc.decompose(code)
-        db = self._db_components()
         idxs = []
-        with self.env.begin(db=db) as txn:
+
+        with self.env.begin() as txn:
             for code in components:
-                idx = txn.get(code.bytes)
+                db = self._db_components(code.type_id)
+                idx = txn.get(code.hash_bytes, db=db)
                 if idx is not None:
                     idxs.append(idx)
-        # Check if any of the full code entries is an exact match
-        full_code_bytes = iscc.compose(components).bytes
-        db = self._db_isccs()
-        with self.env.begin(db=db) as txn:
+            # Check if any of the full code entries is an exact match
+            full_code_bytes = iscc.compose(components).bytes
+            db = self._db_isccs()
             for idx in idxs:
-                if txn.get(idx) == full_code_bytes:
+                if txn.get(idx, db=db) == full_code_bytes:
                     return msgpack.loads(idx)
 
     def get_iscc(self, key):
@@ -333,11 +335,13 @@ class Index:
 
     def iter_components(self) -> Generator[bytes, None, None]:
         """Itereates over all indexed components in lexicographic order."""
-        db = self._db_components()
-        with self.env.begin(db) as txn:
-            with txn.cursor(db) as c:
-                for key in c.iternext_nodup():
-                    yield key
+        with self.env.begin() as txn:
+            for dbname in self.dbs():
+                if dbname.startswith(b"comp-"):
+                    db = self._db_components(dbname.lstrip(b"comp-").decode("ascii"))
+                    with txn.cursor(db) as c:
+                        for key in c.iternext_nodup():
+                            yield key
 
     def dbs(self) -> List[bytes]:
         """Return a list of existing sub-databases in the main index."""
@@ -376,10 +380,10 @@ class Index:
     def _db_isccs(self) -> lmdb._Database:
         return self.env.open_db(b"isccs", integerkey=False, create=True)
 
-    def _db_components(self) -> lmdb._Database:
+    def _db_components(self, type_id: str) -> lmdb._Database:
         """Return componets database."""
         return self.env.open_db(
-            b"components",
+            b"comp-" + type_id.encode("ascii"),
             dupsort=True,  # Duplicate keys allowed
             create=True,  # Create table if required
             integerkey=False,  # Keys are component raw bytes
@@ -400,13 +404,13 @@ class Index:
     def _db_metadata(self) -> lmdb._Database:
         return self.env.open_db(b"metadata", integerkey=False, create=True)
 
-    def _add_component(self, code: bytes, fkey: bytes) -> bool:
+    def _add_component(self, code: iscc.Code, fkey: bytes) -> bool:
         """
         Add a component to the index with a pointer to its source ISCC.
         A single component can point to multipe ISCC entries in the main table.
         """
-        db = self._db_components()
-        return self._put(db, code, fkey, dupdata=True, overwrite=True)
+        db = self._db_components(code.type_id)
+        return self._put(db, code.hash_bytes, fkey, dupdata=True, overwrite=True)
 
     def _add_feature(self, kind, feature, fkey, position):
         # type: (str, bytes, bytes, Union[int, float]) -> bool

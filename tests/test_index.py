@@ -53,6 +53,15 @@ def test_index_name(idx):
     assert idx.name == "test-db"
 
 
+def test_index_get_key(idx, full_iscc):
+    assert len(idx) == 0
+    key = idx.add(full_iscc)
+    assert idx.get_key(full_iscc) == 0 == key
+    i2 = iscc.Code.rnd(mt=iscc.MT.ISCC, bits=256)
+    key = idx.get_key(i2)
+    assert idx.get_key(i2) == 1 == key
+
+
 def test_index_len_autoid(idx, full_iscc):
     assert len(idx) == 0
     idx.add(full_iscc)
@@ -66,7 +75,13 @@ def test_index_contains(idx, full_iscc):
 
 def test_index_stats(idx, full_iscc):
     idx.add(full_iscc)
-    assert idx.stats == {"components": 4, "isccs": 1}
+    assert idx.stats == {
+        "comp-CONTENT-TEXT-V0-64": 1,
+        "comp-DATA-NONE-V0-64": 1,
+        "comp-INSTANCE-NONE-V0-64": 1,
+        "comp-META-NONE-V0-64": 1,
+        "isccs": 1,
+    }
 
 
 def test_index_key_int(idx, full_iscc):
@@ -118,7 +133,13 @@ def test_index_dbs_default(idx, iscc_result):
     # Default index
     assert idx.dbs() == []
     idx.add(iscc_result)
-    assert idx.dbs() == [b"components", b"isccs"]
+    assert idx.dbs() == [
+        b"comp-CONTENT-VIDEO-V0-64",
+        b"comp-DATA-NONE-V0-64",
+        b"comp-INSTANCE-NONE-V0-64",
+        b"comp-META-NONE-V0-64",
+        b"isccs",
+    ]
 
 
 def test_index_dbs_features():
@@ -127,7 +148,14 @@ def test_index_dbs_features():
     iscc_result = iscc.code_iscc(iscc_samples.videos()[0], video_granular=True)
     idx.add(iscc_result)
     try:
-        assert idx.dbs() == [b"components", b"feat-video-0", b"isccs"]
+        assert idx.dbs() == [
+            b"comp-CONTENT-VIDEO-V0-64",
+            b"comp-DATA-NONE-V0-64",
+            b"comp-INSTANCE-NONE-V0-64",
+            b"comp-META-NONE-V0-64",
+            b"feat-video-0",
+            b"isccs",
+        ]
     finally:
         idx.destroy()
 
@@ -138,7 +166,14 @@ def test_index_dbs_metadata():
     iscc_result = iscc.code_iscc(iscc_samples.videos()[0], video_granular=True)
     idx.add(iscc_result)
     try:
-        assert idx.dbs() == [b"components", b"isccs", b"metadata"]
+        assert idx.dbs() == [
+            b"comp-CONTENT-VIDEO-V0-64",
+            b"comp-DATA-NONE-V0-64",
+            b"comp-INSTANCE-NONE-V0-64",
+            b"comp-META-NONE-V0-64",
+            b"isccs",
+            b"metadata",
+        ]
     finally:
         idx.destroy()
 
@@ -160,29 +195,29 @@ def test_index_isccs(idx):
 
 def test_index_components(idx, full_iscc):
     idx.add(full_iscc.code)
-    components_orig = set([c.bytes for c in iscc.decompose(full_iscc)])
+    components_orig = set([c.hash_bytes for c in iscc.decompose(full_iscc)])
     compenents_idx = set(idx.iter_components())
     assert compenents_idx == components_orig
 
 
 def test__add_component(idx):
-    comp, fkey = os.urandom(10), os.urandom(8)
+    comp, fkey = iscc.Code.rnd(bits=64), os.urandom(8)
     idx._add_component(comp, fkey)
-    db = idx._db_components()
-    assert idx._get_values(db, comp) == [fkey]
+    db = idx._db_components(comp.type_id)
+    assert idx._get_values(db, comp.hash_bytes) == [fkey]
 
     # is idempotent?
     idx._add_component(comp, fkey)
-    assert idx._get_values(db, comp) == [fkey]
+    assert idx._get_values(db, comp.hash_bytes) == [fkey]
 
     # dupe component with different fkey gets appended
     fkey2 = os.urandom(8)
     idx._add_component(comp, fkey2)
-    assert set(idx._get_values(db, comp)) == {fkey, fkey2}
+    assert set(idx._get_values(db, comp.hash_bytes)) == {fkey, fkey2}
 
     # dupe fkey for same component is ignored
     idx._add_component(comp, fkey)
-    assert set(idx._get_values(db, comp)) == {fkey, fkey2}
+    assert set(idx._get_values(db, comp.hash_bytes)) == {fkey, fkey2}
 
 
 def test__add_feature(idx):
