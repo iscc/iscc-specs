@@ -127,7 +127,7 @@ def test_index_dbs_features():
     iscc_result = iscc.code_iscc(iscc_samples.videos()[0], video_granular=True)
     idx.add(iscc_result)
     try:
-        assert idx.dbs() == [b"components", b"feat-video", b"isccs"]
+        assert idx.dbs() == [b"components", b"feat-video-0", b"isccs"]
     finally:
         idx.destroy()
 
@@ -311,29 +311,29 @@ def test_index_query_features():
         feature_matches=[
             FeatureMatch(
                 matched_iscc="KMD6P2X7C73P72Z4K2MYF7CYSK5NT3IYMMD6TDPH3NPWULHXP5BXSJI",
-                kind="video",
+                kind="video-0",
                 source_feature="Vq5CVg8cvu0",
                 source_pos=None,
                 matched_feature="Vo5CVg8cvu0",
-                matched_position=10,
+                matched_position=9,
                 distance=1,
             ),
             FeatureMatch(
                 matched_iscc="KMD6P2X7C73P72Z4K2MYF7CYSK5NT3IYMMD6TDPH3PE2RQEAMBDN4MA",
-                kind="video",
+                kind="video-0",
                 source_feature="Vq5CVg8cvu0",
                 source_pos=None,
                 matched_feature="Vo5CVg8cvu0",
-                matched_position=10,
+                matched_position=9,
                 distance=1,
             ),
             FeatureMatch(
                 matched_iscc="KMD6P2X7C73P72Z4K2MYF7CYSK5NT3IYMMD6TDPH3NPWULHXP5BXSJI",
-                kind="video",
+                kind="video-0",
                 source_feature="Dp4H_PrQ8FE",
                 source_pos=None,
                 matched_feature="Dp4H_fvQ8FE",
-                matched_position=24,
+                matched_position=20,
                 distance=2,
             ),
         ],

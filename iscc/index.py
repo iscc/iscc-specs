@@ -122,10 +122,11 @@ class Index:
 
         # Add feature hashes
         if self.opts.index_features and features is not None:
-            for fobj in features:
+            for fdict in features:
                 pos = 0
-                for feat, size in zip(fobj["features"], fobj["sizes"]):
-                    self._add_feature(fobj["kind"], iscc.decode_base64(feat), keyb, pos)
+                fobj = iscc.schema.Features(**fdict)
+                for feat, size in zip(fobj.features, fobj.sizes):
+                    self._add_feature(fobj.type_id, iscc.decode_base64(feat), keyb, pos)
                     pos += size
 
         # Add metadata
@@ -169,10 +170,12 @@ class Index:
 
         # Collect ISCC feature level matches
         feature_matches = set()
-        for feat_obj in features:
-            kind = feat_obj["kind"]
-            for src_feat in feat_obj["features"]:
-                for fm in self.match_feature(kind, src_feat, ft=ft, ignore=seen_fkeys):
+        for feat_dict in features:
+            feat_obj = iscc.schema.Features(**feat_dict)
+            for src_feat in feat_obj.features:
+                for fm in self.match_feature(
+                    feat_obj.type_id, src_feat, ft=ft, ignore=seen_fkeys
+                ):
                     feature_matches.add(fm)
 
         return QueryResult(
