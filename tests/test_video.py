@@ -100,6 +100,7 @@ def test_code_video_granular_scenes():
             ],
             "sizes": [7.625, 2.5, 5.083, 1.25, 3.75, 2.792, 15.458, 8.167, 13.042],
             "kind": "video",
+            "version": 0,
         },
         "fps": 24.0,
         "height": 144,
@@ -214,6 +215,7 @@ def test_compute_video_features_scenes():
         ],
         "sizes": [7.625, 2.5, 5.083, 1.25, 3.75, 2.792, 15.458, 8.167, 13.042],
         "kind": "video",
+        "version": 0,
     }
 
 

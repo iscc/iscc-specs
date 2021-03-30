@@ -107,6 +107,7 @@ def test_code_data_granular():
                 61123,
             ],
             "kind": "data",
+            "version": 0,
         },
     }
 

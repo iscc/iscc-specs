@@ -130,6 +130,7 @@ def test_code_audio_granular_short():
                 "YmzOgA",
             ],
             "kind": "audio",
+            "version": 0,
         },
         "title": "Belly Button",
     }
@@ -196,6 +197,7 @@ def test_code_audio_granular_default():
                 "eIYOpniEC6Y",
             ],
             "kind": "audio",
+            "version": 0,
         },
         "title": "Belly Button",
     }

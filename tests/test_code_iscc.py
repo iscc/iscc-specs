@@ -102,6 +102,7 @@ def test_code_iscc_text_granular():
                 ],
                 "kind": "text",
                 "sizes": [1014, 455, 667, 2809, 455, 667, 1],
+                "version": 0,
             }
         ],
         "filename": "demo.doc",
@@ -182,6 +183,7 @@ def test_code_iscc_audio_granular():
                     "eIYOpniEC6Y",
                 ],
                 "kind": "audio",
+                "version": 0,
             }
         ],
         "filename": "demo.aif",
@@ -255,6 +257,7 @@ def test_code_iscc_video_granular():
                     2.625,
                 ],
                 "kind": "video",
+                "version": 0,
             }
         ],
         "filename": "demo.3g2",

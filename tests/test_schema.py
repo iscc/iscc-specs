@@ -9,26 +9,27 @@ from iscc.codec import encode_base64
 
 def test_video_features_only():
     features = [encode_base64(d) for d in [os.urandom(8) for _ in range(10)]]
-    vf = schema.Features(features=features)
+    vf = schema.Features(features=features, version=0, kind=iscc.FeatureType.video)
     assert vf.window == 7
     assert vf.overlap == 3
+    assert vf.type_id == "video-0"
 
 
 def test_video_features_checks_codes():
     features = []
     with pytest.raises(ValidationError):
-        schema.Features(features=features)
+        schema.Features(features=features, version=0, kind=iscc.FeatureType.video)
 
     features = ["A"]
     with pytest.raises(ValidationError):
-        schema.Features(features=features)
+        schema.Features(features=features, version=0, kind=iscc.FeatureType.video)
 
     features = ["AAAAAAAAAAA"]
-    assert schema.Features(features=features)
+    assert schema.Features(features=features, version=0, kind=iscc.FeatureType.video)
 
     features = ["AAAAAAAAAA="]
     with pytest.raises(ValidationError):
-        schema.Features(features=features)
+        schema.Features(features=features, version=0, kind=iscc.FeatureType.video)
 
 
 def test_feature_match_distance():

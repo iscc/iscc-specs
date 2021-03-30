@@ -45,7 +45,8 @@ def encode_data_features(sizes, features, **options):
         for cf in chunked(features, opts.data_granular_factor)
     ]
     return dict(
-        kind=FeatureType.data,
+        kind=FeatureType.data.value,
+        version=0,
         features=encoded_features,
         sizes=encoded_sizes,
     )

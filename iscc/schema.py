@@ -315,13 +315,14 @@ class Features(BaseModel):
     based on content aware chunking.
     """
 
-    kind: Optional[FeatureType] = Field(description="Type of granular features")
+    kind: FeatureType = Field(description="Type of granular features")
+    version: int = Field(description="Version of feature generation algorithm")
     features: List[str] = Field(
         description="Segmentwise 64-bit features (base64url encoded).",
         regex=FEATURE_REGEX,
         min_items=1,
     )
-    sizes: Optional[List[float]] = Field(
+    sizes: Optional[List[Union[int, float]]] = Field(
         description="Sizes of segmets used for feature calculation.",
         min_items=1,
     )
@@ -333,6 +334,11 @@ class Features(BaseModel):
         DEFAULT_OVERLAP,
         description="Overlap size of feature segments",
     )
+
+    @property
+    def type_id(self) -> str:
+        """Composite string of type-version used as table name for feature indexing."""
+        return f"{self.kind}-{self.version}"
 
 
 class ISCC(BaseModel):

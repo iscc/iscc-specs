@@ -229,7 +229,9 @@ def compute_video_features_scenes(frames, scenes):
             except IndexError:
                 break
 
-    return dict(kind=FeatureType.video.value, features=features, sizes=durations)
+    return dict(
+        kind=FeatureType.video.value, version=0, features=features, sizes=durations
+    )
 
 
 def detect_video_crop(uri):

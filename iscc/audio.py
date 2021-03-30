@@ -68,7 +68,7 @@ def encode_audio_features(features):
         for int_feature in int_features:
             digest += int_feature.to_bytes(4, "big", signed=True)
         fingerprints.append(encode_base64(digest))
-    return dict(kind=FeatureType.audio.value, features=fingerprints)
+    return dict(kind=FeatureType.audio.value, version=0, features=fingerprints)
 
 
 FPCALC_VERSION = "1.5.0"
