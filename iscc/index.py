@@ -386,7 +386,7 @@ class Index:
 
     def _db_features(self, kind: str) -> lmdb._Database:
         return self.env.open_db(
-            kind.encode("utf-8"),
+            b"feat-" + kind.encode("utf-8"),
             dupsort=True,  # Duplicate keys allowed
             create=True,  # Create table if required
             integerkey=False,  # Keys are raw byte feature hashes

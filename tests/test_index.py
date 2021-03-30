@@ -127,7 +127,7 @@ def test_index_dbs_features():
     iscc_result = iscc.code_iscc(iscc_samples.videos()[0], video_granular=True)
     idx.add(iscc_result)
     try:
-        assert idx.dbs() == [b"components", b"isccs", b"video"]
+        assert idx.dbs() == [b"components", b"feat-video", b"isccs"]
     finally:
         idx.destroy()
 
