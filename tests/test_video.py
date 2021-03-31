@@ -113,33 +113,33 @@ def test_code_video_granular_scenes():
 
 def test_code_video_granular_scenes_ffmpeg():
     result = code_video(
-        videos("ogg")[0],
+        SAMPLE,
         video_granular=True,
         video_scenes=True,
         video_scenes_ffmpeg=True,
+        video_scenes_ffmpeg_th=0.25,
     )
     assert result == {
-        "code": "EMAVNHED6RMNV4XZ",
+        "code": "EMAVNHMC7TMJV6XZ",
         "duration": 60.042,
         "features": {
             "features": [
-                "VwQR1Ty58nw",
-                "VgaBv514Yng",
-                "fx6LP5068ng",
-                "O5GgreSqmJg",
-                "b56LP50acHg",
-                "b56LP50acHg",
-                "Bx8gPZy6cPg",
-                "E92BqsAmGMI",
-                "XxoBt1169vg",
+                "FgbTZBCZ5l0",
+                "ThuCHh16dvw",
+                "OgmyCcqXmyU",
+                "Vo7C1g8Yvu0",
+                "XpyD_XjS9tk",
+                "aiCypM48crg",
+                "Apki-e7j2lM",
             ],
             "kind": "video",
-            "sizes": [1.5, 0.583, 0.167, 0.375, 0.292, 0.083, 0.833, 0.167, 4.0],
+            "sizes": [0.125, 7.5, 2.5, 5.083, 23.25, 1.5, 6.667],
             "version": 0,
         },
         "fps": 24.0,
         "height": 144,
         "language": "en",
+        "title": "Kali by Anokato - Spiral Sessions 2019",
         "width": 176,
     }
 

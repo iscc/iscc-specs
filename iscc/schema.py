@@ -141,6 +141,8 @@ class Options(BaseSettings):
         "pyscenedetect but at least 2x faster).",
     )
 
+    video_scenes_ffmpeg_th: float = Field(0.4, description="FFMPEG scene cut threshold")
+
     video_scenes_fs: int = Field(
         2,
         description="Number of frames to skip per processing step for scene detection. "

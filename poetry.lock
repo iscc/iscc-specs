@@ -1001,7 +1001,7 @@ turbo = ["cython", "numba"]
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.6.1"
-content-hash = "8c7c86b114741c0cd154abfc8eb1c07b25cc1be399bb898ba797f67c321da7c5"
+content-hash = "7c3926803518093dfb250650a684a4ab1ca1e57bb68e590e6c083aa414bdc7c2"
 
 [metadata.files]
 aiocontextvars = [

@@ -193,7 +193,7 @@ def extract_video_signature_cutpoints(uri, crop=None, **options):
     if opts.video_fps:
         sig = f"fps=fps={opts.video_fps}," + sig
 
-    scene = f"select='gte(scene,0.4)',metadata=print:file={scene_path_escaped}"
+    scene = f"select='gte(scene,{opts.video_scenes_ffmpeg_th})',metadata=print:file={scene_path_escaped}"
 
     cmd = [
         FFMPEG,
