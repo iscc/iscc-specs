@@ -176,11 +176,13 @@ class Index:
         feature_matches = set()
         for feat_dict in features:
             feat_obj = iscc.schema.Features(**feat_dict)
-            for src_feat in feat_obj.features:
+            src_pos = 0
+            for src_feat, src_size in zip(feat_obj.features, feat_obj.sizes):
                 for fm in self.match_feature(
-                    feat_obj.type_id, src_feat, ft=ft, ignore=seen_fkeys
+                    feat_obj.type_id, src_feat, src_pos, ft=ft, ignore=seen_fkeys
                 ):
                     feature_matches.add(fm)
+                src_pos += src_size
 
         return QueryResult(
             iscc_matches=sorted(iscc_matches)[:k],
@@ -221,14 +223,15 @@ class Index:
                         c2.close()
             return list(fkeys)
 
-    def match_feature(self, kind, feature, ft=0, ignore=None):
-        # type: (str, Union[str,bytes], int, Set[bytes]) -> List[FeatureMatch]
+    def match_feature(self, kind, feature, src_pos=None, ft=0, ignore=None):
+        # type: (str, Union[str,bytes], Optional[float], int, Set[bytes]) -> List[FeatureMatch]
         """
         Match ISCCs by a given feature with feature threshold `ft` (max distance).
         Ignore matches for fkeys in `ignore`.
 
         :param str kind: Feature type to be matched.
         :param str|bytes feature: Raw or base64 encoded granular feature.
+        :param float|None src_pos: Position of queried feature in source.
         :param int ft: Feature threshold (max hamming distance to match feature)
         :param set ignore: Set of ISCC table primarky keys to ignore.
         """
@@ -254,6 +257,7 @@ class Index:
                     matched_iscc=self.get_iscc(fkey).code,
                     kind=kind,
                     source_feature=feature_str,
+                    source_pos=src_pos,
                     matched_feature=feature_str,
                     matched_position=match_pos,
                 )
@@ -277,6 +281,7 @@ class Index:
                                 matched_iscc=self.get_iscc(fkey).code,
                                 kind=kind,
                                 source_feature=feature_str,
+                                source_pos=src_pos,
                                 matched_feature=iscc.encode_base64(candidate_feature),
                                 matched_position=matched_position,
                             )
