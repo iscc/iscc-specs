@@ -29,6 +29,7 @@ The `features` inverted indexes can be rebuild from the `metadata`-table if avai
 import os
 from os.path import join
 from typing import List, Optional, Dict, Any, Tuple, Union, Set, Generator
+from bitarray import bitarray
 from loguru import logger as log
 import iscc
 import lmdb
@@ -36,7 +37,7 @@ import shutil
 from humanize import naturalsize
 from iscc.schema import FeatureMatch, IsccMatch, QueryResult, Options, ISCC
 import msgpack
-
+from annoy import AnnoyIndex
 
 IsccObj = Union[str, Dict, iscc.Code, ISCC]
 Key = Union[int, str, bytes]
@@ -581,3 +582,47 @@ class Index:
         """Check if full iscc code is in index."""
         key = self.get_key(item)
         return False if key is None else True
+
+
+def build_anns(index):
+    # type: (Index) -> None
+    """Build ANNS indexes for a given LMDB-Index."""
+    for dbname in index.dbs():
+
+        # Build feature ANN indexes.
+        if dbname.startswith(b"feat-"):
+            if b"INSTANCE" in dbname:
+                continue
+            kind = dbname.lstrip(b"feat-").decode()
+            ann = AnnoyIndex(64, "hamming")
+            db = index._db_features(kind)
+            log.debug(f"collecting {kind}")
+            with index.env.begin() as txn:
+                with txn.cursor(db) as c:
+                    for i, k in enumerate(c.iternext_nodup(keys=True, values=False)):
+                        ba = bitarray()
+                        ba.frombytes(k)
+                        ann.add_item(i, ba.tolist(True))
+            log.debug(f"building {kind}")
+            ann.build(-1)
+            outf = join(index.dbpath, dbname.decode("ascii") + ".ann")
+            log.debug(f"saving {outf}")
+            ann.save(outf)
+
+        # Build component ANN indexes.
+        if dbname.startswith(b"comp-"):
+            type_id = dbname.lstrip(b"comp-").decode()
+            ann = AnnoyIndex(64, "hamming")
+            db = index._db_components(type_id)
+            log.debug(f"collecting {type_id}")
+            with index.env.begin() as txn:
+                with txn.cursor(db) as c:
+                    for i, k in enumerate(c.iternext_nodup(keys=True, values=False)):
+                        ba = bitarray()
+                        ba.frombytes(k)
+                        ann.add_item(i, ba.tolist(True))
+            log.debug(f"building {type_id}")
+            ann.build(-1)
+            outf = join(index.dbpath, dbname.decode("ascii") + ".ann")
+            log.debug(f"saving {outf}")
+            ann.save(outf)
