@@ -12,6 +12,7 @@ from typing import Any, Generator, List, Sequence, Tuple, Optional, Union
 import imageio_ffmpeg
 from statistics import mode
 from langcodes import standardize_tag
+from more_itertools import windowed
 from scenedetect import ContentDetector, FrameTimecode, SceneManager, VideoManager
 from iscc import uread
 from iscc.schema import FeatureType, Options, Readable, File, Uri
@@ -22,7 +23,7 @@ import av
 
 
 FFMPEG = imageio_ffmpeg.get_ffmpeg_exe()
-Scene = Tuple[FrameTimecode, FrameTimecode]
+Scene = Union[Tuple[FrameTimecode, FrameTimecode], Tuple[float, float]]
 SceneSig = Tuple[List[str], List[int]]  # feature hashes, scene durations
 
 
@@ -161,6 +162,82 @@ def extract_video_signature(uri, crop=None, **options):
     return sigdata
 
 
+def extract_video_signature_cutpoints(uri, crop=None, **options):
+    # type: (Union[File, Uri], Optional[str], **Any) -> Tuple[bytes, List[Scene]]
+    """Extract MPEG-7 Video Signature together with ffmpeg scdet cutponts
+
+    :param uri: File to process
+    :param crop: FFMPEG style cropsting "w:h:x:y"
+    :key video_fps: Frames per second for signature processing
+    :key video_hwaccel: Hadware acceleration mode (None or "auto")
+    :return: raw signature data
+    """
+
+    opts = Options(**options)
+
+    infile = uread.open_data(uri)
+    if not hasattr(infile, "name"):
+        log.error("Cannot extract signature without file.name")
+        raise ValueError(f"Cannot extract signature from {type(infile)}")
+
+    infile_path = infile.name
+    sig_path = Path(mkdtemp(), token_hex(16) + ".bin")
+    sig_path_escaped = sig_path.as_posix().replace(":", "\\\\:")
+    scene_path = Path(mkdtemp(), token_hex(16) + ".cut")
+    scene_path_escaped = scene_path.as_posix().replace(":", "\\\\:")
+
+    sig = f"signature=format=binary:filename={sig_path_escaped}"
+    if crop:
+        sig = f"{crop}," + sig
+
+    if opts.video_fps:
+        sig = f"fps=fps={opts.video_fps}," + sig
+
+    scene = f"select='gte(scene,0.4)',metadata=print:file={scene_path_escaped}"
+
+    cmd = [
+        FFMPEG,
+    ]
+
+    if opts.video_hwaccel is not None:
+        cmd.extend(["-hwaccel", opts.video_hwaccel])
+
+    cmd.extend(
+        [
+            "-i",
+            infile_path,
+            "-an",
+            "-sn",
+            "-filter_complex",
+            f"scale='min(960,iw):-1:flags=neighbor',split[in1][in2];[in1]{scene}[out1];[in2]{sig}[out2]",
+            # f"split[in1][in2];[in1]{scene}[out1];[in2]{sig}[out2]",
+            "-map",
+            "[out1]",
+            "-f",
+            "null",
+            "-",
+            "-map",
+            "[out2]",
+            "-f",
+            "null",
+            "-",
+        ]
+    )
+
+    log.debug(f"video sig and cutpoint extraction with {subprocess.list2cmdline(cmd)}")
+    with Timer(
+        text="video sig and cutpoint extraction took {:0.3f}s", logger=log.debug
+    ):
+        subprocess.run(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    with open(sig_path, "rb") as sigin:
+        sigdata = sigin.read()
+    with open(scene_path, "rt", encoding="utf-8") as scenein:
+        scenetext = scenein.read()
+    os.remove(sig_path)
+    os.remove(scene_path)
+    return sigdata, parse_ffmpeg_scenes(scenetext)
+
+
 def hash_video(features, **options):
     # type: (Sequence[Tuple[int]], **int) -> bytes
     """Compute wta-hash for a list of frame signature vectors"""
@@ -210,6 +287,10 @@ def compute_video_features_scenes(frames, scenes):
     Returns features and durations as tuple.
     """
 
+    if scenes:
+        if isinstance(scenes[0][0], FrameTimecode):
+            scenes = [(start.get_seconds(), end.get_seconds()) for start, end in scenes]
+
     scene_idx = 0
     scene = scenes[scene_idx]
     durations, features = [], []
@@ -217,10 +298,10 @@ def compute_video_features_scenes(frames, scenes):
     for fidx, frame in enumerate(frames):
         frame_t = tuple(frame.vector.tolist())
         segment.append(frame_t)
-        if frame.elapsed >= scene[1].get_seconds():
+        if frame.elapsed >= scene[1]:
             features.append(encode_base64(hash_video(segment)))
             segment = []
-            duration = scene[1].get_seconds() - scene[0].get_seconds()
+            duration = scene[1] - scene[0]
             duration = round(duration, 3)
             durations.append(duration)
             scene_idx += 1
@@ -340,3 +421,12 @@ def _signature_extractor(crop=None):
     initialized_generator = raw_generator(crop)
     next(initialized_generator)
     return initialized_generator
+
+
+def parse_ffmpeg_scenes(scene_text: str):
+    cutpoints = [0.0]
+    for line in scene_text.splitlines():
+        if line.startswith("frame:"):
+            cp = round(float(line.split()[-1].split(":")[-1]), 3)
+            cutpoints.append(cp)
+    return list(windowed(cutpoints, n=2, step=1))

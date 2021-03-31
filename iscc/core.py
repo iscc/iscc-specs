@@ -296,7 +296,12 @@ def code_video(uri, **options):
     result.update(metadata)
 
     crop_value = video.detect_video_crop(uri) if opts.video_crop else None
-    signature = video.extract_video_signature(uri, crop_value, **options)
+    if opts.video_scenes_ffmpeg:
+        signature, cutpoints = video.extract_video_signature_cutpoints(
+            uri, crop_value, **options
+        )
+    else:
+        signature = video.extract_video_signature(uri, crop_value, **options)
     frames = read_ffmpeg_signature(signature)
     logger.debug(f"video sig {naturalsize(len(signature))} with {len(frames)} frames")
     features = [tuple(sig.vector.tolist()) for sig in frames]
@@ -315,7 +320,8 @@ def code_video(uri, **options):
         return result
 
     if opts.video_scenes:
-        cutpoints = video.detect_video_scenes(uri, **options)
+        if not opts.video_scenes_ffmpeg:
+            cutpoints = video.detect_video_scenes(uri, **options)
         features = video.compute_video_features_scenes(frames, cutpoints)
     else:
         features = video.compute_video_features_rolling(frames, **options)

@@ -135,11 +135,16 @@ class Options(BaseSettings):
         True, description="Use scene detection for granular features"
     )
 
+    video_scenes_ffmpeg: bool = Field(
+        False,
+        description="Use ffmpeg built-in scene detection. (Less accurate than "
+        "pyscenedetect but at least 2x faster).",
+    )
+
     video_scenes_fs: int = Field(
         2,
         description="Number of frames to skip per processing step for scene detection. "
-        "Higher values will increase detection speed and decrease detection"
-        " quality.",
+        "Higher values will increase detection speed and decrease detection quality.",
     )
 
     video_scenes_th: int = Field(
@@ -149,7 +154,7 @@ class Options(BaseSettings):
 
     video_scenes_min: int = Field(
         15,
-        description="Minimum number of frames per scene.",
+        description="Minimum number of frames per scene. Used by pyscenedetect",
     )
 
     video_scenes_previews: bool = Field(

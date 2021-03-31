@@ -35,7 +35,6 @@ bitarray-hardbyte = "^1.6"
 numpy = "<=1.19.3"
 numba = { version = "0.52", python = ">=3.6,<3.9", optional = true}
 loguru = "^0.5"
-imageio-ffmpeg = "^0.4"
 pydantic = "^1.8"
 scenedetect = {extras = ["opencv-headless"], version = "^0.5"}
 av = "^8.0"
@@ -55,6 +54,7 @@ python-dotenv = "^0.16.0"
 lmdb = "^1.1.1"
 msgpack = "^1.0.2"
 annoy = "^1.17.0"
+imageio-ffmpeg = "^0.4.3"
 
 [tool.poetry.extras]
 turbo = ["cython", "numba"]

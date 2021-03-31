@@ -111,6 +111,39 @@ def test_code_video_granular_scenes():
     }
 
 
+def test_code_video_granular_scenes_ffmpeg():
+    result = code_video(
+        videos("ogg")[0],
+        video_granular=True,
+        video_scenes=True,
+        video_scenes_ffmpeg=True,
+    )
+    assert result == {
+        "code": "EMAVNHED6RMNV4XZ",
+        "duration": 60.042,
+        "features": {
+            "features": [
+                "VwQR1Ty58nw",
+                "VgaBv514Yng",
+                "fx6LP5068ng",
+                "O5GgreSqmJg",
+                "b56LP50acHg",
+                "b56LP50acHg",
+                "Bx8gPZy6cPg",
+                "E92BqsAmGMI",
+                "XxoBt1169vg",
+            ],
+            "kind": "video",
+            "sizes": [1.5, 0.583, 0.167, 0.375, 0.292, 0.083, 0.833, 0.167, 4.0],
+            "version": 0,
+        },
+        "fps": 24.0,
+        "height": 144,
+        "language": "en",
+        "width": 176,
+    }
+
+
 def test_code_video_granular_rolling():
     result = code_video(SAMPLE, video_granular=True, video_scenes=False)
     assert result == {
