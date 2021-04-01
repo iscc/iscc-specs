@@ -271,8 +271,53 @@ class Index:
                     matched_position=match_pos,
                 )
                 matches.add(fm)
+        elif self.anns.get("feat-" + kind):
+            # ANNS based lookup
+            anns: AnnoyIndex = self.anns.get("feat-" + kind)
+            feature_ba = bitarray()
+            feature_ba.frombytes(feature_raw)
+            result = anns.get_nns_by_vector(
+                feature_ba.tolist(True), n=10, search_k=-1, include_distances=True
+            )
+            # filter by distance, dereference annoy_id and encode vectors to hashes
+            mfeatures_raw, mfeatures_b64, distances = [], [], []
+            for annoy_id, dist in zip(result[0], result[1]):
+                if dist <= ft:
+                    mfraw = bitarray(anns.get_item_vector(annoy_id)).tobytes()
+                    mfeatures_raw.append(mfraw)
+                    mfeatures_b64.append(iscc.encode_base64(mfraw))
+                    distances.append(int(dist))
+            # lookup in lmdb
+            with self.env.begin() as txn:
+                with txn.cursor(self._db_features(kind)) as c:
+                    refs = c.getmulti(mfeatures_raw, dupdata=True)
+                    # refs -> [(mfeature_raw, bytes(fkey, pos)), ...]
+                # decode refs
+                isccs_raw, fkeys, positions = [], [], []
+                for ref in refs:
+                    fkey, pos = msgpack.unpackb(ref[1])
+                    fkeys.append(fkey)
+                    positions.append(pos)
+                # deference and decode matched ISCCs
+                with txn.cursor(self._db_isccs()) as c:
+                    isccs = [iscc.Code(v).code for _, v in c.getmulti(fkeys)]
+                # iscc str, kind, src_feat, src_pos, mat_feat, mat_pos
+                for iscc_str, matched_feat, matched_pos, dist, fkey in zip(
+                    isccs, mfeatures_b64, positions, distances, fkeys
+                ):
+                    if fkey in ignore:
+                        continue
+                    fm = FeatureMatch(
+                        matched_iscc=iscc_str,
+                        kind=kind,
+                        source_feature=feature_str,
+                        source_pos=src_pos,
+                        matched_feature=matched_feat,
+                        matched_position=matched_pos,
+                        distance=dist,
+                    )
+                    matches.add(fm)
         else:
-            # TODO: pluck ANNS search here if available
             # Fallback full scan with non-zero threshold an no ANNS index
             db = self._db_features(kind)
             with self.env.begin(db) as txn:
