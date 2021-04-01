@@ -28,6 +28,7 @@ The `features` inverted indexes can be rebuild from the `metadata`-table if avai
 """
 import os
 from os.path import join
+from pathlib import Path
 from typing import List, Optional, Dict, Any, Tuple, Union, Set, Generator
 from bitarray import bitarray
 from loguru import logger as log
@@ -77,6 +78,8 @@ class Index:
             meminit=False,
             map_async=True,
         )
+        # Aproximate Nearest Neighbor indexes
+        self.anns = {}
 
     def add(self, iscc_obj, key=None):
         # type: (IsccObj, Optional[Key]) -> Key
@@ -358,6 +361,40 @@ class Index:
                 dbnames.append(c.key())
         return dbnames
 
+    def build_anns(self):
+        """Build ANNS indexes."""
+        with self.env.begin() as txn:
+            for dbname in self.dbs():
+                # Filter relevant dbnames
+                if b"INSTANCE" in dbname or not b"-" in dbname:
+                    continue
+                prefix = dbname.split(b"-")[0]
+                kind = dbname.lstrip(prefix + b"-").decode()
+                db = (
+                    self._db_components(kind)
+                    if prefix == b"comp"
+                    else self._db_features(kind)
+                )
+                ann = AnnoyIndex(64, "hamming")
+                log.debug(f"collect {kind} for anns")
+                with txn.cursor(db) as c:
+                    for i, k in enumerate(c.iternext_nodup(keys=True, values=False)):
+                        ba = bitarray()
+                        ba.frombytes(k)
+                        ann.add_item(i, ba.tolist(True))
+                log.debug(f"build {kind}")
+                ann.build(-1)
+                outf = join(self.dbpath, dbname.decode("ascii") + ".ann")
+                log.debug(f"save {outf}")
+                ann.save(outf)
+
+    def load_anns(self):
+        """Load existing ANNS indexes"""
+        for ann_file in Path(self.dbpath).glob("*.ann"):
+            ann = AnnoyIndex(64, "hamming")
+            ann.load(ann_file.as_posix())
+            self.anns[ann_file.stem] = ann
+
     def destroy(self):
         """Close and delete index from disk."""
         self.env.close()
@@ -582,47 +619,3 @@ class Index:
         """Check if full iscc code is in index."""
         key = self.get_key(item)
         return False if key is None else True
-
-
-def build_anns(index):
-    # type: (Index) -> None
-    """Build ANNS indexes for a given LMDB-Index."""
-    for dbname in index.dbs():
-
-        # Build feature ANN indexes.
-        if dbname.startswith(b"feat-"):
-            if b"INSTANCE" in dbname:
-                continue
-            kind = dbname.lstrip(b"feat-").decode()
-            ann = AnnoyIndex(64, "hamming")
-            db = index._db_features(kind)
-            log.debug(f"collecting {kind}")
-            with index.env.begin() as txn:
-                with txn.cursor(db) as c:
-                    for i, k in enumerate(c.iternext_nodup(keys=True, values=False)):
-                        ba = bitarray()
-                        ba.frombytes(k)
-                        ann.add_item(i, ba.tolist(True))
-            log.debug(f"building {kind}")
-            ann.build(-1)
-            outf = join(index.dbpath, dbname.decode("ascii") + ".ann")
-            log.debug(f"saving {outf}")
-            ann.save(outf)
-
-        # Build component ANN indexes.
-        if dbname.startswith(b"comp-"):
-            type_id = dbname.lstrip(b"comp-").decode()
-            ann = AnnoyIndex(64, "hamming")
-            db = index._db_components(type_id)
-            log.debug(f"collecting {type_id}")
-            with index.env.begin() as txn:
-                with txn.cursor(db) as c:
-                    for i, k in enumerate(c.iternext_nodup(keys=True, values=False)):
-                        ba = bitarray()
-                        ba.frombytes(k)
-                        ann.add_item(i, ba.tolist(True))
-            log.debug(f"building {type_id}")
-            ann.build(-1)
-            outf = join(index.dbpath, dbname.decode("ascii") + ".ann")
-            log.debug(f"saving {outf}")
-            ann.save(outf)
