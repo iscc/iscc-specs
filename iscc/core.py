@@ -36,6 +36,7 @@ from iscc.schema import (
     Data,
     File,
     Readable,
+    ISCC,
 )
 from iscc.mediatype import mime_guess, mime_to_gmt
 from iscc import uread
@@ -103,7 +104,9 @@ def code_iscc(uri, title=None, extra=None, **options):
     concat = bytes.fromhex(result["metahash"]) + bytes.fromhex(result["datahash"])
     result["tophash"] = blake3(concat).hexdigest()
 
-    return result
+    valid = ISCC(**result)
+
+    return valid.dict(exclude_unset=True)
 
 
 def code_meta(title, extra=None, **options):
