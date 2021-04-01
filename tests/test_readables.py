@@ -26,7 +26,11 @@ def audio_readables():
 
 
 def image_readables():
-    return get_readables(s.images()[2])
+    readables = get_readables(s.images()[2])
+    readables.append(
+        "https://github.com/iscc/iscc-samples/blob/master/iscc_samples/files/image/demo.jpg?raw=true"
+    )
+    return readables
 
 
 def text_readables():

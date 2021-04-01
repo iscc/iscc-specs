@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from loguru import logger as log
 import requests
 from loguru import logger
 import hashlib
@@ -25,13 +26,15 @@ def sliding_window(seq, width):
     return (seq[i : i + width] for i in idx)
 
 
-def download_file(url, md5=None, sanitize=False):
-    """Download file to app dir and return path."""
+def download_file(url, folder=None, md5=None, sanitize=False):
+    # type: (str, Optional[Union[str, Path]], Optional[str], bool) -> str
+    """Download file to `folder` (default app_dir) and return file path."""
     url_obj = urlparse(url)
     file_name = os.path.basename(url_obj.path)
     if sanitize:
         file_name = safe_filename(file_name)
-    out_path = os.path.join(APP_DIR, file_name)
+    out_dir = folder or APP_DIR
+    out_path = os.path.join(out_dir, file_name)
     if os.path.exists(out_path):
         logger.debug(f"Already downloaded: {file_name}")
         if md5:
@@ -39,6 +42,7 @@ def download_file(url, md5=None, sanitize=False):
             assert md5 == md5_calc, f"Integrity error for {out_path}"
             return out_path
 
+    log.debug(f"downloading {url} to {out_path}")
     r = requests.get(url, stream=True)
     chunk_size = 1024
     iter_size = 0
