@@ -133,9 +133,14 @@ class Index:
             for fdict in features:
                 pos = 0
                 fobj = iscc.schema.Features(**fdict)
+                items = []
                 for feat, size in zip(fobj.features, fobj.sizes):
-                    self._add_feature(fobj.type_id, iscc.decode_base64(feat), keyb, pos)
+                    # feature -> (fkey, pos)
+                    item = iscc.decode_base64(feat), msgpack.packb((keyb, pos))
+                    items.append(item)
                     pos += size
+                db = self._db_features(fobj.type_id)
+                self._putmulti(db, items, dupdata=True, overwrite=True)
 
         # Add metadata
         if self.opts.index_metadata and metadata is not None:
