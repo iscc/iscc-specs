@@ -240,11 +240,11 @@ class FeatureMatch(BaseModel):
         description="The kind of feature that has been matched.",
     )
     source_feature: str = Field(description="The original feature that was queried.")
-    source_pos: Optional[Union[int, float]] = Field(
+    source_pos: Optional[float] = Field(
         description="The position of of the original feature"
     )
     matched_feature: str = Field(description="The feature hash of the matched entry.")
-    matched_position: Union[int, float] = Field(
+    matched_position: float = Field(
         description="The position of the feature in the matched content."
     )
     distance: Optional[int] = Field(description="The hamming distance of the match")
@@ -329,7 +329,7 @@ class Features(BaseModel):
         regex=FEATURE_REGEX,
         min_items=1,
     )
-    sizes: Optional[List[Union[int, float]]] = Field(
+    sizes: Optional[List[float]] = Field(
         description="Sizes of segmets used for feature calculation.",
         min_items=1,
     )
