@@ -5,7 +5,7 @@ import mmap
 from io import BufferedReader, BytesIO
 from pathlib import Path
 from typing import BinaryIO, List, Optional, Union
-from pydantic import BaseSettings, BaseModel, Field, validator
+from pydantic import BaseSettings, BaseModel, Field, validator, StrictInt, StrictFloat
 from iscc import APP_DIR
 from os.path import join
 from iscc.metrics import distance_b64
@@ -15,6 +15,7 @@ Data = Union[bytes, bytearray, memoryview]
 Uri = Union[str, Path]
 File = Union[BinaryIO, mmap.mmap, BytesIO, BufferedReader]
 Readable = Union[Uri, Data, File]
+Num = Union[StrictInt, StrictFloat]
 
 
 DEFAULT_WINDOW = 7
@@ -240,11 +241,11 @@ class FeatureMatch(BaseModel):
         description="The kind of feature that has been matched.",
     )
     source_feature: str = Field(description="The original feature that was queried.")
-    source_pos: Optional[float] = Field(
+    source_pos: Optional[Num] = Field(
         description="The position of of the original feature"
     )
     matched_feature: str = Field(description="The feature hash of the matched entry.")
-    matched_position: float = Field(
+    matched_position: Optional[Num] = Field(
         description="The position of the feature in the matched content."
     )
     distance: Optional[int] = Field(description="The hamming distance of the match")
@@ -329,7 +330,7 @@ class Features(BaseModel):
         regex=FEATURE_REGEX,
         min_items=1,
     )
-    sizes: Optional[List[float]] = Field(
+    sizes: Optional[List[Num]] = Field(
         description="Sizes of segmets used for feature calculation.",
         min_items=1,
     )
