@@ -256,6 +256,8 @@ class Index:
 
         matches = set()
 
+        db = self._db_features(kind)
+
         if ft == 0:
             # Simple lookup with zero threshold
             lookup = self._get_feature(kind, feature_raw)
@@ -287,12 +289,11 @@ class Index:
                     mfeatures_raw.append(mfraw)
                     mfeatures_b64.append(iscc.encode_base64(mfraw))
                     distances.append(int(dist))
-            # lookup in lmdb
+            # lookup matchesd features in lmdb
             with self.env.begin() as txn:
-                with txn.cursor(self._db_features(kind)) as c:
+                with txn.cursor(db=db) as c:
                     refs = c.getmulti(mfeatures_raw, dupdata=True)
-                    # refs -> [(mfeature_raw, bytes(fkey, pos)), ...]
-                # decode refs
+                # decode refs > [(mfeature_raw, msgpack_coded(fkey, pos)), ...]
                 isccs_raw, fkeys, positions = [], [], []
                 for ref in refs:
                     fkey, pos = msgpack.unpackb(ref[1])
@@ -301,22 +302,23 @@ class Index:
                 # deference and decode matched ISCCs
                 with txn.cursor(self._db_isccs()) as c:
                     isccs = [iscc.Code(v).code for _, v in c.getmulti(fkeys)]
-                # iscc str, kind, src_feat, src_pos, mat_feat, mat_pos
-                for iscc_str, matched_feat, matched_pos, dist, fkey in zip(
-                    isccs, mfeatures_b64, positions, distances, fkeys
-                ):
-                    if fkey in ignore:
-                        continue
-                    fm = FeatureMatch(
-                        matched_iscc=iscc_str,
-                        kind=kind,
-                        source_feature=feature_str,
-                        source_pos=src_pos,
-                        matched_feature=matched_feat,
-                        matched_position=matched_pos,
-                        distance=dist,
-                    )
-                    matches.add(fm)
+            # Build FeatureMatch objects
+            # iscc str, kind, src_feat, src_pos, mat_feat, mat_pos
+            for iscc_str, matched_feat, matched_pos, dist, fkey in zip(
+                isccs, mfeatures_b64, positions, distances, fkeys
+            ):
+                if fkey in ignore:
+                    continue
+                fm = FeatureMatch(
+                    matched_iscc=iscc_str,
+                    kind=kind,
+                    source_feature=feature_str,
+                    source_pos=src_pos,
+                    matched_feature=matched_feat,
+                    matched_position=matched_pos,
+                    distance=dist,
+                )
+                matches.add(fm)
         else:
             # Fallback full scan with non-zero threshold an no ANNS index
             db = self._db_features(kind)
@@ -374,7 +376,7 @@ class Index:
                 return iscc.Code(iscc_bytes)
 
     def get_metadata(self, key):
-        # type: (Key) -> iscc.ISCC
+        # type: (Key) -> dict
         """Get ISCC metadata by index key"""
         if not isinstance(key, bytes):
             key = msgpack.dumps(key)
