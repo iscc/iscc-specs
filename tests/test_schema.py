@@ -68,3 +68,15 @@ def test_feature_match_sortable():
     sorted_matches = sorted(matches)
     distances = [m.distance for m in sorted_matches]
     assert distances == sorted(distances)
+
+
+def test_feature_int_float():
+    feat = iscc.encode_base64(os.urandom(8))
+    ft = schema.Features(
+        kind="text", version=0, features=[feat, feat, feat], sizes=[0, 1, 2]
+    )
+    assert isinstance(ft.sizes[0], int)
+    ft = schema.Features(
+        kind="text", version=0, features=[feat, feat, feat], sizes=[0.0, 1.1, 2.1]
+    )
+    assert isinstance(ft.sizes[0], float)
