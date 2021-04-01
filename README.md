@@ -25,27 +25,30 @@ A short example on how to create an ISCC Code with the reference implementation.
 
 ``` python
 >>> import iscc
->>> iscc.code_iscc("README.md")
-{
-    'characters': 3289,
-    'datahash': '2bf48bdd82a7ac977acf39a3a70514793cce7ad0b347db4a8eb93a00670a83dd',
-    'features': [{'features': ['VoYV6zlLw1I',
-                            'gx7N7I0tjCE',
-                            'lNlHLTp74x0',
+>>> iscc.code_iscc("README.md", all_granular=True)
+{'version': '0-0-0',
+ 'iscc': 'KADYHLZUJ43U3LX7G7PNLS54JHAET3ANW4EQ3YQIP3LDAZHEYIS5GWI',
+ 'title': '# ISCC Spec and Reference Code',
+ 'filename': 'README.md',
+ 'filesize': 3840,
+ 'mediatype': 'text/markdown',
+ 'tophash': '00194e2c4e5570e637bd18667740fdcf7f1683d6ccace7f5c0cc6531f6e982e5',
+ 'metahash': '828dd01bf76b78fc448f6d2ab25008835d2993c6acde205235dc942083c4677d',
+ 'datahash': 'd63064e4c225d3594bdf60c30bcb04554e53059d9077a6f330f8295b4420ded5',
+ 'gmt': <GMT.text: 'text'>,
+ 'characters': 3457,
+ 'language': 'en',
+ 'features': [{'kind': <FeatureType.data: 'data'>,
+               'version': 0,
+               'features': ['7A23CQ3iCH4'],
+               'sizes': [3840]},
+              {'kind': <FeatureType.text: 'text'>,
+               'version': 0,
+               'features': ['Nt6V67hJxmk',
+                            '9HvPYqt1rQw',
+                            'ld1FLbp7A50',
                             'M8aTn6atuB0'],
-               'kind': <FeatureType.text: 'text'>,
-               'sizes': [1596, 824, 353, 516]}],
-    'filename': 'README.md',
-    'filesize': 3605,
-    'gmt': 'text',
-    'iscc': 'KADYHLZUJ43U3LX7C6LMLSZ7JHAUXHKNWECRZZS4NYV7JC65QKT2ZFY',
-    'language': 'en',
-    'mediatype': 'text/markdown',
-    'metahash': '828dd01bf76b78fc448f6d2ab25008835d2993c6acde205235dc942083c4677d',
-    'title': '# ISCC Spec and Reference Code',
-    'tophash': '44a61d49189868b584d72c44e97a505090ca55eda2ad03f1578f6a58383a1023',
-    'version': '0-0-0'
-}
+               'sizes': [2340, 309, 292, 516]}]}
 ```
 
 ## Working with the specification
