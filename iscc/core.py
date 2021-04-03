@@ -6,13 +6,12 @@ from os.path import basename
 import base64
 import io
 from PIL.ImageOps import exif_transpose
+from codetiming import Timer
 from humanize import naturalsize
-from loguru import logger
+from loguru import logger as log
 from typing import List, Optional, Union, Any
 from PIL import Image
-import xxhash
 from blake3 import blake3
-from iscc.minhash import minhash_256
 from pyld import jsonld
 from iscc import jcs
 from iscc import text, image, audio, video
@@ -26,7 +25,6 @@ from iscc.codec import (
     write_header,
     compose,
 )
-from iscc.cdc import data_chunks
 from iscc.mp7 import read_ffmpeg_signature
 from iscc.meta import meta_hash
 from iscc.schema import (
@@ -40,7 +38,7 @@ from iscc.schema import (
 )
 from iscc.mediatype import mime_guess, mime_to_gmt
 from iscc import uread
-from iscc.data import extract_data_features, encode_data_features
+from iscc.data import extract_data_features, encode_data_features, hash_data_features
 
 from iscc.jldloader import requests_document_loader
 
@@ -72,15 +70,19 @@ def code_iscc(uri, title=None, extra=None, **options):
     if file_name:
         result["filename"] = basename(file_name)
 
-    instance = code_instance(file_obj, **options)
+    with Timer(text="instance code creation took {:0.4f}s", logger=log.debug):
+        instance = code_instance(file_obj, **options)
     result.update(instance)
 
-    data = code_data(file_obj, **options)
+    with Timer(text="data code creation took {:0.4f}s", logger=log.debug):
+        data = code_data(file_obj, **options)
+
     if "features" in data:
         features.append(data.pop("features"))
     result.update(data)
 
     content = code_content(file_obj, **options)
+
     if "features" in content:
         features.append(content.pop("features"))
     result.update(content)
@@ -167,13 +169,17 @@ def code_content(data, **options):
     gmt = mime_to_gmt(mediatype)
 
     if gmt == GMT.text:
-        cc = code_text(data, **options)
+        with Timer(text="content code text creation took {:0.4f}s", logger=log.debug):
+            cc = code_text(data, **options)
     elif gmt == GMT.image:
-        cc = code_image(data, **options)
+        with Timer(text="content code image creation took {:0.4f}s", logger=log.debug):
+            cc = code_image(data, **options)
     elif gmt == GMT.audio:
-        cc = code_audio(data, **options)
+        with Timer(text="content code audio creation took {:0.4f}s", logger=log.debug):
+            cc = code_audio(data, **options)
     elif gmt == GMT.video:
-        cc = code_video(data, **options)
+        with Timer(text="content code video creation took {:0.4f}s", logger=log.debug):
+            cc = code_video(data, **options)
     else:
         raise ValueError("Unknown mediatype")
 
@@ -228,7 +234,7 @@ def code_image(data, **options):
     try:
         result = image.extract_image_metadata(data) or {}
     except Exception as e:
-        logger.error(f"Failed image metadata extraction: {e}")
+        log.error(f"Failed image metadata extraction: {e}")
         result = {}
 
     if isinstance(data, Image.Image):
@@ -305,8 +311,10 @@ def code_video(uri, **options):
         )
     else:
         signature = video.extract_video_signature(uri, crop_value, **options)
-    frames = read_ffmpeg_signature(signature)
-    logger.debug(f"video sig {naturalsize(len(signature))} with {len(frames)} frames")
+
+    with Timer(text="video signature decoding took {:0.4f}s", logger=log.debug):
+        frames = read_ffmpeg_signature(signature)
+    log.debug(f"video sig {naturalsize(len(signature))} with {len(frames)} frames")
     features = [tuple(sig.vector.tolist()) for sig in frames]
     video_hash = video.hash_video(features, **options)
     video_code = Code((MT.CONTENT, ST_CC.VIDEO, VS.V0, nbits, video_hash))
@@ -351,20 +359,13 @@ def code_data(data, **options):
     opts = Options(**options)
     nbits = opts.data_bits
     nbytes = nbits // 8
-    features = []
-    sizes = []
-
-    for chunk in data_chunks(data, **options):
-        sizes.append(len(chunk))
-        features.append(xxhash.xxh32_intdigest(chunk))
-
-    data_hash = minhash_256(features)
+    sizes, features = extract_data_features(data, **options)
+    data_hash = hash_data_features(features)
     header = write_header(MT.DATA, ST.NONE, VS.V0, nbits)
     code = encode_base32(header + data_hash[:nbytes])
     result = dict(code=code)
 
     if opts.data_granular or opts.all_granular:
-        sizes, features = extract_data_features(data, **options)
         features = encode_data_features(sizes, features)
         result["features"] = features
 
