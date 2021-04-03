@@ -113,7 +113,8 @@ def extract_video_preview(file, **options):
         "image2pipe",
         "-",
     ]
-    result = subprocess.run(cmd, stdout=PIPE, stderr=DEVNULL)
+    with Timer(text="video preview extraction took {:0.4f}s", logger=log.debug):
+        result = subprocess.run(cmd, stdout=PIPE, stderr=DEVNULL)
     return result.stdout
 
 
@@ -209,8 +210,7 @@ def extract_video_signature_cutpoints(uri, crop=None, **options):
             "-an",
             "-sn",
             "-filter_complex",
-            f"scale='min(960,iw):-1:flags=neighbor',split[in1][in2];[in1]{scene}[out1];[in2]{sig}[out2]",
-            # f"split[in1][in2];[in1]{scene}[out1];[in2]{sig}[out2]",
+            f"split[in1][in2];[in1]{scene}[out1];[in2]{sig}[out2]",
             "-map",
             "[out1]",
             "-f",

@@ -120,17 +120,17 @@ def test_code_video_granular_scenes_ffmpeg():
         video_scenes_ffmpeg_th=0.25,
     )
     assert result == {
-        "code": "EMAVNHMC7TMJV6XZ",
+        "code": "EMAVMHMC7RMJF6XZ",
         "duration": 60.042,
         "features": {
             "features": [
-                "FgbTZBCZ5l0",
-                "ThuCHh16dvw",
-                "OgmyCcqXmyU",
-                "Vo7C1g8Yvu0",
-                "XpyD_XjS9tk",
-                "aiCypM48crg",
-                "Apki-e7j2lM",
+                "FgbTZBCd5l0",
+                "DhuCPB1advw",
+                "OgmyIcqHmyU",
+                "Vo5C1g8Yvu0",
+                "Xp6D_XjS9tk",
+                "aiCyoM48cqo",
+                "Apki-e7jWlM",
             ],
             "kind": "video",
             "sizes": [0.125, 7.5, 2.5, 5.083, 23.25, 1.5, 6.667],
