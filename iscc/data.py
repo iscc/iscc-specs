@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
 """Fuction for similarity preserving Data-Code."""
+from loguru import logger as log
 from typing import Any, Tuple, List
 import xxhash
+from codetiming import Timer
 from more_itertools import chunked
 from iscc.cdc import data_chunks
 from iscc.minhash import minhash_64, minhash_256
@@ -17,7 +19,8 @@ def hash_data(data):
 def hash_data_features(features):
     # type: (List[int]) -> bytes
     """Create 256-bit data similarity hash from data-chunk int32 hashes"""
-    return minhash_256(features)
+    with Timer(text="data feature minhashing took {:0.4f}s", logger=log.debug):
+        return minhash_256(features)
 
 
 def extract_data_features(data, **options):
@@ -26,9 +29,10 @@ def extract_data_features(data, **options):
     opts = Options(**options)
     features = []
     sizes = []
-    for chunk in data_chunks(data, **opts.dict()):
-        sizes.append(len(chunk))
-        features.append(xxhash.xxh32_intdigest(chunk))
+    with Timer(text="data features extraction took {:0.4f}s", logger=log.debug):
+        for chunk in data_chunks(data, **opts.dict()):
+            sizes.append(len(chunk))
+            features.append(xxhash.xxh32_intdigest(chunk))
     return sizes, features
 
 
@@ -39,11 +43,12 @@ def encode_data_features(sizes, features, **options):
     :return: dicttionary with {"sizes": ..., "features": ...}
     """
     opts = Options(**options)
-    encoded_sizes = [sum(fh) for fh in chunked(sizes, opts.data_granular_factor)]
-    encoded_features = [
-        encode_base64(minhash_64(cf))
-        for cf in chunked(features, opts.data_granular_factor)
-    ]
+    with Timer(text="data features encoding took {:0.4f}s", logger=log.debug):
+        encoded_sizes = [sum(fh) for fh in chunked(sizes, opts.data_granular_factor)]
+        encoded_features = [
+            encode_base64(minhash_64(cf))
+            for cf in chunked(features, opts.data_granular_factor)
+        ]
     return dict(
         kind=FeatureType.data.value,
         version=0,
