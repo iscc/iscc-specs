@@ -137,7 +137,7 @@ class Options(BaseSettings):
     )
 
     video_scenes_ffmpeg: bool = Field(
-        False,
+        True,
         description="Use ffmpeg built-in scene detection. (Less accurate than "
         "pyscenedetect but at least 2x faster).",
     )

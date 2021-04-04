@@ -198,7 +198,9 @@ def test_code_iscc_audio_granular():
 
 
 def test_code_iscc_video_granular():
-    result = iscc.code_iscc(s.videos()[0], video_granular=True)
+    result = iscc.code_iscc(
+        s.videos()[0], video_granular=True, video_scenes_ffmpeg=False
+    )
     assert result == {
         "version": "0-0-0",
         # "crop": "352:192:0:46",

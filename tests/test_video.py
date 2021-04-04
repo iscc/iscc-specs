@@ -81,6 +81,7 @@ def test_code_video_granular_scenes():
         video_scenes_fs=0,
         video_scenes_th=50,
         video_scenes_min=15,
+        video_scenes_ffmpeg=False,
     )
     assert result == {
         "code": "EMAVMHMC7RMJF6XZ",
@@ -105,7 +106,6 @@ def test_code_video_granular_scenes():
         "fps": 24.0,
         "height": 144,
         "language": "en",
-        # "signature_fps": 5,
         "title": "Kali by Anokato - Spiral Sessions 2019",
         "width": 176,
     }

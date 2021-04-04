@@ -437,7 +437,7 @@ def compute_video_features_scenes(frames, scenes):
             kind=FeatureType.video.value,
             version=0,
             features=[feature],
-            sizes=round(float(frames[-1].elapsed), 3),
+            sizes=[round(float(frames[-1].elapsed), 3)],
         )
 
     durations, features = [], []
@@ -464,4 +464,3 @@ def compute_video_features_scenes(frames, scenes):
     return dict(
         kind=FeatureType.video.value, version=0, features=features, sizes=durations
     )
-
