@@ -194,7 +194,7 @@ def extract_video_signature_cutpoints(uri, crop=None, **options):
     if opts.video_fps:
         sig = f"fps=fps={opts.video_fps}," + sig
 
-    scene = f"select='gte(scene,{opts.video_scenes_ffmpeg_th})',metadata=print:file={scene_path_escaped}"
+    scene = f"select='gte(scene,0)',metadata=print:file={scene_path_escaped}"
 
     cmd = [
         FFMPEG,
@@ -235,7 +235,7 @@ def extract_video_signature_cutpoints(uri, crop=None, **options):
         scenetext = scenein.read()
     os.remove(sig_path)
     os.remove(scene_path)
-    return sigdata, parse_ffmpeg_scenes(scenetext)
+    return sigdata, parse_ffmpeg_scenes(scenetext, **options)
 
 
 def hash_video(features, **options):
@@ -281,40 +281,6 @@ def compute_video_features_rolling(frames, **options):
     )
 
 
-def compute_video_features_scenes(frames, scenes):
-    # type: (List[Frame], List[Scene]) -> dict
-    """Compute video signatures for individual scenes in video.
-    Returns features and durations as tuple.
-    """
-
-    if scenes:
-        if isinstance(scenes[0][0], FrameTimecode):
-            scenes = [(start.get_seconds(), end.get_seconds()) for start, end in scenes]
-
-    scene_idx = 0
-    scene = scenes[scene_idx]
-    durations, features = [], []
-    segment = []
-    for fidx, frame in enumerate(frames):
-        frame_t = tuple(frame.vector.tolist())
-        segment.append(frame_t)
-        if frame.elapsed >= scene[1]:
-            features.append(encode_base64(hash_video(segment)))
-            segment = []
-            duration = scene[1] - scene[0]
-            duration = round(duration, 3)
-            durations.append(duration)
-            scene_idx += 1
-            try:
-                scene = scenes[scene_idx]
-            except IndexError:
-                break
-
-    return dict(
-        kind=FeatureType.video.value, version=0, features=features, sizes=durations
-    )
-
-
 def detect_video_crop(uri):
     # type: (Union[Uri, File]) -> str
     """
@@ -350,7 +316,7 @@ def detect_video_crop(uri):
 
 
 def detect_video_scenes(uri, **options):
-    # type: (Union[Uri, File], **Any) -> List[Tuple[FrameTimecode, FrameTimecode]]
+    # type: (Union[Uri, File], **Any) -> List[float]
     """Compute Scenedetection and return cutpoints.
 
     :param uri: Video file to be processed (file path or object)
@@ -386,7 +352,10 @@ def detect_video_scenes(uri, **options):
             show_progress=False,
             frame_skip=opts.video_scenes_fs,
         )
-    return scene_manager.get_scene_list(base_timecode)
+    # Use end frames from scene_list to exclude 0 and include last frame time
+    scenes = scene_manager.get_scene_list(base_timecode)
+    cutlist = [round(float(scene[1].get_seconds()), 3) for scene in scenes]
+    return cutlist
 
 
 def _signature_extractor(crop=None):
@@ -423,10 +392,76 @@ def _signature_extractor(crop=None):
     return initialized_generator
 
 
-def parse_ffmpeg_scenes(scene_text: str):
-    cutpoints = [0.0]
+def parse_ffmpeg_scenes(scene_text, **options):
+    # type: (str, **Any) -> List[float]
+    """Parse scene score output from ffmpeg
+
+    :param str scene_text: Scene score output from ffmpeg
+    :key float video_scenes_ffmpeg_th: Scene Score threshold for valid cutpoint
+    """
+    if not scene_text.strip():
+        return []
+
+    opts = Options(**options)
+    times = []
+    scores = []
     for line in scene_text.splitlines():
         if line.startswith("frame:"):
-            cp = round(float(line.split()[-1].split(":")[-1]), 3)
-            cutpoints.append(cp)
-    return list(windowed(cutpoints, n=2, step=1))
+            ts = round(float(line.split()[-1].split(":")[-1]), 3)
+            times.append(ts)
+        if line.startswith("lavfi.scene_score"):
+            scores.append(float(line.split("=")[-1]))
+
+    cutpoints = []
+    for ts, score in zip(times, scores):
+        if score >= opts.video_scenes_ffmpeg_th:
+            cutpoints.append(ts)
+
+    # append last frame timestamp if not in cutpoints
+    if cutpoints and cutpoints[-1] != times[-1]:
+        cutpoints.append(times[-1])
+
+    return cutpoints[1:]
+
+
+def compute_video_features_scenes(frames, scenes):
+    # type: (List[Frame], List[float]) -> dict
+    """Compute video signatures for individual scenes in video.
+    Returns features and durations as tuple.
+    """
+    if not scenes:
+        log.warning(f"{len(frames)} frames but no scenes")
+        segment = [tuple(f.vector.tolist()) for f in frames]
+        feature = encode_base64(hash_video(segment))
+        return dict(
+            kind=FeatureType.video.value,
+            version=0,
+            features=[feature],
+            sizes=round(float(frames[-1].elapsed), 3),
+        )
+
+    durations, features = [], []
+    segment = []
+    cutpoint_idx = 0
+    cutpoint = scenes[cutpoint_idx]
+    prev_cutpoint = 0.0
+    for fidx, frame in enumerate(frames):
+        frame_t = tuple(frame.vector.tolist())
+        segment.append(frame_t)
+        if frame.elapsed >= cutpoint:
+            features.append(encode_base64(hash_video(segment)))
+            segment = []
+            duration = cutpoint - prev_cutpoint
+            duration = round(duration, 3)
+            durations.append(duration)
+            prev_cutpoint = cutpoint
+            cutpoint_idx += 1
+            try:
+                cutpoint = scenes[cutpoint_idx]
+            except IndexError:
+                break
+
+    return dict(
+        kind=FeatureType.video.value, version=0, features=features, sizes=durations
+    )
+

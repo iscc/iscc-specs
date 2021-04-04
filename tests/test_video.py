@@ -124,7 +124,6 @@ def test_code_video_granular_scenes_ffmpeg():
         "duration": 60.042,
         "features": {
             "features": [
-                "FgbTZBCd5l0",
                 "DhuCPB1advw",
                 "OgmyIcqHmyU",
                 "Vo5C1g8Yvu0",
@@ -133,7 +132,7 @@ def test_code_video_granular_scenes_ffmpeg():
                 "Apki-e7jWlM",
             ],
             "kind": "video",
-            "sizes": [0.125, 7.5, 2.5, 5.083, 23.25, 1.5, 6.667],
+            "sizes": [7.625, 2.5, 5.083, 23.25, 1.5, 6.667],
             "version": 0,
         },
         "fps": 24.0,
@@ -304,51 +303,20 @@ def test_detect_video_crop():
     assert video.detect_video_crop(SAMPLE) == "crop=176:96:0:24"
 
 
-def test_detect_video_scenes():
-    assert video.detect_video_scenes(
-        SAMPLE,
-        video_scenes_fs=0,
-        video_scenes_th=50,
-        video_scenes_min=15,
-    ) == [
-        (
-            FrameTimecode(timecode=0, fps=24.000000),
-            FrameTimecode(timecode=183, fps=24.000000),
-        ),
-        (
-            FrameTimecode(timecode=183, fps=24.000000),
-            FrameTimecode(timecode=243, fps=24.000000),
-        ),
-        (
-            FrameTimecode(timecode=243, fps=24.000000),
-            FrameTimecode(timecode=365, fps=24.000000),
-        ),
-        (
-            FrameTimecode(timecode=365, fps=24.000000),
-            FrameTimecode(timecode=395, fps=24.000000),
-        ),
-        (
-            FrameTimecode(timecode=395, fps=24.000000),
-            FrameTimecode(timecode=485, fps=24.000000),
-        ),
-        (
-            FrameTimecode(timecode=485, fps=24.000000),
-            FrameTimecode(timecode=552, fps=24.000000),
-        ),
-        (
-            FrameTimecode(timecode=552, fps=24.000000),
-            FrameTimecode(timecode=923, fps=24.000000),
-        ),
-        (
-            FrameTimecode(timecode=923, fps=24.000000),
-            FrameTimecode(timecode=1119, fps=24.000000),
-        ),
-        (
-            FrameTimecode(timecode=1119, fps=24.000000),
-            FrameTimecode(timecode=1432, fps=24.000000),
-        ),
-        (
-            FrameTimecode(timecode=1432, fps=24.000000),
-            FrameTimecode(timecode=1441, fps=24.000000),
-        ),
-    ]
+def test_detect_video_scenes_pyscene():
+    assert (
+        video.detect_video_scenes(
+            SAMPLE,
+            video_scenes_fs=0,
+            video_scenes_th=50,
+            video_scenes_min=15,
+        )
+        == [7.625, 10.125, 15.208, 16.458, 20.208, 23.0, 38.458, 46.625, 59.667, 60.042]
+    )
+
+
+def test_detect_video_scenes_ffmpeg():
+    _, scenes = video.extract_video_signature_cutpoints(
+        SAMPLE, video_scenes_ffmpeg_th=0.24
+    )
+    assert scenes == [7.625, 10.125, 15.208, 30.875, 36.0, 38.458, 39.958, 46.625, 60.0]
