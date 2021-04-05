@@ -8,22 +8,13 @@ from bitarray import bitarray
 WTA_SEED = 10
 
 
-def wtahash(vec: Sequence[int], hl=64) -> bytes:
+def wtahash(vec: Sequence[float], hl=64) -> bytes:
     """Calculate WTA Hash from vector."""
     vl = len(vec)
     perms = wta_permutations(WTA_SEED, vl, hl)
     h = []
-    assert len(set(vec)) > 1, "Vector for wtahash needs at least 2 different values."
-
-    def get_neq_vals(idxs):
-        vals = vec[idxs[0]], vec[idxs[1]]
-        while vals[0] == vals[1]:
-            idxs = idxs[0], (idxs[1] + 1) % vl
-            vals = vec[idxs[0]], vec[idxs[1]]
-        return vals
-
     for n, perm in enumerate(perms):
-        v = get_neq_vals(perm)
+        v = vec[perm[0]], vec[perm[1]]
         h.append(v.index(max(v)))
         if len(h) == hl:
             break

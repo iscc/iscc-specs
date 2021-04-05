@@ -9,11 +9,11 @@ def test_permutations():
 
 def test_wtahash_64():
     vec = tuple([0] * 379) + (1,)
-    assert wtahash(vec, 64).hex() == "ffffffffffffffff"
+    assert wtahash(vec, 64).hex() == "0000000000000000"
     vec = (1,) + tuple([0] * 379)
-    assert wtahash(vec, 64).hex() == "ffffffffffffffff"
+    assert wtahash(vec, 64).hex() == "0000000000000000"
     vec = (1,) + tuple([0] * 378) + (1,)
-    assert wtahash(vec, 64).hex() == "ffffffffffffffff"
+    assert wtahash(vec, 64).hex() == "0000000000000000"
     vec = (0,) + tuple([2] * 378) + (0,)
     assert wtahash(vec, 64).hex() == "0000000000000000"
     vec = tuple(range(380))
@@ -24,17 +24,17 @@ def test_wtahash_256():
     vec = tuple([0] * 379) + (1,)
     assert (
         wtahash(vec, 256).hex()
-        == "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"
+        == "0000000000000000000000000000000000000200000000000000000000000000"
     )
     vec = (1,) + tuple([0] * 379)
     assert (
         wtahash(vec, 256).hex()
-        == "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"
+        == "0000000000000000000000000000000000000000000000000000000000000000"
     )
     vec = (1,) + tuple([0] * 378) + (1,)
     assert (
         wtahash(vec, 256).hex()
-        == "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"
+        == "0000000000000000000000000000000000000200000000000000000000000000"
     )
     vec = (0,) + tuple([2] * 378) + (0,)
     assert (
@@ -53,9 +53,8 @@ def test_wtahash_prefix_stable():
     assert wtahash(vec, 256).hex()[:16] == wtahash(vec, 64).hex()
 
 
-def test_needs_two_uniques():
-    with pytest.raises(AssertionError):
-        wtahash([1, 1])
+def test_needs_no_uniques():
+    assert wtahash([1, 1]).hex() == "0000000000000000"
 
 
 def test_any_vector_length():

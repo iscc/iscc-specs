@@ -52,9 +52,8 @@ def test_extract_video_preview_readables():
             assert result[:10].hex() == "89504e470d0a1a0a0000"
 
 
-def test_hach_video_0_features():
-    with pytest.raises(AssertionError):
-        video.hash_video([tuple([0] * 380)])
+def test_hash_video_0_features():
+    assert video.hash_video([tuple([0] * 380)]) == b"\x00\x00\x00\x00\x00\x00\x00\x00"
 
 
 def test_code_video():
@@ -85,22 +84,21 @@ def test_code_video_granular_scenes():
     )
     assert result == {
         "code": "EMAVMHMC7RMJF6XZ",
-        # "crop": "176:96:0:24",
         "duration": 60.042,
         "features": {
             "features": [
                 "DhuCPB1advw",
-                "OgmyIcqHmyU",
+                "OgmyIIqHmiU",
                 "Vo5C1g8Yvu0",
-                "dh2g_g_Sumk",
-                "V5-AvcCOpn8",
-                "lJgzpvjPltM",
+                "Zh2A_g9Sumg",
+                "V56AtcCOpn8",
+                "lJgzovjPltM",
                 "Hp4D_XrSdtk",
-                "Qpkise6nWlM",
+                "Qpkisa6nWlM",
                 "Vi2i7PwrGvM",
             ],
-            "sizes": [7.625, 2.5, 5.083, 1.25, 3.75, 2.792, 15.458, 8.167, 13.042],
             "kind": "video",
+            "sizes": [7.625, 2.5, 5.083, 1.25, 3.75, 2.792, 15.458, 8.167, 13.042],
             "version": 0,
         },
         "fps": 24.0,
@@ -125,11 +123,11 @@ def test_code_video_granular_scenes_ffmpeg():
         "features": {
             "features": [
                 "DhuCPB1advw",
-                "OgmyIcqHmyU",
+                "OgmyIIqHmiU",
                 "Vo5C1g8Yvu0",
                 "Xp6D_XjS9tk",
-                "aiCyoM48cqo",
-                "Apki-e7jWlM",
+                "SiAyoIw8cqg",
+                "Apki-a7jWlM",
             ],
             "kind": "video",
             "sizes": [7.625, 2.5, 5.083, 23.25, 1.5, 6.667],
@@ -147,32 +145,30 @@ def test_code_video_granular_rolling():
     result = code_video(SAMPLE, video_granular=True, video_scenes=False)
     assert result == {
         "code": "EMAVMHMC7RMJF6XZ",
-        # "crop": "176:96:0:24",
         "duration": 60.042,
         "features": {
             "features": [
                 "ThqCHh1advw",
-                "Hg8iCIgavm0",
-                "Ug5ylg8Yvm0",
-                "Vh-A9gXavm0",
-                "Vp6j59COtlM",
-                "HpoD_3jS8FE",
+                "Hg8iCIganm0",
+                "Ug5Slg8Yvm0",
+                "Vh-A9AXavm0",
+                "Vpqj59COtlM",
+                "HpoD93jC8FE",
                 "Xp8D_fjS_NE",
                 "XhcDvfjSXto",
                 "XBiCvX4Ydvg",
-                "Qhgi8c43UtE",
+                "Qhgi8c43UlE",
                 "Qpki_fyjmHM",
                 "Vi2iDFg7GoM",
-                "Fo2ibPyjGVM",
+                "Fo2ibLyjGVM",
             ],
+            "kind": "video",
             "overlap": 3,
             "window": 7,
-            "kind": "video",
         },
         "fps": 24.0,
         "height": 144,
         "language": "en",
-        # "signature_fps": 5,
         "title": "Kali by Anokato - Spiral Sessions 2019",
         "width": 176,
     }
@@ -203,23 +199,23 @@ def test_compute_video_features_rolling():
     rolling_sigs = video.compute_video_features_rolling(frames)
     assert rolling_sigs == {
         "features": [
-            "XxqT9x1b8nw",
-            "Hi7Wfg0a8u0",
-            "Vg7U8A0e8uw",
+            "XxqD9x1a8nw",
+            "Hg7Wdg0a8u0",
+            "Vg6Q8A0e8uw",
             "Vg6E_AUU8uw",
             "fhqH3HUQ9vU",
-            "XgoH93VacvE",
-            "Xg4X9N1Sc3g",
+            "XgoH9nVacvE",
+            "XgwX9N1Sc3g",
             "Hi4X9P1acng",
             "H2qRtdwbcvk",
-            "XGoAl8YVcqU",
+            "XEoAl8YVcqU",
             "Xk4A3dQVUqQ",
             "U06SYFUdUqs",
-            "f06CXFQVUrU",
+            "P06CXFQVUrU",
         ],
+        "kind": "video",
         "overlap": 3,
         "window": 7,
-        "kind": "video",
     }
 
 
@@ -236,17 +232,17 @@ def test_compute_video_features_scenes():
     assert scene_signatures == {
         "features": [
             "XxqT9x1a8vw",
-            "HGqWS0AW8oQ",
-            "Vg7U9A0esuw",
-            "VgYGfgj2tmQ",
+            "HEqSSwAW8oQ",
+            "VA7Q9A0esuw",
+            "VgYGfAjUsmQ",
             "dw6FTHUE4nU",
-            "vhqD3XVSdtE",
+            "vBqD3XVSdtE",
             "Hg4X9f1acvg",
-            "XkoAn8YVcqU",
+            "XkoAn4YVcqU",
             "V06CXBQdUrU",
         ],
-        "sizes": [7.625, 2.5, 5.083, 1.25, 3.75, 2.792, 15.458, 8.167, 13.042],
         "kind": "video",
+        "sizes": [7.625, 2.5, 5.083, 1.25, 3.75, 2.792, 15.458, 8.167, 13.042],
         "version": 0,
     }
 
