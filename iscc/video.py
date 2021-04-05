@@ -235,7 +235,8 @@ def extract_video_signature_cutpoints(uri, crop=None, **options):
         scenetext = scenein.read()
     os.remove(sig_path)
     os.remove(scene_path)
-    return sigdata, parse_ffmpeg_scenes(scenetext, **options)
+    scenes = parse_ffmpeg_scenes(scenetext, **options)
+    return sigdata, scenes
 
 
 def hash_video(features, **options):
@@ -427,40 +428,30 @@ def parse_ffmpeg_scenes(scene_text, **options):
 def compute_video_features_scenes(frames, scenes):
     # type: (List[Frame], List[float]) -> dict
     """Compute video signatures for individual scenes in video.
-    Returns features and durations as tuple.
+    Returns a dictionary conforming to `shema.Feature`- objects.
     """
-    if not scenes:
-        log.warning(f"{len(frames)} frames but no scenes")
-        segment = [tuple(f.vector.tolist()) for f in frames]
-        feature = encode_base64(hash_video(segment))
-        return dict(
-            kind=FeatureType.video.value,
-            version=0,
-            features=[feature],
-            sizes=[round(float(frames[-1].elapsed), 3)],
-        )
-
-    durations, features = [], []
-    segment = []
-    cutpoint_idx = 0
-    cutpoint = scenes[cutpoint_idx]
-    prev_cutpoint = 0.0
-    for fidx, frame in enumerate(frames):
-        frame_t = tuple(frame.vector.tolist())
-        segment.append(frame_t)
-        if frame.elapsed >= cutpoint:
-            features.append(encode_base64(hash_video(segment)))
-            segment = []
-            duration = cutpoint - prev_cutpoint
-            duration = round(duration, 3)
-            durations.append(duration)
-            prev_cutpoint = cutpoint
-            cutpoint_idx += 1
-            try:
-                cutpoint = scenes[cutpoint_idx]
-            except IndexError:
+    features, sizes, segment = [], [], []
+    start_frame = 0
+    for cidx, cutpoint in enumerate(scenes):
+        try:
+            frames = frames[start_frame:]
+        except IndexError:
+            break
+        for fidx, frame in enumerate(frames):
+            frame_t = tuple(frame.vector.tolist())
+            segment.append(frame_t)
+            if frame.elapsed >= cutpoint:
+                features.append(encode_base64(hash_video(segment)))
+                segment = []
+                prev_cutpoint = 0 if cidx == 0 else scenes[cidx - 1]
+                duration = round(cutpoint - prev_cutpoint, 3)
+                sizes.append(duration)
+                start_frame = fidx + 1
                 break
+    if not features:
+        log.info("No scenes detected. Use all frames")
+        segment = [tuple(frame.vector.tolist()) for frame in frames]
+        features = [encode_base64(hash_video(segment))]
+        sizes = [round(float(frames[-1].elapsed), 3)]
 
-    return dict(
-        kind=FeatureType.video.value, version=0, features=features, sizes=durations
-    )
+    return dict(kind=FeatureType.video.value, version=0, features=features, sizes=sizes)
