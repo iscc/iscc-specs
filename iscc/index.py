@@ -79,7 +79,7 @@ class Index:
             map_async=True,
         )
         # Aproximate Nearest Neighbor indexes
-        self.anns = {}
+        self.anns: Dict[str, AnnoyIndex] = {}
 
     def add(self, iscc_obj, key=None):
         # type: (IsccObj, Optional[Key]) -> Key
@@ -414,7 +414,8 @@ class Index:
         return dbnames
 
     def build_anns(self):
-        """Build ANNS indexes."""
+        """Build and reload ANNS indexes (replacing previous versions)."""
+        tmp_files = []
         with self.env.begin() as txn:
             for dbname in self.dbs():
                 # Filter relevant dbnames
@@ -436,9 +437,21 @@ class Index:
                         ann.add_item(i, ba.tolist(True))
                 log.debug(f"build {kind}")
                 ann.build(-1)
-                outf = join(self.dbpath, dbname.decode("ascii") + ".ann")
+                outf = join(self.dbpath, dbname.decode("ascii") + ".ann.tmp")
                 log.debug(f"save {outf}")
                 ann.save(outf)
+                ann.unload()
+                tmp_files.append(outf)
+        # Switch to new anns files
+        self.unload_anns()
+        targets = [p.rstrip(".tmp") for p in tmp_files]
+        for src, dst in zip(tmp_files, targets):
+            try:
+                os.remove(dst)
+            except FileNotFoundError:
+                pass
+            os.rename(src, dst)
+        self.load_anns()
 
     def load_anns(self):
         """Load existing ANNS indexes"""
@@ -446,6 +459,12 @@ class Index:
             ann = AnnoyIndex(64, "hamming")
             ann.load(ann_file.as_posix())
             self.anns[ann_file.stem] = ann
+
+    def unload_anns(self):
+        """Unload ANNS"""
+        for ann in self.anns.values():
+            ann.unload()
+        self.anns = {}
 
     def destroy(self):
         """Close and delete index from disk."""
