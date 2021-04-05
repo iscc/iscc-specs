@@ -67,7 +67,7 @@ class Options(BaseSettings):
     )
 
     text_granular: bool = Field(
-        False, description="Calculate and return granular text features"
+        True, description="Calculate and return granular text features"
     )
 
     text_avg_chunk_size: int = Field(
@@ -85,11 +85,11 @@ class Options(BaseSettings):
     )
 
     image_trim: bool = Field(
-        False,
+        True,
         description="Autocrop empty borders of images before Image-Code generation",
     )
 
-    image_preview: bool = Field(False, description="Generate image preview thumbnail")
+    image_preview: bool = Field(True, description="Generate image preview thumbnail")
 
     image_preview_size: int = Field(
         96, description="Size of larger side of thumbnail in pixels"
@@ -109,7 +109,7 @@ class Options(BaseSettings):
     )
 
     audio_granular: bool = Field(
-        False, description="Calculate and return granular audio features"
+        True, description="Calculate and return granular audio features"
     )
 
     audio_max_duration: int = Field(
@@ -130,7 +130,7 @@ class Options(BaseSettings):
         True, description="Detect and remove black borders before processing"
     )
 
-    video_granular: bool = Field(False, description="Generate granular features")
+    video_granular: bool = Field(True, description="Generate granular features")
 
     video_scenes: bool = Field(
         True, description="Use scene detection for granular features"
@@ -146,44 +146,47 @@ class Options(BaseSettings):
 
     video_scenes_fs: int = Field(
         2,
-        description="Number of frames to skip per processing step for scene detection. "
-        "Higher values will increase detection speed and decrease detection quality.",
+        description="Number of frames to skip per processing step "
+        "for scene detection with pyscenedetect. Higher values will increase detection "
+        "speed and decrease detection quality (PySceneDetect only).",
     )
 
     video_scenes_th: int = Field(
         40,
-        description="Threshold for scene detection. Higher values detect less scenes.",
+        description="Threshold for scene detection. Higher values detect less scenes "
+        "(PySceneDetect only).",
     )
 
     video_scenes_min: int = Field(
         15,
-        description="Minimum number of frames per scene. Used by pyscenedetect",
+        description="Minimum number of frames per scene. (PySceneDetect only)",
     )
 
-    video_scenes_previews: bool = Field(
-        False,
-        description="Generate and return per scene preview thumbnails when scene "
-        "detection is used.",
-    )
+    # video_scenes_previews: bool = Field(
+    #     False,
+    #     description="Generate and return per scene preview thumbnails when scene "
+    #     "detection is used.",
+    # )
 
     video_window: int = Field(
-        7, description="Seconds of video per granular feature in rolling window mode"
+        7,
+        description="Seconds of video per granular feature if using rolling window mode",
     )
 
     video_overlap: int = Field(
-        3, description="Seconds of video that overlap in roling window mode"
+        3, description="Seconds of video that overlap if using rolling window mode"
     )
 
     video_include_fingerprint: bool = Field(
         False, description="Include raw MPEG-7 Video Signature in output"
     )
 
-    video_preview: bool = Field(
-        False, description="Generate 128px video preview thumbnail(s)"
-    )
+    video_preview: bool = Field(True, description="Generate video preview thumbnail(s)")
 
     video_hwaccel: Optional[str] = Field(
-        None, description="Use hardware acceleration for video processing"
+        None,
+        description="Use ffmpeg hardware acceleration for video processing "
+        "(use the string `auto` as value to activae).",
     )
 
     data_bits: int = Field(64, description="Length of generated Data-Code in bits")

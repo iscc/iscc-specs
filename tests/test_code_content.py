@@ -3,8 +3,8 @@ import iscc
 import iscc_samples as s
 
 
-def test_content_code_with_text_defaults():
-    tc = iscc.code_content(s.texts()[0])
+def test_content_code_with_text_nogran():
+    tc = iscc.code_content(s.texts()[0], text_granular=False)
     assert tc == {
         "characters": 6068,
         "code": "EAASS2POFKWX7KDJ",
@@ -15,8 +15,8 @@ def test_content_code_with_text_defaults():
     }
 
 
-def test_content_code_with_image_defaults():
-    tc = iscc.code_content(s.images()[2])
+def test_content_code_with_image_nogran():
+    tc = iscc.code_content(s.images()[2], image_preview=False)
     assert tc == {
         "code": "EEA4GQZQTY6J5DTH",
         "gmt": "image",
@@ -27,8 +27,8 @@ def test_content_code_with_image_defaults():
     }
 
 
-def test_content_code_with_audio_defaults():
-    tc = iscc.code_content(s.audios()[0])
+def test_content_code_with_audio_nogran():
+    tc = iscc.code_content(s.audios()[0], audio_granular=False)
     assert tc == {
         "code": "EIAWUJFCEZVCJIRG",
         "duration": 15.503,
@@ -38,17 +38,15 @@ def test_content_code_with_audio_defaults():
     }
 
 
-def test_content_code_with_video_defaults():
-    tc = iscc.code_content(s.videos()[0])
+def test_content_code_with_video_nogran():
+    tc = iscc.code_content(s.videos()[0], video_granular=False, video_preview=False)
     assert tc == {
         "code": "EMAVNGMC7RMJFOWZ",
-        # "crop": "352:192:0:46",
         "duration": 60.042,
         "fps": 24.0,
         "gmt": "video",
         "height": 288,
         "language": "en",
         "mediatype": "video/3gpp2",
-        # "signature_fps": 5,
         "width": 352,
     }

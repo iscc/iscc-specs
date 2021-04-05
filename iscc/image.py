@@ -102,7 +102,7 @@ def trim_image(img):
 
     bg = Image.new(img.mode, img.size, img.getpixel((0, 0)))
     diff = ImageChops.difference(img, bg)
-    diff = ImageChops.add(diff, diff, 2.0, -100)
+    diff = ImageChops.add(diff, diff)
     bbox = diff.getbbox()
     if bbox:
         logger.debug(f"Image has been trimmed: {img}")

@@ -54,10 +54,10 @@ def test_extract_text_metadata():
 
 
 def test_code_text_empty():
-    r64 = iscc.code_text(b"")
+    r64 = iscc.code_text(b"", text_granular=False)
     assert TextCode(**r64)
     assert r64 == dict(code="EAASL4F2WZY7KBXB", characters=0)
-    r128 = iscc.code_text(b"", text_bits=128)
+    r128 = iscc.code_text(b"", text_bits=128, text_granular=False)
     assert r128 == dict(code="EABSL4F2WZY7KBXBYUZPREWZ26IXU", characters=0)
 
     with pytest.raises(AssertionError):
@@ -66,15 +66,15 @@ def test_code_text_empty():
     assert iscc.distance(Code(r64["code"]), Code(r128["code"]), mixed=True) == 0
 
 
-def test_code_text_default():
-    a = iscc.code_text(TEXT_A.encode("utf-8"))
+def test_code_text_nogrn():
+    a = iscc.code_text(TEXT_A.encode("utf-8"), text_granular=False)
     assert a == {
         "characters": 291,
         "code": "EAAR7BVKOFMBVNE4",
         "language": "en",
         "title": "Their most significant and usefull property of similaritypreserving",
     }
-    b = iscc.code_text(TEXT_B.encode("utf-8"))
+    b = iscc.code_text(TEXT_B.encode("utf-8"), text_granular=False)
     assert b == {
         "characters": 289,
         "code": "EAAR7BVKOFMBVNGM",

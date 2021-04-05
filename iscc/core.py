@@ -251,9 +251,9 @@ def code_image(data, **options):
 
     if opts.image_trim:
         img_obj = image.trim_image(img_obj)
-        if img_obj.size != result.values():
-            tw, th = img_obj.size
-            result["trimmed"] = dict(width=tw, height=th)
+        # if img_obj.size != result.values():
+        #     tw, th = img_obj.size
+        #     result["trimmed"] = dict(width=tw, height=th)
 
     if opts.image_preview or opts.all_preview:
         preview = image.extract_image_preview(img_obj, **options)

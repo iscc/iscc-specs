@@ -5,7 +5,7 @@ import iscc_samples as s
 
 
 def test_code_iscc_text():
-    result = iscc.code_iscc(s.texts()[0])
+    result = iscc.code_iscc(s.texts()[0], text_granular=False)
     assert result == {
         "characters": 6068,
         "datahash": "46d1ebd64f515371c88d1df5bc0d43893b1fa1e58654b2c4244e491d06007a61",
@@ -24,7 +24,7 @@ def test_code_iscc_text():
 
 
 def test_code_iscc_image():
-    result = iscc.code_iscc(s.images()[0])
+    result = iscc.code_iscc(s.images()[0], image_preview=False)
     assert result == {
         "version": "0-0-0",
         "tophash": "63f6e48bd32d55abe6f05b8d5b99bb2eaf162c47410bcffb7010de00385b71fd",
@@ -43,7 +43,7 @@ def test_code_iscc_image():
 
 
 def test_code_iscc_audio():
-    result = iscc.code_iscc(s.audios()[0])
+    result = iscc.code_iscc(s.audios()[0], audio_granular=False)
     assert result == {
         "version": "0-0-0",
         "tophash": "d20388f25f31bee40baa4895f67b282b68597580edecbb3bcd6c970a934bee7e",
@@ -61,9 +61,8 @@ def test_code_iscc_audio():
 
 
 def test_code_iscc_video():
-    result = iscc.code_iscc(s.videos()[0])
+    result = iscc.code_iscc(s.videos()[0], video_granular=False, video_preview=False)
     assert result == {
-        # "crop": "352:192:0:46",
         "version": "0-0-0",
         "tophash": "27afa05e42a2bfd756317f31713b01bd4cad1b768d49c2644dbee53ef0030e5b",
         "datahash": "c9a8c0806046de30261e3b31c12e8e8a8392c73e2faae3f822f8913dc6ba0931",
@@ -199,7 +198,10 @@ def test_code_iscc_audio_granular():
 
 def test_code_iscc_video_granular():
     result = iscc.code_iscc(
-        s.videos()[0], video_granular=True, video_scenes_ffmpeg=False
+        s.videos()[0],
+        video_granular=True,
+        video_scenes_ffmpeg=False,
+        video_preview=False,
     )
     assert result == {
         "datahash": "c9a8c0806046de30261e3b31c12e8e8a8392c73e2faae3f822f8913dc6ba0931",

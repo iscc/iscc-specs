@@ -102,12 +102,12 @@ def test_hamming_distance():
 
 
 def test_content_id_image():
-    cid_i = iscc.code_image("file_image_lenna.jpg")
+    cid_i = iscc.code_image("file_image_lenna.jpg", image_preview=False)
     assert len(cid_i["code"]) == 16
     assert cid_i == {"code": "EEAZTRSWFV2THIUW", "height": 512, "width": 512}
 
     data = open("file_image_lenna.jpg", "rb").read()
-    cid_i = iscc.code_image(data)
+    cid_i = iscc.code_image(data, image_preview=False)
     assert len(cid_i["code"]) == 16
     assert cid_i == {"code": "EEAZTRSWFV2THIUW", "height": 512, "width": 512}
 

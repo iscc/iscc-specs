@@ -86,7 +86,7 @@ def test_hash_audio_signed():
 
 
 def test_code_audio_from_file_path():
-    assert iscc.code_audio(audios()[0].as_posix()) == {
+    assert iscc.code_audio(audios()[0].as_posix(), audio_granular=False) == {
         "code": "EIAWUJFCEZVCJIRG",
         "duration": 15.503,
         "title": "Belly Button",
@@ -94,7 +94,7 @@ def test_code_audio_from_file_path():
 
 
 def test_code_audio_from_data():
-    assert iscc.code_audio(audios()[0].open("rb").read()) == {
+    assert iscc.code_audio(audios()[0].open("rb").read(), audio_granular=False) == {
         "code": "EIAWUJFCEZVCJIRG",
         "duration": 15.503,
         "title": "Belly Button",
@@ -102,7 +102,9 @@ def test_code_audio_from_data():
 
 
 def test_code_audio_256():
-    assert iscc.code_audio(audios()[0].as_posix(), audio_bits=256) == {
+    assert iscc.code_audio(
+        audios()[0].as_posix(), audio_bits=256, audio_granular=False
+    ) == {
         "code": "EIDWUJFCEZVCJIRGNISKEBTKESRAM2REUIDGUJFCEZVCJIRGNISKEJQ",
         "duration": 15.503,
         "title": "Belly Button",

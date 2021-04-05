@@ -81,6 +81,7 @@ def test_code_video_granular_scenes():
         video_scenes_th=50,
         video_scenes_min=15,
         video_scenes_ffmpeg=False,
+        video_preview=False,
     )
     assert result == {
         "code": "EMAVMHMC7RMJF6XZ",
@@ -116,6 +117,7 @@ def test_code_video_granular_scenes_ffmpeg():
         video_scenes=True,
         video_scenes_ffmpeg=True,
         video_scenes_ffmpeg_th=0.25,
+        video_preview=False,
     )
     assert result == {
         "code": "EMAVMHMC7RMJF6XZ",
@@ -142,7 +144,9 @@ def test_code_video_granular_scenes_ffmpeg():
 
 
 def test_code_video_granular_rolling():
-    result = code_video(SAMPLE, video_granular=True, video_scenes=False)
+    result = code_video(
+        SAMPLE, video_granular=True, video_scenes=False, video_preview=False
+    )
     assert result == {
         "code": "EMAVMHMC7RMJF6XZ",
         "duration": 60.042,
