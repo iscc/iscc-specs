@@ -280,7 +280,13 @@ def code_audio(data, **options):
         chroma = dict(fingerprint=data)
     else:
         chroma = audio.extract_audio_features(data, **options)
-        result.update(video.extract_video_metadata(data))
+        # Todo: implement custom audio metadata extraction
+        metadata = video.extract_video_metadata(data)
+        # We remove video related keys that are detected in some audio files.
+        metadata.pop("fps", None)
+        metadata.pop("width", None)
+        metadata.pop("height", None)
+        result.update(metadata)
 
     shash_digest = audio.hash_audio(chroma["fingerprint"])
 
