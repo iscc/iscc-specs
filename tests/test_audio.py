@@ -129,7 +129,7 @@ def test_code_audio_granular_short():
                 "ExZAkhE-QKI",
                 "MX5sojH-6aM",
                 "c67LgXLty4A",
-                "YmzOgA",
+                "YmzOgAAAAAA",
             ],
             "kind": "audio",
             "version": 0,

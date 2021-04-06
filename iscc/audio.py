@@ -69,6 +69,8 @@ def encode_audio_features(features):
 
     Note: Last feature will be 32-bit if number of features is uneven.
     """
+    if len(features) % 2 != 0:
+        features.append(0)
     fingerprints = []
     for int_features in chunked(features, 2):
         digest = b""
