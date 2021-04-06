@@ -113,8 +113,8 @@ class Options(BaseSettings):
     )
 
     audio_max_duration: int = Field(
-        120,
-        description="Maximum seconds of audio to process",
+        0,
+        description="Maximum seconds of audio to process (0 for full fingerprint)",
     )
 
     video_bits: int = Field(
