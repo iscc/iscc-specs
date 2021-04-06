@@ -44,9 +44,16 @@ def extract_audio_features(data, **options):
     length = str(opts.audio_max_duration)
     file = uread.open_data(data)
     cmd = [fpcalc_bin(), "-raw", "-json", "-signed", "-length", length, "-"]
-    res = subprocess.run(
-        cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, input=file.read()
-    )
+    try:
+        res = subprocess.run(
+            cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, input=file.read()
+        )
+    except FileNotFoundError:
+        fpcalc_install()
+        file.seek(0)
+        res = subprocess.run(
+            cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, input=file.read()
+        )
     output = res.stdout.decode("utf-8")
     try:
         result = json.loads(output)
