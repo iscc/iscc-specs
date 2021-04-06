@@ -148,6 +148,7 @@ SUPPORTED_MEDIATYPES = {
     # Audio Formats
     "audio/mpeg": {"gmt": "audio", "ext": "mp3"},
     "audio/wav": {"gmt": "audio", "ext": "wav"},
+    "audio/x-wav": {"gmt": "audio", "ext": "wav"},
     "audio/ogg": {"gmt": "audio", "ext": "ogg"},
     "audio/aiff": {"gmt": "audio", "ext": "aif"},
     "audio/x-aiff": {"gmt": "audio", "ext": "aif"},
@@ -175,6 +176,7 @@ SUPPORTED_MEDIATYPES = {
 
 MEDIATYPE_NORM = {
     "audio/x-aiff": "audio/aiff",
+    "audio/x-wav": "audio/wav",
     "image/x-ms-bmp": "image/bmp",
     "video/x-msvideo": "video/avi",
 }
