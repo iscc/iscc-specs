@@ -134,7 +134,8 @@ class Index:
                 pos = 0
                 fobj = iscc.schema.Features(**fdict)
                 items = []
-                for feat, size in zip(fobj.features, fobj.sizes):
+                sizes = fobj.sizes or list(range(len(fobj.features)))
+                for feat, size in zip(fobj.features, sizes):
                     # feature -> (fkey, pos)
                     item = iscc.decode_base64(feat), msgpack.packb((keyb, pos))
                     items.append(item)
@@ -186,7 +187,8 @@ class Index:
         for feat_dict in features:
             feat_obj = iscc.schema.Features(**feat_dict)
             src_pos = 0
-            for src_feat, src_size in zip(feat_obj.features, feat_obj.sizes):
+            sizes = feat_obj.sizes or list(range(len(features)))
+            for src_feat, src_size in zip(feat_obj.features, sizes):
                 for fm in self.match_feature(
                     feat_obj.type_id, src_feat, src_pos, ft=ft, ignore=seen_fkeys
                 ):

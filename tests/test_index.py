@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import os
 
+import bitarray
 import msgpack
 import pytest
 import iscc
@@ -362,6 +363,35 @@ def test_index_query_features():
                 matched_position=0,
                 distance=4,
             ),
+        ],
+    )
+    idx.destroy()
+
+
+def test_index_audio_features():
+    idx = iscc.Index(
+        "test-index-audio-features", index_components=True, index_features=True
+    )
+    v0 = iscc.code_iscc(iscc_samples.audios()[0], audio_granular=True)
+    v1 = iscc.code_iscc(iscc_samples.audios()[1], audio_granular=True)
+    # change code so we can match by feature
+    code = iscc.Code(v0["iscc"])
+    nc = iscc.Code(code.header_bytes + (b"\xff" * 32))
+    v0["iscc"] = nc.code
+    idx.add(v0)
+
+    assert idx.query(v1, k=10, ct=0, ft=5) == QueryResult(
+        iscc_matches=[],
+        feature_matches=[
+            FeatureMatch(
+                matched_iscc="KID777777777777777777777777777777777777777777777777777Y",
+                kind="audio-0",
+                source_feature="KMUSJSjEMjc",
+                source_pos=0,
+                matched_feature="KMUSJSjEMjc",
+                matched_position=0,
+                distance=0,
+            )
         ],
     )
     idx.destroy()
