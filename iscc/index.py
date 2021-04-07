@@ -267,6 +267,7 @@ class Index:
                 if fkey in ignore:
                     continue
                 fm = FeatureMatch(
+                    key=msgpack.unpackb(fkey),
                     matched_iscc=self.get_iscc(fkey).code,
                     kind=kind,
                     source_feature=feature_str,
@@ -312,6 +313,7 @@ class Index:
                 if fkey in ignore:
                     continue
                 fm = FeatureMatch(
+                    key=msgpack.unpackb(fkey),
                     matched_iscc=iscc_str,
                     kind=kind,
                     source_feature=feature_str,
@@ -336,6 +338,7 @@ class Index:
                             if fkey in ignore:
                                 continue
                             fm = FeatureMatch(
+                                key=msgpack.unpackb(fkey),
                                 matched_iscc=self.get_iscc(fkey).code,
                                 kind=kind,
                                 source_feature=feature_str,

@@ -345,6 +345,7 @@ def test_index_query_features():
         ],
         feature_matches=[
             FeatureMatch(
+                key=1,
                 matched_iscc="KMD6P2X7C73P72Z4K2MYF7CYSK5NT3IYMMD6TDPH3NPWULHXP5BXSJI",
                 kind="video-0",
                 source_feature="Vh2C_FiS-vk",
@@ -354,6 +355,7 @@ def test_index_query_features():
                 distance=4,
             ),
             FeatureMatch(
+                key=0,
                 matched_iscc="KMD6P2X7C73P72Z4K2MYF7CYSK5NT3IYMMD6TDPH3PE2RQEAMBDN4MA",
                 kind="video-0",
                 source_feature="Vh2C_FiS-vk",
@@ -383,6 +385,7 @@ def test_index_audio_features():
         iscc_matches=[],
         feature_matches=[
             FeatureMatch(
+                key=0,
                 matched_iscc="KID777777777777777777777777777777777777777777777777777Y",
                 kind="audio-0",
                 source_feature="KMUSJSjEMjc",

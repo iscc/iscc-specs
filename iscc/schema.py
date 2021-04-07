@@ -243,8 +243,8 @@ class FeatureMatch(BaseModel):
     class Config:
         frozen = True
 
+    key: Optional[IndexKey] = Field(description="Unique key of ISCC entry.")
     matched_iscc: str = Field(description="The matched (candidate) ISCC")
-
     kind: str = Field(
         description="The kind of feature that has been matched.",
     )
