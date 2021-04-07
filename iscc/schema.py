@@ -5,10 +5,16 @@ import mmap
 from io import BufferedReader, BytesIO
 from pathlib import Path
 from typing import BinaryIO, List, Optional, Union
-from pydantic import BaseSettings, BaseModel, Field, validator, conint, confloat
+from pydantic import BaseSettings, BaseModel, Field, validator, conint, confloat, constr
 from iscc import APP_DIR
 from os.path import join
 from iscc.metrics import distance_b64
+
+
+DEFAULT_WINDOW = 7
+DEFAULT_OVERLAP = 3
+FEATURE_REGEX = "^[-A-Za-z0-9_]{11}"
+IKEY_REGEX = "^[A-Za-z0-9+/]*={0,2}$"
 
 
 Data = Union[bytes, bytearray, memoryview]
@@ -16,11 +22,10 @@ Uri = Union[str, Path]
 File = Union[BinaryIO, mmap.mmap, BytesIO, BufferedReader]
 Readable = Union[Uri, Data, File]
 PositiveNum = Union[conint(strict=True, ge=0), confloat(strict=True, ge=0.0)]
-
-
-DEFAULT_WINDOW = 7
-DEFAULT_OVERLAP = 3
-FEATURE_REGEX = "^[-A-Za-z0-9_]{11}"
+IndexKey = Union[
+    conint(strict=True, ge=0),
+    constr(strict=True, min_length=1, max_length=64, regex=IKEY_REGEX),
+]
 
 
 class Options(BaseSettings):
@@ -282,7 +287,7 @@ class IsccMatch(BaseModel):
     class Config:
         frozen = True
 
-    key: Optional[Union[str, int]] = Field(description="Unique key of ISCC entry.")
+    key: Optional[IndexKey] = Field(description="Unique key of ISCC entry.")
     matched_iscc: str = Field(description="The ISCC found to match with the query.")
     distance: Optional[int] = Field(description="Hamming distance of the full code")
     mdist: Optional[int] = Field(description="Hamming distance of Meta-Code.")

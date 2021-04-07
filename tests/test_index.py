@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
 import os
-
-import bitarray
 import msgpack
 import pytest
 import iscc
@@ -254,7 +252,7 @@ def test_query():
     assert idx.query(QUERY_CODE, k=3) == QueryResult(
         iscc_matches=[
             IsccMatch(
-                key="13",
+                key=13,
                 matched_iscc="KMD73CA6R4XJLI5CKYOYF7CYSL5PSJGVYXJVMT4PF3CSTGC4KNJ4ILI",
                 distance=0,
                 mdist=0,
@@ -263,7 +261,7 @@ def test_query():
                 imatch=True,
             ),
             IsccMatch(
-                key="4",
+                key=4,
                 matched_iscc="KMD73CA6R4XJLI5CKYOYF7CYSL5PSBWQO33FNHPQNNCY4KHZALJ54JA",
                 distance=48,
                 mdist=0,
@@ -272,7 +270,7 @@ def test_query():
                 imatch=False,
             ),
             IsccMatch(
-                key="12",
+                key=12,
                 matched_iscc="KMD73CA6R4XJLI5CKYOYF7CYSL5PTKDOPDEUETYGNGGUADC5E5GWOBA",
                 distance=52,
                 mdist=0,
@@ -335,7 +333,7 @@ def test_index_query_features():
     assert r == QueryResult(
         iscc_matches=[
             IsccMatch(
-                key="2",
+                key=2,
                 matched_iscc="KMD73CA6R4XJLI5CKYOYF7CYTL5PSDTGHO52LVRXEGNXO4RA672UNMQ",
                 distance=66,
                 mdist=0,
