@@ -5,6 +5,7 @@ import pytest
 import iscc
 import iscc_samples
 from iscc.schema import IsccMatch, FeatureMatch, QueryResult
+import uuid
 
 
 TEST_CODES = [
@@ -393,3 +394,16 @@ def test_index_audio_features():
         ],
     )
     idx.destroy()
+
+
+def test_index_add_string_key(idx, full_iscc):
+    uid = str(uuid.uuid4())
+    idx.add(full_iscc.code, uid)
+    assert idx.get_key(full_iscc) == uid
+
+
+def test_index_query_string_key(idx, full_iscc):
+    uid = str(uuid.uuid4())
+    idx.add(full_iscc.code, uid)
+    r = idx.query(full_iscc)
+    assert r.iscc_matches[0].key == uid

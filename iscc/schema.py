@@ -14,7 +14,7 @@ from iscc.metrics import distance_b64
 DEFAULT_WINDOW = 7
 DEFAULT_OVERLAP = 3
 FEATURE_REGEX = "^[-A-Za-z0-9_]{11}"
-IKEY_REGEX = "^[A-Za-z0-9+/]*={0,2}$"
+IKEY_REGEX = "^[-A-Za-z0-9+/]*={0,2}$"
 
 
 Data = Union[bytes, bytearray, memoryview]
