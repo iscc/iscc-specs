@@ -124,7 +124,7 @@ def ffprobe_version_info():
             .strip()
             .splitlines()[0]
             .split()[2]
-            .rstrip("-static")
+            .rstrip("-static").rstrip("-tessu")
         )
     except FileNotFoundError:
         return "ffprobe not installed"
@@ -139,7 +139,7 @@ def ffmpeg_version_info():
             .strip()
             .splitlines()[0]
             .split()[2]
-            .rstrip("-static")
+            .rstrip("-static").rstrip("-tessu")
         )
     except FileNotFoundError:
         return "ffmpeg not installed"
