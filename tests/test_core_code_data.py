@@ -20,7 +20,7 @@ def test_code_data_1mib_robustness():
     random.seed(1)
     mib = 1024 * 1024
     data = bytearray(static_bytes(mib))
-    rbyte = lambda: random.randint(0, 255)
+    rbyte = lambda: random.randint(0, 256)
     rpos = lambda: random.randint(0, mib)
 
     # random single byte changes in data
