@@ -3,7 +3,6 @@
 from typing import Union
 from bitarray import bitarray
 from bitarray.util import count_xor, hex2ba
-from hexhamming import hamming_distance
 from iscc.codec import Code, read_header, decode_base32, decode_base64, decompose, MT
 
 
@@ -82,13 +81,16 @@ def distance_int(a, b):
 def distance_bytes(a, b):
     # type: (bytes, bytes) -> int
     """Calculate hamming distance for bytes hash digests of equal length."""
-    return hamming_distance(a.hex(), b.hex())
+    ba, bb = bitarray(), bitarray()
+    ba.frombytes(a)
+    bb.frombytes(b)
+    return count_xor(ba, bb)
 
 
 def distance_hex(a, b):
     # type: (str, str) -> int
     """Calculate hamming distnace for hex encoded hashes of equal length."""
-    return hamming_distance(a, b)
+    return count_xor(hex2ba(a), hex2ba(b))
 
 
 def distance_ba(a, b):

@@ -249,14 +249,6 @@ python-versions = ">=3.4"
 gitdb = ">=4.0.1,<5"
 
 [[package]]
-name = "hexhamming"
-version = "1.4.0"
-description = "Fast Hamming distance calculation for hexadecimal strings"
-category = "main"
-optional = false
-python-versions = "*"
-
-[[package]]
 name = "htmlmin"
 version = "0.1.12"
 description = "An HTML Minifier"
@@ -1008,7 +1000,7 @@ turbo = ["cython", "numba"]
 [metadata]
 lock-version = "1.1"
 python-versions = ">=3.6.1,<3.10"
-content-hash = "e6028aab83d84b38f238b1bd5e18225c675ddb679aac142182340189b9830687"
+content-hash = "8dc7750964f0a70b928dc1ec23744fa67fa0a4dac7a87df015371c6b8996e843"
 
 [metadata.files]
 aiocontextvars = [
@@ -1221,11 +1213,6 @@ gitdb = [
 gitpython = [
     {file = "GitPython-3.1.14-py3-none-any.whl", hash = "sha256:3283ae2fba31c913d857e12e5ba5f9a7772bbc064ae2bb09efafa71b0dd4939b"},
     {file = "GitPython-3.1.14.tar.gz", hash = "sha256:be27633e7509e58391f10207cd32b2a6cf5b908f92d9cd30da2e514e1137af61"},
-]
-hexhamming = [
-    {file = "hexhamming-1.4.0-cp27-cp27m-macosx_10_15_x86_64.whl", hash = "sha256:b87840bbf985895af6554402347f10f870d5bffa768efa5c60667ad3888254d9"},
-    {file = "hexhamming-1.4.0-cp37-cp37m-macosx_10_14_x86_64.whl", hash = "sha256:e630b79d20851f090d9e0fc3c546a745d7a5a4d22391e41a9ad5c59bdd0c392d"},
-    {file = "hexhamming-1.4.0.tar.gz", hash = "sha256:6449f2b8eb46e44eb833eb7979aa76849bee7fd223cd9d2699a534acb55a8a4f"},
 ]
 htmlmin = [
     {file = "htmlmin-0.1.12.tar.gz", hash = "sha256:50c1ef4630374a5d723900096a961cff426dff46b48f34d194a81bbe14eca178"},
