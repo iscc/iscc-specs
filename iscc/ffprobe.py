@@ -73,7 +73,13 @@ def ffprobe_version_info():
     """Get ffprobe version"""
     try:
         r = subprocess.run([ffprobe_bin(), "-version"], stdout=subprocess.PIPE)
-        return r.stdout.decode("utf-8").strip().splitlines()[0].split()[2]
+        return (
+            r.stdout.decode("utf-8")
+            .strip()
+            .splitlines()[0]
+            .split()[2]
+            .rstrip(".static")
+        )
     except FileNotFoundError:
         return "ffprobe not installed"
 
@@ -84,9 +90,3 @@ def system_tag():
         os_tag = "osx"
     os_bits = architecture()[0].rstrip("bit")
     return f"{os_tag}-{os_bits}"
-
-
-if __name__ == "__main__":
-    print(ffprobe_version_info())
-    print(ffprobe_install())
-    print(ffprobe_version_info())
