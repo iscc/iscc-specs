@@ -9,20 +9,19 @@ import sys
 from subprocess import Popen, PIPE, DEVNULL
 from secrets import token_hex
 from typing import Any, Generator, List, Sequence, Tuple, Optional, Union
-import imageio_ffmpeg
 from statistics import mode
 from langcodes import standardize_tag
-from more_itertools import windowed
 from scenedetect import ContentDetector, FrameTimecode, SceneManager, VideoManager
 from iscc import uread
 from iscc.schema import FeatureType, Options, Readable, File, Uri
 from iscc.codec import encode_base64
 from iscc.wtahash import wtahash
 from iscc.mp7 import Frame
+from iscc.bin import ffmpeg_bin
 import av
 
 
-FFMPEG = imageio_ffmpeg.get_ffmpeg_exe()
+FFMPEG = ffmpeg_bin()
 Scene = Union[Tuple[FrameTimecode, FrameTimecode], Tuple[float, float]]
 SceneSig = Tuple[List[str], List[int]]  # feature hashes, scene durations
 

@@ -258,7 +258,7 @@ python-versions = "*"
 
 [[package]]
 name = "humanize"
-version = "3.4.0"
+version = "3.4.1"
 description = "Python humanize utilities"
 category = "main"
 optional = false
@@ -274,14 +274,6 @@ description = "Internationalized Domain Names in Applications (IDNA)"
 category = "main"
 optional = false
 python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
-
-[[package]]
-name = "imageio-ffmpeg"
-version = "0.4.3"
-description = "FFMPEG wrapper for Python"
-category = "main"
-optional = false
-python-versions = ">=3.4"
 
 [[package]]
 name = "immutables"
@@ -1000,7 +992,7 @@ turbo = ["cython", "numba"]
 [metadata]
 lock-version = "1.1"
 python-versions = ">=3.6.1,<3.10"
-content-hash = "8dc7750964f0a70b928dc1ec23744fa67fa0a4dac7a87df015371c6b8996e843"
+content-hash = "6fb9c23b269bec77005794cabc7e6be3ed1c725b269dcb9220d195691072d72a"
 
 [metadata.files]
 aiocontextvars = [
@@ -1218,19 +1210,12 @@ htmlmin = [
     {file = "htmlmin-0.1.12.tar.gz", hash = "sha256:50c1ef4630374a5d723900096a961cff426dff46b48f34d194a81bbe14eca178"},
 ]
 humanize = [
-    {file = "humanize-3.4.0-py3-none-any.whl", hash = "sha256:d292736d81da462b84b78eee0c9bba26bdbfa10112e302c4fcddb6621d2a08dd"},
-    {file = "humanize-3.4.0.tar.gz", hash = "sha256:096b9ae6d1d56321d3d81f17117c2068179d7b4f7f73ba4baf302726923b48ec"},
+    {file = "humanize-3.4.1-py3-none-any.whl", hash = "sha256:c2ccaea7f8cbcd883ec420279d6e71ad20371bb36dbf5100b178d9756563289e"},
+    {file = "humanize-3.4.1.tar.gz", hash = "sha256:6e04cdd75d66074c34ff93c30a2ad6d19d91202a65c1bd400b2edeedae399bda"},
 ]
 idna = [
     {file = "idna-2.10-py2.py3-none-any.whl", hash = "sha256:b97d804b1e9b523befed77c48dacec60e6dcb0b5391d57af6a65a312a90648c0"},
     {file = "idna-2.10.tar.gz", hash = "sha256:b307872f855b18632ce0c21c5e45be78c0ea7ae4c15c828c20788b26921eb3f6"},
-]
-imageio-ffmpeg = [
-    {file = "imageio-ffmpeg-0.4.3.tar.gz", hash = "sha256:f826260a3207b872f1a4ba87ec0c8e02c00afba4fd03348a59049bdd8215841e"},
-    {file = "imageio_ffmpeg-0.4.3-py3-none-macosx_10_9_intel.macosx_10_9_x86_64.macosx_10_10_intel.macosx_10_10_x86_64.whl", hash = "sha256:5b69f9390f791a0f1e125ae5244dcb8a6dbb7008195d047d529225a7ef351be4"},
-    {file = "imageio_ffmpeg-0.4.3-py3-none-manylinux2010_x86_64.whl", hash = "sha256:4b8067bf1ead54b03fa7fa37f80ce152b34426e128aa835131b04eb64ee52b32"},
-    {file = "imageio_ffmpeg-0.4.3-py3-none-win32.whl", hash = "sha256:3b00bb04e8649f60d5ede91aa47b754283d1fa9fd8d40803d9871c8afd72cd50"},
-    {file = "imageio_ffmpeg-0.4.3-py3-none-win_amd64.whl", hash = "sha256:b1b9cc52ead5ea0c6e9806bcce4d6d1b0d8d4e9baf017af090fb932cc37ad6b0"},
 ]
 immutables = [
     {file = "immutables-0.15-cp35-cp35m-macosx_10_14_x86_64.whl", hash = "sha256:6728f4392e3e8e64b593a5a0cd910a1278f07f879795517e09f308daed138631"},

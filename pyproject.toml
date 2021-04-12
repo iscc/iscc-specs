@@ -35,7 +35,6 @@ bitarray-hardbyte = "^1.6.2"
 numpy = "1.19.3"
 numba = { version = "0.53.1", python = ">=3.6,<3.10", optional = true}
 loguru = "^0.5.3"
-imageio-ffmpeg = "^0.4.3"
 pydantic = "^1.8.1"
 scenedetect = {extras = ["opencv-headless"], version = "^0.5.5"}
 av = "^8.0.3"
