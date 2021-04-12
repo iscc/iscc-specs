@@ -71,5 +71,5 @@ fauxfactory = "^3.1.0"
 iscc-samples = "^0.4.0"
 
 [build-system]
-requires = ["poetry>=1.1.0", "setuptools", "wheel", "cython"]
+requires = ["poetry==1.1.5", "setuptools", "wheel", "cython"]
 build-backend = "poetry.masonry.api"
