@@ -23,11 +23,6 @@ def test_download_url():
     assert audio.FPCALC_VERSION in url
 
 
-def test_download():
-    out_path = audio.fpcalc_download()
-    assert os.path.exists(out_path)
-
-
 def test_install():
     exe_path = audio.fpcalc_install()
     assert os.path.exists(exe_path)
