@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+import json
+
 from codetiming import Timer
 from loguru import logger as log
 import subprocess
@@ -17,13 +19,43 @@ from iscc.schema import FeatureType, Options, Readable, File, Uri
 from iscc.codec import encode_base64
 from iscc.wtahash import wtahash
 from iscc.mp7 import Frame
-from iscc.bin import ffmpeg_bin
+from iscc.bin import ffmpeg_bin, ffprobe_bin
 import av
 
 
 FFMPEG = ffmpeg_bin()
+FFPROBE = ffprobe_bin()
 Scene = Union[Tuple[FrameTimecode, FrameTimecode], Tuple[float, float]]
 SceneSig = Tuple[List[str], List[int]]  # feature hashes, scene durations
+
+
+def extract_video_metadata2(file):
+    # type: (Union[File, Uri], **Any) -> Optional[bytes]
+    """Extract video metadata"""
+
+    infile = uread.open_data(file)
+
+    if not hasattr(infile, "name"):
+        log.warning("Cannot extract preview without file.name")
+        return None
+
+    cmd = [ffprobe_bin(),
+           "-hide_banner",
+           "-loglevel", "fatal",
+           "-find_stream_info",
+           "-show_error",
+           "-show_format",
+           "-show_streams",
+           "-show_programs",
+           "-show_chapters",
+           "-show_private_data",
+           "-print_format", "json",
+           "-i", infile.name
+           ]
+    res = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE,)
+    return json.loads(res.stdout)
+
+
 
 
 def extract_video_metadata(data):
@@ -454,3 +486,10 @@ def compute_video_features_scenes(frames, scenes):
         sizes = [round(float(frames[-1].elapsed), 3)]
 
     return dict(kind=FeatureType.video.value, version=0, features=features, sizes=sizes)
+
+
+if __name__ == '__main__':
+    from iscc_samples import videos, audios
+    from pprint import pprint
+    r = extract_video_metadata2(audios()[2].as_posix())
+    pprint(r, sort_dicts=False)

@@ -110,7 +110,7 @@ def ffmpeg_install():
     archive_path = ffmpeg_download()
     ffmpeg_extract(archive_path)
     st = os.stat(ffmpeg_bin())
-    os.chmod(ffprobe_bin(), st.st_mode | stat.S_IEXEC)
+    os.chmod(ffmpeg_bin(), st.st_mode | stat.S_IEXEC)
     assert is_installed(ffmpeg_bin())
     return ffmpeg_bin()
 
