@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 import json
-
 from codetiming import Timer
 from loguru import logger as log
 import subprocess
@@ -21,6 +20,7 @@ from iscc.wtahash import wtahash
 from iscc.mp7 import Frame
 from iscc.bin import ffmpeg_bin, ffprobe_bin
 import av
+import jmespath
 
 
 FFMPEG = ffmpeg_bin()
@@ -39,23 +39,31 @@ def extract_video_metadata2(file):
         log.warning("Cannot extract preview without file.name")
         return None
 
-    cmd = [ffprobe_bin(),
-           "-hide_banner",
-           "-loglevel", "fatal",
-           "-find_stream_info",
-           "-show_error",
-           "-show_format",
-           "-show_streams",
-           "-show_programs",
-           "-show_chapters",
-           "-show_private_data",
-           "-print_format", "json",
-           "-i", infile.name
-           ]
-    res = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE,)
+    cmd = [
+        ffprobe_bin(),
+        "-hide_banner",
+        "-loglevel",
+        "fatal",
+        "-find_stream_info",
+        "-show_error",
+        "-show_format",
+        "-show_streams",
+        "-show_programs",
+        "-show_chapters",
+        "-show_private_data",
+        "-print_format",
+        "json",
+        "-i",
+        infile.name,
+    ]
+    res = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    metadata = json.loads(res.stdout)
+
+    durations = [jmespath.search("format.duration", metadata)] or jmespath.search(
+        "streams[*].duration", metadata
+    )
+    duration = max(round(float(d), 3) for d in durations)
     return json.loads(res.stdout)
-
-
 
 
 def extract_video_metadata(data):
@@ -488,8 +496,9 @@ def compute_video_features_scenes(frames, scenes):
     return dict(kind=FeatureType.video.value, version=0, features=features, sizes=sizes)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     from iscc_samples import videos, audios
     from pprint import pprint
-    r = extract_video_metadata2(audios()[2].as_posix())
+
+    r = extract_video_metadata2(videos()[1])
     pprint(r, sort_dicts=False)
