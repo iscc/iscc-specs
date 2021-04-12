@@ -78,7 +78,7 @@ def ffprobe_version_info():
             .strip()
             .splitlines()[0]
             .split()[2]
-            .rstrip(".static")
+            .rstrip("-static")
         )
     except FileNotFoundError:
         return "ffprobe not installed"
