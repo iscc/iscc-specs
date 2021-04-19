@@ -2,21 +2,112 @@
 import math
 import iscc
 from iscc_samples import images
-from PIL import Image
 from iscc.codec import Code
 from tests.test_readables import image_readables
 
 
 def test_code_image_plain():
-    assert iscc.code_image(images()[0], image_preview=False) == dict(
+    assert iscc.code_image(
+        images()[0], image_preview=False, image_granular=False
+    ) == dict(
         code="EEA4GQZQTY6J5DTH",
         width=200,
         height=133,
     )
 
 
+def test_code_image_granular():
+    assert iscc.code_image(images()[0], image_preview=False, image_granular=True) == {
+        "code": "EEA4GQZQTY6J5DTH",
+        "features": {
+            "features": [
+                "LX_6ZHK_v84",
+                "ab79w3Lb-3Y",
+                "FVfv7v_vePo",
+                "-f9Oe-nrr98",
+                "_dfa63rtqjA",
+                "9__fpqXolZQ",
+                "Xf6P7q_4-9M",
+                "OAiKKhQWY2w",
+                "XfnMv-j1oVI",
+                "Kr8MIe5yogs",
+                "2dwt-uPtyVo",
+                "6f2q_m7UrVo",
+                "9__u6_7l-2I",
+                "o_8nXM1-m8Y",
+                "vP_me9xsr28",
+                "7fyjYPh9uVM",
+                "Y_9goKj8-wM",
+                "y-sYG2TW_jM",
+                "Jat8cuBzsaA",
+                "st4wUarm0rI",
+                "mZa337yWn18",
+                "97ZlKUM20T4",
+                "TJoQQKEE-ws",
+                "O3yfqMDwMVc",
+            ],
+            "positions": [
+                (37.5, 45.865),
+                (37.2, 46.015),
+                (37.44, 46.556),
+                (39.0, 45.865),
+                (39.0, 46.015),
+                (61.0, 40.602),
+                (38.88, 47.639),
+                (30.0, 72.18),
+                (39.0, 47.82),
+                (51.0, 69.925),
+                (38.88, 46.773),
+                (42.48, 50.887),
+                (37.152, 46.773),
+                (50.0, 38.346),
+                (39.0, 48.12),
+                (42.6, 50.526),
+                (42.336, 51.97),
+                (58.32, 42.226),
+                (41.472, 55.868),
+                (49.8, 37.895),
+                (35.4, 45.113),
+                (56.88, 51.97),
+                (54.95, 48.332),
+                (58.061, 48.332),
+            ],
+            "sizes": [
+                15.5,
+                18.6,
+                22.32,
+                15.5,
+                18.6,
+                15.5,
+                22.32,
+                15.5,
+                18.6,
+                15.5,
+                26.784,
+                22.32,
+                26.784,
+                15.5,
+                15.5,
+                18.6,
+                26.784,
+                22.32,
+                26.784,
+                18.6,
+                18.6,
+                22.32,
+                32.141,
+                32.141,
+            ],
+        },
+        "height": 133,
+        "width": 200,
+    }
+
+
 def test_code_image_with_meta():
-    assert iscc.code_image(images()[2], image_preview=False) == dict(
+    assert iscc.code_image(
+        images()[2], image_preview=False, image_granular=False
+    ) == dict(
         code="EEA4GQZQTY6J5DTH",
         title="Concentrated Cat",
         width=200,
@@ -25,27 +116,63 @@ def test_code_image_with_meta():
 
 
 def test_code_image_bits32():
-    cidi32 = iscc.code_image(images()[0], image_bits=32, image_preview=False)
+    cidi32 = iscc.code_image(
+        images()[0], image_bits=32, image_preview=False, image_granular=False
+    )
     assert cidi32 == dict(code="EEAMGQZQTY", width=200, height=133)
     c1 = Code(cidi32["code"])
     assert c1.length == 32
-    cidi64 = iscc.code_image(images()[0], image_bits=32, image_preview=False)
+    cidi64 = iscc.code_image(
+        images()[0], image_bits=32, image_preview=False, image_granular=False
+    )
     c2 = Code(cidi64["code"])
     assert c1 ^ c2 == 0
 
 
 def test_code_image_preview():
-    cidi = iscc.code_image(images()[0], image_preview=True)
+    cidi = iscc.code_image(images()[0], image_preview=True, image_granular=False)
     preview = cidi["preview"]
     assert preview.startswith("data:image/webp;base64,UklGRl4DAABXRUJQVlA4IFIDAACQEwCd")
     assert preview.endswith("U0YXrp8k4FtKO0FRbKeE7aFq4V66Ybga9t8TC+QV/hK62WDyAxPciuoAA")
 
 
 def test_normalize_image_inputs():
-    path_obj = iscc.normalize_image(images()[0])
-    path_str = iscc.normalize_image(images()[0].as_posix())
-    pil_obj = iscc.normalize_image(Image.open(images()[0]))
-    assert path_obj == path_str == pil_obj
+    for r in image_readables():
+        pix = iscc.normalize_image(r)
+        assert pix[0] == [
+            25,
+            18,
+            14,
+            15,
+            25,
+            79,
+            92,
+            92,
+            106,
+            68,
+            110,
+            101,
+            99,
+            93,
+            74,
+            69,
+            58,
+            52,
+            52,
+            73,
+            153,
+            159,
+            131,
+            81,
+            95,
+            81,
+            91,
+            78,
+            50,
+            20,
+            24,
+            26,
+        ]
 
 
 def test_normalize_image_dimensions():
@@ -58,7 +185,7 @@ def test_hash_image_reference():
     image_hashes = []
     for img_path in images():
         pixels = iscc.normalize_image(img_path)
-        image_hash = iscc.hash_image(pixels)
+        image_hash = iscc.hash_image_pixels(pixels)
         image_hashes.append(image_hash.hex())
     assert image_hashes == [
         "c343309e3c9e8e67",
@@ -1178,3 +1305,14 @@ def test_normalize_image():
             52,
         ],
     ]
+
+
+def test_extract_image_features_readables():
+    for r in image_readables():
+        features, sizes, positions = iscc.extract_image_features(r)
+        assert features[0] == "7XzuZHrfv-w"
+        assert sizes[0] == 15.5
+        assert positions[0] == (37.5, 45.865)
+        assert features[-1] == "O3yfqMDwMVc"
+        assert sizes[-1] == 32.141
+        assert positions[-1] == (58.061, 48.332)

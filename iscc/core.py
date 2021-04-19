@@ -224,8 +224,13 @@ def code_text(data, **options):
 
 
 def code_image(data, **options):
-    # type: (Union[Uri, Data, Image.Image], **Any) -> dict
+    # type: (Union[Readable], **Any) -> dict
+    """Generate Content-Code Image
 
+    :param data: raw data, file or path to image
+    :key bool image_granular: Wether to compute granular image features
+    :key int image_granular_n: Number of features to compute (default 32)
+    """
     opts = Options(**options)
     nbits = opts.image_bits
     nbytes = nbits // 8
@@ -240,8 +245,7 @@ def code_image(data, **options):
     if isinstance(data, Image.Image):
         img_obj = data
     else:
-        with uread.open_data(data) as infile:
-            img_obj = Image.open(io.BytesIO(infile.read()))
+        img_obj = Image.open(io.BytesIO(uread.open_data(data).read()))
 
     if opts.image_exif_transpose:
         img_obj = exif_transpose(img_obj)
@@ -255,13 +259,26 @@ def code_image(data, **options):
         #     tw, th = img_obj.size
         #     result["trimmed"] = dict(width=tw, height=th)
 
+    if opts.image_granular:
+        try:
+            features, sizes, positions = image.extract_image_features(
+                data, n=opts.image_granular_n
+            )
+            result["features"] = {
+                "features": features,
+                "sizes": sizes,
+                "positions": positions,
+            }
+        except Exception as e:
+            log.error("image feature extraction failed")
+            log.exception(e)
+
     if opts.image_preview or opts.all_preview:
         preview = image.extract_image_preview(img_obj, **options)
         preview_uri = image.encode_image_to_data_uri(preview, **options)
         result["preview"] = preview_uri
 
-    pixels = image.normalize_image(img_obj)
-    hash_digest = image.hash_image(pixels)[:nbytes]
+    hash_digest = bytes.fromhex(image.hash_image(img_obj))[:nbytes]
     header = write_header(MT.CONTENT, ST_CC.IMAGE, VS.V0, nbits)
     code = encode_base32(header + hash_digest)
     result["code"] = code

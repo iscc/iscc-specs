@@ -16,7 +16,7 @@ def test_content_code_with_text_nogran():
 
 
 def test_content_code_with_image_nogran():
-    tc = iscc.code_content(s.images()[2], image_preview=False)
+    tc = iscc.code_content(s.images()[2], image_preview=False, image_granular=False)
     assert tc == {
         "code": "EEA4GQZQTY6J5DTH",
         "gmt": "image",

@@ -11,13 +11,42 @@ import math
 from statistics import median
 from PIL import Image, ImageChops, ImageEnhance
 import numpy as np
+from more_itertools import chunked
+import iscc
 from iscc.schema import Options, Readable
+from iscc.simhash import similarity_hash
 from iscc.text import normalize_text
 from iscc import uread
+import cv2 as cv
+
+
+IMAGE_META_MAP = {
+    "Xmp.dc.title": "title",
+    "Xmp.dc.identifier": "identifier",
+    "Xmp.dc.language": "language",
+    "Xmp.xmp.Identifier": "identifier",
+    "Xmp.xmp.Nickname": "title",
+    "Xmp.xmpDM.shotName": "title",
+    "Xmp.photoshop.Headline": "title",
+    "Xmp.iptcExt.AOTitle": "title",
+    "Iptc.Application2.Headline": "title",
+    "Iptc.Application2.Language": "language",
+    "Exif.Image.ImageID": "identifier",
+    "Exif.Image.XPTitle": "title",
+    "Exif.Photo.ImageUniqueID": "identifier",
+}
 
 
 def extract_image_metadata(data):
     # type: (Readable) -> Optional[dict]
+    """Extracts and normalizes seed netadata from image files (exif, iptc, xmp).
+
+    TODO: Create a more advanced cross-standard metadata mapping.
+    Returns an optional dictionary with the following possible fields:
+        - title
+        - identifier
+        - langauge
+    """
     file = uread.open_data(data)
     try:
         img_obj = pyexiv2.ImageData(file.read())
@@ -58,6 +87,47 @@ def extract_image_metadata(data):
             continue
         longest_meta[k] = best_v
     return longest_meta or None
+
+
+def extract_image_features(data, n=32):
+    # type: (Readable, int) -> Tuple
+    """Extract granular features from image.
+
+    Returns a tuple of (features, positions, sizes) where:
+        features - base64 encoded feature hashes
+        sizes - keypoint sizes as percentage relative to the larger side of the image
+        positions - percentage based x, y coordinates of the corresponding keypoints
+    """
+
+    file = uread.open_data(data)
+    img_array = np.array(bytearray(file.read()), dtype=np.uint8)
+    img = cv.imdecode(img_array, cv.IMREAD_GRAYSCALE)
+
+    height, width = img.shape[:2]
+    pix_count = max(img.shape[:2])  # pix count of longer side
+    orb = cv.ORB_create(32)
+    keypoints = orb.detect(img, None)
+    beblid = cv.xfeatures2d.BEBLID_create(0.75)
+    keypoints, descriptors = beblid.compute(img, keypoints)
+    zipped = list(zip(keypoints, descriptors))
+    ranked = sorted(zipped, key=lambda x: x[0].response, reverse=True)
+    feat_map = {}  # simhash -> (size, pos)
+    for kp, desc in ranked:
+        shash = iscc.encode_base64(
+            similarity_hash([bytes(c) for c in chunked(desc, 8)])
+        )
+        feature_size = round(kp.size / pix_count * 100, 3)
+        feature_pos = (
+            round(kp.pt[0] / width * 100, 3),
+            round(kp.pt[1] / height * 100, 3),
+        )
+        feat_map[shash] = (feature_size, feature_pos)
+        if len(feat_map) == n:
+            break
+    features = list(feat_map.keys())
+    sizes = [fm[0] for fm in feat_map.values()]
+    positions = [fm[1] for fm in feat_map.values()]
+    return features, sizes, positions
 
 
 def extract_image_preview(img, **options):
@@ -110,12 +180,19 @@ def trim_image(img):
     return img
 
 
+def hash_image(img):
+    # type: (Union[Readable, Image.Image]) -> str
+    """Create hex coded image hash."""
+    pixels = normalize_image(img)
+    return hash_image_pixels(pixels).hex()
+
+
 def normalize_image(img):
     # type: (Union[str, Path, Image.Image]) -> List[List[int]]
     """Takes a path or PIL Image Object and returns a normalized array of pixels."""
 
     if not isinstance(img, Image.Image):
-        img = Image.open(img)
+        img = Image.open(io.BytesIO(uread.open_data(img).read()))
 
     # 1. Convert to greyscale
     img = img.convert("L")
@@ -129,7 +206,7 @@ def normalize_image(img):
     return pixels
 
 
-def hash_image(pixels):
+def hash_image_pixels(pixels):
     # type: (List[List[int]]) -> bytes
     """Calculate image hash from 2D-Array of normalized image."""
 
@@ -192,20 +269,3 @@ def compute_image_dct(values_list):
         result.append(alpha[-1])
         result.append(beta[-1])
         return result
-
-
-IMAGE_META_MAP = {
-    "Xmp.dc.title": "title",
-    "Xmp.dc.identifier": "identifier",
-    "Xmp.dc.language": "language",
-    "Xmp.xmp.Identifier": "identifier",
-    "Xmp.xmp.Nickname": "title",
-    "Xmp.xmpDM.shotName": "title",
-    "Xmp.photoshop.Headline": "title",
-    "Xmp.iptcExt.AOTitle": "title",
-    "Iptc.Application2.Headline": "title",
-    "Iptc.Application2.Language": "language",
-    "Exif.Image.ImageID": "identifier",
-    "Exif.Image.XPTitle": "title",
-    "Exif.Photo.ImageUniqueID": "identifier",
-}

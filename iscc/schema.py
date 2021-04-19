@@ -94,6 +94,12 @@ class Options(BaseSettings):
         description="Autocrop empty borders of images before Image-Code generation",
     )
 
+    image_granular: bool = Field(
+        True, description="Calculate and return granular image features"
+    )
+
+    image_granular_n: int = Field(32, description="Top-N granular features to retain")
+
     image_preview: bool = Field(True, description="Generate image preview thumbnail")
 
     image_preview_size: int = Field(

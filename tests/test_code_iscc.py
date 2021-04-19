@@ -24,7 +24,7 @@ def test_code_iscc_text():
 
 
 def test_code_iscc_image():
-    result = iscc.code_iscc(s.images()[0], image_preview=False)
+    result = iscc.code_iscc(s.images()[0], image_preview=False, image_granular=False)
     assert result == {
         "version": "0-0-0",
         "tophash": "63f6e48bd32d55abe6f05b8d5b99bb2eaf162c47410bcffb7010de00385b71fd",

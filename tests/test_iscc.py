@@ -102,12 +102,16 @@ def test_hamming_distance():
 
 
 def test_content_id_image():
-    cid_i = iscc.code_image("file_image_lenna.jpg", image_preview=False)
+    cid_i = iscc.code_image(
+        "file_image_lenna.jpg", image_preview=False, image_granular=False
+    )
     assert len(cid_i["code"]) == 16
     assert cid_i == {"code": "EEAZTRSWFV2THIUW", "height": 512, "width": 512}
 
+
+def test_content_id_image_robust():
     data = open("file_image_lenna.jpg", "rb").read()
-    cid_i = iscc.code_image(data, image_preview=False)
+    cid_i = iscc.code_image(data, image_preview=False, image_granular=False)
     assert len(cid_i["code"]) == 16
     assert cid_i == {"code": "EEAZTRSWFV2THIUW", "height": 512, "width": 512}
 
@@ -116,11 +120,11 @@ def test_content_id_image():
     img3 = ImageEnhance.Brightness(img1).enhance(1.4)
     img4 = ImageEnhance.Contrast(img1).enhance(1.2)
 
-    cid1 = iscc.code_image(img1)["code"]
-    cid2 = iscc.code_image(img2)["code"]
-    cid3 = iscc.code_image(img3)["code"]
-    cid4 = iscc.code_image(img4)["code"]
+    cid1 = iscc.hash_image(img1)
+    cid2 = iscc.hash_image(img2)
+    cid3 = iscc.hash_image(img3)
+    cid4 = iscc.hash_image(img4)
 
-    assert iscc.distance(cid1, cid2) == 0
-    assert iscc.distance(cid1, cid3) == 2
-    assert iscc.distance(cid1, cid4) == 0
+    assert iscc.distance_hex(cid1, cid2) == 0
+    assert iscc.distance_hex(cid1, cid3) == 2
+    assert iscc.distance_hex(cid1, cid4) == 0
