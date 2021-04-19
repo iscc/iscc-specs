@@ -44,7 +44,7 @@ def download_file(url, folder=None, md5=None, sanitize=False):
 
     log.debug(f"downloading {url} to {out_path}")
     r = requests.get(url, stream=True)
-    chunk_size = 1024
+    chunk_size = 1024 * 1024
     iter_size = 0
     with io.open(out_path, "wb") as fd:
         for chunk in r.iter_content(chunk_size):
