@@ -29,7 +29,8 @@ class MT(enum.IntEnum):
     DATA = 3
     INSTANCE = 4
     ISCC = 5
-    SUM = 6
+    SID = 6
+    SUM = 7
 
 
 class ST(enum.IntEnum):
@@ -46,6 +47,14 @@ class ST_CC(enum.IntEnum):
     AUDIO = 2
     VIDEO = 3
     GENERIC = 4
+
+
+class ST_SID(enum.IntEnum):
+    PRIVATE = 0
+    BITCOIN = 1
+    ETHEREUM = 2
+    COBLO = 3
+    BLOXBERG = 4
 
 
 class VS(enum.IntEnum):
@@ -69,8 +78,15 @@ def write_header(mtype: int, stype: int, version: int = 0, length: int = 64) -> 
     The result is minimum 2 and maximum 8 bytes long. If the final count of nibbles
     is uneven it is padded with 4-bit `0000` at the end.
     """
-    assert length >= 32 and not length % 32, "Length must be a multiple of 32"
-    length = (length // 32) - 1
+    if mtype == MT.SID:
+        # For the Short-ID length field denotes number of bits of the trailing counter.
+        assert (
+            0 <= length <= 64 and not length % 8
+        ), f"Short-ID length must be multiple of 8 and max 64"
+        length = length // 8
+    else:
+        assert length >= 32 and not length % 32, "Length must be a multiple of 32"
+        length = (length // 32) - 1
     header = bitarray()
     for n in (mtype, stype, version, length):
         header += _write_varnibble(n)
@@ -94,7 +110,13 @@ def read_header(data: bytes) -> Tuple[int, int, int, int, bytes]:
 
     # interpret length value
     length, data = _read_varnibble(data)
-    result.append((length + 1) * 32)
+
+    if result[0] == MT.SID:
+        bit_length = length * 8
+    else:
+        bit_length = (length + 1) * 32
+
+    result.append(bit_length)
 
     # Strip 4-bit padding if required
     if len(data) % 8 and data[:4] == bitarray("0000"):
@@ -254,7 +276,12 @@ class Code:
     @property
     def explain(self) -> str:
         """Human readble representation of code header."""
-        return f"{self.type_id}-{self.hash_hex}"
+        if self.maintype == MT.SID:
+            counter_bytes = self.hash_bytes[8:]
+            counter = int.from_bytes(counter_bytes, "big", signed=False)
+            return f"{self.type_id}-{self.hash_bytes[:8].hex()}-{counter}"
+        else:
+            return f"{self.type_id}-{self.hash_hex}"
 
     @property
     def hash_bytes(self) -> bytes:
@@ -297,10 +324,12 @@ class Code:
         return MT(self._head[0])
 
     @property
-    def subtype(self) -> Union[ST, ST_CC]:
+    def subtype(self) -> Union[ST, ST_CC, ST_SID]:
         """Enum subtype of code."""
         if self.maintype in (MT.CONTENT, MT.ISCC):
             return ST_CC(self._head[1])
+        elif self.maintype == MT.SID:
+            return ST_SID(self._head[1])
         return ST(self._head[1])
 
     @property
@@ -326,10 +355,10 @@ class Code:
 
     @classmethod
     def rnd(cls, mt=None, bits=64, data=None):
-        """Returns a syntactically correct random code"""
-        mt = choice(list(MT)) if mt is None else mt
+        """Returns a syntactically correct random code (no SID support yet)"""
+        mtypes = (MT.META, MT.CONTENT, MT.DATA, MT.INSTANCE)
+        mt = choice(mtypes) if mt is None else mt
         st = choice(list(ST_CC)) if mt == MT.CONTENT else choice(list(ST))
-        # vs = choice(list(VS))
         vs = 0
         ln = bits or choice(list(LN)).value
         data = data or os.urandom(ln // 8)
@@ -343,6 +372,8 @@ def compose(codes: List[Union[Code, str]]) -> Code:
     assert len(codes) in (2, 4), "Can only compose ISCC from 2 or 4 codes"
     codes = sorted(codes, key=attrgetter("maintype"))
     types = tuple(c.maintype for c in codes)
+    assert MT.SID not in types, "Cannot compose ISCC Short-ID"
+    assert MT.ISCC not in types, "Cannot compose canonical ISCC code"
     if len(codes) == 2:
         assert types == (MT.DATA, MT.INSTANCE), "ISCC SUM needs DATA and INSTANCE codes"
         for code in codes:

@@ -13,6 +13,7 @@ from typing import List, Optional, Union, Any
 from PIL import Image
 from blake3 import blake3
 from pyld import jsonld
+import iscc
 from iscc import jcs
 from iscc import text, image, audio, video
 from iscc.codec import (
@@ -425,3 +426,24 @@ def code_instance(data, **options):
     datahash = datahash_digest.hex()
 
     return dict(code=code, datahash=datahash, filesize=filesize)
+
+
+def code_short_id(chain, iscc_code, counter=0):
+    # type: (int, str, int) -> str
+    """Create an ISCC Short-ID."""
+    assert chain in list(iscc.ST_SID)
+    components = iscc.decompose(iscc_code)
+    if len(components) > 1:
+        digests = [c.bytes[:8] for c in components if c.maintype != iscc.MT.INSTANCE]
+    else:
+        digests = components[0].bytes[:8]
+
+    short_id_body = iscc.similarity_hash(digests)
+    n_bits_counter = 0
+    if counter:
+        n_bytes_counter = (counter.bit_length() + 7) // 8
+        short_id_body += counter.to_bytes(n_bytes_counter, "big", signed=False)
+        n_bits_counter += n_bytes_counter * 8
+
+    code = iscc.Code((iscc.MT.SID, chain, iscc.VS.V0m, n_bits_counter, short_id_body))
+    return code.code

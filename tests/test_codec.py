@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from binascii import unhexlify
 import pytest
+import iscc
 from iscc import codec as c
 from iscc.core import code_meta
 from bitarray import bitarray as ba
@@ -26,7 +27,7 @@ def dco():
 
 @pytest.fixture
 def ico():
-    """Random data code"""
+    """Random instance code"""
     return c.Code.rnd(c.MT.INSTANCE).code
 
 
@@ -261,3 +262,26 @@ def test_iscc_clean():
     assert c.clean("ISCC: SOME-CODE") == "SOMECODE"
     assert c.clean(" SOMECODE ") == "SOMECODE"
     assert c.clean("ISCC:") == ""
+
+
+def test_iscc_short_id_0():
+    body = b"\x07" * 8
+    sid = iscc.Code((iscc.MT.SID, iscc.ST_SID.BITCOIN, iscc.VS.V0, 0, body))
+    assert sid.code == "MEAAOBYHA4DQOBYH"
+    assert sid.explain == "SID-BITCOIN-V0-0-0707070707070707-0"
+    assert sid.maintype == iscc.MT.SID
+    assert sid.subtype == iscc.ST_SID.BITCOIN
+
+
+def test_iscc_short_id_1():
+    body = b"\x07" * 8 + b"\01"
+    sid = iscc.Code((iscc.MT.SID, iscc.ST_SID.BITCOIN, iscc.VS.V0, 8, body))
+    assert sid.code == "MEAQOBYHA4DQOBYHAE"
+    assert sid.explain == "SID-BITCOIN-V0-8-0707070707070707-1"
+
+
+def test_iscc_short_id_300():
+    body = b"\x07" * 8 + (300).to_bytes(2, "big", signed=False)
+    sid = iscc.Code((iscc.MT.SID, iscc.ST_SID.ETHEREUM, iscc.VS.V0, 16, body))
+    assert sid.code == "MIBAOBYHA4DQOBYHAEWA"
+    assert sid.explain == "SID-ETHEREUM-V0-16-0707070707070707-300"
