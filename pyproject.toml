@@ -34,7 +34,7 @@ more-itertools = "^8.7.0"
 bitarray-hardbyte = "^1.6.2"
 numpy = "1.19.3"
 numba = { version = "0.53.1", python = ">=3.6,<3.10", optional = true}
-loguru = "^0.5.3"
+loguru = "<0.6"
 pydantic = "^1.8.1"
 scenedetect = "^0.5.5"
 av = "^8.0.3"

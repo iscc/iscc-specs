@@ -132,11 +132,10 @@ SUPPORTED_MEDIATYPES = {
         "ext": "pptx",
     },
     "application/vnd.ms-excel": {"gmt": "text", "ext": "xls"},
-    # TODO add mobi support
-    # "application/x-mobipocket-ebook": {
-    #     "gmt": "text",
-    #     "ext": ["mobi", "prc", "azw", "azw3", "azw4"],
-    # },
+    "application/x-mobipocket-ebook": {
+        "gmt": "text",
+        "ext": ["mobi", "prc", "azw", "azw3", "azw4"],
+    },
     # Image Formats
     "image/bmp": {"gmt": "image", "ext": "bmp"},
     "image/gif": {"gmt": "image", "ext": "gif"},

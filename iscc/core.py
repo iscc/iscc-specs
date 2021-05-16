@@ -5,6 +5,7 @@ from json import JSONDecodeError
 from os.path import basename
 import base64
 import io
+import mobi
 from PIL.ImageOps import exif_transpose
 from codetiming import Timer
 from humanize import naturalsize
@@ -168,6 +169,10 @@ def code_content(data, **options):
     """Detect mediatype and create corresponding Content-Code."""
     mediatype = mime_guess(data)
     gmt = mime_to_gmt(mediatype)
+
+    is_mobi = mediatype == "application/x-mobipocket-ebook"
+    if is_mobi:
+        tempdir, data = mobi.extract(data)
 
     if gmt == GMT.text:
         with Timer(text="content code text creation took {:0.4f}s", logger=log.debug):
