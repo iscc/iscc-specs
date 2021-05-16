@@ -434,7 +434,7 @@ def code_instance(data, **options):
 
 
 def code_short_id(chain, iscc_code, counter=0):
-    # type: (int, str, int) -> str
+    # type: (iscc.ST_SID, str, int) -> str
     """Create an ISCC Short-ID."""
     assert chain in list(iscc.ST_SID)
     components = iscc.decompose(iscc_code)

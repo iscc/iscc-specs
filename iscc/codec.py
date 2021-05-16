@@ -204,6 +204,9 @@ def _read_varnibble(b: bitarray) -> Tuple[int, bitarray]:
     raise ValueError("Invalid bitarray")
 
 
+IsccTuple = Tuple[MT, Union[ST, ST_CC, ST_SID], VS, Union[LN, int], bytes]
+
+
 class Code:
     """
     A singular ISCC component.
@@ -212,7 +215,7 @@ class Code:
     """
 
     def __init__(self, code):
-        # type: (Union[str, Tuple[MT, Union[ST, ST_CC], VS, Union[LN, int], bytes], bytes, Code]) -> None
+        # type: (Union[str, IsccTuple, bytes, Code]) -> None
         if isinstance(code, Code):
             code_fields = code._head + (code.hash_bytes,)
         elif isinstance(code, str):
