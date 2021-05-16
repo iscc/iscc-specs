@@ -25,7 +25,7 @@ def explain(icode: str):
 
 @app.command()
 def distance(a: str, b: str):
-    """Calculate hamming distance of codes"""
+    """Calculate hamming distance of codes."""
     codes_a = iscc.decompose(a)
     codes_b = iscc.decompose(b)
     for a, b in zip(codes_a, codes_b):
@@ -36,9 +36,15 @@ def distance(a: str, b: str):
 
 @app.command()
 def decompose(icode: str):
-    """Decompose ISCC into its components"""
+    """Decompose ISCC into its components."""
     codes = iscc.decompose(icode)
     typer.echo(f'ISCC:{"-".join(c.code for c in codes)}')
+
+
+@app.command("detect")
+def detect(path: Path):
+    """Detect mime time of file."""
+    typer.echo(iscc.mime_guess(path))
 
 
 @app.command("iscc")
