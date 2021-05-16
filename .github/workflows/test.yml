@@ -9,7 +9,7 @@ jobs:
     runs-on: ${{ matrix.os }}-latest
     strategy:
       matrix:
-        os: [Ubuntu, MacOS]
+        os: [Ubuntu, MacOS, Windows]
         python-version: [3.6, 3.7, 3.8]
 
     steps:
@@ -24,7 +24,6 @@ jobs:
       id: pip-cache
       run: |
         echo "::set-output name=dir::$(pip cache dir)"
-
     - name: pip cache
       uses: actions/cache@v2
       with:
@@ -32,7 +31,6 @@ jobs:
         key: ${{ runner.os }}-pip-${{ hashFiles('**/poetry.lock') }}
         restore-keys: |
           ${{ runner.os }}-pip-
-
     - name: Install poetry
       run: pip install poetry==1.1.5
 
@@ -46,4 +44,3 @@ jobs:
       run: poetry install --extras turbo
 
     - name: Run pytest with extras
-      run: poetry run pytest -q tests
