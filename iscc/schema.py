@@ -90,7 +90,7 @@ class Options(BaseSettings):
     )
 
     image_trim: bool = Field(
-        True,
+        False,
         description="Autocrop empty borders of images before Image-Code generation",
     )
 
@@ -322,6 +322,7 @@ class FeatureType(str, Enum):
     """Type of granular features."""
 
     text = "text"
+    image = "image"
     audio = "audio"
     video = "video"
     data = "data"
@@ -356,6 +357,8 @@ class Features(BaseModel):
         DEFAULT_OVERLAP,
         description="Overlap size of feature segments",
     )
+
+    # TODO add positions or locations array
 
     @property
     def type_id(self) -> str:
