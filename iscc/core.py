@@ -107,7 +107,6 @@ def code_iscc(uri, title=None, extra=None, **options):
     result["iscc"] = iscc_code_obj.code
     concat = bytes.fromhex(result["metahash"]) + bytes.fromhex(result["datahash"])
     result["tophash"] = blake3(concat).hexdigest()
-
     valid = ISCC(**result)
 
     return valid.dict(exclude_unset=True)
@@ -267,14 +266,8 @@ def code_image(data, **options):
 
     if opts.image_granular:
         try:
-            features, sizes, positions = image.extract_image_features(
-                data, n=opts.image_granular_n
-            )
-            result["features"] = {
-                "features": features,
-                "sizes": sizes,
-                "positions": positions,
-            }
+            feat_obj = image.extract_image_features(data, n=opts.image_granular_n)
+            result["features"] = feat_obj
         except Exception as e:
             log.error("image feature extraction failed")
             log.exception(e)

@@ -3,7 +3,11 @@ import math
 import iscc
 from iscc_samples import images
 from iscc.codec import Code
+from iscc.schema import Features
 from tests.test_readables import image_readables
+
+
+# TODO add testcase for images with alpha transparency
 
 
 def test_code_image_plain():
@@ -46,6 +50,7 @@ def test_code_image_granular():
                 "TJoQQKEE-ws",
                 "O3yfqMDwMVc",
             ],
+            "kind": "image",
             "positions": [
                 (37.5, 45.865),
                 (37.2, 46.015),
@@ -98,6 +103,7 @@ def test_code_image_granular():
                 32.141,
                 32.141,
             ],
+            "version": 0,
         },
         "height": 133,
         "width": 200,
@@ -1309,10 +1315,10 @@ def test_normalize_image():
 
 def test_extract_image_features_readables():
     for r in image_readables():
-        features, sizes, positions = iscc.extract_image_features(r)
-        assert features[0] == "7XzuZHrfv-w"
-        assert sizes[0] == 15.5
-        assert positions[0] == (37.5, 45.865)
-        assert features[-1] == "O3yfqMDwMVc"
-        assert sizes[-1] == 32.141
-        assert positions[-1] == (58.061, 48.332)
+        fo = Features(**iscc.extract_image_features(r))
+        assert fo.features[0] == "7XzuZHrfv-w"
+        assert fo.sizes[0] == 15.5
+        # assert fo.positions[0] == (37.5, 45.865)
+        assert fo.features[-1] == "O3yfqMDwMVc"
+        assert fo.sizes[-1] == 32.141
+        # assert fo.positions[-1] == (58.061, 48.332)

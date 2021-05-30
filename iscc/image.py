@@ -13,7 +13,7 @@ from PIL import Image, ImageChops, ImageEnhance
 import numpy as np
 from more_itertools import chunked
 import iscc
-from iscc.schema import Options, Readable
+from iscc.schema import FeatureType, Options, Readable
 from iscc.simhash import similarity_hash
 from iscc.text import normalize_text
 from iscc import uread
@@ -90,10 +90,10 @@ def extract_image_metadata(data):
 
 
 def extract_image_features(data, n=32):
-    # type: (Readable, int) -> Tuple
+    # type: (Readable, int) -> dict
     """Extract granular features from image.
 
-    Returns a tuple of (features, positions, sizes) where:
+    Returns a dict (features, positions, sizes) where:
         features - base64 encoded feature hashes
         sizes - keypoint sizes as percentage relative to the larger side of the image
         positions - percentage based x, y coordinates of the corresponding keypoints
@@ -127,7 +127,13 @@ def extract_image_features(data, n=32):
     features = list(feat_map.keys())
     sizes = [fm[0] for fm in feat_map.values()]
     positions = [fm[1] for fm in feat_map.values()]
-    return features, sizes, positions
+    return dict(
+        kind=FeatureType.image.value,
+        version=0,
+        features=features,
+        sizes=sizes,
+        positions=positions,
+    )
 
 
 def extract_image_preview(img, **options):
@@ -193,6 +199,12 @@ def normalize_image(img):
 
     if not isinstance(img, Image.Image):
         img = Image.open(io.BytesIO(uread.open_data(img).read()))
+
+    if img.mode == "RGBA":
+        # Add white background to images that have an alpha transparency channel
+        bg = Image.new("RGB", img.size, (255, 255, 255))
+        bg.paste(img, mask=img.split()[3])  # 3 is alpha channel
+        img = bg
 
     # 1. Convert to greyscale
     img = img.convert("L")
