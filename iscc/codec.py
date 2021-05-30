@@ -9,7 +9,6 @@ Header:
 Body:
     <hash-digest> with number of bits as indicated byi <length>
 """
-import base64
 import enum
 import math
 import os
@@ -18,6 +17,12 @@ from random import choice
 from typing import List, Tuple, Union
 from bitarray import bitarray, frozenbitarray
 from bitarray.util import ba2hex, int2ba, ba2int, count_xor
+from base64 import b32encode, b32decode
+
+try:
+    from pybase64 import urlsafe_b64encode, urlsafe_b64decode
+except ImportError:
+    from base64 import urlsafe_b64encode, urlsafe_b64decode
 
 
 class MT(enum.IntEnum):
@@ -131,7 +136,7 @@ def encode_base32(data: bytes) -> str:
     """
     Standard RFC4648 base32 encoding without padding.
     """
-    return base64.b32encode(data).decode("ascii").rstrip("=")
+    return b32encode(data).decode("ascii").rstrip("=")
 
 
 def decode_base32(code: str) -> bytes:
@@ -142,14 +147,14 @@ def decode_base32(code: str) -> bytes:
     cl = len(code)
     pad_length = math.ceil(cl / 8) * 8 - cl
 
-    return bytes(base64.b32decode(code + "=" * pad_length, casefold=True))
+    return bytes(b32decode(code + "=" * pad_length, casefold=True))
 
 
 def encode_base64(data: bytes) -> str:
     """
     Standard RFC4648 base64url encoding without padding.
     """
-    code = base64.urlsafe_b64encode(data).decode("ascii")
+    code = urlsafe_b64encode(data).decode("ascii")
     return code.rstrip("=")
 
 
@@ -159,7 +164,7 @@ def decode_base64(code: str) -> bytes:
     """
     padding = 4 - (len(code) % 4)
     string = code + ("=" * padding)
-    return base64.urlsafe_b64decode(string)
+    return urlsafe_b64decode(string)
 
 
 def _write_varnibble(n: int) -> bitarray:
