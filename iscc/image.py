@@ -39,7 +39,7 @@ IMAGE_META_MAP = {
 
 def extract_image_metadata(data):
     # type: (Readable) -> Optional[dict]
-    """Extracts and normalizes seed netadata from image files (exif, iptc, xmp).
+    """Extracts and normalizes seed metadata from image files (exif, iptc, xmp).
 
     TODO: Create a more advanced cross-standard metadata mapping.
     Returns an optional dictionary with the following possible fields:
