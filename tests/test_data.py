@@ -44,5 +44,3 @@ def test_hash_data_1mib_robust():
     ba.insert(rpos(), rbyte())
     h2 = data.hash_data(ba).hex()
     assert h1 != h2
-
-
