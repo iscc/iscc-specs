@@ -35,14 +35,15 @@ class Options(BaseSettings):
         env_file = ".env"
         env_file_encoding = "utf-8"
 
-    all_granular: bool = Field(
-        False,
+    all_granular: Optional[bool] = Field(
+        None,
         description="Generate granular fingerprints for all code types "
         "(overides individual options).",
     )
-    all_preview: bool = Field(
-        False,
-        description="Generate previews for all code types"
+
+    all_preview: Optional[bool] = Field(
+        None,
+        description="Generate previews for all code types "
         "(overrides individual options).",
     )
 
@@ -197,7 +198,7 @@ class Options(BaseSettings):
     video_hwaccel: Optional[str] = Field(
         None,
         description="Use ffmpeg hardware acceleration for video processing "
-        "(use the string `auto` as value to activae).",
+        "(use the string `auto` as value to activate).",
     )
 
     data_bits: int = Field(64, description="Length of generated Data-Code in bits")

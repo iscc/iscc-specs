@@ -221,7 +221,8 @@ def code_text(data, **options):
     code = encode_base32(header + text_hash[:nbytes])
     result["code"] = code
 
-    if opts.text_granular or opts.all_granular:
+    granular = opts.all_granular if isinstance(opts.all_granular, bool) else opts.text_granular
+    if granular:
         features = text.extract_text_features(text_norm, **options)
         result["features"] = features
 
@@ -264,7 +265,8 @@ def code_image(data, **options):
         #     tw, th = img_obj.size
         #     result["trimmed"] = dict(width=tw, height=th)
 
-    if opts.image_granular:
+    granular = opts.all_granular if isinstance(opts.all_granular, bool) else opts.image_granular
+    if granular:
         try:
             feat_obj = image.extract_image_features(data, n=opts.image_granular_n)
             result["features"] = feat_obj
@@ -306,7 +308,8 @@ def code_audio(data, **options):
 
     shash_digest = audio.hash_audio(chroma["fingerprint"])
 
-    if opts.audio_granular or opts.all_granular:
+    granular = granular = opts.all_granular if isinstance(opts.all_granular, bool) else opts.audio_granular
+    if granular:
         features = audio.encode_audio_features(chroma["fingerprint"])
         result["features"] = features
 
@@ -327,7 +330,11 @@ def code_video(uri, **options):
     result.update(metadata)
 
     crop_value = video.detect_video_crop(uri) if opts.video_crop else None
-    if opts.video_scenes_ffmpeg and (opts.video_granular or opts.all_granular):
+
+    granular = opts.all_granular if isinstance(opts.all_granular, bool) else opts.video_granular
+    do_ffmpeg_scenes = granular and opts.video_scenes_ffmpeg
+
+    if do_ffmpeg_scenes:
         signature, cutpoints = video.extract_video_signature_cutpoints(
             uri, crop_value, **options
         )
@@ -349,7 +356,7 @@ def code_video(uri, **options):
         img_raw = video.extract_video_preview(uri)
         result["preview"] = image.encode_image_to_data_uri(img_raw)
 
-    if opts.video_granular is False and opts.all_granular is False:
+    if not granular:
         return result
 
     if opts.video_scenes:
@@ -387,7 +394,8 @@ def code_data(data, **options):
     code = encode_base32(header + data_hash[:nbytes])
     result = dict(code=code)
 
-    if opts.data_granular or opts.all_granular:
+    granular = opts.all_granular if isinstance(opts.all_granular, bool) else opts.data_granular
+    if granular:
         features = encode_data_features(sizes, features)
         result["features"] = features
 
