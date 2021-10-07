@@ -327,7 +327,7 @@ def code_video(uri, **options):
     result.update(metadata)
 
     crop_value = video.detect_video_crop(uri) if opts.video_crop else None
-    if opts.video_scenes_ffmpeg:
+    if opts.video_scenes_ffmpeg and (opts.video_granular or opts.all_granular):
         signature, cutpoints = video.extract_video_signature_cutpoints(
             uri, crop_value, **options
         )

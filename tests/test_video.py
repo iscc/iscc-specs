@@ -72,6 +72,24 @@ def test_code_video_no_crop():
     assert "crop" not in result
 
 
+def test_code_video_no_granular_no_preview():
+    result = code_video(
+        SAMPLE,
+        video_granular=False,
+        video_preview=False,
+    )
+
+    assert result == {
+        "code": "EMAVMHMC7RMJF6XZ",
+        "duration": 60.042,
+        "fps": 24.0,
+        "height": 144,
+        "language": "en",
+        "title": "Kali by Anokato - Spiral Sessions 2019",
+        "width": 176,
+    }
+
+
 def test_code_video_granular_scenes():
     result = code_video(
         SAMPLE,
