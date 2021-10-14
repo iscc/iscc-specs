@@ -7,6 +7,8 @@ import iscc
 from pathlib import Path
 from typing import Optional
 from codetiming import Timer
+import iscc.bin
+import iscc.audio
 
 
 app = typer.Typer()
@@ -14,6 +16,14 @@ app = typer.Typer()
 Parg = typer.Argument(..., help="Path to file or folder (default: currend dir)")
 Debug = typer.Option(False, "--debug", "-d", help="Show debug output.")
 Verbose = typer.Option(0, "--verbose", "-v", count=True)
+
+
+@app.command()
+def install():
+    """Install binary dependencies/tools (ffmpeg, ffprobe, fpcalc)"""
+    iscc.bin.ffmpeg_install()
+    iscc.bin.ffprobe_install()
+    iscc.audio.fpcalc_install()
 
 
 @app.command()
