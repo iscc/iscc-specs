@@ -1,7 +1,6 @@
 # ISCC - Spec and Reference Code
 
-[![Build](https://travis-ci.org/iscc/iscc-specs.svg?branch=master)](https://travis-ci.org/iscc/iscc-specs)
-[![Version](https://img.shields.io/pypi/v/iscc.svg)](https://pypi.python.org/pypi/iscc/)
+[![Build](https://github.com/iscc/iscc-specs/actions/workflows/test.yml/badge.svg?branch=version-1.1)](https://github.com/iscc/iscc-specs/actions/workflows/test.yml)
 [![License](https://img.shields.io/pypi/l/iscc.svg)](https://pypi.python.org/pypi/iscc/)
 [![Downloads](https://pepy.tech/badge/iscc)](https://pepy.tech/project/iscc)
 [![DOI](https://zenodo.org/badge/96668860.svg)](https://zenodo.org/badge/latestdoi/96668860)
@@ -16,13 +15,13 @@ The **International Standard Content Code** is a proposal for an [open standard]
 The reference code is published with the package name [iscc](https://pypi.python.org/pypi/iscc) on Python Package Index. Install it with:
 
 ``` bash
-pip install iscc==1.1.0b6
+pip install iscc==1.1.0b7
 ```
 
 If your system is setup to compile c-extensions install with:
 
 ``` bash
-pip install iscc[turbo]==1.1.0b6
+pip install iscc[turbo]==1.1.0b7
 ```
 
 This will install cython and build binary extansions for faster ISCC processing.
@@ -82,6 +81,9 @@ A short example on how to create an ISCC Code with the reference implementation.
 ```
 
 ## Working with the specification
+
+| NOTE: This is ISCC Version 1.1 - The specs are not yet updated!!! |
+| --- |
 
 The entire **ISCC Specification** is written in plain text [Markdown](https://en.wikipedia.org/wiki/Markdown). The markdown content is than built and published with the excellent [mkdocs](http://www.mkdocs.org/) documetation tool. If you have some basic command line skills you can build and run the specification site on your own computer. Make sure you have the [git](https://git-scm.com/) and [Python](https://www.python.org/) and [Poetry](https://pypi.org/project/poetry/) installed on your system and follow these steps on the command line:
 
