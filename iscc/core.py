@@ -52,7 +52,7 @@ jsonld.set_document_loader(requests_document_loader())
 
 
 def code_iscc(uri, title=None, extra=None, **options):
-    # type: (Union[Uri, File], Optional[str, dict], Optional[exec()], **Any) -> dict
+    # type: (Union[Uri, File], Optional[str], Optional[str, dict], **Any) -> dict
     """Create a full ISCC.
 
     The full ISCC is a composite of Meta, Content, Data and Instance Codes.
@@ -451,5 +451,5 @@ def code_short_id(chain, iscc_code, counter=0):
         short_id_body += counter.to_bytes(n_bytes_counter, "big", signed=False)
         n_bits_counter += n_bytes_counter * 8
 
-    code = iscc.Code((iscc.MT.SID, chain, iscc.VS.V0m, n_bits_counter, short_id_body))
+    code = iscc.Code((iscc.MT.SID, chain, iscc.VS.V0, n_bits_counter, short_id_body))
     return code.code
