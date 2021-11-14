@@ -328,6 +328,25 @@ optional = false
 python-versions = "*"
 
 [[package]]
+name = "iscc-core"
+version = "0.1.1"
+description = "ISCC - Core Algorithms"
+category = "main"
+optional = false
+python-versions = ">=3.6.1,<4.0"
+
+[package.dependencies]
+bitarray-hardbyte = "*"
+blake3 = "*"
+more-itertools = "*"
+Pillow = "*"
+pydantic = ">=1.8.2,<2.0.0"
+xxhash = "*"
+
+[package.extras]
+turbo = ["cython", "pybase64"]
+
+[[package]]
 name = "iscc-samples"
 version = "0.4.0"
 description = "A collection of media files as sample data for ISCC testing."
@@ -1054,7 +1073,7 @@ turbo = ["cython", "numba", "pybase64"]
 [metadata]
 lock-version = "1.1"
 python-versions = ">=3.6.1,<3.10"
-content-hash = "60b94c0b6ba8a23879c66b04d1411e4268ab601d6f06015ce7712d9fab812641"
+content-hash = "75178ad1e7c238edd7a4324061cf35134b9492b439fe5698b77a410e8b848095"
 
 [metadata.files]
 aiocontextvars = [
@@ -1376,6 +1395,9 @@ importlib-metadata = [
 iniconfig = [
     {file = "iniconfig-1.1.1-py2.py3-none-any.whl", hash = "sha256:011e24c64b7f47f6ebd835bb12a743f2fbe9a26d4cecaa7f53bc4f35ee9da8b3"},
     {file = "iniconfig-1.1.1.tar.gz", hash = "sha256:bc3af051d7d14b2ee5ef9969666def0cd1a000e121eaea580d4a313df4b37f32"},
+]
+iscc-core = [
+    {file = "iscc-core-0.1.1.tar.gz", hash = "sha256:173d2dfe55bb5a19bb74fba5422abe00463f0dca7c19e1e3869b265d67167ee0"},
 ]
 iscc-samples = [
     {file = "iscc-samples-0.4.0.tar.gz", hash = "sha256:98925bec8adcc8c843ddd42b32d0c7972ed1c2ff635cb44144fd7c08929d2a2f"},

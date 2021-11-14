@@ -58,6 +58,7 @@ jmespath = "^0.10.0"
 opencv-contrib-python-headless = "^4.5.1"
 mobi = "^0.3.1"
 pybase64 = { version = "^1.1.4", optional = true }
+iscc-core = "^0.1.1"
 
 [tool.poetry.extras]
 turbo = ["cython", "numba", "pybase64"]
@@ -74,5 +75,5 @@ fauxfactory = "^3.1.0"
 iscc-samples = "^0.4.0"
 
 [build-system]
-requires = ["poetry==1.1.5", "setuptools", "wheel", "cython"]
+requires = ["poetry==1.1.5", "setuptools", "wheel"]
 build-backend = "poetry.masonry.api"
