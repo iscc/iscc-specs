@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 """ISCC Reference Implementation"""
 import iscc_core
+from iscc_core.code_content_text import normalize_text
 import json
 from json import JSONDecodeError
 from os.path import basename
@@ -200,32 +201,22 @@ def code_text(data, **options):
     """Generate Content-ID Text
 
     :param data: Any kind of text document
-    :key text_guess_title: whether to guess the title from the text itself as fallback.
-    :key meta_trim_title: Max number of bytes for utf-8 encoded title.
-    :key text_avg_chunk_size: Avg. number of chars per text chunk to be hashed.
-    :key text_ngram_size: Sliding window size in number of characters.
-    :key text_granular: Wether to extract granular text features
     """
     opts = Options(**options)
-    nbits = opts.text_bits
-    nbytes = nbits // 8
     result = {}
 
     f = uread.open_data(data)
     metadata = text.extract_text_metadata(f, **options)
     result.update(metadata)
     text_raw = text.extract_text(f)
-    text_norm = text.normalize_text(text_raw)
-    text_hash = text.hash_text(text_norm, **options)
-
-    header = write_header(MT.CONTENT, ST_CC.TEXT, VS.V0, nbits)
-    code = encode_base32(header + text_hash[:nbytes])
-    result["code"] = code
+    text_code = iscc_core.gen_text_code_v0(text_raw, bits=opts.text_bits)
+    result.update(text_code.dict(exclude_unset=True))
 
     granular = (
         opts.all_granular if isinstance(opts.all_granular, bool) else opts.text_granular
     )
     if granular:
+        text_norm = normalize_text(text_raw)
         features = text.extract_text_features(text_norm, **options)
         result["features"] = features
 
