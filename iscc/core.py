@@ -8,7 +8,6 @@ from os.path import basename
 import base64
 import io
 import mobi
-from PIL.ImageOps import exif_transpose
 from codetiming import Timer
 from humanize import naturalsize
 from loguru import logger as log
@@ -20,13 +19,6 @@ import iscc
 from iscc import jcs
 from iscc import text, image, audio, video
 from iscc.codec import (
-    Code,
-    MT,
-    ST,
-    ST_CC,
-    VS,
-    encode_base32,
-    write_header,
     compose,
 )
 from iscc.mp7 import read_ffmpeg_signature
@@ -115,7 +107,7 @@ def code_iscc(uri, title=None, extra=None, **options):
 
 
 def code_meta(title, extra=None, **options):
-    # type: (Union[str, bytes], Optional[Union[str, bytes, dict]], **Any) -> dict
+    # type: (Union[str, bytes], Union[None, str, bytes, dict]], **Any) -> dict
     """Generate Meta Code from title and extra metadata.
 
     :param title: Used as input for first half of Meta-Code (or full if no extra)
@@ -127,42 +119,27 @@ def code_meta(title, extra=None, **options):
     :returns: Dict keys: code, title, matahash, (extra)
     """
     opts = Options(**options)
-    nbits = opts.meta_bits
-    nbytes = nbits // 8
-    title_norm = text.normalize_text(title)
+    extra = None if extra in (b"", "", bytearray(), None) else extra
 
+    # Try json decoding
     if isinstance(extra, (str, bytes, bytearray)):
         try:
             extra = json.loads(extra)
         except JSONDecodeError:
             pass
 
-    if extra is None:
-        extra = ""
-    elif isinstance(extra, dict):
+    if isinstance(extra, dict):
         if "@context" in extra:
             extra = jsonld.normalize(
                 extra, {"algorithm": "URDNA2015", "format": "application/n-quads"}
             )
         else:
-            extra = jcs.canonicalize(extra)
+            extra = jcs.canonicalize(extra, utf8=False)
 
-    extra_norm = text.normalize_text(extra)
-    title_trimmed = text.trim_text(title_norm, opts.meta_trim_title)
-    extra_trimmed = text.trim_text(extra_norm, opts.meta_trim_extra)
-    meta_simhash = meta_hash(title_trimmed, extra_trimmed, **options)
-    header = write_header(MT.META, ST.NONE, VS.V0, nbits)
-    digest = header + meta_simhash[:nbytes]
-    code = encode_base32(digest)
-    result = dict(
-        code=code,
-        title=title_trimmed,
+    meta_code = iscc_core.gen_meta_code_v0(
+        title=title, extra=extra, bits=opts.meta_bits
     )
-    if extra_trimmed:
-        result["extra"] = extra_trimmed
-    payload = title_trimmed + extra_trimmed
-    result["metahash"] = blake3(payload.encode("utf-8")).hexdigest()
-    return result
+    return meta_code.dict(exclude_unset=True, exclude={"binary"}, exclude_none=True)
 
 
 def code_content(data, **options):

@@ -392,6 +392,8 @@ class ISCC(BaseModel):
         "referent may be used."
     )
 
+    # binary: bool = Field(description="Extra metadata was supplied in binary format.")
+
     # File Properties
     filename: Optional[str] = Field(
         description="Filename of the referenced digital asset (automatically used as "
