@@ -241,9 +241,6 @@ def code_image(data, **options):
     :key int image_granular_n: Number of features to compute (default 32)
     """
     opts = Options(**options)
-    nbits = opts.image_bits
-    nbytes = nbits // 8
-    assert nbits in (32, 64), "Content-ID Image does not yet support more than 64-bits"
 
     try:
         result = image.extract_image_metadata(data) or {}
@@ -251,22 +248,24 @@ def code_image(data, **options):
         log.error(f"Failed image metadata extraction: {e}")
         result = {}
 
+    stream = uread.open_data(data)
+    image_code = iscc_core.gen_image_code_v0(stream, bits=opts.image_bits)
+    result.update(image_code.dict(exclude_unset=True))
+
     if isinstance(data, Image.Image):
         img_obj = data
     else:
         img_obj = Image.open(io.BytesIO(uread.open_data(data).read()))
 
-    if opts.image_exif_transpose:
-        img_obj = exif_transpose(img_obj)
-
-    width, height = img_obj.size
-    result.update(dict(width=width, height=height))
-
-    if opts.image_trim:
-        img_obj = image.trim_image(img_obj)
-        # if img_obj.size != result.values():
-        #     tw, th = img_obj.size
-        #     result["trimmed"] = dict(width=tw, height=th)
+    # Todo review  image exif_transpose and trimming
+    # if opts.image_exif_transpose:
+    #     img_obj = exif_transpose(img_obj)
+    #
+    # if opts.image_trim:
+    #     img_obj = image.trim_image(img_obj)
+    #     # if img_obj.size != result.values():
+    #     #     tw, th = img_obj.size
+    #     #     result["trimmed"] = dict(width=tw, height=th)
 
     granular = (
         opts.all_granular
@@ -285,11 +284,6 @@ def code_image(data, **options):
         preview = image.extract_image_preview(img_obj, **options)
         preview_uri = image.encode_image_to_data_uri(preview, **options)
         result["preview"] = preview_uri
-
-    hash_digest = bytes.fromhex(image.hash_image(img_obj))[:nbytes]
-    header = write_header(MT.CONTENT, ST_CC.IMAGE, VS.V0, nbits)
-    code = encode_base32(header + hash_digest)
-    result["code"] = code
 
     return result
 
