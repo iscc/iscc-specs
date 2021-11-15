@@ -392,28 +392,34 @@ def code_data(data, **options):
 
     The Data-Code is a similarity preserving hash of the input data.
 
-    :param data: File, filepath or raw data used for Data-Code creation.
-    :key data_avg_chunk_size: Target chunk size in bytes for data chunking.
-    :key data_granular: Return granular features (one hash per chunk).
-    :key data_granular_factor: Size of granular data chunks times average chunk size.
-    :key io_chunk_size: Number of bytes to read per IO operation.
-    :return: dict
+    :param Readable data: File, filepath or raw data used for Data-Code creation.
+    :key int data_avg_chunk_size: Target chunk size in bytes for data chunking.
+    :key int data_granular: Return granular features (one hash per chunk).
+    :key int data_granular_factor: Size of granular data chunks times average chunk size.
+    :key int io_chunk_size: Number of bytes to read per IO operation.
+    :return: DataCode conformant dictionary
+    :rtype: dict
     """
 
     opts = Options(**options)
-    nbits = opts.data_bits
-    nbytes = nbits // 8
-    sizes, features = extract_data_features(data, **options)
-    data_hash = hash_data_features(features)
-    header = write_header(MT.DATA, ST.NONE, VS.V0, nbits)
-    code = encode_base32(header + data_hash[:nbytes])
+    stream = uread.open_data(data)
+
+    hasher = iscc_core.DataHasherV0()
+    data = stream.read(opts.io_chunk_size)
+
+    while data:
+        hasher.push(data)
+        data = stream.read(opts.io_chunk_size)
+
+    code = hasher.code(bits=opts.data_bits)
     result = dict(code=code)
 
     granular = (
         opts.all_granular if isinstance(opts.all_granular, bool) else opts.data_granular
     )
+
     if granular:
-        features = encode_data_features(sizes, features)
+        features = encode_data_features(hasher.chunk_sizes, hasher.chunk_features)
         result["features"] = features
 
     return result
@@ -436,7 +442,7 @@ def code_instance(data, **options):
     """
     opts = Options(**options)
     stream = uread.open_data(data)
-    code = iscc_core.gen_instance_code(stream, opts.instance_bits)
+    code = iscc_core.gen_instance_code_v0(stream, opts.instance_bits)
     return code.dict()
 
 
