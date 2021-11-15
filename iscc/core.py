@@ -18,11 +18,7 @@ from pyld import jsonld
 import iscc
 from iscc import jcs
 from iscc import text, image, audio, video
-from iscc.codec import (
-    compose,
-)
 from iscc.mp7 import read_ffmpeg_signature
-from iscc.meta import meta_hash
 from iscc.schema import (
     GMT,
     Options,
@@ -95,7 +91,7 @@ def code_iscc(uri, title=None, extra=None, **options):
     result.update(meta)
     del result["code"]
 
-    iscc_code_obj = compose(
+    iscc_code_obj = iscc_core.compose(
         [meta["code"], content["code"], data["code"], instance["code"]]
     )
     result["iscc"] = iscc_code_obj.code
