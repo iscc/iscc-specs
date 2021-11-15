@@ -360,8 +360,7 @@ def code_video(uri, **options):
         frames = read_ffmpeg_signature(signature)
     log.debug(f"video sig {naturalsize(len(signature))} with {len(frames)} frames")
     features = [tuple(sig.vector.tolist()) for sig in frames]
-    video_hash = video.hash_video(features, **options)
-    video_code = Code((MT.CONTENT, ST_CC.VIDEO, VS.V0, nbits, video_hash))
+    video_code = iscc_core.gen_video_code_v0(features, bits=opts.video_bits)
     result["code"] = video_code.code
 
     if opts.video_include_fingerprint:
