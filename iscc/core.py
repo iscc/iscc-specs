@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 """ISCC Reference Implementation"""
+import iscc_core
 import json
 from json import JSONDecodeError
 from os.path import basename
@@ -221,7 +222,9 @@ def code_text(data, **options):
     code = encode_base32(header + text_hash[:nbytes])
     result["code"] = code
 
-    granular = opts.all_granular if isinstance(opts.all_granular, bool) else opts.text_granular
+    granular = (
+        opts.all_granular if isinstance(opts.all_granular, bool) else opts.text_granular
+    )
     if granular:
         features = text.extract_text_features(text_norm, **options)
         result["features"] = features
@@ -265,7 +268,11 @@ def code_image(data, **options):
         #     tw, th = img_obj.size
         #     result["trimmed"] = dict(width=tw, height=th)
 
-    granular = opts.all_granular if isinstance(opts.all_granular, bool) else opts.image_granular
+    granular = (
+        opts.all_granular
+        if isinstance(opts.all_granular, bool)
+        else opts.image_granular
+    )
     if granular:
         try:
             feat_obj = image.extract_image_features(data, n=opts.image_granular_n)
@@ -308,7 +315,11 @@ def code_audio(data, **options):
 
     shash_digest = audio.hash_audio(chroma["fingerprint"])
 
-    granular = granular = opts.all_granular if isinstance(opts.all_granular, bool) else opts.audio_granular
+    granular = granular = (
+        opts.all_granular
+        if isinstance(opts.all_granular, bool)
+        else opts.audio_granular
+    )
     if granular:
         features = audio.encode_audio_features(chroma["fingerprint"])
         result["features"] = features
@@ -331,7 +342,11 @@ def code_video(uri, **options):
 
     crop_value = video.detect_video_crop(uri) if opts.video_crop else None
 
-    granular = opts.all_granular if isinstance(opts.all_granular, bool) else opts.video_granular
+    granular = (
+        opts.all_granular
+        if isinstance(opts.all_granular, bool)
+        else opts.video_granular
+    )
     do_ffmpeg_scenes = granular and opts.video_scenes_ffmpeg
 
     if do_ffmpeg_scenes:
@@ -394,7 +409,9 @@ def code_data(data, **options):
     code = encode_base32(header + data_hash[:nbytes])
     result = dict(code=code)
 
-    granular = opts.all_granular if isinstance(opts.all_granular, bool) else opts.data_granular
+    granular = (
+        opts.all_granular if isinstance(opts.all_granular, bool) else opts.data_granular
+    )
     if granular:
         features = encode_data_features(sizes, features)
         result["features"] = features
@@ -407,31 +424,20 @@ def code_instance(data, **options):
     """Create ISCC Instance-Code.
 
     The Instance-Code is prefix of a cryptographic hash (blake3) of the input data.
+    It´s purpose is to serve as an checksum that detects even minimal changes
+    to the data of the referenced media asset. For cryptographicaly secure integrity
+    checking a full 256-bit blake3 hash is provided with the `datahash` field.
 
-    :param data: File, filepath or raw data used for Instance-Code creation.
-    :key instance_bits: Length of generated Instance-Code in bits (default 64).
-    :key io_chunk_size: Number of bytes to read per IO operation.
-    :return: An InstanceCode object with attributes: code, datahash, filesize
+    :param Readable data: File, filepath or raw data used for Instance-Code creation.
+    :key int instance_bits: Length of generated Instance-Code in bits (default 64).
+    :key int io_chunk_size: Number of bytes to read per IO operation.
+    :return: An InstanceCode conformant dict with attributes: code, datahash, filesize
+    :rtype: dict
     """
     opts = Options(**options)
-    nbits = opts.instance_bits
-    nbytes = nbits // 8
-    filesize = 0
-    b3 = blake3()
     stream = uread.open_data(data)
-
-    buffer = stream.read(opts.io_chunk_size)
-    while buffer:
-        filesize += len(buffer)
-        b3.update(buffer)
-        buffer = stream.read(opts.io_chunk_size)
-
-    datahash_digest = b3.digest()
-    header = write_header(MT.INSTANCE, ST.NONE, VS.V0, nbits)
-    code = encode_base32(header + datahash_digest[:nbytes])
-    datahash = datahash_digest.hex()
-
-    return dict(code=code, datahash=datahash, filesize=filesize)
+    code = iscc_core.gen_instance_code(stream, opts.instance_bits)
+    return code.dict()
 
 
 def code_short_id(chain, iscc_code, counter=0):
