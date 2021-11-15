@@ -299,8 +299,7 @@ def code_audio(data, **options):
     """Generate Audio-ID from file(path) or Chromaprint features"""
     opts = Options(**options)
     result = dict()
-    nbits = opts.audio_bits
-    nbytes = nbits // 8
+
     if isinstance(data, list):
         chroma = dict(fingerprint=data)
     else:
@@ -313,9 +312,10 @@ def code_audio(data, **options):
         metadata.pop("height", None)
         result.update(metadata)
 
-    shash_digest = audio.hash_audio(chroma["fingerprint"])
-
-    granular = granular = (
+    audio_code = iscc_core.gen_audio_code_v0(
+        cv=chroma["fingerprint"], bits=opts.audio_bits
+    )
+    granular = (
         opts.all_granular
         if isinstance(opts.all_granular, bool)
         else opts.audio_granular
@@ -324,9 +324,7 @@ def code_audio(data, **options):
         features = audio.encode_audio_features(chroma["fingerprint"])
         result["features"] = features
 
-    header = write_header(MT.CONTENT, ST_CC.AUDIO, VS.V0, nbits)
-    code = encode_base32(header + shash_digest[:nbytes])
-    result["code"] = code
+    result["code"] = audio_code.code
     return result
 
 

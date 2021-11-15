@@ -30,7 +30,7 @@ def test_content_code_with_image_nogran():
 def test_content_code_with_audio_nogran():
     tc = iscc.code_content(s.audios()[0], audio_granular=False)
     assert tc == {
-        "code": "EIAWUJFCEZVCJIRG",
+        "code": "EIAWUJFCEZZOJYVD",
         "duration": 15.503,
         "gmt": "audio",
         "mediatype": "audio/aiff",
