@@ -30,7 +30,7 @@ from iscc.schema import (
 )
 from iscc.mediatype import mime_guess, mime_to_gmt
 from iscc import uread
-from iscc.data import extract_data_features, encode_data_features, hash_data_features
+from iscc.data import encode_data_features
 
 from iscc.jldloader import requests_document_loader
 
