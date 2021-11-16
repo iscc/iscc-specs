@@ -61,6 +61,15 @@ def test_index_get_key(idx, full_iscc):
     key = idx.get_key(i2)
     assert idx.get_key(i2) == 1 == key
 
+# Todo: pass db.get_key after reopen
+# def test_index_get_key_after_reopen(idx, full_iscc):
+#     assert len(idx) == 0
+#     key = idx.add(full_iscc)
+#     assert idx.get_key(full_iscc) == 0 == key
+#     idx.close()
+#     idx = iscc.Index("test-db")
+#     assert idx.get_key(full_iscc) == 0 == key
+
 
 def test_index_len_autoid(idx, full_iscc):
     assert len(idx) == 0
@@ -200,7 +209,7 @@ def test_index_components(idx, full_iscc):
     assert compenents_idx == components_orig
 
 
-def test__add_component(idx):
+def test_add_component(idx):
     comp, fkey = iscc.Code.rnd(bits=64), os.urandom(8)
     idx._add_component(comp, fkey)
     db = idx._db_components(comp.type_id)
@@ -220,7 +229,7 @@ def test__add_component(idx):
     assert set(idx._get_values(db, comp.hash_bytes)) == {fkey, fkey2}
 
 
-def test__add_feature(idx):
+def test_add_feature(idx):
     kind, feature, fkey, pos = "video", os.urandom(8), os.urandom(6), 666
     idx._add_feature(kind, feature, fkey, pos)
     assert idx._get_feature(kind, feature) == [(fkey, pos)]

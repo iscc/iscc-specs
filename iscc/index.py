@@ -357,9 +357,12 @@ class Index:
         idxs = []
 
         with self.env.begin() as txn:
-            for code in components:
-                db = self._db_components(code.type_id)
-                idx = txn.get(code.hash_bytes, db=db)
+            for comp_code in components:
+                db = self._db_components(comp_code.type_id)
+                try:
+                    idx = txn.get(comp_code.hash_bytes, db=db)
+                except lmdb.InvalidParameterError:
+                    continue
                 if idx is not None:
                     idxs.append(idx)
             # Check if any of the full code entries is an exact match
