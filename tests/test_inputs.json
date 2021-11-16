@@ -109,23 +109,6 @@
             ]
         }
     },
-    "data_chunks": {
-        "test_001_file_image_cat_jpg": {
-            "inputs": [
-                "file_image_cat.jpg"
-            ]
-        },
-        "test_002_file_image_cat_png": {
-            "inputs": [
-                "file_image_cat.png"
-            ]
-        },
-        "test_003_file_image_cat_gif": {
-            "inputs": [
-                "file_image_cat.gif"
-            ]
-        }
-    },
     "normalize_image": {
         "test_001_file_image_cat_jpg": {
             "inputs": [

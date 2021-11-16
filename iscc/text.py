@@ -9,7 +9,7 @@ import xxhash
 from functools import lru_cache
 import langcodes
 from iscc.schema import FeatureType, Options
-from iscc.cdc import data_chunks
+from iscc_core.cdc import data_chunks
 from iscc import uread
 from iscc.utils import sliding_window
 from iscc.codec import encode_base64
@@ -182,7 +182,7 @@ def chunk_text(text, **options):
     avg_size = opts.text_avg_chunk_size
     data = text.encode("utf-32-be")
     avg_size *= 4  # 4 bytes per character
-    for chunk in data_chunks(data, utf32=True, text_avg_chunk_size=avg_size):
+    for chunk in data_chunks(data, utf32=True, avg_chunk_size=avg_size):
         yield chunk.decode("utf-32-be")
 
 

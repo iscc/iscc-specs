@@ -5,7 +5,7 @@ from typing import Any, Tuple, List
 import xxhash
 from codetiming import Timer
 from more_itertools import chunked
-from iscc.cdc import data_chunks
+from iscc_core.cdc import data_chunks
 from iscc.minhash import minhash_64, minhash_256
 from iscc.codec import encode_base64
 from iscc.schema import FeatureType, Readable, Options
