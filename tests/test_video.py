@@ -227,6 +227,11 @@ def test_code_video_preview():
     assert preview.endswith("GvkEq8A/EtLg6gfFTFgDZr++JWCKAbvgD3Qmv6NBCua61VsXvvDGIAAA=")
 
 
+def test_code_video_global_preview_overrides():
+    result = code_video(SAMPLE, all_preview=False, video_preview=True)
+    assert "preview" not in result
+
+
 def test_hash_video():
     features = [tuple(range(380))]
     assert video.hash_video(features, video_bits=64).hex() == "528f91431f7c4ad2"

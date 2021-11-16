@@ -20,6 +20,13 @@ def test_code_image_plain():
     )
 
 
+def test_code_image_global_preview_overrides():
+    r = iscc.code_image(
+        images()[0], all_preview=False, image_preview=True, image_granular=False
+    )
+    assert "preview" not in r
+
+
 def test_code_image_granular():
     assert iscc.code_image(images()[0], image_preview=False, image_granular=True) == {
         "code": "EEA4GQZQTY6J5DTH",

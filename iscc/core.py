@@ -244,7 +244,11 @@ def code_image(data, **options):
             log.error("image feature extraction failed")
             log.exception(e)
 
-    if opts.image_preview or opts.all_preview:
+    do_preview = (
+        opts.all_preview if isinstance(opts.all_preview, bool) else opts.image_preview
+    )
+
+    if do_preview:
         preview = image.extract_image_preview(img_obj, **options)
         preview_uri = image.encode_image_to_data_uri(preview, **options)
         result["preview"] = preview_uri
@@ -290,8 +294,6 @@ def code_video(uri, **options):
     # type: (Union[Uri, File], **Any) -> dict
     """Compute Content-ID video."""
     opts = Options(**options)
-    nbits = opts.video_bits
-
     result = {}
     metadata = video.extract_video_metadata(uri)
     result.update(metadata)
@@ -322,7 +324,11 @@ def code_video(uri, **options):
     if opts.video_include_fingerprint:
         result["fingerprint"] = base64.b64encode(signature).decode("ascii")
 
-    if opts.video_preview or opts.all_preview:
+    do_preview = (
+        opts.all_preview if isinstance(opts.all_preview, bool) else opts.video_preview
+    )
+
+    if do_preview:
         img_raw = video.extract_video_preview(uri)
         result["preview"] = image.encode_image_to_data_uri(img_raw)
 
