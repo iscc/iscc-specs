@@ -19,7 +19,7 @@ tika.log.disabled = True
 from iscc.core import *
 from iscc.metrics import *
 from iscc.image import *
-from iscc.minhash import minhash
+from iscc_core.minhash import minhash
 from iscc.text import *
 from iscc.wtahash import *
 from iscc.data import *

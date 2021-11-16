@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 import pytest
-from iscc.minhash import minhash, compress
+from iscc_core.minhash import minhash, compress
 
 
 def test_minhash_empty():
