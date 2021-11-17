@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import iscc_core
 import pytest
 from scenedetect import FrameTimecode
 from iscc.core import code_video
@@ -53,7 +54,10 @@ def test_extract_video_preview_readables():
 
 
 def test_hash_video_0_features():
-    assert video.hash_video([tuple([0] * 380)]) == b"\x00\x00\x00\x00\x00\x00\x00\x00"
+    assert (
+        iscc_core.soft_hash_video_v0([tuple([0] * 380)])
+        == b"\x00\x00\x00\x00\x00\x00\x00\x00"
+    )
 
 
 def test_code_video():
@@ -234,8 +238,8 @@ def test_code_video_global_preview_overrides():
 
 def test_hash_video():
     features = [tuple(range(380))]
-    assert video.hash_video(features, video_bits=64).hex() == "528f91431f7c4ad2"
-    extended = video.hash_video(features, video_bits=256).hex()
+    assert iscc_core.soft_hash_video_v0(features, bits=64).hex() == "528f91431f7c4ad2"
+    extended = iscc_core.soft_hash_video_v0(features, bits=256).hex()
     assert extended.startswith("528f91431f7c4ad2")
 
 

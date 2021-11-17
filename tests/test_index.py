@@ -35,6 +35,15 @@ def idx():
 
 
 @pytest.fixture
+def idx_feat():
+    idx_feat = iscc.Index(
+        "test-query-features", index_components=True, index_features=True
+    )
+    yield idx_feat
+    idx_feat.destroy()
+
+
+@pytest.fixture
 def full_iscc():
     return iscc.Code.rnd(mt=iscc.MT.ISCC, bits=256)
 
@@ -60,6 +69,7 @@ def test_index_get_key(idx, full_iscc):
     i2 = iscc.Code.rnd(mt=iscc.MT.ISCC, bits=256)
     key = idx.get_key(i2)
     assert idx.get_key(i2) == 1 == key
+
 
 # TODO: pass db.get_key after reopen
 # def test_index_get_key_after_reopen(idx, full_iscc):
@@ -330,12 +340,12 @@ def test_index_match_feature_similar():
     idx.destroy()
 
 
-def test_index_query_features():
-    idx = iscc.Index("test-query-features", index_components=True, index_features=True)
-    v0 = iscc.code_iscc(iscc_samples.videos()[0], video_granular=True)
-    v1 = iscc.code_iscc(iscc_samples.videos()[1], video_granular=True)
-    v2 = iscc.code_iscc(iscc_samples.videos()[2], video_granular=True)
-    v3 = iscc.code_iscc(iscc_samples.videos()[3], video_granular=True)
+def test_index_query_features(idx_feat):
+    idx = idx_feat
+    v0 = iscc.code_iscc(iscc_samples.videos()[0], all_granular=True)
+    v1 = iscc.code_iscc(iscc_samples.videos()[1], all_granular=True)
+    v2 = iscc.code_iscc(iscc_samples.videos()[2], all_granular=True)
+    v3 = iscc.code_iscc(iscc_samples.videos()[3], all_granular=True)
     idx.add(v0)
     idx.add(v1)
     idx.add(v2)
@@ -375,7 +385,6 @@ def test_index_query_features():
             ),
         ],
     )
-    idx.destroy()
 
 
 def test_index_audio_features():

@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
+import io
 import os
 import json
+
+import iscc_core
 import pytest
 from PIL import Image, ImageFilter, ImageEnhance
 import iscc
@@ -115,16 +118,25 @@ def test_content_id_image_robust():
     assert len(cid_i["code"]) == 16
     assert cid_i == {"code": "EEAZTRSWFV2THIUW", "height": 512, "width": 512}
 
-    img1 = Image.open("file_image_lenna.jpg")
-    img2 = img1.filter(ImageFilter.GaussianBlur(10))
-    img3 = ImageEnhance.Brightness(img1).enhance(1.4)
-    img4 = ImageEnhance.Contrast(img1).enhance(1.2)
+    img1_obj = Image.open("file_image_lenna.jpg")
 
-    cid1 = iscc.hash_image(img1)
-    cid2 = iscc.hash_image(img2)
-    cid3 = iscc.hash_image(img3)
-    cid4 = iscc.hash_image(img4)
+    img2_obj = img1_obj.filter(ImageFilter.GaussianBlur(10))
+    img2 = io.BytesIO()
+    img2_obj.save(img2, format="JPEG")
 
-    assert iscc.distance_hex(cid1, cid2) == 0
-    assert iscc.distance_hex(cid1, cid3) == 2
-    assert iscc.distance_hex(cid1, cid4) == 0
+    img3_obj = ImageEnhance.Brightness(img1_obj).enhance(1.4)
+    img3 = io.BytesIO()
+    img3_obj.save(img3, format="JPEG")
+
+    img4_obj = ImageEnhance.Contrast(img1_obj).enhance(1.2)
+    img4 = io.BytesIO()
+    img4_obj.save(img4, format="JPEG")
+
+    cid1 = iscc_core.gen_image_code_v0(open("file_image_lenna.jpg", "rb"))
+    cid2 = iscc_core.gen_image_code_v0(img2)
+    cid3 = iscc_core.gen_image_code_v0(img3)
+    cid4 = iscc_core.gen_image_code_v0(img4)
+
+    assert iscc.distance(cid1.code, cid2.code) == 0
+    assert iscc.distance(cid1.code, cid3.code) == 2
+    assert iscc.distance(cid1.code, cid4.code) == 0

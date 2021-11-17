@@ -42,12 +42,13 @@ lmdb = "^1.1.1"
 msgpack = "^1.0.2"
 annoy = "^1.17.0"
 jmespath = "^0.10.0"
-opencv-contrib-python-headless = "^4.5.1"
+opencv-contrib-python-headless = { version = "^4.5.1", optional = true }
 mobi = "^0.3.1"
 iscc-core = "^0.1"
 
 [tool.poetry.extras]
 turbo = ["cython", "numba", "pybase64"]
+optional = ["opencv-contrib-python-headless"]
 
 [tool.poetry.dev-dependencies]
 pytest = "^6.2.3"

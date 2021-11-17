@@ -55,38 +55,6 @@
             ]
         }
     },
-    "hash_image": {
-        "test_001_file_image_pixel_png_transp_png": {
-            "inputs": [
-                "file_image_pixel_png_transp.png"
-            ]
-        },
-        "test_002_file_image_pixel_png_white_png": {
-            "inputs": [
-                "file_image_pixel_png_white.png"
-            ]
-        },
-        "test_003_file_image_pixel_png_black_png": {
-            "inputs": [
-                "file_image_pixel_png_black.png"
-            ]
-        },
-        "test_004_file_image_cat_jpg": {
-            "inputs": [
-                "file_image_cat.jpg"
-            ]
-        },
-        "test_005_file_image_cat_png": {
-            "inputs": [
-                "file_image_cat.png"
-            ]
-        },
-        "test_006_file_image_cat_gif": {
-            "inputs": [
-                "file_image_cat.gif"
-            ]
-        }
-    },
     "code_audio": {
         "test_001_audio_empty": {
             "inputs": [
@@ -106,23 +74,6 @@
         "test_003_audio_signed": {
             "inputs": [
                 [-1, 0, 1]
-            ]
-        }
-    },
-    "normalize_image": {
-        "test_001_file_image_cat_jpg": {
-            "inputs": [
-                "file_image_cat.jpg"
-            ]
-        },
-        "test_002_file_image_cat_png": {
-            "inputs": [
-                "file_image_cat.png"
-            ]
-        },
-        "test_003_file_image_cat_gif": {
-            "inputs": [
-                "file_image_cat.gif"
             ]
         }
     },
