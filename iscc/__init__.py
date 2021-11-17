@@ -3,7 +3,7 @@ import os
 from pathlib import Path
 import click
 
-__version__ = "1.1.0b8"
+__version__ = "1.1.0b9"
 
 HERE = Path(__file__).parent
 APP_NAME = "iscc"
@@ -21,7 +21,7 @@ from iscc.metrics import *
 from iscc.image import *
 from iscc_core.minhash import minhash
 from iscc.text import *
-from iscc.wtahash import *
+from iscc_core.wtahash import *
 from iscc.data import *
 from iscc.codec import *
 from iscc.video import *
