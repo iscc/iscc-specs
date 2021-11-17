@@ -86,6 +86,11 @@ class Options(BaseSettings):
         description="Use first line from text as title if we don´t have an explicit title",
     )
 
+    text_store: bool = Field(
+        False,
+        description="Store extracted paintext (with filename: <datahash>.txt.gz)."
+    )
+
     image_bits: int = Field(
         64, description="Length of generated Content-ID-Image in bits"
     )

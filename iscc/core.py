@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 """ISCC Reference Implementation"""
+import gzip
+import os.path
 import iscc_core
 from iscc_core.code_content_text import normalize_text
 import json
@@ -52,7 +54,7 @@ def code_iscc(uri, title=None, extra=None, **options):
     :param extra: Metadata to be used for Meta-Code generation
     :param options: See iscc.schema.Options for detailed ISCC generator options.
     """
-
+    opts = Options(**options)
     result = {"version": "0-0-0"}
     features = []
 
@@ -74,6 +76,15 @@ def code_iscc(uri, title=None, extra=None, **options):
     result.update(data)
 
     content = code_content(file_obj, **options)
+
+    # TODO generalize to store extracts from all mediatypes (mp7, chroma,...)
+    if opts.text_store and 'plaintext' in content:
+        plaintext = content.pop("plaintext")
+        path = os.path.dirname(file_obj.name)
+        outpath = os.path.join(path, instance['datahash'] + 'txt.gz')
+        with gzip.open(outpath, 'wb') as outf:
+            outf.write(plaintext.encode('utf-8'))
+        log.debug(f"Stored plaintext at: {outpath}")
 
     if "features" in content:
         features.append(content.pop("features"))
@@ -121,7 +132,9 @@ def code_meta(title, extra=None, **options):
     if isinstance(extra, (str, bytes, bytearray)):
         try:
             extra = json.loads(extra)
+            log.debug("Metadata decoded as JSON")
         except JSONDecodeError:
+            log.debug("Metadata not JSON-decodable")
             pass
 
     if isinstance(extra, dict):
@@ -129,8 +142,10 @@ def code_meta(title, extra=None, **options):
             extra = jsonld.normalize(
                 extra, {"algorithm": "URDNA2015", "format": "application/n-quads"}
             )
+            log.debug("Metadata normalized with JSON-LD URDNA2015")
         else:
             extra = jcs.canonicalize(extra, utf8=False)
+            log.debug("Metadata normalized with JCS")
 
     meta_code = iscc_core.gen_meta_code_v0(
         title=title, extra=extra, bits=opts.meta_bits
@@ -161,7 +176,7 @@ def code_content(data, **options):
         with Timer(text="content code video creation took {:0.4f}s", logger=log.debug):
             cc = code_video(data, **options)
     else:
-        raise ValueError("Unknown mediatype")
+        raise ValueError("Unsupported mediatype: {}".format(mediatype))
 
     cc["mediatype"] = mediatype
     cc["gmt"] = gmt
@@ -193,6 +208,9 @@ def code_text(data, **options):
         features = text.extract_text_features(text_norm, **options)
         result["features"] = features
 
+    if opts.text_store:
+        result["plaintext"] = text_raw
+
     return result
 
 
@@ -221,7 +239,7 @@ def code_image(data, **options):
     else:
         img_obj = Image.open(io.BytesIO(uread.open_data(data).read()))
 
-    # Todo review  image exif_transpose and trimming
+    # TODO review  image exif_transpose and trimming
     # if opts.image_exif_transpose:
     #     img_obj = exif_transpose(img_obj)
     #
@@ -266,7 +284,7 @@ def code_audio(data, **options):
         chroma = dict(fingerprint=data)
     else:
         chroma = audio.extract_audio_features(data, **options)
-        # Todo: implement custom audio metadata extraction
+        # TODO: implement custom audio metadata extraction
         metadata = video.extract_video_metadata(data)
         # We remove video related keys that are detected in some audio files.
         metadata.pop("fps", None)
