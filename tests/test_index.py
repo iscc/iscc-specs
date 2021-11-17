@@ -61,7 +61,7 @@ def test_index_get_key(idx, full_iscc):
     key = idx.get_key(i2)
     assert idx.get_key(i2) == 1 == key
 
-# Todo: pass db.get_key after reopen
+# TODO: pass db.get_key after reopen
 # def test_index_get_key_after_reopen(idx, full_iscc):
 #     assert len(idx) == 0
 #     key = idx.add(full_iscc)
