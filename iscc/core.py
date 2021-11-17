@@ -4,8 +4,6 @@ import gzip
 import os.path
 import iscc_core
 from iscc_core.code_content_text import normalize_text
-import json
-from json import JSONDecodeError
 from os.path import basename
 import base64
 import io
@@ -16,7 +14,6 @@ from loguru import logger as log
 from typing import List, Optional, Union, Any
 from PIL import Image
 from blake3 import blake3
-from pyld import jsonld
 import iscc
 from iscc import jcs
 from iscc import text, image, audio, video
@@ -34,9 +31,6 @@ from iscc.mediatype import mime_guess, mime_to_gmt
 from iscc import uread
 from iscc.data import encode_data_features
 
-from iscc.jldloader import requests_document_loader
-
-jsonld.set_document_loader(requests_document_loader())
 
 ###############################################################################
 # High-Level ISCC Code generator functions                                   #
@@ -44,7 +38,7 @@ jsonld.set_document_loader(requests_document_loader())
 
 
 def code_iscc(uri, title=None, extra=None, **options):
-    # type: (Union[Uri, File], Optional[str], Optional[str, dict], **Any) -> dict
+    # type: (Union[Uri, File], Union[str, bytes], Union[None, str, bytes, dict], **Any) -> dict
     """Create a full ISCC.
 
     The full ISCC is a composite of Meta, Content, Data and Instance Codes.
@@ -114,7 +108,7 @@ def code_iscc(uri, title=None, extra=None, **options):
 
 
 def code_meta(title, extra=None, **options):
-    # type: (Union[str, bytes], Union[None, str, bytes, dict]], **Any) -> dict
+    # type: (Union[str, bytes], Union[None, str, bytes, dict], **Any) -> dict
     """Generate Meta Code from title and extra metadata.
 
     :param title: Used as input for first half of Meta-Code (or full if no extra)
@@ -128,24 +122,9 @@ def code_meta(title, extra=None, **options):
     opts = Options(**options)
     extra = None if extra in (b"", "", bytearray(), None) else extra
 
-    # Try json decoding
-    if isinstance(extra, (str, bytes, bytearray)):
-        try:
-            extra = json.loads(extra)
-            log.debug("Metadata decoded as JSON")
-        except JSONDecodeError:
-            log.debug("Metadata not JSON-decodable")
-            pass
-
     if isinstance(extra, dict):
-        if "@context" in extra:
-            extra = jsonld.normalize(
-                extra, {"algorithm": "URDNA2015", "format": "application/n-quads"}
-            )
-            log.debug("Metadata normalized with JSON-LD URDNA2015")
-        else:
-            extra = jcs.canonicalize(extra, utf8=False)
-            log.debug("Metadata normalized with JCS")
+        extra = jcs.canonicalize(extra).decode("utf-8")
+        log.debug("Metadata JSON encoded and conanicalized with JCS")
 
     meta_code = iscc_core.gen_meta_code_v0(
         title=title, extra=extra, bits=opts.meta_bits

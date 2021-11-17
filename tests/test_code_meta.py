@@ -55,14 +55,10 @@ def test_code_meta_extra_schema_org():
     }
 
     assert iscc.code_meta("Hello World", data) == {
-        "code": "AAA77PPFVTLFYRO6",
-        "extra": ':c14n0 <http://schema.org/jobTitle> "Professor" . :c14n0 '
-        '<http://schema.org/name> "Jane Doe" . :c14n0 '
-        '<http://schema.org/telephone> "425 1234567" . :c14n0 '
-        "<http://schema.org/url> <http://www.janedoe.com> . :c14n0 "
-        "<http://www.w3.org/1999/02/22rdfsyntaxns#type> "
-        "<http://schema.org/Person> .",
-        "metahash": "61aa0525902e5905b10d0a25ae799f6047b64d94b13a2ffb550b4799c20790a5",
+        "code": "AAA77PPFVQJUAP6S",
+        "extra": '"@context":"http://schema.org/","@type":"Person","jobTitle":"Professor","name":"Jane '
+        'Doe","telephone":"425 1234567","url":"http://www.janedoe.com"',
+        "metahash": "b7b701a9c02155f5d617b55477d49950f670d5ac4ed97f6ba12948fff312d3c2",
         "title": "Hello World",
     }
 
@@ -80,12 +76,10 @@ def test_code_meta_extra_json_ld():
     }
 
     assert iscc.code_meta("Hello World", jld) == {
-        "code": "AAA77PPFVRJXDZM6",
-        "extra": ":c14n0 <http://www.w3.org/2002/12/cal/ical#dtstart> "
-        '"20110409T20:00:00Z"^^<http://www.w3.org/2001/XMLSchema#dateTime> . '
-        ':c14n0 <http://www.w3.org/2002/12/cal/ical#location> "New Orleans '
-        'Arena, New Orleans, Louisiana, USA" . :c14n0 '
-        '<http://www.w3.org/2002/12/cal/ical#summary> "Lady Gaga Concert" .',
-        "metahash": "f1ee420d071a4e078942ff622fa7b85d74e776f99de8cd64298d94a61fb80029",
+        "code": "AAA77PPFVRF6BZOA",
+        "extra": '"@context":"ical":"http://www.w3.org/2002/12/cal/ical#","ical:dtstart":"@type":"xsd:dateTime","xsd":"http://www.w3.org/2001/XMLSchema#","ical:dtstart":"20110409T20:00:00Z","ical:location":"New '
+        'Orleans Arena, New Orleans, Louisiana, USA","ical:summary":"Lady '
+        'Gaga Concert"',
+        "metahash": "e2f123b51f44268f1361f513629c3013366a853075fb32329b3316727313e837",
         "title": "Hello World",
     }
