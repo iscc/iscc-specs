@@ -81,7 +81,7 @@ def code_iscc(uri, title=None, extra=None, **options):
     if opts.text_store and "plaintext" in content:
         plaintext = content.pop("plaintext")
         path = os.path.dirname(file_obj.name)
-        outpath = os.path.join(path, instance["datahash"] + "txt.gz")
+        outpath = os.path.join(path, instance["datahash"] + ".txt.gz")
         with gzip.open(outpath, "wb") as outf:
             outf.write(plaintext.encode("utf-8"))
         log.debug(f"Stored plaintext at: {outpath}")
