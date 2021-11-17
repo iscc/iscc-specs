@@ -15,37 +15,22 @@ The **International Standard Content Code** is a proposal for an [open standard]
 The reference code is published with the package name [iscc](https://pypi.python.org/pypi/iscc) on Python Package Index. Install it with:
 
 ``` bash
-pip install iscc==1.1.0b8
+pip install iscc==1.1.0b9
 ```
 
 If your system is setup to compile c-extensions install with:
 
 ``` bash
-pip install iscc[turbo]==1.1.0b8
+pip install iscc[turbo]==1.1.0b9
 ```
 
 This will install cython and build binary extansions for faster ISCC processing.
 
 To install the required binaries for content extraction do:
 
-``` bash
-igen install
-```
-
-If `igen` cli tool is not on you path can find it in the `bin` folder (linux) or
-`Scripts` folder of the python installation where you installed the `iscc` package.
-
-## Using the provisional cli-tool
-
-``` bash
-igen --help
-igen iscc myfile.ext
-```
-
-For debug messages and verbose output use:
-
-``` bash
-igen iscc -d -vvv myfile.ext
+```python
+from iscc.bin import install
+install()
 ```
 
 ## Using the reference code
