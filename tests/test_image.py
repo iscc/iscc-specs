@@ -1,5 +1,8 @@
 # -*- coding: utf-8 -*-
 import math
+
+import pytest
+
 import iscc
 from iscc_samples import images
 from iscc.codec import Code
@@ -27,6 +30,7 @@ def test_code_image_global_preview_overrides():
     assert "preview" not in r
 
 
+@pytest.mark.optional
 def test_code_image_granular():
     assert iscc.code_image(images()[0], image_preview=False, image_granular=True) == {
         "code": "EEA4GQZQTY6J5DTH",
@@ -166,6 +170,7 @@ def test_pi():
     assert math.pi == 3.141592653589793
 
 
+@pytest.mark.optional
 def test_extract_image_features_readables():
     for r in image_readables():
         fo = Features(**iscc.extract_image_features(r))

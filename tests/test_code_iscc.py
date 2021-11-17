@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+import pytest
+
 import iscc
 from iscc.schema import ISCC
 import iscc_samples as s
@@ -196,6 +198,7 @@ def test_code_iscc_audio_granular():
     assert ISCC(**result)
 
 
+@pytest.mark.optional
 def test_code_iscc_video_granular():
     result = iscc.code_iscc(
         s.videos()[0],

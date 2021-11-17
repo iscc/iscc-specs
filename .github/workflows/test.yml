@@ -30,10 +30,10 @@ jobs:
       run: poetry install
 
     - name: Run pytest
-      run: poetry run pytest -q tests
+      run: poetry run pytest -q  -m "not optional" tests
 
-    - name: Install dependencies with extras
-      run: poetry install --extras turbo
+    - name: Install dependencies with extras and optional features
+      run: poetry install --extras "turbo optional"
 
     - name: Run pytest with extras
-      run: poetry run pytest -q tests
+      run: poetry run pytest -q -m optional tests
