@@ -88,7 +88,7 @@ class Options(BaseSettings):
 
     text_store: bool = Field(
         False,
-        description="Store extracted paintext (with filename: <datahash>.txt.gz)."
+        description="Store extracted paintext (with filename: <datahash>.txt.gz).",
     )
 
     image_bits: int = Field(

@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 import json
+
+import iscc_core
 from codetiming import Timer
 from loguru import logger as log
 import subprocess
@@ -16,7 +18,7 @@ from scenedetect import ContentDetector, FrameTimecode, SceneManager, VideoManag
 from iscc import uread
 from iscc.schema import FeatureType, Options, Readable, File, Uri
 from iscc.codec import encode_base64
-from iscc.wtahash import wtahash
+from iscc_core.wtahash import wtahash
 from iscc.mp7 import Frame
 from iscc.bin import ffmpeg_bin, ffprobe_bin
 import av
@@ -278,16 +280,6 @@ def extract_video_signature_cutpoints(uri, crop=None, **options):
     return sigdata, scenes
 
 
-def hash_video(features, **options):
-    # type: (Sequence[Tuple[int]], **int) -> bytes
-    """Compute wta-hash for a list of frame signature vectors"""
-    opts = Options(**options)
-    sigs = set(features)
-    vecsum = [sum(col) for col in zip(*sigs)]
-    video_hash = wtahash(vecsum, hl=opts.video_bits)
-    return video_hash
-
-
 def compute_video_features_rolling(frames, **options):
     # type: (List[Frame], **int) -> dict
     """
@@ -314,7 +306,9 @@ def compute_video_features_rolling(frames, **options):
         for frame in frames[ci:]:
             segment_frames.append(tuple(frame.vector.tolist()))
             if frame.elapsed > start + window:
-                sigs.append(encode_base64(hash_video(segment_frames)))
+                sigs.append(
+                    encode_base64(iscc_core.soft_hash_video_v0(segment_frames, bits=64))
+                )
                 break
     return dict(
         kind=FeatureType.video.value, features=sigs, window=window, overlap=overlap
@@ -480,7 +474,9 @@ def compute_video_features_scenes(frames, scenes):
             frame_t = tuple(frame.vector.tolist())
             segment.append(frame_t)
             if frame.elapsed >= cutpoint:
-                features.append(encode_base64(hash_video(segment)))
+                features.append(
+                    encode_base64(iscc_core.soft_hash_video_v0(segment, 64))
+                )
                 segment = []
                 prev_cutpoint = 0 if cidx == 0 else scenes[cidx - 1]
                 duration = round(cutpoint - prev_cutpoint, 3)
@@ -490,14 +486,14 @@ def compute_video_features_scenes(frames, scenes):
     if not features:
         log.info("No scenes detected. Use all frames")
         segment = [tuple(frame.vector.tolist()) for frame in frames]
-        features = [encode_base64(hash_video(segment))]
+        features = [encode_base64(iscc_core.soft_hash_video_v0(segment, 64))]
         sizes = [round(float(frames[-1].elapsed), 3)]
 
     return dict(kind=FeatureType.video.value, version=0, features=features, sizes=sizes)
 
 
 if __name__ == "__main__":
-    from iscc_samples import videos, audios
+    from iscc_samples import videos
     from pprint import pprint
 
     r = extract_video_metadata2(videos()[1])
