@@ -1,37 +1,41 @@
 # -*- coding: utf-8 -*-
 import os
+
+import iscc_core
+
 import iscc
 from iscc_samples import audios
 from iscc import audio
+import iscc.bin
 import platform
 from tests.test_readables import audio_readables
 
 
 def test_fpcalc_bin():
-    assert "fpcalc" in audio.fpcalc_bin()
+    assert "fpcalc" in iscc.bin.fpcalc_bin()
 
 
 def test_fpcalc_is_installed():
-    assert isinstance(audio.fpcalc_is_installed(), bool)
+    assert isinstance(iscc.bin.fpcalc_is_installed(), bool)
 
 
 def test_download_url():
-    url = audio.fpcalc_download_url()
+    url = iscc.bin.fpcalc_download_url()
     pl = platform.system().lower()
     pl = "macos" if pl == "darwin" else pl
     assert pl in url
-    assert audio.FPCALC_VERSION in url
+    assert iscc.bin.FPCALC_VERSION in url
 
 
 def test_install():
     exe_path = audio.fpcalc_install()
     assert os.path.exists(exe_path)
-    assert audio.fpcalc_is_installed()
+    assert iscc.bin.fpcalc_is_installed()
 
 
 def test_get_version_info():
-    vi = audio.fpcalc_version_info()
-    assert vi == audio.FPCALC_VERSION
+    vi = iscc.bin.fpcalc_version_info()
+    assert vi == iscc.bin.FPCALC_VERSION
 
 
 def test_extract_audio_features():
@@ -54,29 +58,29 @@ def test_extract_audio_features():
 
 def test_hash_audio_empty():
     assert (
-        audio.hash_audio([]).hex()
+        iscc_core.soft_hash_audio_v0([]).hex()
         == "0000000000000000000000000000000000000000000000000000000000000000"
     )
 
 
 def test_hash_audio_single():
     assert (
-        audio.hash_audio([1]).hex()
-        == "0000000100000000000000000000000000000000000000000000000000000000"
+        iscc_core.soft_hash_audio_v0([1]).hex()
+        == "0000000100000001000000000000000000000000000000010000000000000000"
     )
 
 
 def test_hash_audio_short():
     assert (
-        audio.hash_audio([1, 2]).hex()
-        == "0000000100000002000000000000000000000000000000000000000000000000"
+        iscc_core.soft_hash_audio_v0([1, 2]).hex()
+        == "0000000300000001000000020000000000000000000000010000000200000000"
     )
 
 
 def test_hash_audio_signed():
     assert (
-        audio.hash_audio([-1, 0, 1]).hex()
-        == "ffffffff00000000000000010000000000000000000000000000000000000000"
+        iscc_core.soft_hash_audio_v0([-1, 0, 1]).hex()
+        == "00000001ffffffff000000000000000100000000ffffffff0000000000000001"
     )
 
 
