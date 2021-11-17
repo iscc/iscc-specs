@@ -51,6 +51,7 @@ def mime_normalize(mime: str) -> str:
     """Return normalized version of a mediatype."""
     return MEDIATYPE_NORM.get(mime, mime)
 
+
 # TODO make use of mime_supported
 def mime_supported(mime: str) -> bool:
     """Check if mediatype is supported"""
