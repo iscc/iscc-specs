@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 import iscc_core
 import pytest
-
 import iscc
 from iscc.core import code_video
 from iscc import video, mp7
@@ -271,7 +270,7 @@ def test_compute_video_features_rolling():
     }
 
 
-@pytest.mark.skipif(iscc.scenedetect_installed is False, reason="requires scenedetect")
+@pytest.mark.optional
 def test_compute_video_features_scenes():
     signature = video.extract_video_signature(SAMPLE, video_fps=5, video_hwaccel=None)
     frames = mp7.read_ffmpeg_signature(signature)
