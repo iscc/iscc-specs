@@ -30,7 +30,7 @@ def download_file(url, folder=None, md5=None, sanitize=False):
     # type: (str, Optional[Union[str, Path]], Optional[str], bool) -> str
     """Download file to `folder` (default app_dir) and return file path."""
     url_obj = urlparse(url)
-    file_name = os.path.basename(url_obj.path)
+    file_name = os.path.basename(url_obj.path or url_obj.netloc)
     if sanitize:
         file_name = safe_filename(file_name)
     out_dir = folder or APP_DIR

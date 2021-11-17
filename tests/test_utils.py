@@ -37,3 +37,15 @@ def test_sliding_window_bigger_than_sequence():
 
     slices = list(utils.sliding_window("hello", 5))
     assert slices[0] == "hello"
+
+
+def test_download_file(tmp_path):
+    local_path = utils.download_file(
+        "https://iscc.foundation/news/images/lib-arch-ottawa.jpg"
+    )
+    assert local_path.endswith("lib-arch-ottawa.jpg")
+
+
+def test_download_file_domain_root(tmp_path):
+    local_path = utils.download_file("https://iscc.foundation", folder=tmp_path)
+    assert local_path.endswith("iscc.foundation")
