@@ -78,12 +78,12 @@ def code_iscc(uri, title=None, extra=None, **options):
     content = code_content(file_obj, **options)
 
     # TODO generalize to store extracts from all mediatypes (mp7, chroma,...)
-    if opts.text_store and 'plaintext' in content:
+    if opts.text_store and "plaintext" in content:
         plaintext = content.pop("plaintext")
         path = os.path.dirname(file_obj.name)
-        outpath = os.path.join(path, instance['datahash'] + 'txt.gz')
-        with gzip.open(outpath, 'wb') as outf:
-            outf.write(plaintext.encode('utf-8'))
+        outpath = os.path.join(path, instance["datahash"] + "txt.gz")
+        with gzip.open(outpath, "wb") as outf:
+            outf.write(plaintext.encode("utf-8"))
         log.debug(f"Stored plaintext at: {outpath}")
 
     if "features" in content:
