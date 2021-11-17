@@ -11,14 +11,12 @@ import os
 import sys
 from subprocess import Popen, PIPE, DEVNULL
 from secrets import token_hex
-from typing import Any, Generator, List, Sequence, Tuple, Optional, Union
+from typing import Any, Generator, List, Tuple, Optional, Union
 from statistics import mode
 from langcodes import standardize_tag
-from scenedetect import ContentDetector, FrameTimecode, SceneManager, VideoManager
 from iscc import uread
 from iscc.schema import FeatureType, Options, Readable, File, Uri
 from iscc.codec import encode_base64
-from iscc_core.wtahash import wtahash
 from iscc.mp7 import Frame
 from iscc.bin import ffmpeg_bin, ffprobe_bin
 import av
@@ -27,7 +25,7 @@ import jmespath
 
 FFMPEG = ffmpeg_bin()
 FFPROBE = ffprobe_bin()
-Scene = Union[Tuple[FrameTimecode, FrameTimecode], Tuple[float, float]]
+Scene = Union[Tuple["FrameTimecode", "FrameTimecode"], Tuple[float, float]]
 SceneSig = Tuple[List[str], List[int]]  # feature hashes, scene durations
 
 
@@ -360,6 +358,17 @@ def detect_video_scenes(uri, **options):
     :key video_scenes_previews: Generate per scene preview thumbnails.
     :return: List of tuples with start end end FrameTimecode.
     """
+    try:
+        from scenedetect import (
+            ContentDetector,
+            FrameTimecode,
+            SceneManager,
+            VideoManager,
+        )
+    except ImportError:
+        raise EnvironmentError(
+            "Please install `scenedetect`python module for advanced scenedetection."
+        )
 
     opts = Options(**options)
 

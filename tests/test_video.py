@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 import iscc_core
 import pytest
-from scenedetect import FrameTimecode
+
+import iscc
 from iscc.core import code_video
 from iscc import video, mp7
 from blake3 import blake3
@@ -113,6 +114,7 @@ def test_code_video_all_granular_overrides():
     }
 
 
+@pytest.mark.optional
 def test_code_video_granular_scenes():
     result = code_video(
         SAMPLE,
@@ -269,6 +271,7 @@ def test_compute_video_features_rolling():
     }
 
 
+@pytest.mark.skipif(iscc.scenedetect_installed is False, reason="requires scenedetect")
 def test_compute_video_features_scenes():
     signature = video.extract_video_signature(SAMPLE, video_fps=5, video_hwaccel=None)
     frames = mp7.read_ffmpeg_signature(signature)
@@ -349,6 +352,7 @@ def test_detect_video_crop():
     assert video.detect_video_crop(SAMPLE) == "crop=176:96:0:24"
 
 
+@pytest.mark.optional
 def test_detect_video_scenes_pyscene():
     assert (
         video.detect_video_scenes(

@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
+__version__ = "1.1.0b9"
 import os
 from pathlib import Path
 import click
 
-__version__ = "1.1.0b9"
 
 HERE = Path(__file__).parent
 APP_NAME = "iscc"
