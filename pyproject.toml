@@ -19,9 +19,6 @@ classifiers=[
     "Programming Language :: Python :: 3.9",
 ]
 
-[tool.poetry.scripts]
-igen = 'iscc.cli:app'
-
 [tool.poetry.dependencies]
 python = ">=3.6.1,<3.10"
 numpy = "1.19.3"
@@ -37,7 +34,6 @@ langdetect = "^1.0.8"
 pyexiv2 = "2.6.4"  # 2.7.0 currently fails extracting title from sample files
 requests = "^2.25.1"
 humanize = "^3.3.0"
-typer = "^0.4.0"
 codetiming = "^1.3.0"
 bidict = "^0.21.2"
 PyLD = "^2.0.3"
