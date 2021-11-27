@@ -2,9 +2,7 @@
 from loguru import logger
 from lxml import etree
 import numpy as np
-
 from iscc.mp7 import read_ffmpeg_signature
-
 from fractions import Fraction
 
 
@@ -17,7 +15,7 @@ logger.remove()
 
 def test_bin_integrity():
     signature_byte_data = open(example_bin, "rb").read()
-    _ = read_ffmpeg_signature(signature_byte_data, test_mode=True)
+    _ = read_ffmpeg_signature(signature_byte_data)
 
 
 def test_all_signatures():
