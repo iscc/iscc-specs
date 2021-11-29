@@ -27,6 +27,7 @@ IMAGE_META_MAP = {
     "Xmp.photoshop.Headline": "title",
     "Xmp.iptcExt.AOTitle": "title",
     "Iptc.Application2.Headline": "title",
+    "Iptc.Application2.ObjectName": "title",
     "Iptc.Application2.Language": "language",
     "Exif.Image.ImageID": "identifier",
     "Exif.Image.XPTitle": "title",
@@ -70,6 +71,8 @@ def extract_image_metadata(data):
             v = v.replace('lang="xdefault"', "").strip()
             if not v:
                 continue
+        elif isinstance(v, dict):
+            v = v.get('lang="x-default"', None)
         else:
             raise ValueError(f"missed type {type(v)}")
 
