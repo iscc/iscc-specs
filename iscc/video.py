@@ -16,7 +16,7 @@ from statistics import mode
 from langcodes import standardize_tag
 from iscc import SdkOptions, uread
 from iscc.schema import FeatureType, Readable, File, Uri
-from iscc.codec import encode_base64
+from iscc_core import encode_base64
 from iscc.mp7 import Frame
 from iscc.bin import ffmpeg_bin, ffprobe_bin
 import av

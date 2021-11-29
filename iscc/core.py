@@ -11,7 +11,7 @@ import mobi
 from codetiming import Timer
 from humanize import naturalsize
 from loguru import logger as log
-from typing import List, Optional, Union, Any
+from typing import List, Union, Any
 from PIL import Image
 from blake3 import blake3
 import iscc

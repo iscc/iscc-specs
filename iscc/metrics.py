@@ -3,7 +3,7 @@
 from typing import Union
 from bitarray import bitarray
 from bitarray.util import count_xor, hex2ba
-from iscc.codec import Code, read_header, decode_base32, decode_base64, decompose, MT
+from iscc_core import Code, read_header, decode_base32, decode_base64, decompose, MT
 
 
 __all__ = [

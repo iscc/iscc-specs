@@ -4,7 +4,7 @@ from iscc_core import ContentCodeText
 
 import iscc
 from iscc.text import _extract_with_tika
-from iscc.codec import Code
+from iscc_core import Code
 from fauxfactory.factories.strings import gen_utf8
 from iscc_samples import texts
 from tests.test_readables import text_readables

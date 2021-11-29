@@ -7,7 +7,7 @@ import iscc_core
 import pytest
 from PIL import Image, ImageFilter, ImageEnhance
 import iscc
-from iscc.codec import decode_base32
+from iscc_core import decode_base32
 
 
 TESTS_PATH = os.path.dirname(os.path.realpath(__file__))

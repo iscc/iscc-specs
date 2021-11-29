@@ -5,7 +5,7 @@ import pytest
 
 import iscc
 from iscc_samples import images
-from iscc.codec import Code
+from iscc_core import Code
 from iscc.schema import Features
 from tests.test_readables import image_readables
 

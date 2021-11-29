@@ -12,7 +12,7 @@ from iscc.schema import FeatureType
 from iscc_core.cdc import data_chunks
 from iscc import SdkOptions, uread
 from iscc.utils import sliding_window
-from iscc.codec import encode_base64
+from iscc_core import encode_base64
 from iscc.schema import Readable
 from iscc.mediatype import mime_clean, mime_to_gmt
 from iscc_core.minhash import minhash_64, minhash_256

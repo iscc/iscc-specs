@@ -24,7 +24,7 @@ from iscc_core.minhash import minhash
 from iscc.text import *
 from iscc_core.wtahash import *
 from iscc.data import *
-from iscc.codec import *
+from iscc_core.codec import *
 from iscc.video import *
 from iscc.jcs import *
 from iscc.match import *

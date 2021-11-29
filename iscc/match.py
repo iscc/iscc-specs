@@ -6,6 +6,7 @@ from typing import Hashable
 from bitarray.util import count_xor
 from iscc.schema import IsccMatch
 import iscc
+import iscc_core
 from bidict import bidict
 from collections import defaultdict
 
@@ -73,7 +74,7 @@ class SimpleIndex:
 
     @staticmethod
     def normalize(code):
-        return iscc.compose(iscc.decompose(code))
+        return iscc_core.gen_iscc_code(iscc.decompose(code))
 
     def __contains__(self, item):
         return self.normalize(item).code in self.isccs.inverse
@@ -130,7 +131,7 @@ class SimpleSplitIndex:
 
     @staticmethod
     def normalize(code):
-        return iscc.compose(iscc.decompose(code))
+        return iscc_core.gen_iscc_code(iscc_core.decompose(code))
 
     def __contains__(self, item):
         return self.normalize(item).code in self.isccs.inverse

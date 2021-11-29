@@ -40,8 +40,9 @@ from iscc.schema import FeatureMatch, IsccMatch, QueryResult, ISCC
 from iscc import SdkOptions
 import msgpack
 from annoy import AnnoyIndex
+import iscc_core
 
-IsccObj = Union[str, Dict, iscc.Code, ISCC]
+IsccObj = Union[str, Dict, iscc_core.Code, ISCC]
 Key = Union[int, str, bytes]
 
 
@@ -104,7 +105,7 @@ class Index:
 
         # Normalize
         components = iscc.decompose(iscc_code)
-        iscc_code = iscc.compose(components)
+        iscc_code = iscc_core.gen_iscc_code(components)
 
         # Init component databases
         for c in components:
@@ -138,7 +139,7 @@ class Index:
                 sizes = fobj.sizes or list(range(len(fobj.features)))
                 for feat, size in zip(fobj.features, sizes):
                     # feature -> (fkey, pos)
-                    item = iscc.decode_base64(feat), msgpack.packb((keyb, pos))
+                    item = iscc_core.decode_base64(feat), msgpack.packb((keyb, pos))
                     items.append(item)
                     pos += size
                 db = self._db_features(fobj.type_id)
@@ -202,11 +203,11 @@ class Index:
         )
 
     def match_component(self, code, ct=0):
-        # type: (iscc.Code, int) -> List[bytes]
+        # type: (iscc_core.Code, int) -> List[bytes]
         """
         Match ISCCs (fkeys) by given commponent with threshold `ct` (max distance).
 
-        :param iscc.Code code: ISCC Code component object to be matched.
+        :param iscc_core.Code code: ISCC Code component object to be matched.
         :param int ct: Component threshold (max hamming distance for match).
         :return: List[bytes] - foreign keys to ISCC table.
         """
@@ -224,7 +225,7 @@ class Index:
             with self.env.begin(db) as txn:
                 with txn.cursor(db) as c:
                     for k in c.iternext_nodup(keys=True, values=False):
-                        candidate = iscc.Code(prefix + k)
+                        candidate = iscc_core.Code(prefix + k)
                         distance = iscc.distance_ba(code.hash_ba, candidate.hash_ba)
                         if distance > ct:
                             continue
@@ -249,9 +250,9 @@ class Index:
         """
 
         if isinstance(feature, str):
-            feature_raw, feature_str = iscc.decode_base64(feature), feature
+            feature_raw, feature_str = iscc_core.decode_base64(feature), feature
         elif isinstance(feature, bytes):
-            feature_raw, feature_str = feature, iscc.encode_base64(feature)
+            feature_raw, feature_str = feature, iscc_core.encode_base64(feature)
         else:
             raise ValueError(f"feature must be str or bytes, not {type(feature)}")
 
@@ -291,7 +292,7 @@ class Index:
                 if dist <= ft:
                     mfraw = bitarray(anns.get_item_vector(annoy_id)).tobytes()
                     mfeatures_raw.append(mfraw)
-                    mfeatures_b64.append(iscc.encode_base64(mfraw))
+                    mfeatures_b64.append(iscc_core.encode_base64(mfraw))
                     distances.append(int(dist))
             # lookup matchesd features in lmdb
             with self.env.begin() as txn:
@@ -305,7 +306,7 @@ class Index:
                     positions.append(pos)
                 # deference and decode matched ISCCs
                 with txn.cursor(self._db_isccs()) as c:
-                    isccs = [iscc.Code(v).code for _, v in c.getmulti(fkeys)]
+                    isccs = [iscc_core.Code(v).code for _, v in c.getmulti(fkeys)]
             # Build FeatureMatch objects
             # iscc str, kind, src_feat, src_pos, mat_feat, mat_pos
             for iscc_str, matched_feat, matched_pos, dist, fkey in zip(
@@ -344,14 +345,16 @@ class Index:
                                 kind=kind,
                                 source_feature=feature_str,
                                 source_pos=src_pos,
-                                matched_feature=iscc.encode_base64(candidate_feature),
+                                matched_feature=iscc_core.encode_base64(
+                                    candidate_feature
+                                ),
                                 matched_position=matched_position,
                             )
                             matches.add(fm)
 
         return sorted(matches)
 
-    def get_key(self, code: iscc.Code) -> Optional[int]:
+    def get_key(self, code: iscc_core.Code) -> Optional[int]:
         """Resolve internal ISCC key via components."""
         # Find per component matches
         components = iscc.decompose(code)
@@ -365,14 +368,14 @@ class Index:
                 if idx is not None:
                     idxs.append(idx)
             # Check if any of the full code entries is an exact match
-            full_code_bytes = iscc.compose(components).bytes
+            full_code_bytes = iscc_core.gen_iscc_code(components).bytes
             db = self._db_isccs()
             for idx in idxs:
                 if txn.get(idx, db=db) == full_code_bytes:
                     return msgpack.loads(idx)
 
     def get_iscc(self, key):
-        # type: (Key) -> iscc.Code
+        # type: (Key) -> iscc_core.Code
         """Get ISCC by index key"""
         if not isinstance(key, bytes):
             key = msgpack.dumps(key)
@@ -380,7 +383,7 @@ class Index:
         with self.env.begin(db) as txn:
             iscc_bytes = txn.get(key)
             if iscc_bytes:
-                return iscc.Code(iscc_bytes)
+                return iscc_core.Code(iscc_bytes)
 
     def get_metadata(self, key):
         # type: (Key) -> dict
@@ -525,7 +528,7 @@ class Index:
     def _db_metadata(self) -> lmdb._Database:
         return self.env.open_db(b"metadata", integerkey=False, create=True)
 
-    def _add_component(self, code: iscc.Code, fkey: bytes) -> bool:
+    def _add_component(self, code: iscc_core.Code, fkey: bytes) -> bool:
         """
         Add a component to the index with a pointer to its source ISCC.
         A single component can point to multipe ISCC entries in the main table.
@@ -607,9 +610,9 @@ class Index:
                     return c.putmulti(items, dupdata=dupdata, overwrite=overwrite)
 
     def _build_match(self, source_iscc, matched_key):
-        # type: (iscc.Code, bytes) -> IsccMatch
+        # type: (iscc_core.Code, bytes) -> IsccMatch
         """Build IsccMatch for source_iscc and iscc of a matched foreign key."""
-        matched_iscc: iscc.Code = self.get_iscc(matched_key)
+        matched_iscc: iscc_core.Code = self.get_iscc(matched_key)
         matchdata = iscc.compare(source_iscc, matched_iscc)
         matchdata["matched_iscc"] = matched_iscc.code
         matchdata["key"] = msgpack.loads(matched_key)
@@ -620,22 +623,22 @@ class Index:
 
     @staticmethod
     def _parse_iscc_obj(iscc_obj):
-        # type: (IsccObj) -> Tuple[iscc.Code, List[dict], Optional[dict]]
+        # type: (IsccObj) -> Tuple[iscc_core.Code, List[dict], Optional[dict]]
         """Unpack different types of ISCC inputs."""
 
         metadata = None
         features = []
 
         if isinstance(iscc_obj, str):
-            iscc_code = iscc.Code(iscc_obj)
-        elif isinstance(iscc_obj, iscc.Code):
+            iscc_code = iscc_core.Code(iscc_obj)
+        elif isinstance(iscc_obj, iscc_core.Code):
             iscc_code = iscc_obj
         elif isinstance(iscc_obj, ISCC):
-            iscc_code = iscc.Code(iscc_obj.iscc)
+            iscc_code = iscc_core.Code(iscc_obj.iscc)
             metadata = iscc_obj.dict(exclude_unset=True)
             features = metadata.get("features", [])
         elif isinstance(iscc_obj, dict):
-            iscc_code = iscc.Code(iscc_obj["iscc"])
+            iscc_code = iscc_core.Code(iscc_obj["iscc"])
             metadata = iscc_obj
             features = metadata.get("features", [])
         else:
@@ -647,14 +650,14 @@ class Index:
     def _dump(self):
         """Dump DB to console"""
         for idx, value in enumerate(self.iter_isccs()):
-            print("ISCC", idx, iscc.Code(value).code)
+            print("ISCC", idx, iscc_core.Code(value).code)
         if self.opts.index_components:
             db = self._db_components()
             with self.env.begin(db) as txn:
                 with txn.cursor(db) as c:
                     c.first()
                     for k in c.iternext_nodup():
-                        print("COMPONENT", iscc.Code(k), end=" ")
+                        print("COMPONENT", iscc_core.Code(k), end=" ")
                         c2 = txn.cursor(db)
                         c2.set_key(k)
                         for v in c2.iternext_dup(keys=False, values=True):
@@ -672,7 +675,7 @@ class Index:
                         c.first()
                         for k in c.iternext_nodup():
                             print(kind.upper(), end=" ")
-                            print(iscc.encode_base64(k), end=" ")
+                            print(iscc_core.encode_base64(k), end=" ")
                             c2 = txn.cursor(db)
                             c2.set_key(k)
                             for v in c2.iternext_dup(keys=False, values=True):
