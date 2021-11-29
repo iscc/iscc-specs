@@ -7,6 +7,7 @@ from iscc_core import codec as c
 from iscc_core import gen_iscc_code_v01
 from iscc.core import code_meta
 from bitarray import bitarray as ba
+import uvarint
 
 
 @pytest.fixture
@@ -199,43 +200,11 @@ def test_code_hashable():
     assert code in {code}
 
 
-# def test_compose():
-#     mid = c.Code.rnd(c.MT.META, 64)
-#     cid = c.Code.rnd(c.MT.CONTENT, 64)
-#     did = c.Code.rnd(c.MT.DATA, 128)
-#     iid = c.Code.rnd(c.MT.INSTANCE, 256)
-#     ic = c.compose([mid, cid, did, iid])
-#     assert ic.maintype == c.MT.ISCC
-#     assert ic.length == 256
-#     assert ic.explain.startswith("ISCC-")
-#     assert c.compose([did, mid, cid, iid]) == ic
-
-
-# def test_compose_body():
-#     data = b"\x00" * 8
-#     mid = c.Code.rnd(c.MT.META, data=data)
-#     cid = c.Code.rnd(c.MT.CONTENT, data=data)
-#     did = c.Code.rnd(c.MT.DATA, data=data)
-#     iid = c.Code.rnd(c.MT.INSTANCE, data=data)
-#     ic = c.compose([mid, cid, did, iid])
-#     assert ic.hash_bytes == data * 4
-
-
 def test_decompose_single_component():
     code = c.Code.rnd()
     assert c.decompose(code)[0] == code
     assert c.decompose(code.code)[0] == code
     assert c.decompose(code.bytes)[0] == code
-
-
-# def test_compose_sum():
-#     did = c.Code.rnd(c.MT.DATA, 128)
-#     iid = c.Code.rnd(c.MT.INSTANCE, 256)
-#     isum = c.compose([did, iid])
-#     assert isum.maintype == c.MT.SUM
-#     assert isum.length == 256
-#     assert isum.explain.startswith("SUM-NONE")
-#     assert c.compose([iid, did]) == isum
 
 
 def test_decompose_str_of_codes():
@@ -279,11 +248,11 @@ def test_iscc_short_id_1():
     body = b"\x07" * 8 + b"\01"
     sid = iscc_core.Code((iscc.MT.ID, iscc.ST_ID.BITCOIN, iscc.VS.V0, 70, body))
     assert sid.code == "MEAAOBYHA4DQOBYHAE"
-    assert sid.explain == "ID-BITCOIN-V0-70-070707070707070701"
+    assert sid.explain == "ID-BITCOIN-V0-70-0707070707070707-1"
 
 
 def test_iscc_short_id_300():
-    body = b"\x07" * 8 + (300).to_bytes(2, "big", signed=False)
+    body = b"\x07" * 8 + uvarint.encode(300)
     sid = iscc_core.Code((iscc.MT.ID, iscc.ST_ID.ETHEREUM, iscc.VS.V0, 80, body))
-    assert sid.code == "MIBAOBYHA4DQOBYHAEWA"
-    assert sid.explain == "ID-ETHEREUM-V0-80-0707070707070707012c"
+    assert sid.code == "MIBAOBYHA4DQOBYHVQBA"
+    assert sid.explain == "ID-ETHEREUM-V0-80-0707070707070707-300"
