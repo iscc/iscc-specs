@@ -313,7 +313,7 @@ python-versions = "*"
 
 [[package]]
 name = "iscc-core"
-version = "0.1.5"
+version = "0.1.6"
 description = "ISCC - Core Algorithms"
 category = "main"
 optional = false
@@ -1259,7 +1259,7 @@ iniconfig = [
     {file = "iniconfig-1.1.1.tar.gz", hash = "sha256:bc3af051d7d14b2ee5ef9969666def0cd1a000e121eaea580d4a313df4b37f32"},
 ]
 iscc-core = [
-    {file = "iscc-core-0.1.5.tar.gz", hash = "sha256:c3534f4f7be691d9ade21638b36f29fe9be4c8966583b6780ff54b93389875be"},
+    {file = "iscc-core-0.1.6.tar.gz", hash = "sha256:dac9549ffe55024f9e2c7a4a443e56e91ca29c1b92c35c0ef504b463734158aa"},
 ]
 iscc-samples = [
     {file = "iscc-samples-0.4.0.tar.gz", hash = "sha256:98925bec8adcc8c843ddd42b32d0c7972ed1c2ff635cb44144fd7c08929d2a2f"},
