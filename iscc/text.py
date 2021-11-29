@@ -8,7 +8,7 @@ import langdetect
 import xxhash
 from functools import lru_cache
 import langcodes
-from iscc.schema import FeatureType, Options
+from iscc.schema import FeatureType, SdkOptions
 from iscc_core.cdc import data_chunks
 from iscc import uread
 from iscc.utils import sliding_window
@@ -66,7 +66,7 @@ def extract_text_metadata(data, **options):
     :param data: File with textual content
     :key text_guess_title: Guess title from content if not found in metadata.
     """
-    opts = Options(**options)
+    opts = SdkOptions(**options)
     file = uread.open_data(data)
     tika_result = _extract_with_tika(file)
 
@@ -107,7 +107,7 @@ def extract_text_features(text, **options):
     :key text_ngram_size: Sliding window size in number of characters.
     :returns dict: Dictionary with 'sizes' and 'features'.
     """
-    opts = Options(**options)
+    opts = SdkOptions(**options)
     text = text.lower()
     chunks = chunk_text(text, text_avg_chunk_size=opts.text_avg_chunk_size)
     sizes = []
@@ -162,7 +162,7 @@ def hash_text(text, **options):
     Create a 256-bit similarity preserving hash for text input.
     Text should be normalized before hash creation.
     """
-    opts = Options(**options)
+    opts = SdkOptions(**options)
     text = text.lower()
     ngrams = ("".join(chars) for chars in sliding_window(text, opts.text_ngram_size))
     features = [xxhash.xxh32_intdigest(s.encode("utf-8")) for s in ngrams]
@@ -178,7 +178,7 @@ def chunk_text(text, **options):
     :param text: normalized plaintext
     :key: text_avg_chunk_size: Targeted average size of text chunks in bytes.
     """
-    opts = Options(**options)
+    opts = SdkOptions(**options)
     avg_size = opts.text_avg_chunk_size
     data = text.encode("utf-32-be")
     avg_size *= 4  # 4 bytes per character
@@ -216,7 +216,7 @@ def _title_from_tika(tika_result, **options):
     :key: text_guess_title: whether to guess the title from the text itself as fallback.
     :key: meta_trim_title: Max number of bytes for utf-8 encoded title.
     """
-    opts = Options(**options)
+    opts = SdkOptions(**options)
     title = ""
     meta = tika_result.get("metadata")
     mime_type = mime_clean(meta.get("Content-Type"))

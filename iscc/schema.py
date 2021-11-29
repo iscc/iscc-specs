@@ -5,10 +5,11 @@ import mmap
 from io import BufferedReader, BytesIO
 from pathlib import Path
 from typing import BinaryIO, List, Optional, Union
-from pydantic import BaseSettings, BaseModel, Field, validator, conint, confloat, constr
+from pydantic import BaseModel, Field, validator, conint, confloat, constr
 from iscc import APP_DIR
 from os.path import join
 from iscc.metrics import distance_b64
+from iscc_core.options import CoreOptions
 
 
 DEFAULT_WINDOW = 7
@@ -28,11 +29,11 @@ IndexKey = Union[
 ]
 
 
-class Options(BaseSettings):
+class SdkOptions(CoreOptions):
     """Options for ISCC generation"""
 
     class Config:
-        env_file = ".env"
+        env_file = "iscc-sdk.env"
         env_file_encoding = "utf-8"
 
     all_granular: Optional[bool] = Field(
@@ -47,29 +48,12 @@ class Options(BaseSettings):
         "(overrides individual options).",
     )
 
-    meta_bits: int = Field(64, description="Length of generated Meta-Code in bits")
+    # meta_bits: int = Field(64, description="Length of generated Meta-Code in bits")
 
     meta_title_from_uri: bool = Field(
         True,
         description="Use normalized filename as title if we have nor explicit title "
         "and also no title from metadata extraction.",
-    )
-
-    meta_trim_title: int = Field(
-        128, description="Trim title length to this mumber of bytes"
-    )
-    meta_trim_extra: int = Field(4096, description="Trim extra to this number of bytes")
-
-    meta_ngram_size: int = Field(
-        3, description="Number of characters for sliding window over metadata text."
-    )
-
-    text_bits: int = Field(
-        64, description="Length of generated Content-ID-Text in bits"
-    )
-
-    text_ngram_size: int = Field(
-        13, description="Number of characters per feature hash (size of sliding window)"
     )
 
     text_granular: bool = Field(
@@ -89,10 +73,6 @@ class Options(BaseSettings):
     text_store: bool = Field(
         False,
         description="Store extracted paintext (with filename: <datahash>.txt.gz).",
-    )
-
-    image_bits: int = Field(
-        64, description="Length of generated Content-ID-Image in bits"
     )
 
     image_trim: bool = Field(
@@ -121,10 +101,6 @@ class Options(BaseSettings):
         description="Transpose according to EXIF Orientation tag before hashing",
     )
 
-    audio_bits: int = Field(
-        64, description="Length of generated Content-ID-Audio in bits"
-    )
-
     audio_granular: bool = Field(
         True, description="Calculate and return granular audio features"
     )
@@ -132,10 +108,6 @@ class Options(BaseSettings):
     audio_max_duration: int = Field(
         0,
         description="Maximum seconds of audio to process (0 for full fingerprint)",
-    )
-
-    video_bits: int = Field(
-        64, description="Length of generated Content-ID-Video in bits"
     )
 
     video_fps: int = Field(
@@ -179,12 +151,6 @@ class Options(BaseSettings):
         description="Minimum number of frames per scene. (PySceneDetect only)",
     )
 
-    # video_scenes_previews: bool = Field(
-    #     False,
-    #     description="Generate and return per scene preview thumbnails when scene "
-    #     "detection is used.",
-    # )
-
     video_window: int = Field(
         7,
         description="Seconds of video per granular feature if using rolling window mode",
@@ -206,24 +172,10 @@ class Options(BaseSettings):
         "(use the string `auto` as value to activate).",
     )
 
-    data_bits: int = Field(64, description="Length of generated Data-Code in bits")
-
-    data_avg_chunk_size: int = Field(
-        1024, description="Average chunk size for data chunking."
-    )
-
     data_granular: bool = Field(False, description="Return granular data features.")
 
     data_granular_factor: int = Field(
         64, description="Size of granular data chunks time average chunk size"
-    )
-
-    instance_bits: int = Field(
-        64, description="Length of generated Instance-Code in bits"
-    )
-
-    io_chunk_size: int = Field(
-        262144, description="Number of bytes per io read operation"
     )
 
     index_root: Path = Field(join(APP_DIR, "db"), description="Storage root path")

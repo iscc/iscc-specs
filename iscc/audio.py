@@ -4,7 +4,7 @@ import json
 import subprocess
 from more_itertools import chunked
 from iscc.bin import fpcalc_bin, fpcalc_install
-from iscc.schema import FeatureType, Options, Readable
+from iscc.schema import FeatureType, SdkOptions, Readable
 from iscc.codec import encode_base64
 from typing import Any, List
 from iscc import uread
@@ -18,7 +18,7 @@ def extract_audio_features(data, **options):
     - duration: total duration of extracted fingerprint in seconds (Broken with pipe)
     - fingerprint: 32-bit (4 byte) integers as features
     """
-    opts = Options(**options)
+    opts = SdkOptions(**options)
     length = str(opts.audio_max_duration)
     file = uread.open_data(data)
     cmd = [fpcalc_bin(), "-raw", "-json", "-signed", "-length", length, "-"]

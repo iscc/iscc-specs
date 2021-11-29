@@ -11,7 +11,7 @@ from PIL import Image, ImageChops, ImageEnhance
 import numpy as np
 from more_itertools import chunked
 import iscc
-from iscc.schema import FeatureType, Options, Readable
+from iscc.schema import FeatureType, SdkOptions, Readable
 from iscc.simhash import similarity_hash
 from iscc.text import normalize_text
 from iscc import uread
@@ -142,7 +142,7 @@ def extract_image_features(data, n=32):
 def extract_image_preview(img, **options):
     # type: (Union[str, Path, Image.Image], **Any) -> Image.Image
     """Create a thumbnail for an image."""
-    opts = Options(**options)
+    opts = SdkOptions(**options)
     size = opts.image_preview_size
     if not isinstance(img, Image.Image):
         img = Image.open(img)
@@ -156,7 +156,7 @@ def extract_image_preview(img, **options):
 def encode_image_to_data_uri(img, **options):
     # type: (Union[str, Path, Image.Image, bytes, io.BytesIO], **Any) -> str
     """Converts image to WebP data-uri."""
-    opts = Options(**options)
+    opts = SdkOptions(**options)
     quality = opts.image_preview_quality
 
     if isinstance(img, bytes):

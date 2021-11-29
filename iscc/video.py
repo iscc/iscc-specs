@@ -15,7 +15,7 @@ from typing import Any, Generator, List, Tuple, Optional, Union
 from statistics import mode
 from langcodes import standardize_tag
 from iscc import uread
-from iscc.schema import FeatureType, Options, Readable, File, Uri
+from iscc.schema import FeatureType, SdkOptions, Readable, File, Uri
 from iscc.codec import encode_base64
 from iscc.mp7 import Frame
 from iscc.bin import ffmpeg_bin, ffprobe_bin
@@ -128,7 +128,7 @@ def extract_video_metadata(data):
 def extract_video_preview(file, **options):
     # type: (Union[File, Uri], **Any) -> Optional[bytes]
     """Extract thumbnail from video and return raw png byte data."""
-    opts = Options(**options)
+    opts = SdkOptions(**options)
     size = opts.image_preview_size
     infile = uread.open_data(file)
 
@@ -168,7 +168,7 @@ def extract_video_signature(uri, crop=None, **options):
     :return: raw signature data
     """
 
-    opts = Options(**options)
+    opts = SdkOptions(**options)
 
     infile = uread.open_data(uri)
     if not hasattr(infile, "name"):
@@ -213,7 +213,7 @@ def extract_video_signature_cutpoints(uri, crop=None, **options):
     :return: raw signature data
     """
 
-    opts = Options(**options)
+    opts = SdkOptions(**options)
 
     infile = uread.open_data(uri)
     if not hasattr(infile, "name"):
@@ -286,7 +286,7 @@ def compute_video_features_rolling(frames, **options):
     Generates segment-wise features where 'window' is the duration of segments in
     seconds and 'overlap' is the number of seconds that overlap for each segment.
     """
-    opts = Options(**options)
+    opts = SdkOptions(**options)
     window = opts.video_window
     overlap = opts.video_overlap
     assert overlap < window, "Overlap must be shorter than window"
@@ -370,7 +370,7 @@ def detect_video_scenes(uri, **options):
             "Please install `scenedetect`python module for advanced scenedetection."
         )
 
-    opts = Options(**options)
+    opts = SdkOptions(**options)
 
     infile = uread.open_data(uri)
     if not hasattr(infile, "name"):
@@ -445,7 +445,7 @@ def parse_ffmpeg_scenes(scene_text, **options):
     if not scene_text.strip():
         return []
 
-    opts = Options(**options)
+    opts = SdkOptions(**options)
     times = []
     scores = []
     for line in scene_text.splitlines():

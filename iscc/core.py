@@ -20,7 +20,7 @@ from iscc import text, image, audio, video
 from iscc.mp7 import read_ffmpeg_signature
 from iscc.schema import (
     GMT,
-    Options,
+    SdkOptions,
     Uri,
     Data,
     File,
@@ -48,7 +48,7 @@ def code_iscc(uri, title=None, extra=None, **options):
     :param extra: Metadata to be used for Meta-Code generation
     :param options: See iscc.schema.Options for detailed ISCC generator options.
     """
-    opts = Options(**options)
+    opts = SdkOptions(**options)
     result = {"version": "0-0-0"}
     features = []
 
@@ -119,7 +119,7 @@ def code_meta(title, extra=None, **options):
     :key meta_trim_extra: Trim extra data to this number of bytes
     :returns: Dict keys: code, title, matahash, (extra)
     """
-    opts = Options(**options)
+    opts = SdkOptions(**options)
     extra = None if extra in (b"", "", bytearray(), None) else extra
 
     if isinstance(extra, dict):
@@ -169,7 +169,7 @@ def code_text(data, **options):
 
     :param data: Any kind of text document
     """
-    opts = Options(**options)
+    opts = SdkOptions(**options)
     result = {}
 
     f = uread.open_data(data)
@@ -201,7 +201,7 @@ def code_image(data, **options):
     :key bool image_granular: Wether to compute granular image features
     :key int image_granular_n: Number of features to compute (default 32)
     """
-    opts = Options(**options)
+    opts = SdkOptions(**options)
 
     try:
         result = image.extract_image_metadata(data) or {}
@@ -256,7 +256,7 @@ def code_image(data, **options):
 def code_audio(data, **options):
     # type: (Union[Uri, Data, List], **Any) -> dict
     """Generate Audio-ID from file(path) or Chromaprint features"""
-    opts = Options(**options)
+    opts = SdkOptions(**options)
     result = dict()
 
     if isinstance(data, list):
@@ -290,7 +290,7 @@ def code_audio(data, **options):
 def code_video(uri, **options):
     # type: (Union[Uri, File], **Any) -> dict
     """Compute Content-ID video."""
-    opts = Options(**options)
+    opts = SdkOptions(**options)
     result = {}
     metadata = video.extract_video_metadata(uri)
     result.update(metadata)
@@ -359,15 +359,15 @@ def code_data(data, **options):
     :rtype: dict
     """
 
-    opts = Options(**options)
+    opts = SdkOptions(**options)
     stream = uread.open_data(data)
 
     hasher = iscc_core.DataHasherV0()
-    data = stream.read(opts.io_chunk_size)
+    data = stream.read(opts.io_read_size)
 
     while data:
         hasher.push(data)
-        data = stream.read(opts.io_chunk_size)
+        data = stream.read(opts.io_read_size)
 
     code = hasher.code(bits=opts.data_bits)
     result = dict(code=code)
@@ -398,7 +398,7 @@ def code_instance(data, **options):
     :return: An InstanceCode conformant dict with attributes: code, datahash, filesize
     :rtype: dict
     """
-    opts = Options(**options)
+    opts = SdkOptions(**options)
     stream = uread.open_data(data)
     code = iscc_core.gen_instance_code_v0(stream, opts.instance_bits)
     return code.dict()

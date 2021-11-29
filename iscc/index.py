@@ -36,7 +36,7 @@ import iscc
 import lmdb
 import shutil
 from humanize import naturalsize
-from iscc.schema import FeatureMatch, IsccMatch, QueryResult, Options, ISCC
+from iscc.schema import FeatureMatch, IsccMatch, QueryResult, SdkOptions, ISCC
 import msgpack
 from annoy import AnnoyIndex
 
@@ -60,7 +60,7 @@ class Index:
         :key bool index_metadata: Store metadata in index (default False).
         """
 
-        self.opts = Options(**options)
+        self.opts = SdkOptions(**options)
 
         self.name = name
         self.dbpath = join(self.opts.index_root, self.name)

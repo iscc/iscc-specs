@@ -6,7 +6,7 @@ from codetiming import Timer
 from more_itertools import chunked
 from iscc_core.minhash import minhash_64
 from iscc.codec import encode_base64
-from iscc.schema import FeatureType, Options
+from iscc.schema import FeatureType, SdkOptions
 
 
 def encode_data_features(sizes, features, **options):
@@ -15,7 +15,7 @@ def encode_data_features(sizes, features, **options):
 
     :return: dicttionary with {"sizes": ..., "features": ...}
     """
-    opts = Options(**options)
+    opts = SdkOptions(**options)
     with Timer(text="data features encoding took {:0.4f}s", logger=log.debug):
         encoded_sizes = [sum(fh) for fh in chunked(sizes, opts.data_granular_factor)]
         encoded_features = [
