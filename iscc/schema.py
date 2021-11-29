@@ -455,56 +455,6 @@ class ISCC(BaseModel):
     )
 
 
-class TextCode(BaseModel):
-    code: str = Field(
-        ...,
-        title="Text-Code",
-        description="Content-Code Text in standard representation.",
-    )
-
-    title: Optional[str] = Field(description="The title of the text.")
-
-    characters: Optional[int] = Field(
-        description="Number of text characters (code points after Unicode "
-        "normalization) (GMT Text only)."
-    )
-
-    language: Optional[str] = Field(description="Main language of content (BCP-47)")
-
-    features: Optional[List[str]] = Field(description="List of hashes per text chunk")
-
-    sizes: Optional[List[int]] = Field(description="Sizes of text chunks in characters")
-
-
-class ImageCode(BaseModel):
-
-    code: str = Field(
-        ...,
-        title="Image-Code",
-        description="Content-Code Image in standard representation.",
-    )
-
-    title: Optional[str] = Field(description="The title of the image.")
-
-    width: Optional[int] = Field(description="Width of original image in pixels.")
-    height: Optional[int] = Field(description="Height of original image in pixels.")
-    preview: Optional[str] = Field(description="Data-Uri of image preview thumbnail.")
-
-
-class DataCode(BaseModel):
-    code: str = Field(
-        ..., title="Instance-Code", description="Data-Code in standard representation."
-    )
-    features: Optional[List[str]] = Field(description="List of hashes per datachunk")
-    sizes: Optional[List[int]] = Field(description="Sizes of datachunks")
-
-
-class InstanceCode(BaseModel):
-    code: str = Field(..., description="Instance-Code in standard representation.")
-    datahash: str = Field(description="Blake3 hash of resource (as hex-string).")
-    filesize: int = Field(description="File size in bytes.")
-
-
 if __name__ == "__main__":
     """Save ISCC JSON schema"""
     from os.path import abspath, dirname, join

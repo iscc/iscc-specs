@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
 import pytest
+from iscc_core import ContentCodeText
+
 import iscc
 from iscc.text import _extract_with_tika
 from iscc.codec import Code
-from iscc.schema import TextCode
 from fauxfactory.factories.strings import gen_utf8
 from iscc_samples import texts
 from tests.test_readables import text_readables
@@ -55,7 +56,7 @@ def test_extract_text_metadata():
 
 def test_code_text_empty():
     r64 = iscc.code_text(b"", text_granular=False)
-    assert TextCode(**r64)
+    assert ContentCodeText(**r64)
     assert r64 == dict(code="EAASL4F2WZY7KBXB", characters=0)
     r128 = iscc.code_text(b"", text_bits=128, text_granular=False)
     assert r128 == dict(code="EABSL4F2WZY7KBXBYUZPREWZ26IXU", characters=0)
