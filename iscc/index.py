@@ -36,7 +36,8 @@ import iscc
 import lmdb
 import shutil
 from humanize import naturalsize
-from iscc.schema import FeatureMatch, IsccMatch, QueryResult, SdkOptions, ISCC
+from iscc.schema import FeatureMatch, IsccMatch, QueryResult, ISCC
+from iscc import SdkOptions
 import msgpack
 from annoy import AnnoyIndex
 

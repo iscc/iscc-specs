@@ -11,10 +11,10 @@ from PIL import Image, ImageChops, ImageEnhance
 import numpy as np
 from more_itertools import chunked
 import iscc
-from iscc.schema import FeatureType, SdkOptions, Readable
+from iscc.schema import FeatureType, Readable
 from iscc.simhash import similarity_hash
 from iscc.text import normalize_text
-from iscc import uread
+from iscc import SdkOptions, uread
 
 
 IMAGE_META_MAP = {

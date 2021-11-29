@@ -4,7 +4,8 @@ import json
 import subprocess
 from more_itertools import chunked
 from iscc.bin import fpcalc_bin, fpcalc_install
-from iscc.schema import FeatureType, SdkOptions, Readable
+from iscc.schema import FeatureType, Readable
+from iscc.options import SdkOptions
 from iscc.codec import encode_base64
 from typing import Any, List
 from iscc import uread

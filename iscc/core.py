@@ -16,17 +16,16 @@ from PIL import Image
 from blake3 import blake3
 import iscc
 from iscc import jcs
-from iscc import text, image, audio, video
 from iscc.mp7 import read_ffmpeg_signature
 from iscc.schema import (
     GMT,
-    SdkOptions,
     Uri,
     Data,
     File,
     Readable,
     ISCC,
 )
+from iscc.options import SdkOptions
 from iscc.mediatype import mime_guess, mime_to_gmt
 from iscc import uread
 from iscc.data import encode_data_features
@@ -90,7 +89,7 @@ def code_iscc(uri, title=None, extra=None, **options):
     if not title:
         title = content.get("title")
     if not title and file_name:
-        title = text.name_from_uri(file_name)
+        title = iscc.text.name_from_uri(file_name)
 
     meta = code_meta(title, extra, **options)
     result.update(meta)
@@ -173,9 +172,9 @@ def code_text(data, **options):
     result = {}
 
     f = uread.open_data(data)
-    metadata = text.extract_text_metadata(f, **options)
+    metadata = iscc.text.extract_text_metadata(f, **options)
     result.update(metadata)
-    text_raw = text.extract_text(f)
+    text_raw = iscc.text.extract_text(f)
     text_code = iscc_core.gen_text_code_v0(text_raw, bits=opts.text_bits)
     result.update(text_code.dict(exclude_unset=True))
 
@@ -184,7 +183,7 @@ def code_text(data, **options):
     )
     if granular:
         text_norm = normalize_text(text_raw)
-        features = text.extract_text_features(text_norm, **options)
+        features = iscc.text.extract_text_features(text_norm, **options)
         result["features"] = features
 
     if opts.text_store:
@@ -204,7 +203,7 @@ def code_image(data, **options):
     opts = SdkOptions(**options)
 
     try:
-        result = image.extract_image_metadata(data) or {}
+        result = iscc.image.extract_image_metadata(data) or {}
     except Exception as e:
         log.error(f"Failed image metadata extraction: {e}")
         result = {}
@@ -235,7 +234,7 @@ def code_image(data, **options):
     )
     if granular:
         try:
-            feat_obj = image.extract_image_features(data, n=opts.image_granular_n)
+            feat_obj = iscc.image.extract_image_features(data, n=opts.image_granular_n)
             result["features"] = feat_obj
         except Exception as e:
             log.error("image feature extraction failed")
@@ -246,8 +245,8 @@ def code_image(data, **options):
     )
 
     if do_preview:
-        preview = image.extract_image_preview(img_obj, **options)
-        preview_uri = image.encode_image_to_data_uri(preview, **options)
+        preview = iscc.image.extract_image_preview(img_obj, **options)
+        preview_uri = iscc.image.encode_image_to_data_uri(preview, **options)
         result["preview"] = preview_uri
 
     return result
@@ -262,9 +261,9 @@ def code_audio(data, **options):
     if isinstance(data, list):
         chroma = dict(fingerprint=data)
     else:
-        chroma = audio.extract_audio_features(data, **options)
+        chroma = iscc.audio.extract_audio_features(data, **options)
         # TODO: implement custom audio metadata extraction
-        metadata = video.extract_video_metadata(data)
+        metadata = iscc.video.extract_video_metadata(data)
         # We remove video related keys that are detected in some audio files.
         metadata.pop("fps", None)
         metadata.pop("width", None)
@@ -280,7 +279,7 @@ def code_audio(data, **options):
         else opts.audio_granular
     )
     if granular:
-        features = audio.encode_audio_features(chroma["fingerprint"])
+        features = iscc.audio.encode_audio_features(chroma["fingerprint"])
         result["features"] = features
 
     result["code"] = audio_code.code
@@ -292,10 +291,10 @@ def code_video(uri, **options):
     """Compute Content-ID video."""
     opts = SdkOptions(**options)
     result = {}
-    metadata = video.extract_video_metadata(uri)
+    metadata = iscc.video.extract_video_metadata(uri)
     result.update(metadata)
 
-    crop_value = video.detect_video_crop(uri) if opts.video_crop else None
+    crop_value = iscc.video.detect_video_crop(uri) if opts.video_crop else None
 
     granular = (
         opts.all_granular
@@ -305,11 +304,11 @@ def code_video(uri, **options):
     do_ffmpeg_scenes = granular and opts.video_scenes_ffmpeg
 
     if do_ffmpeg_scenes:
-        signature, cutpoints = video.extract_video_signature_cutpoints(
+        signature, cutpoints = iscc.video.extract_video_signature_cutpoints(
             uri, crop_value, **options
         )
     else:
-        signature = video.extract_video_signature(uri, crop_value, **options)
+        signature = iscc.video.extract_video_signature(uri, crop_value, **options)
 
     with Timer(text="video signature decoding took {:0.4f}s", logger=log.debug):
         frames = read_ffmpeg_signature(signature)
@@ -326,18 +325,18 @@ def code_video(uri, **options):
     )
 
     if do_preview:
-        img_raw = video.extract_video_preview(uri)
-        result["preview"] = image.encode_image_to_data_uri(img_raw)
+        img_raw = iscc.video.extract_video_preview(uri)
+        result["preview"] = iscc.image.encode_image_to_data_uri(img_raw)
 
     if not granular:
         return result
 
     if opts.video_scenes:
         if not opts.video_scenes_ffmpeg:
-            cutpoints = video.detect_video_scenes(uri, **options)
-        features = video.compute_video_features_scenes(frames, cutpoints)
+            cutpoints = iscc.video.detect_video_scenes(uri, **options)
+        features = iscc.video.compute_video_features_scenes(frames, cutpoints)
     else:
-        features = video.compute_video_features_rolling(frames, **options)
+        features = iscc.video.compute_video_features_rolling(frames, **options)
 
     result["features"] = features
 

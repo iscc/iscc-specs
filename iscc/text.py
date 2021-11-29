@@ -8,9 +8,9 @@ import langdetect
 import xxhash
 from functools import lru_cache
 import langcodes
-from iscc.schema import FeatureType, SdkOptions
+from iscc.schema import FeatureType
 from iscc_core.cdc import data_chunks
-from iscc import uread
+from iscc import SdkOptions, uread
 from iscc.utils import sliding_window
 from iscc.codec import encode_base64
 from iscc.schema import Readable
