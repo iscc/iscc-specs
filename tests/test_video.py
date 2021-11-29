@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 import iscc_core
 import pytest
-import iscc
 from iscc.core import code_video
 from iscc import video, mp7
 from blake3 import blake3
@@ -328,6 +327,7 @@ def test_extract_video_signature_with_crop():
     assert sigh == "5dc1f30d13d798b062c2a47870364a9f5a6e2161bdd6e242e93eb5e6309bc4fa"
 
 
+@pytest.mark.slow
 def test_code_video_hwaccel():
     ra = code_video(SAMPLE)
     rb = code_video(SAMPLE, video_hwaccel="auto")

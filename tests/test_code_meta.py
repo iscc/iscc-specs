@@ -30,7 +30,7 @@ def test_code_meta_extra_text():
     assert iscc.code_meta("Hello World", "Some Description") == {
         "code": "AAA77PPFVTPBZ5L7",
         "extra": "Some Description",
-        "metahash": "543a47e96f1d6c6e2515a9f98484df6de4c819ae2f8b1d14a5d9b4751d3e4f0d",
+        "metahash": "d916f95eaa226a1ffa3d1cb44e8f570cfbd4cb0e84f0d990c299d4f52e9709a2",
         "title": "Hello World",
     }
 
@@ -39,7 +39,7 @@ def test_code_meta_extra_dict():
     assert iscc.code_meta("Hello World", {"Some": "Description"}) == {
         "code": "AAA77PPFVTNH55L7",
         "extra": '"Some":"Description"',
-        "metahash": "ae4dfd36a9c6c1b2170f1328dbd0af11e0725713d50d3dabb7dacf5732e69623",
+        "metahash": "43af9020f7e93c602482d98fee0e723408ee84aa08e3f3ca5c6abd83fd07ebf5",
         "title": "Hello World",
     }
 
@@ -58,7 +58,7 @@ def test_code_meta_extra_schema_org():
         "code": "AAA77PPFVQJUAP6S",
         "extra": '"@context":"http://schema.org/","@type":"Person","jobTitle":"Professor","name":"Jane '
         'Doe","telephone":"425 1234567","url":"http://www.janedoe.com"',
-        "metahash": "b7b701a9c02155f5d617b55477d49950f670d5ac4ed97f6ba12948fff312d3c2",
+        "metahash": "e5e901c618337a9a467b48adaf0b696cc2ae53a5c75675d9c04fcbc388de55df",
         "title": "Hello World",
     }
 
@@ -80,6 +80,6 @@ def test_code_meta_extra_json_ld():
         "extra": '"@context":"ical":"http://www.w3.org/2002/12/cal/ical#","ical:dtstart":"@type":"xsd:dateTime","xsd":"http://www.w3.org/2001/XMLSchema#","ical:dtstart":"20110409T20:00:00Z","ical:location":"New '
         'Orleans Arena, New Orleans, Louisiana, USA","ical:summary":"Lady '
         'Gaga Concert"',
-        "metahash": "e2f123b51f44268f1361f513629c3013366a853075fb32329b3316727313e837",
+        "metahash": "cc61ddc04fd00f335b757550d477e11357152b016bed686d67b742c9da93254f",
         "title": "Hello World",
     }

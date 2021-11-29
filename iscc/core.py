@@ -96,7 +96,7 @@ def code_iscc(uri, title=None, extra=None, **options):
     result.update(meta)
     del result["code"]
 
-    iscc_code_obj = iscc_core.compose(
+    iscc_code_obj = iscc_core.gen_iscc_code(
         [meta["code"], content["code"], data["code"], instance["code"]]
     )
     result["iscc"] = iscc_code_obj.code
