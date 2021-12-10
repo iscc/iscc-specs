@@ -201,7 +201,7 @@ def test_code_hashable():
 
 
 def test_decompose_single_component():
-    code = c.Code.rnd()
+    code = c.Code.rnd(mt=c.MT.META)
     assert c.decompose(code)[0] == code
     assert c.decompose(code.code)[0] == code
     assert c.decompose(code.bytes)[0] == code
