@@ -17,9 +17,6 @@ from typing import List, Union, Any
 from PIL import Image
 from blake3 import blake3
 import iscc
-
-# from image import encode_image_to_data_uri, extract_image_metadata
-# from iscc.audio import encode_audio_features, extract_audio_features
 from iscc import jcs
 from iscc.mp7 import read_ffmpeg_signature
 from iscc.schema import (
@@ -33,11 +30,6 @@ from iscc.schema import (
 from iscc.options import SdkOptions
 from iscc.mediatype import mime_guess, mime_to_gmt
 from iscc import uread
-import iscc.text
-import iscc.image
-import iscc.audio
-import iscc.video
-import iscc.data
 from iscc.wrappers import decompose
 from iscc_core import codec
 
@@ -45,13 +37,6 @@ from iscc_core import codec
 ###############################################################################
 # High-Level ISCC Code generator functions                                   #
 ###############################################################################
-from video import (
-    detect_video_crop,
-    extract_video_metadata,
-    extract_video_preview,
-    extract_video_signature,
-    extract_video_signature_cutpoints,
-)
 
 
 def code_iscc(uri, title=None, extra=None, **options):
@@ -308,10 +293,10 @@ def code_video(uri, **options):
     """Compute Content-ID video."""
     opts = SdkOptions(**options)
     result = {}
-    metadata = extract_video_metadata(uri)
+    metadata = iscc.video.extract_video_metadata(uri)
     result.update(metadata)
 
-    crop_value = detect_video_crop(uri) if opts.video_crop else None
+    crop_value = iscc.video.detect_video_crop(uri) if opts.video_crop else None
 
     granular = (
         opts.all_granular
@@ -321,11 +306,11 @@ def code_video(uri, **options):
     do_ffmpeg_scenes = granular and opts.video_scenes_ffmpeg
 
     if do_ffmpeg_scenes:
-        signature, cutpoints = extract_video_signature_cutpoints(
+        signature, cutpoints = iscc.video.extract_video_signature_cutpoints(
             uri, crop_value, **options
         )
     else:
-        signature = extract_video_signature(uri, crop_value, **options)
+        signature = iscc.video.extract_video_signature(uri, crop_value, **options)
 
     with Timer(text="video signature decoding took {:0.4f}s", logger=log.debug):
         frames = read_ffmpeg_signature(signature)
