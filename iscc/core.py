@@ -17,7 +17,7 @@ from typing import List, Union, Any
 from PIL import Image
 from blake3 import blake3
 import iscc
-from audio import encode_audio_features, extract_audio_features
+from iscc.audio import encode_audio_features, extract_audio_features
 from iscc import jcs
 from iscc.mp7 import read_ffmpeg_signature
 from iscc.schema import (
