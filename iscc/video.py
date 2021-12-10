@@ -3,6 +3,7 @@ import json
 
 import iscc_core
 from codetiming import Timer
+from iscc_core.code_content_video import soft_hash_video_v0
 from loguru import logger as log
 import subprocess
 from pathlib import Path
@@ -16,7 +17,7 @@ from statistics import mode
 from langcodes import standardize_tag
 from iscc import SdkOptions, uread
 from iscc.schema import FeatureType, Readable, File, Uri
-from iscc_core import encode_base64
+from iscc_core.codec import encode_base64
 from iscc.mp7 import Frame
 from iscc.bin import ffmpeg_bin, ffprobe_bin
 import av
@@ -304,9 +305,7 @@ def compute_video_features_rolling(frames, **options):
         for frame in frames[ci:]:
             segment_frames.append(tuple(frame.vector.tolist()))
             if frame.elapsed > start + window:
-                sigs.append(
-                    encode_base64(iscc_core.soft_hash_video_v0(segment_frames, bits=64))
-                )
+                sigs.append(encode_base64(soft_hash_video_v0(segment_frames, bits=64)))
                 break
     return dict(
         kind=FeatureType.video.value, features=sigs, window=window, overlap=overlap
@@ -483,9 +482,7 @@ def compute_video_features_scenes(frames, scenes):
             frame_t = tuple(frame.vector.tolist())
             segment.append(frame_t)
             if frame.elapsed >= cutpoint:
-                features.append(
-                    encode_base64(iscc_core.soft_hash_video_v0(segment, 64))
-                )
+                features.append(encode_base64(soft_hash_video_v0(segment, 64)))
                 segment = []
                 prev_cutpoint = 0 if cidx == 0 else scenes[cidx - 1]
                 duration = round(cutpoint - prev_cutpoint, 3)
@@ -495,7 +492,7 @@ def compute_video_features_scenes(frames, scenes):
     if not features:
         log.info("No scenes detected. Use all frames")
         segment = [tuple(frame.vector.tolist()) for frame in frames]
-        features = [encode_base64(iscc_core.soft_hash_video_v0(segment, 64))]
+        features = [encode_base64(soft_hash_video_v0(segment, 64))]
         sizes = [round(float(frames[-1].elapsed), 3)]
 
     return dict(kind=FeatureType.video.value, version=0, features=features, sizes=sizes)

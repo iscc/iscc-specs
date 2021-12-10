@@ -9,6 +9,7 @@ import iscc
 import iscc_core
 from bidict import bidict
 from collections import defaultdict
+from iscc.wrappers import decompose
 
 
 __all__ = ["SimpleIndex", "SimpleSplitIndex"]
@@ -74,7 +75,7 @@ class SimpleIndex:
 
     @staticmethod
     def normalize(code):
-        return iscc_core.gen_iscc_code(iscc.decompose(code))
+        return iscc_core.gen_iscc_code_v0([c.code for c in decompose(code)]).code_obj
 
     def __contains__(self, item):
         return self.normalize(item).code in self.isccs.inverse
@@ -101,7 +102,7 @@ class SimpleSplitIndex:
         self.isccs[new_id] = norm_code_obj.code
 
         # Index components
-        for component in iscc.decompose(norm_code_obj):
+        for component in decompose(norm_code_obj):
             # Create index for component type if we don't have one yet
             if component.type_id not in self.codes:
                 self.codes[component.type_id] = defaultdict(list)
@@ -113,7 +114,7 @@ class SimpleSplitIndex:
         query_code = self.normalize(code)
         result = []
         seen = set()
-        for comp_code in iscc.decompose(query_code):
+        for comp_code in decompose(query_code):
             index = self.codes.get(comp_code.type_id, {})
             for index_ba in index.keys():
                 distance = count_xor(comp_code.hash_ba, index_ba)
@@ -131,7 +132,7 @@ class SimpleSplitIndex:
 
     @staticmethod
     def normalize(code):
-        return iscc_core.gen_iscc_code(iscc_core.decompose(code))
+        return iscc_core.gen_iscc_code_v0([c.code for c in decompose(code)]).code_obj
 
     def __contains__(self, item):
         return self.normalize(item).code in self.isccs.inverse

@@ -4,7 +4,7 @@ from iscc_core import ContentCodeText
 
 import iscc
 from iscc.text import _extract_with_tika
-from iscc_core import Code
+from iscc_core.codec import Code
 from fauxfactory.factories.strings import gen_utf8
 from iscc_samples import texts
 from tests.test_readables import text_readables
@@ -57,32 +57,32 @@ def test_extract_text_metadata():
 def test_code_text_empty():
     r64 = iscc.code_text(b"", text_granular=False)
     assert ContentCodeText(**r64)
-    assert r64 == dict(code="EAASL4F2WZY7KBXB", characters=0)
+    assert r64 == dict(iscc="EAASL4F2WZY7KBXB", characters=0)
     r128 = iscc.code_text(b"", text_bits=128, text_granular=False)
-    assert r128 == dict(code="EABSL4F2WZY7KBXBYUZPREWZ26IXU", characters=0)
+    assert r128 == dict(iscc="EABSL4F2WZY7KBXBYUZPREWZ26IXU", characters=0)
 
     with pytest.raises(AssertionError):
-        iscc.distance(r64["code"], r128["code"])
+        iscc.distance(r64["iscc"], r128["iscc"])
 
-    assert iscc.distance(Code(r64["code"]), Code(r128["code"]), mixed=True) == 0
+    assert iscc.distance(Code(r64["iscc"]), Code(r128["iscc"]), mixed=True) == 0
 
 
 def test_code_text_nogrn():
     a = iscc.code_text(TEXT_A.encode("utf-8"), text_granular=False)
     assert a == {
         "characters": 291,
-        "code": "EAAR7BVKOFMBVNE4",
+        "iscc": "EAAR7BVKOFMBVNE4",
         "language": "en",
         "title": "Their most significant and usefull property of similaritypreserving",
     }
     b = iscc.code_text(TEXT_B.encode("utf-8"), text_granular=False)
     assert b == {
         "characters": 289,
-        "code": "EAAR7BVKOFMBVNGM",
+        "iscc": "EAAR7BVKOFMBVNGM",
         "language": "en",
         "title": "The most significant and usefull property of similaritypreserving",
     }
-    assert iscc.distance(a["code"], b["code"]) == 2
+    assert iscc.distance(a["iscc"], b["iscc"]) == 2
 
 
 def test_code_text_granular():
@@ -91,7 +91,7 @@ def test_code_text_granular():
     )
     assert a == {
         "characters": 291,
-        "code": "EAAR7BVKOFMBVNE4",
+        "iscc": "EAAR7BVKOFMBVNE4",
         "features": {
             "features": ["XYy_cVAdfP8", "7LaIeVSCsaA", "_pZVWTpBYOY", "kSem2vF2HOo"],
             "sizes": [78, 91, 66, 56],
@@ -106,7 +106,7 @@ def test_code_text_granular():
     )
     assert b == {
         "characters": 289,
-        "code": "EAAR7BVKOFMBVNGM",
+        "iscc": "EAAR7BVKOFMBVNGM",
         "features": {
             "features": ["XY29cVA9fO4", "7LaIeVSCsaA", "_pZVWTpBYOY", "kSem2vF2HOo"],
             "sizes": [76, 91, 66, 56],
@@ -116,7 +116,7 @@ def test_code_text_granular():
         "language": "en",
         "title": "The most significant and usefull property of similaritypreserving",
     }
-    assert iscc.distance(a["code"], b["code"]) == 2
+    assert iscc.distance(a["iscc"], b["iscc"]) == 2
 
 
 def test_hash_text():

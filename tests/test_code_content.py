@@ -7,7 +7,7 @@ def test_content_code_with_text_nogran():
     tc = iscc.code_content(s.texts()[0], text_granular=False)
     assert tc == {
         "characters": 6068,
-        "code": "EAASS2POFKWX7KDJ",
+        "iscc": "EAASS2POFKWX7KDJ",
         "gmt": "text",
         "language": "ca",
         "mediatype": "application/msword",
@@ -18,7 +18,7 @@ def test_content_code_with_text_nogran():
 def test_content_code_with_image_nogran():
     tc = iscc.code_content(s.images()[2], image_preview=False, image_granular=False)
     assert tc == {
-        "code": "EEA4GQZQTY6J5DTH",
+        "iscc": "EEA4GQZQTY6J5DTH",
         "gmt": "image",
         "height": 133,
         "mediatype": "image/jpeg",
@@ -30,7 +30,7 @@ def test_content_code_with_image_nogran():
 def test_content_code_with_audio_nogran():
     tc = iscc.code_content(s.audios()[0], audio_granular=False)
     assert tc == {
-        "code": "EIAWUJFCEZZOJYVD",
+        "iscc": "EIAWUJFCEZZOJYVD",
         "duration": 15.503,
         "gmt": "audio",
         "mediatype": "audio/aiff",
@@ -41,7 +41,7 @@ def test_content_code_with_audio_nogran():
 def test_content_code_with_video_nogran():
     tc = iscc.code_content(s.videos()[0], video_granular=False, video_preview=False)
     assert tc == {
-        "code": "EMAVNGMC7RMJFOWZ",
+        "iscc": "EMAVNGMC7RMJFOWZ",
         "duration": 60.042,
         "fps": 24.0,
         "gmt": "video",

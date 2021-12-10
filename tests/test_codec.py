@@ -1,47 +1,50 @@
 # -*- coding: utf-8 -*-
+import os
 from binascii import unhexlify
 import pytest
 import iscc
 import iscc_core
 from iscc_core import codec as c
-from iscc_core import gen_iscc_code_v01
+from iscc_core import gen_iscc_code_v0
 from iscc.core import code_meta
 from bitarray import bitarray as ba
 import uvarint
+from iscc.wrappers import decompose
 
 
 @pytest.fixture
-def mco():
+def mco() -> str:
     """Random meta code"""
     return c.Code.rnd(c.MT.META).code
 
 
 @pytest.fixture
-def cco():
+def cco() -> str:
     """Random content code"""
-    return c.Code.rnd(c.MT.CONTENT).code
+    return c.Code((c.MT.CONTENT, c.ST_CC.TEXT, 0, 64, os.urandom(8))).code
+    # return c.Code.rnd(c.MT.CONTENT).code
 
 
 @pytest.fixture
-def dco():
+def dco() -> str:
     """Random data code"""
     return c.Code.rnd(c.MT.DATA).code
 
 
 @pytest.fixture
-def ico():
+def ico() -> str:
     """Random instance code"""
     return c.Code.rnd(c.MT.INSTANCE).code
 
 
 @pytest.fixture
-def iscc_sequence(mco, cco, dco, ico):
+def iscc_sequence(mco, cco, dco, ico) -> str:
     return f"{mco}-{cco}-{dco}-{ico}"
 
 
 @pytest.fixture
-def iscc_canonical(mco, cco, dco, ico):
-    return gen_iscc_code_v01([mco, cco, dco, ico])
+def iscc_canonical(mco, cco, dco, ico) -> str:
+    return gen_iscc_code_v0([mco, cco, dco, ico]).code_obj.code
 
 
 def test_main_type():
@@ -162,8 +165,8 @@ def test_read_varnibble():
 
 
 def test_code_properties():
-    c64 = c.Code(code_meta("Hello World")["code"])
-    c256 = c.Code(code_meta("Hello World", meta_bits=256)["code"])
+    c64 = c.Code(code_meta("Hello World")["iscc"])
+    c256 = c.Code(code_meta("Hello World", meta_bits=256)["iscc"])
     assert c64.code == "AAA77PPFVS6JDUQB"
     assert c256.code == "AAD77PPFVS6JDUQBWZDBIUGOUNAGIZYGCQ75ICNLH5QV73OXGWZV5CQ"
     assert c64.bytes == unhexlify(c64.hex)
@@ -202,9 +205,9 @@ def test_code_hashable():
 
 def test_decompose_single_component():
     code = c.Code.rnd(mt=c.MT.META)
-    assert c.decompose(code)[0] == code
-    assert c.decompose(code.code)[0] == code
-    assert c.decompose(code.bytes)[0] == code
+    assert decompose(code)[0] == code
+    assert decompose(code.code)[0] == code
+    assert decompose(code.bytes)[0] == code
 
 
 def test_decompose_str_of_codes():
@@ -213,12 +216,12 @@ def test_decompose_str_of_codes():
     dco = c.Code.rnd(c.MT.DATA)
     ico = c.Code.rnd(c.MT.INSTANCE)
     iscc = f"ISCC:{mco.code}-{cco.code}-{dco.code}-{ico.code}"
-    codes = c.decompose(iscc)
+    codes = decompose(iscc)
     assert codes == [mco, cco, dco, ico]
 
 
 def test_decompose_canonical_iscc(iscc_canonical):
-    codes = c.decompose(iscc_canonical)
+    codes = decompose(iscc_canonical)
     assert len(codes) == 4
     for code in codes:
         assert code.length == 64
@@ -237,22 +240,22 @@ def test_iscc_clean():
 
 def test_iscc_short_id_0():
     body = b"\x07" * 8
-    sid = iscc_core.Code((iscc.MT.ID, iscc.ST_ID.BITCOIN, iscc.VS.V0, 64, body))
+    sid = c.Code((c.MT.ID, c.ST_ID.BITCOIN, c.VS.V0, 64, body))
     assert sid.code == "MEAAOBYHA4DQOBYH"
     assert sid.explain == "ID-BITCOIN-V0-64-0707070707070707"
-    assert sid.maintype == iscc.MT.ID
-    assert sid.subtype == iscc.ST_ID.BITCOIN
+    assert sid.maintype == c.MT.ID
+    assert sid.subtype == c.ST_ID.BITCOIN
 
 
 def test_iscc_short_id_1():
     body = b"\x07" * 8 + b"\01"
-    sid = iscc_core.Code((iscc.MT.ID, iscc.ST_ID.BITCOIN, iscc.VS.V0, 70, body))
+    sid = c.Code((c.MT.ID, c.ST_ID.BITCOIN, c.VS.V0, 70, body))
     assert sid.code == "MEAAOBYHA4DQOBYHAE"
     assert sid.explain == "ID-BITCOIN-V0-70-0707070707070707-1"
 
 
 def test_iscc_short_id_300():
     body = b"\x07" * 8 + uvarint.encode(300)
-    sid = iscc_core.Code((iscc.MT.ID, iscc.ST_ID.ETHEREUM, iscc.VS.V0, 80, body))
+    sid = c.Code((c.MT.ID, c.ST_ID.ETHEREUM, c.VS.V0, 80, body))
     assert sid.code == "MIBAOBYHA4DQOBYHVQBA"
     assert sid.explain == "ID-ETHEREUM-V0-80-0707070707070707-300"

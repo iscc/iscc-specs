@@ -6,7 +6,7 @@ from more_itertools import chunked
 from iscc.bin import fpcalc_bin, fpcalc_install
 from iscc.schema import FeatureType, Readable
 from iscc.options import SdkOptions
-from iscc_core import encode_base64
+from iscc_core.codec import encode_base64
 from typing import Any, List
 from iscc import uread
 

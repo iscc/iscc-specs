@@ -3,7 +3,7 @@ import pytest
 from iscc import metrics
 from bitarray.util import int2ba
 from iscc.core import code_meta
-from iscc_core import Code
+from iscc_core.codec import Code
 
 A_INT = 0b0000_0000_0000_1111
 B_INT = 0b1111_0000_0000_1111
@@ -11,10 +11,10 @@ C_INT = 0b0000_1111
 A_BYT = A_INT.to_bytes(length=2, byteorder="big", signed=False)
 B_BYT = B_INT.to_bytes(length=2, byteorder="big", signed=False)
 C_BYT = C_INT.to_bytes(length=2, byteorder="big", signed=False)
-A_CODE = Code(code_meta("Hello World Hello World Hello World Hello World")["code"])
-B_CODE = Code(code_meta("Hello World Hello World Hello World Hello Worlt")["code"])
+A_CODE = Code(code_meta("Hello World Hello World Hello World Hello World")["iscc"])
+B_CODE = Code(code_meta("Hello World Hello World Hello World Hello Worlt")["iscc"])
 C_CODE = Code(
-    code_meta("Hello World Hello World Hello World Hello Worlt", meta_bits=256)["code"]
+    code_meta("Hello World Hello World Hello World Hello Worlt", meta_bits=256)["iscc"]
 )
 
 

@@ -4,7 +4,7 @@ import pytest
 import os
 from pydantic import ValidationError
 from iscc import schema
-from iscc_core import encode_base64
+from iscc_core.codec import encode_base64
 
 
 def test_video_features_only():

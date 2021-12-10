@@ -5,7 +5,7 @@ import pytest
 
 import iscc
 from iscc_samples import images
-from iscc_core import Code
+from iscc_core.codec import Code
 from iscc.schema import Features
 from tests.test_readables import image_readables
 
@@ -17,7 +17,7 @@ def test_code_image_plain():
     assert iscc.code_image(
         images()[0], image_preview=False, image_granular=False
     ) == dict(
-        code="EEA4GQZQTY6J5DTH",
+        iscc="EEA4GQZQTY6J5DTH",
         width=200,
         height=133,
     )
@@ -33,7 +33,7 @@ def test_code_image_global_preview_overrides():
 @pytest.mark.optional
 def test_code_image_granular():
     assert iscc.code_image(images()[0], image_preview=False, image_granular=True) == {
-        "code": "EEA4GQZQTY6J5DTH",
+        "iscc": "EEA4GQZQTY6J5DTH",
         "features": {
             "features": [
                 "LX_6ZHK_v84",
@@ -125,7 +125,7 @@ def test_code_image_with_meta():
     assert iscc.code_image(
         images()[2], image_preview=False, image_granular=False
     ) == dict(
-        code="EEA4GQZQTY6J5DTH",
+        iscc="EEA4GQZQTY6J5DTH",
         title="Concentrated Cat",
         width=200,
         height=133,
@@ -136,13 +136,13 @@ def test_code_image_bits32():
     cidi32 = iscc.code_image(
         images()[0], image_bits=32, image_preview=False, image_granular=False
     )
-    assert cidi32 == dict(code="EEAMGQZQTY", width=200, height=133)
-    c1 = Code(cidi32["code"])
+    assert cidi32 == dict(iscc="EEAMGQZQTY", width=200, height=133)
+    c1 = Code(cidi32["iscc"])
     assert c1.length == 32
     cidi64 = iscc.code_image(
         images()[0], image_bits=32, image_preview=False, image_granular=False
     )
-    c2 = Code(cidi64["code"])
+    c2 = Code(cidi64["iscc"])
     assert c1 ^ c2 == 0
 
 

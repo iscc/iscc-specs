@@ -10,11 +10,14 @@ import io
 import mobi
 from codetiming import Timer
 from humanize import naturalsize
+from iscc_core.code_data import DataHasherV0
+from iscc_core.codec import AnyISCC
 from loguru import logger as log
 from typing import List, Union, Any
 from PIL import Image
 from blake3 import blake3
 import iscc
+from audio import encode_audio_features, extract_audio_features
 from iscc import jcs
 from iscc.mp7 import read_ffmpeg_signature
 from iscc.schema import (
@@ -29,6 +32,8 @@ from iscc.options import SdkOptions
 from iscc.mediatype import mime_guess, mime_to_gmt
 from iscc import uread
 from iscc.data import encode_data_features
+from iscc.wrappers import decompose
+from iscc_core import codec
 
 
 ###############################################################################
@@ -93,11 +98,11 @@ def code_iscc(uri, title=None, extra=None, **options):
 
     meta = code_meta(title, extra, **options)
     result.update(meta)
-    del result["code"]
+    # del result["code"]
 
-    iscc_code_obj = iscc_core.gen_iscc_code(
-        [meta["code"], content["code"], data["code"], instance["code"]]
-    )
+    iscc_code_obj = iscc_core.gen_iscc_code_v0(
+        [meta["iscc"], content["iscc"], data["iscc"], instance["iscc"]]
+    ).code_obj
     result["iscc"] = iscc_code_obj.code
     concat = bytes.fromhex(result["metahash"]) + bytes.fromhex(result["datahash"])
     result["tophash"] = blake3(concat).hexdigest()
@@ -261,7 +266,7 @@ def code_audio(data, **options):
     if isinstance(data, list):
         chroma = dict(fingerprint=data)
     else:
-        chroma = iscc.audio.extract_audio_features(data, **options)
+        chroma = extract_audio_features(data, **options)
         # TODO: implement custom audio metadata extraction
         metadata = iscc.video.extract_video_metadata(data)
         # We remove video related keys that are detected in some audio files.
@@ -279,10 +284,10 @@ def code_audio(data, **options):
         else opts.audio_granular
     )
     if granular:
-        features = iscc.audio.encode_audio_features(chroma["fingerprint"])
+        features = encode_audio_features(chroma["fingerprint"])
         result["features"] = features
 
-    result["code"] = audio_code.code
+    result["iscc"] = audio_code.iscc
     return result
 
 
@@ -315,7 +320,7 @@ def code_video(uri, **options):
     log.debug(f"video sig {naturalsize(len(signature))} with {len(frames)} frames")
     features = [tuple(sig.vector.tolist()) for sig in frames]
     video_code = iscc_core.gen_video_code_v0(features, bits=opts.video_bits)
-    result["code"] = video_code.code
+    result["iscc"] = video_code.iscc
 
     if opts.video_include_fingerprint:
         result["fingerprint"] = base64.b64encode(signature).decode("ascii")
@@ -361,7 +366,7 @@ def code_data(data, **options):
     opts = SdkOptions(**options)
     stream = uread.open_data(data)
 
-    hasher = iscc_core.DataHasherV0()
+    hasher = DataHasherV0()
     data = stream.read(opts.io_read_size)
 
     while data:
@@ -369,7 +374,7 @@ def code_data(data, **options):
         data = stream.read(opts.io_read_size)
 
     code = hasher.code(bits=opts.data_bits)
-    result = dict(code=code)
+    result = dict(iscc=code)
 
     granular = (
         opts.all_granular if isinstance(opts.all_granular, bool) else opts.data_granular
@@ -403,22 +408,17 @@ def code_instance(data, **options):
     return code.dict()
 
 
-def code_short_id(chain, iscc_code, counter=0):
-    # type: (iscc.ST_SID, str, int) -> str
-    """Create an ISCC Short-ID."""
-    assert chain in list(iscc.ST_SID)
-    components = iscc.decompose(iscc_code)
-    if len(components) > 1:
-        digests = [c.bytes[:8] for c in components if c.maintype != iscc.MT.INSTANCE]
-    else:
-        digests = components[0].bytes[:8]
+def code_iscc_id(chain_id, iscc_code, uc=0):
+    # type: (Union[int,codec.ST_ID], AnyISCC, int) -> dict
+    """Create ISCC-ID.
 
-    short_id_body = iscc.similarity_hash(digests)
-    n_bits_counter = 0
-    if counter:
-        n_bytes_counter = (counter.bit_length() + 7) // 8
-        short_id_body += counter.to_bytes(n_bytes_counter, "big", signed=False)
-        n_bits_counter += n_bytes_counter * 8
+    :param int chain_id: ID of chain where the ISCC registration happend.
+    :param AnyISCC iscc_code: An ISCC.
+    :param in uc: Uniqueness counter.
+    """
 
-    code = iscc.Code((iscc.MT.SID, chain, iscc.VS.V0, n_bits_counter, short_id_body))
-    return code.code
+    # Normalize
+    components = decompose(iscc_code)
+    iscc_code = iscc_core.gen_iscc_code_v0([c.code for c in components])
+
+    return iscc_core.gen_iscc_id_v0(chain_id, iscc_code.iscc, uc).dict()

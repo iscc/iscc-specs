@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 import iscc_core
 import pytest
+from iscc_core.code_content_video import soft_hash_video_v0
+
 from iscc.core import code_video
 from iscc import video, mp7
 from blake3 import blake3
@@ -53,24 +55,21 @@ def test_extract_video_preview_readables():
 
 
 def test_hash_video_0_features():
-    assert (
-        iscc_core.soft_hash_video_v0([tuple([0] * 380)])
-        == b"\x00\x00\x00\x00\x00\x00\x00\x00"
-    )
+    assert soft_hash_video_v0([tuple([0] * 380)]) == b"\x00\x00\x00\x00\x00\x00\x00\x00"
 
 
 def test_code_video():
     result = code_video(SAMPLE)
-    assert "code" in result
+    assert "iscc" in result
     # assert "signature" in result
     # assert "crop" in result
-    assert result["code"] == "EMAVMHMC7RMJF6XZ"
+    assert result["iscc"] == "EMAVMHMC7RMJF6XZ"
     # assert result["crop"] == "176:96:0:24"
 
 
 def test_code_video_no_crop():
     result = code_video(SAMPLE, video_crop=False)
-    assert result["code"] == "EMAV4DUC6QORW4X4"
+    assert result["iscc"] == "EMAV4DUC6QORW4X4"
     # assert "signature" in result
     assert "crop" not in result
 
@@ -83,7 +82,7 @@ def test_code_video_no_granular_no_preview():
     )
 
     assert result == {
-        "code": "EMAVMHMC7RMJF6XZ",
+        "iscc": "EMAVMHMC7RMJF6XZ",
         "duration": 60.042,
         "fps": 24.0,
         "height": 144,
@@ -102,7 +101,7 @@ def test_code_video_all_granular_overrides():
     )
 
     assert result == {
-        "code": "EMAVMHMC7RMJF6XZ",
+        "iscc": "EMAVMHMC7RMJF6XZ",
         "duration": 60.042,
         "fps": 24.0,
         "height": 144,
@@ -125,7 +124,7 @@ def test_code_video_granular_scenes():
         video_preview=False,
     )
     assert result == {
-        "code": "EMAVMHMC7RMJF6XZ",
+        "iscc": "EMAVMHMC7RMJF6XZ",
         "duration": 60.042,
         "features": {
             "features": [
@@ -161,7 +160,7 @@ def test_code_video_granular_scenes_ffmpeg():
         video_preview=False,
     )
     assert result == {
-        "code": "EMAVMHMC7RMJF6XZ",
+        "iscc": "EMAVMHMC7RMJF6XZ",
         "duration": 60.042,
         "features": {
             "features": [
@@ -189,7 +188,7 @@ def test_code_video_granular_rolling():
         SAMPLE, video_granular=True, video_scenes=False, video_preview=False
     )
     assert result == {
-        "code": "EMAVMHMC7RMJF6XZ",
+        "iscc": "EMAVMHMC7RMJF6XZ",
         "duration": 60.042,
         "features": {
             "features": [
@@ -238,8 +237,8 @@ def test_code_video_global_preview_overrides():
 
 def test_hash_video():
     features = [tuple(range(380))]
-    assert iscc_core.soft_hash_video_v0(features, bits=64).hex() == "528f91431f7c4ad2"
-    extended = iscc_core.soft_hash_video_v0(features, bits=256).hex()
+    assert soft_hash_video_v0(features, bits=64).hex() == "528f91431f7c4ad2"
+    extended = soft_hash_video_v0(features, bits=256).hex()
     assert extended.startswith("528f91431f7c4ad2")
 
 

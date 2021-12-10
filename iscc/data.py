@@ -5,7 +5,7 @@ from typing import Any, List
 from codetiming import Timer
 from more_itertools import chunked
 from iscc_core.minhash import minhash_64
-from iscc_core import encode_base64
+from iscc_core.codec import encode_base64
 from iscc.schema import FeatureType
 from iscc.options import SdkOptions
 
