@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import iscc
+import iscc.match
 from iscc.schema import IsccMatch
 
 
@@ -23,18 +24,18 @@ QUERY_CODE = "KMD73CA6R4XJLI5CKYOYF7CYSL5PSJGVYXJVMT4PF3CSTGC4KNJ4ILI"
 
 
 def test_simple_index_default_name():
-    idx = iscc.SimpleIndex()
+    idx = iscc.match.SimpleIndex()
     assert idx.name == "default"
 
 
 def test_simple_index_add():
-    idx = iscc.SimpleIndex()
+    idx = iscc.match.SimpleIndex()
     for code in set(TEST_CODES):
         idx.add(code)
 
 
 def test_simple_index_query():
-    idx = iscc.SimpleIndex()
+    idx = iscc.match.SimpleIndex()
     for code in TEST_CODES:
         idx.add(code)
     idx.add(QUERY_CODE)
@@ -67,13 +68,13 @@ def test_simple_index_query():
 
 
 def test_simple_split_index_default_name():
-    idx = iscc.SimpleSplitIndex()
+    idx = iscc.match.SimpleSplitIndex()
     assert idx.name == "default"
 
 
 def test_simple_split_index_membership():
     code = "KIDW33WX76H5PBHFNISKEJTKESRCNYJBCZDNLQXYILWJHQAP3N3KPTQ"
-    idx = iscc.SimpleSplitIndex()
+    idx = iscc.match.SimpleSplitIndex()
     ident = idx.add(code)
     assert ident == 0
     assert "CONTENT-AUDIO-V0-64" in idx.codes
@@ -84,7 +85,7 @@ def test_simple_split_index_membership():
 
 
 def test_simple_split_index_query():
-    idx = iscc.SimpleSplitIndex()
+    idx = iscc.match.SimpleSplitIndex()
     for c in TEST_CODES:
         idx.add(c)
     result = idx.query(QUERY_CODE)

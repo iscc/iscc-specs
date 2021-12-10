@@ -2,7 +2,7 @@
 import pytest
 from iscc import metrics
 from bitarray.util import int2ba
-from iscc.core import code_meta
+from iscc.api import code_meta
 from iscc_core.codec import Code
 
 A_INT = 0b0000_0000_0000_1111

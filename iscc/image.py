@@ -4,17 +4,18 @@ import base64
 from collections import defaultdict
 import io
 import pyexiv2
+from iscc_core.codec import encode_base64
 from loguru import logger
 from pathlib import Path
 from typing import Any, List, Optional, Union
 from PIL import Image, ImageChops, ImageEnhance
 import numpy as np
 from more_itertools import chunked
-import iscc
 from iscc.schema import FeatureType, Readable
-from iscc.simhash import similarity_hash
+from iscc_core.simhash import similarity_hash
 from iscc.text import normalize_text
-from iscc import SdkOptions, uread
+from iscc.options import SdkOptions
+from iscc import uread
 
 
 IMAGE_META_MAP = {
@@ -119,9 +120,7 @@ def extract_image_features(data, n=32):
     ranked = sorted(zipped, key=lambda x: x[0].response, reverse=True)
     feat_map = {}  # simhash -> (size, pos)
     for kp, desc in ranked:
-        shash = iscc.encode_base64(
-            similarity_hash([bytes(c) for c in chunked(desc, 8)])
-        )
+        shash = encode_base64(similarity_hash([bytes(c) for c in chunked(desc, 8)]))
         feature_size = round(kp.size / pix_count * 100, 3)
         feature_pos = (
             round(kp.pt[0] / width * 100, 3),

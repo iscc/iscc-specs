@@ -4,6 +4,7 @@ import math
 import pytest
 
 import iscc
+import iscc.image
 from iscc_samples import images
 from iscc_core.codec import Code
 from iscc.schema import Features
@@ -154,15 +155,17 @@ def test_code_image_preview():
 
 
 def test_extract_image_metadata():
-    assert iscc.extract_image_metadata(images()[0].as_posix()) is None
-    assert iscc.extract_image_metadata(images()[2].as_posix()) == {
+    assert iscc.image.extract_image_metadata(images()[0].as_posix()) is None
+    assert iscc.image.extract_image_metadata(images()[2].as_posix()) == {
         "title": "Concentrated Cat"
     }
 
 
 def test_extract_image_metadata_readables():
     for readable in image_readables():
-        assert iscc.extract_image_metadata(readable) == {"title": "Concentrated Cat"}
+        assert iscc.image.extract_image_metadata(readable) == {
+            "title": "Concentrated Cat"
+        }
 
 
 def test_pi():
@@ -173,7 +176,7 @@ def test_pi():
 @pytest.mark.optional
 def test_extract_image_features_readables():
     for r in image_readables():
-        fo = Features(**iscc.extract_image_features(r))
+        fo = Features(**iscc.image.extract_image_features(r))
         assert fo.features[0] == "7XzuZHrfv-w"
         assert fo.sizes[0] == 15.5
         # assert fo.positions[0] == (37.5, 45.865)

@@ -10,6 +10,7 @@ import iscc_core
 from bidict import bidict
 from collections import defaultdict
 from iscc.wrappers import decompose
+import iscc.metrics
 
 
 __all__ = ["SimpleIndex", "SimpleSplitIndex"]
@@ -66,7 +67,7 @@ class SimpleIndex:
         for hash_ba, total_dist in top_k:
             for key in self.sim_hashes[hash_ba]:
                 candidate = self.isccs[key]
-                matchdata = iscc.compare(norm_code_obj.code, candidate)
+                matchdata = iscc.metrics.compare(norm_code_obj.code, candidate)
                 matchdata["key"] = key
                 matchdata["matched_iscc"] = candidate
                 result.append(IsccMatch(**matchdata))
@@ -123,7 +124,7 @@ class SimpleSplitIndex:
                         candidate = self.isccs[key]
                         if candidate in seen:
                             continue
-                        matchdata = iscc.compare(query_code.code, candidate)
+                        matchdata = iscc.metrics.compare(query_code.code, candidate)
                         matchdata["key"] = key
                         matchdata["matched_iscc"] = candidate
                         result.append(IsccMatch(**matchdata))

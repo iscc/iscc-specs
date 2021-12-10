@@ -15,7 +15,8 @@ from secrets import token_hex
 from typing import Any, Generator, List, Tuple, Optional, Union
 from statistics import mode
 from langcodes import standardize_tag
-from iscc import SdkOptions, uread
+from iscc.options import SdkOptions
+from iscc import uread
 from iscc.schema import FeatureType, Readable, File, Uri
 from iscc_core.codec import encode_base64
 from iscc.mp7 import Frame

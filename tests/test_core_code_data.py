@@ -3,6 +3,7 @@ import random
 from statistics import mean
 
 import iscc
+import iscc.metrics
 from tests.test_readables import text_readables
 from tests.utils import static_bytes
 
@@ -33,7 +34,7 @@ def test_code_data_1mib_robustness():
     # 1-bit difference on 10th byte change
     data.insert(rpos(), rbyte())
     c2 = iscc.code_data(data)
-    assert iscc.distance(c1["iscc"], c2["iscc"]) == 1
+    assert iscc.metrics.distance(c1["iscc"], c2["iscc"]) == 1
 
 
 def test_code_data_extends():
@@ -53,7 +54,7 @@ def test_code_data_random_changes():
         data.insert(random.randint(0, 1000000), random.randint(0, 255))
     did_b = iscc.code_data(data)
     assert did_b == {"iscc": "GAA65ZWUJOQXYAVK"}
-    assert iscc.distance(did_a["iscc"], did_b["iscc"]) == 2
+    assert iscc.metrics.distance(did_a["iscc"], did_b["iscc"]) == 2
 
 
 def test_code_data_inputs():
@@ -168,13 +169,13 @@ def test_code_data_granular_robust():
         data.insert(random.randint(0, 1000000), random.randint(0, 255))
     code_b = iscc.code_data(data, data_granular=True)
     assert code_b["iscc"] == "GAA65ZWUJOQXYBVK"
-    assert iscc.distance(code_a["iscc"], code_b["iscc"]) == 3
+    assert iscc.metrics.distance(code_a["iscc"], code_b["iscc"]) == 3
     assert len(code_a["features"]["features"]) == len(code_b["features"]["features"])
 
     # Pairwise granular hashes should have low average distance
     distances = []
     for gfa, gfb in zip(code_a["features"]["features"], code_b["features"]["features"]):
-        dist = iscc.distance_b64(gfa, gfb)
+        dist = iscc.metrics.distance_b64(gfa, gfb)
         assert dist < 15
         distances.append(dist)
     assert mean(distances) < 7

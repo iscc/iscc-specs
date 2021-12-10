@@ -6,6 +6,11 @@ import iscc
 import iscc_samples
 from iscc.schema import IsccMatch, FeatureMatch, QueryResult
 import uuid
+from iscc.index import Index
+from iscc_core import codec as co
+
+from iscc.wrappers import decompose
+from iscc.metrics import distance_bytes
 
 
 TEST_CODES = [
@@ -29,28 +34,26 @@ QUERY_CODE = "KMD73CA6R4XJLI5CKYOYF7CYSL5PSJGVYXJVMT4PF3CSTGC4KNJ4ILI"
 
 @pytest.fixture
 def idx():
-    idx = iscc.Index("test-db")
+    idx = Index("test-db")
     yield idx
     idx.destroy()
 
 
 @pytest.fixture
 def idx_feat():
-    idx_feat = iscc.Index(
-        "test-query-features", index_components=True, index_features=True
-    )
+    idx_feat = Index("test-query-features", index_components=True, index_features=True)
     yield idx_feat
     idx_feat.destroy()
 
 
 @pytest.fixture
 def full_iscc():
-    return iscc.Code.rnd(mt=iscc.MT.ISCC, bits=256)
+    return co.Code.rnd(mt=co.MT.ISCC, bits=256)
 
 
 @pytest.fixture
 def ten_isccs():
-    return [iscc.Code.rnd(mt=iscc.MT.ISCC, bits=256) for _ in range(10)]
+    return [co.Code.rnd(mt=co.MT.ISCC, bits=256) for _ in range(10)]
 
 
 @pytest.fixture
@@ -66,7 +69,7 @@ def test_index_get_key(idx, full_iscc):
     assert len(idx) == 0
     key = idx.add(full_iscc)
     assert idx.get_key(full_iscc) == 0 == key
-    i2 = iscc.Code.rnd(mt=iscc.MT.ISCC, bits=256)
+    i2 = co.Code.rnd(mt=co.MT.ISCC, bits=256)
     key = idx.get_key(i2)
     assert idx.get_key(i2) == 1 == key
 
@@ -119,7 +122,7 @@ def test_index_key_str(idx, full_iscc):
 
 def test_index_add_returns_key(idx, full_iscc):
     assert idx.add(full_iscc) == 0
-    assert idx.add(iscc.Code.rnd(iscc.MT.ISCC, bits=256)) == 1
+    assert idx.add(co.Code.rnd(co.MT.ISCC, bits=256)) == 1
 
 
 def test_index_add_no_dupes(idx, full_iscc):
@@ -134,7 +137,7 @@ def test_index_get_key(idx, ten_isccs):
         idx.add(code.code)
     assert idx.get_key(ten_isccs[0].code) == 0
     assert idx.get_key(ten_isccs[-1].code) == 9
-    assert idx.get_key(iscc.Code.rnd(iscc.MT.ISCC, bits=256)) is None
+    assert idx.get_key(co.Code.rnd(co.MT.ISCC, bits=256)) is None
 
 
 def test_index_map_size(idx):
@@ -145,7 +148,7 @@ def test_index_in(idx, full_iscc):
     idx.add(full_iscc.code)
     assert full_iscc.code in idx
     # check random code not in index
-    assert iscc.Code.rnd(mt=iscc.MT.ISCC, bits=256).code not in idx
+    assert co.Code.rnd(mt=co.MT.ISCC, bits=256).code not in idx
 
 
 def test_index_dbs_default(idx, iscc_result):
@@ -163,7 +166,7 @@ def test_index_dbs_default(idx, iscc_result):
 
 def test_index_dbs_features():
     # Index with freatures
-    idx = iscc.Index("test-db-features", index_features=True)
+    idx = Index("test-db-features", index_features=True)
     iscc_result = iscc.code_iscc(iscc_samples.videos()[0], video_granular=True)
     idx.add(iscc_result)
     try:
@@ -181,7 +184,7 @@ def test_index_dbs_features():
 
 def test_index_dbs_metadata():
     # Index with metadata
-    idx = iscc.Index("test-db-metadata", index_metadata=True)
+    idx = Index("test-db-metadata", index_metadata=True)
     iscc_result = iscc.code_iscc(iscc_samples.videos()[0], video_granular=True)
     idx.add(iscc_result)
     try:
@@ -204,23 +207,23 @@ def test_index_iscc(idx, full_iscc):
 
 
 def test_index_isccs(idx):
-    a = iscc.Code.rnd(mt=iscc.MT.ISCC, bits=256)
-    b = iscc.Code.rnd(mt=iscc.MT.ISCC, bits=256)
+    a = co.Code.rnd(mt=co.MT.ISCC, bits=256)
+    b = co.Code.rnd(mt=co.MT.ISCC, bits=256)
     idx.add(a.code)
     idx.add(b.code)
-    codes = [iscc.Code(c) for c in idx.iter_isccs()]
+    codes = [co.Code(c) for c in idx.iter_isccs()]
     assert codes == [a, b]
 
 
 def test_index_components(idx, full_iscc):
     idx.add(full_iscc.code)
-    components_orig = set([c.hash_bytes for c in iscc.decompose(full_iscc)])
+    components_orig = set([c.hash_bytes for c in decompose(full_iscc)])
     compenents_idx = set(idx.iter_components())
     assert compenents_idx == components_orig
 
 
 def test_add_component(idx):
-    comp, fkey = iscc.Code.rnd(bits=64), os.urandom(8)
+    comp, fkey = co.Code.rnd(bits=64), os.urandom(8)
     idx._add_component(comp, fkey)
     db = idx._db_components(comp.type_id)
     assert idx._get_values(db, comp.hash_bytes) == [fkey]
@@ -263,7 +266,7 @@ def test_add_feature(idx):
 
 
 def test_query():
-    idx = iscc.Index(
+    idx = Index(
         "test-db",
     )
     for code in TEST_CODES:
@@ -305,17 +308,17 @@ def test_query():
 
 
 def test_index_match_component_exact():
-    idx = iscc.Index("test-match-component", index_components=True)
+    idx = Index("test-match-component", index_components=True)
     for i in TEST_CODES:
         idx.add(i)
-    components = iscc.decompose(TEST_CODES[-1])
+    components = decompose(TEST_CODES[-1])
     fkeys = [msgpack.loads(fk) for fk in idx.match_component(components[0])]
     assert fkeys == [4, 10, 11, 12]
     idx.destroy()
 
 
 def test_index_match_feature_exact():
-    idx = iscc.Index("test-match-feature", index_features=True)
+    idx = Index("test-match-feature", index_features=True)
     feature = os.urandom(8)
     for i in TEST_CODES:
         idx.add(i)
@@ -327,10 +330,10 @@ def test_index_match_feature_exact():
 
 
 def test_index_match_feature_similar():
-    idx = iscc.Index("test-match-feature", index_features=True)
+    idx = Index("test-match-feature", index_features=True)
     feata = b"\x00\x00\x00\x00\x00\x00\x00\x00"
     featb = b"\x00\x00\x00\x00\x00\x00\x00\x03"
-    assert iscc.distance_bytes(feata, featb) == 2
+    assert distance_bytes(feata, featb) == 2
     for i in TEST_CODES:
         idx.add(i)
     idx._add_feature("video", feata, msgpack.dumps(0), 100)
@@ -388,14 +391,12 @@ def test_index_query_features(idx_feat):
 
 
 def test_index_audio_features():
-    idx = iscc.Index(
-        "test-index-audio-features", index_components=True, index_features=True
-    )
+    idx = Index("test-index-audio-features", index_components=True, index_features=True)
     v0 = iscc.code_iscc(iscc_samples.audios()[0], audio_granular=True)
     v1 = iscc.code_iscc(iscc_samples.audios()[1], audio_granular=True)
     # change code so we can match by feature
-    code = iscc.Code(v0["iscc"])
-    nc = iscc.Code(code.header_bytes + (b"\xff" * 32))
+    code = co.Code(v0["iscc"])
+    nc = co.Code(code.header_bytes + (b"\xff" * 32))
     v0["iscc"] = nc.code
     idx.add(v0)
 

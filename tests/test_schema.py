@@ -4,12 +4,12 @@ import pytest
 import os
 from pydantic import ValidationError
 from iscc import schema
-from iscc_core.codec import encode_base64
+from iscc_core import codec
 
 
 def test_video_features_only():
-    features = [encode_base64(d) for d in [os.urandom(8) for _ in range(10)]]
-    vf = schema.Features(features=features, version=0, kind=iscc.FeatureType.video)
+    features = [codec.encode_base64(d) for d in [os.urandom(8) for _ in range(10)]]
+    vf = schema.Features(features=features, version=0, kind=schema.FeatureType.video)
     assert vf.window == 7
     assert vf.overlap == 3
     assert vf.type_id == "video-0"
@@ -18,25 +18,25 @@ def test_video_features_only():
 def test_video_features_checks_codes():
     features = []
     with pytest.raises(ValidationError):
-        schema.Features(features=features, version=0, kind=iscc.FeatureType.video)
+        schema.Features(features=features, version=0, kind=schema.FeatureType.video)
 
     features = ["A"]
     with pytest.raises(ValidationError):
-        schema.Features(features=features, version=0, kind=iscc.FeatureType.video)
+        schema.Features(features=features, version=0, kind=schema.FeatureType.video)
 
     features = ["AAAAAAAAAAA"]
-    assert schema.Features(features=features, version=0, kind=iscc.FeatureType.video)
+    assert schema.Features(features=features, version=0, kind=schema.FeatureType.video)
 
     features = ["AAAAAAAAAA="]
     with pytest.raises(ValidationError):
-        schema.Features(features=features, version=0, kind=iscc.FeatureType.video)
+        schema.Features(features=features, version=0, kind=schema.FeatureType.video)
 
 
 def test_feature_match_distance():
-    s = encode_base64(b"\x00\x00\x00\x00\x00\x00\x00\x00")
-    t = encode_base64(b"\x00\x00\x00\x00\x00\x00\x00\x03")
+    s = codec.encode_base64(b"\x00\x00\x00\x00\x00\x00\x00\x00")
+    t = codec.encode_base64(b"\x00\x00\x00\x00\x00\x00\x00\x03")
     fm = schema.FeatureMatch(
-        matched_iscc=iscc.Code.rnd().code,
+        matched_iscc=codec.Code.rnd().code,
         kind="text",
         source_feature=s,
         source_pos=0,
@@ -56,11 +56,11 @@ def test_feature_match_sortable():
     matches = []
     for x in range(10):
         matches.append(
-            iscc.FeatureMatch(
-                matched_iscc=iscc.Code.rnd().code,
+            schema.FeatureMatch(
+                matched_iscc=codec.Code.rnd().code,
                 kind="video",
-                source_feature=iscc.encode_base64(os.urandom(8)),
-                matched_feature=iscc.encode_base64(os.urandom(8)),
+                source_feature=codec.encode_base64(os.urandom(8)),
+                matched_feature=codec.encode_base64(os.urandom(8)),
                 matched_position=10,
             )
         )
@@ -71,7 +71,7 @@ def test_feature_match_sortable():
 
 
 def test_feature_int_float():
-    feat = iscc.encode_base64(os.urandom(8))
+    feat = codec.encode_base64(os.urandom(8))
     ft = schema.Features(
         kind="text", version=0, features=[feat, feat, feat], sizes=[0, 1, 2]
     )

@@ -10,7 +10,8 @@ from functools import lru_cache
 import langcodes
 from iscc.schema import FeatureType
 from iscc_core.cdc import data_chunks
-from iscc import SdkOptions, uread
+from iscc.options import SdkOptions
+from iscc import uread
 from iscc.utils import sliding_window
 from iscc_core.codec import encode_base64
 from iscc.schema import Readable

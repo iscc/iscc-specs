@@ -32,17 +32,17 @@ from pathlib import Path
 from typing import List, Optional, Dict, Any, Tuple, Union, Set, Generator
 from bitarray import bitarray
 from loguru import logger as log
-import iscc
 import lmdb
 import shutil
 from humanize import naturalsize
-from iscc.schema import FeatureMatch, IsccMatch, QueryResult, ISCC
-from iscc import SdkOptions
+from iscc.schema import FeatureMatch, Features, IsccMatch, QueryResult, ISCC
+from iscc.options import SdkOptions
 import msgpack
 from annoy import AnnoyIndex
 import iscc_core
 from iscc.wrappers import decompose
-from iscc_core.codec import Code, decode_base64, encode_base64
+from iscc_core.codec import Code, decode_base64, encode_base64, MT
+from iscc.metrics import compare, distance_ba, distance_bytes
 
 
 IsccObj = Union[str, Dict, Code, ISCC]
@@ -137,7 +137,7 @@ class Index:
         if self.opts.index_features and features is not None:
             for fdict in features:
                 pos = 0
-                fobj = iscc.schema.Features(**fdict)
+                fobj = Features(**fdict)
                 items = []
                 sizes = fobj.sizes or list(range(len(fobj.features)))
                 for feat, size in zip(fobj.features, sizes):
@@ -190,7 +190,7 @@ class Index:
         # Collect ISCC feature level matches
         feature_matches = set()
         for feat_dict in features:
-            feat_obj = iscc.schema.Features(**feat_dict)
+            feat_obj = Features(**feat_dict)
             src_pos = 0
             sizes = feat_obj.sizes or list(range(len(features)))
             for src_feat, src_size in zip(feat_obj.features, sizes):
@@ -216,7 +216,7 @@ class Index:
         """
         db = self._db_components(code.type_id)
 
-        if code.maintype == iscc.MT.INSTANCE or ct == 0:
+        if code.maintype == MT.INSTANCE or ct == 0:
             # Simple get if instance code or threshold is 0
             return self._get_values(db, code.hash_bytes)
         else:
@@ -229,7 +229,7 @@ class Index:
                 with txn.cursor(db) as c:
                     for k in c.iternext_nodup(keys=True, values=False):
                         candidate = Code(prefix + k)
-                        distance = iscc.distance_ba(code.hash_ba, candidate.hash_ba)
+                        distance = distance_ba(code.hash_ba, candidate.hash_ba)
                         if distance > ct:
                             continue
                         c2 = txn.cursor(db)
@@ -335,7 +335,7 @@ class Index:
                 with txn.cursor(db) as c:
                     while c.next_nodup():
                         candidate_feature = c.key()
-                        distance = iscc.distance_bytes(feature_raw, candidate_feature)
+                        distance = distance_bytes(feature_raw, candidate_feature)
                         if distance > ft:
                             continue
                         for value in c.iternext_dup(keys=False, values=True):
@@ -616,12 +616,10 @@ class Index:
         # type: (Code, bytes) -> IsccMatch
         """Build IsccMatch for source_iscc and iscc of a matched foreign key."""
         matched_iscc: Code = self.get_iscc(matched_key)
-        matchdata = iscc.compare(source_iscc, matched_iscc)
+        matchdata = compare(source_iscc, matched_iscc)
         matchdata["matched_iscc"] = matched_iscc.code
         matchdata["key"] = msgpack.loads(matched_key)
-        matchdata["distance"] = iscc.distance_ba(
-            source_iscc.hash_ba, matched_iscc.hash_ba
-        )
+        matchdata["distance"] = distance_ba(source_iscc.hash_ba, matched_iscc.hash_ba)
         return IsccMatch(**matchdata)
 
     @staticmethod

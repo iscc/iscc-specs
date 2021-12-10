@@ -17,7 +17,9 @@ from typing import List, Union, Any
 from PIL import Image
 from blake3 import blake3
 import iscc
-from iscc.audio import encode_audio_features, extract_audio_features
+
+# from image import encode_image_to_data_uri, extract_image_metadata
+# from iscc.audio import encode_audio_features, extract_audio_features
 from iscc import jcs
 from iscc.mp7 import read_ffmpeg_signature
 from iscc.schema import (
@@ -31,7 +33,11 @@ from iscc.schema import (
 from iscc.options import SdkOptions
 from iscc.mediatype import mime_guess, mime_to_gmt
 from iscc import uread
-from iscc.data import encode_data_features
+import iscc.text
+import iscc.image
+import iscc.audio
+import iscc.video
+import iscc.data
 from iscc.wrappers import decompose
 from iscc_core import codec
 
@@ -39,6 +45,13 @@ from iscc_core import codec
 ###############################################################################
 # High-Level ISCC Code generator functions                                   #
 ###############################################################################
+from video import (
+    detect_video_crop,
+    extract_video_metadata,
+    extract_video_preview,
+    extract_video_signature,
+    extract_video_signature_cutpoints,
+)
 
 
 def code_iscc(uri, title=None, extra=None, **options):
@@ -98,7 +111,6 @@ def code_iscc(uri, title=None, extra=None, **options):
 
     meta = code_meta(title, extra, **options)
     result.update(meta)
-    # del result["code"]
 
     iscc_code_obj = iscc_core.gen_iscc_code_v0(
         [meta["iscc"], content["iscc"], data["iscc"], instance["iscc"]]
@@ -266,7 +278,7 @@ def code_audio(data, **options):
     if isinstance(data, list):
         chroma = dict(fingerprint=data)
     else:
-        chroma = extract_audio_features(data, **options)
+        chroma = iscc.audio.extract_audio_features(data, **options)
         # TODO: implement custom audio metadata extraction
         metadata = iscc.video.extract_video_metadata(data)
         # We remove video related keys that are detected in some audio files.
@@ -284,7 +296,7 @@ def code_audio(data, **options):
         else opts.audio_granular
     )
     if granular:
-        features = encode_audio_features(chroma["fingerprint"])
+        features = iscc.audio.encode_audio_features(chroma["fingerprint"])
         result["features"] = features
 
     result["iscc"] = audio_code.iscc
@@ -296,10 +308,10 @@ def code_video(uri, **options):
     """Compute Content-ID video."""
     opts = SdkOptions(**options)
     result = {}
-    metadata = iscc.video.extract_video_metadata(uri)
+    metadata = extract_video_metadata(uri)
     result.update(metadata)
 
-    crop_value = iscc.video.detect_video_crop(uri) if opts.video_crop else None
+    crop_value = detect_video_crop(uri) if opts.video_crop else None
 
     granular = (
         opts.all_granular
@@ -309,11 +321,11 @@ def code_video(uri, **options):
     do_ffmpeg_scenes = granular and opts.video_scenes_ffmpeg
 
     if do_ffmpeg_scenes:
-        signature, cutpoints = iscc.video.extract_video_signature_cutpoints(
+        signature, cutpoints = extract_video_signature_cutpoints(
             uri, crop_value, **options
         )
     else:
-        signature = iscc.video.extract_video_signature(uri, crop_value, **options)
+        signature = extract_video_signature(uri, crop_value, **options)
 
     with Timer(text="video signature decoding took {:0.4f}s", logger=log.debug):
         frames = read_ffmpeg_signature(signature)
@@ -381,7 +393,9 @@ def code_data(data, **options):
     )
 
     if granular:
-        features = encode_data_features(hasher.chunk_sizes, hasher.chunk_features)
+        features = iscc.data.encode_data_features(
+            hasher.chunk_sizes, hasher.chunk_features
+        )
         result["features"] = features
 
     return result

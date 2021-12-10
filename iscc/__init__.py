@@ -16,17 +16,32 @@ from tika import tika
 
 tika.log.disabled = True
 
-from iscc.core import *
-from iscc.options import *
-from iscc.metrics import *
-from iscc.image import *
-from iscc_core.minhash import minhash
-from iscc.text import *
-from iscc_core.wtahash import *
-from iscc.data import *
-from iscc_core.codec import *
-from iscc.video import *
-from iscc.jcs import *
-from iscc.match import *
-from iscc.mediatype import *
-from iscc.index import *
+from iscc.api import (
+    code_iscc,
+    code_meta,
+    code_content,
+    code_text,
+    code_image,
+    code_audio,
+    code_video,
+    code_data,
+    code_instance,
+    code_iscc_id,
+)
+
+from iscc import (
+    text,
+    image,
+    audio,
+    video,
+    match,
+    metrics,
+    mediatype,
+    utils,
+    bin,
+    data,
+    index,
+    jcs,
+    uread,
+    utils,
+)

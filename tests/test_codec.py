@@ -6,7 +6,7 @@ import iscc
 import iscc_core
 from iscc_core import codec as c
 from iscc_core import gen_iscc_code_v0
-from iscc.core import code_meta
+from iscc.api import code_meta
 from bitarray import bitarray as ba
 import uvarint
 from iscc.wrappers import decompose

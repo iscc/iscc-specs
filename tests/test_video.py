@@ -3,7 +3,7 @@ import iscc_core
 import pytest
 from iscc_core.code_content_video import soft_hash_video_v0
 
-from iscc.core import code_video
+from iscc.api import code_video
 from iscc import video, mp7
 from blake3 import blake3
 from tests import HERE

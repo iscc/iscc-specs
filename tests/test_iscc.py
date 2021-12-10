@@ -7,6 +7,7 @@ import iscc_core
 import pytest
 from PIL import Image, ImageFilter, ImageEnhance
 import iscc
+import iscc.metrics
 from iscc_core.codec import decode_base32
 
 
@@ -56,10 +57,10 @@ def test_meta_id():
     assert mid1 != mid2
 
     mid3 = iscc.code_meta("Die Unentliche Geschichte")["iscc"]
-    assert iscc.distance(mid1, mid3) == 11
+    assert iscc.metrics.distance(mid1, mid3) == 11
 
     mid4 = iscc.code_meta("Geschichte, Die Unendliche")["iscc"]
-    assert iscc.distance(mid1, mid4) == 11
+    assert iscc.metrics.distance(mid1, mid4) == 11
 
     with pytest.raises(UnicodeDecodeError):
         iscc.code_meta(b"\xc3\x28")
@@ -75,33 +76,33 @@ def test_code_meta_composite():
 def test_hamming_distance():
     a = 0b0001111
     b = 0b1000111
-    assert iscc.distance(a, b) == 2
+    assert iscc.metrics.distance(a, b) == 2
 
     mid1 = iscc.code_meta("Die Unendliche Geschichte", "von Michael Ende")["iscc"]
 
     # Change one Character
     mid2 = iscc.code_meta("Die UnXndliche Geschichte", "von Michael Ende")["iscc"]
-    assert iscc.distance(mid1, mid2) <= 10
+    assert iscc.metrics.distance(mid1, mid2) <= 10
 
     # Delete one Character
     mid2 = iscc.code_meta("Die nendliche Geschichte", "von Michael Ende")["iscc"]
-    assert iscc.distance(mid1, mid2) <= 14
+    assert iscc.metrics.distance(mid1, mid2) <= 14
 
     # Add one Character
     mid2 = iscc.code_meta("Die UnendlicheX Geschichte", "von Michael Ende")["iscc"]
-    assert iscc.distance(mid1, mid2) <= 13
+    assert iscc.metrics.distance(mid1, mid2) <= 13
 
     # Add, change, delete
     mid2 = iscc.code_meta("Diex Unandlische Geschiche", "von Michael Ende")["iscc"]
-    assert iscc.distance(mid1, mid2) <= 22
+    assert iscc.metrics.distance(mid1, mid2) <= 22
 
     # Change Word order
     mid2 = iscc.code_meta("Unendliche Geschichte, Die", "von Michael Ende")["iscc"]
-    assert iscc.distance(mid1, mid2) <= 13
+    assert iscc.metrics.distance(mid1, mid2) <= 13
 
     # Totaly different
     mid2 = iscc.code_meta("Now for something different")["iscc"]
-    assert iscc.distance(mid1, mid2) >= 24
+    assert iscc.metrics.distance(mid1, mid2) >= 24
 
 
 def test_content_id_image():
@@ -137,6 +138,6 @@ def test_content_id_image_robust():
     cid3 = iscc_core.gen_image_code_v0(img3)
     cid4 = iscc_core.gen_image_code_v0(img4)
 
-    assert iscc.distance(cid1.iscc, cid2.iscc) == 0
-    assert iscc.distance(cid1.iscc, cid3.iscc) == 2
-    assert iscc.distance(cid1.iscc, cid4.iscc) == 0
+    assert iscc.metrics.distance(cid1.iscc, cid2.iscc) == 0
+    assert iscc.metrics.distance(cid1.iscc, cid3.iscc) == 2
+    assert iscc.metrics.distance(cid1.iscc, cid4.iscc) == 0
