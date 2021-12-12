@@ -45,6 +45,10 @@ def mime_guess(data, file_name=None):
     guess_name = mime_normalize(guess_name)
     media_type = guess_name or guess_data
 
+    # Special cases of missdetection
+    if guess_data and "ogg" in guess_data:
+        media_type = guess_data
+
     log.debug(f"{media_type} media-type detected")
 
     return media_type
@@ -106,6 +110,7 @@ mimetypes.add_type("text/markdown", ".markdown")
 mimetypes.add_type("application/x-mobipocket-ebook", ".mobi")
 mimetypes.add_type("application/x-sqlite3", ".sqlite")
 mimetypes.add_type("video/mp4", ".f4v")
+mimetypes.add_type("video/h264", ".h264")
 
 
 SUPPORTED_MEDIATYPES = {
