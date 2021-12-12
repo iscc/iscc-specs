@@ -6,7 +6,7 @@ import magic
 from PIL import Image
 from iscc.schema import GMT, Readable
 from iscc import uread
-
+from loguru import logger as log
 
 __all__ = [
     "mime_guess",
@@ -43,8 +43,11 @@ def mime_guess(data, file_name=None):
     # Normalize
     guess_data = mime_normalize(guess_data)
     guess_name = mime_normalize(guess_name)
+    media_type = guess_name or guess_data
 
-    return guess_name or guess_data
+    log.debug(f"{media_type} media-type detected")
+
+    return media_type
 
 
 def mime_normalize(mime: str) -> str:

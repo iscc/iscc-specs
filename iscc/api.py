@@ -60,11 +60,11 @@ def code_iscc(uri, title=None, extra=None, **options):
     if file_name:
         result["filename"] = basename(file_name)
 
-    with Timer(text="instance code creation took {:0.4f}s", logger=log.debug):
+    with Timer(text="{:0.4f}s for instance code creation", logger=log.debug):
         instance = code_instance(file_obj, **options)
     result.update(instance)
 
-    with Timer(text="data code creation took {:0.4f}s", logger=log.debug):
+    with Timer(text="{:0.4f}s for data code creation", logger=log.debug):
         data = code_data(file_obj, **options)
 
     if "features" in data:
@@ -144,16 +144,16 @@ def code_content(data, **options):
         tempdir, data = mobi.extract(data)
 
     if gmt == GMT.text:
-        with Timer(text="content code text creation took {:0.4f}s", logger=log.debug):
+        with Timer(text="{:0.4f}s for content code text creation", logger=log.debug):
             cc = code_text(data, **options)
     elif gmt == GMT.image:
-        with Timer(text="content code image creation took {:0.4f}s", logger=log.debug):
+        with Timer(text="{:0.4f}s for content code image creation", logger=log.debug):
             cc = code_image(data, **options)
     elif gmt == GMT.audio:
-        with Timer(text="content code audio creation took {:0.4f}s", logger=log.debug):
+        with Timer(text="{:0.4f}s for content code audio creation", logger=log.debug):
             cc = code_audio(data, **options)
     elif gmt == GMT.video:
-        with Timer(text="content code video creation took {:0.4f}s", logger=log.debug):
+        with Timer(text="{:0.4f}s for content code video creation", logger=log.debug):
             cc = code_video(data, **options)
     else:
         raise ValueError("Unsupported mediatype: {}".format(mediatype))
@@ -300,7 +300,7 @@ def code_video(uri, **options):
     else:
         signature = iscc.video.extract_video_signature(uri, crop_value, **options)
 
-    with Timer(text="video signature decoding took {:0.4f}s", logger=log.debug):
+    with Timer(text="{:0.4f}s for video signature decoding", logger=log.debug):
         frames = read_ffmpeg_signature(signature)
     log.debug(f"video sig {naturalsize(len(signature))} with {len(frames)} frames")
     features = [tuple(sig.vector.tolist()) for sig in frames]

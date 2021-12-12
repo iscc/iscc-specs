@@ -17,7 +17,7 @@ def encode_data_features(sizes, features, **options):
     :return: dicttionary with {"sizes": ..., "features": ...}
     """
     opts = SdkOptions(**options)
-    with Timer(text="data features encoding took {:0.4f}s", logger=log.debug):
+    with Timer(text="{:0.4f}s for data features encoding", logger=log.debug):
         encoded_sizes = [sum(fh) for fh in chunked(sizes, opts.data_granular_factor)]
         encoded_features = [
             encode_base64(minhash_64(cf))

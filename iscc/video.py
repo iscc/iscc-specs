@@ -131,7 +131,7 @@ def extract_video_preview(file, **options):
         "image2pipe",
         "-",
     ]
-    with Timer(text="video preview extraction took {:0.4f}s", logger=log.debug):
+    with Timer(text="{:0.4f}s for video preview extraction", logger=log.debug):
         result = subprocess.run(cmd, stdout=PIPE, stderr=DEVNULL)
     return result.stdout
 
@@ -173,7 +173,7 @@ def extract_video_signature(uri, crop=None, **options):
     cmd.extend(["-i", infile_path, "-vf", vf, "-f", "null", "-"])
 
     log.debug(f"video sig extraction with {cmd}")
-    with Timer(text="video sig extraction took {:0.4f}s", logger=log.debug):
+    with Timer(text="{:0.4f}s for video sig extraction", logger=log.debug):
         subprocess.run(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
     with open(sigfile_path, "rb") as sig:
         sigdata = sig.read()
@@ -243,9 +243,7 @@ def extract_video_signature_cutpoints(uri, crop=None, **options):
     )
 
     log.debug(f"video sig and cutpoint extraction with {subprocess.list2cmdline(cmd)}")
-    with Timer(
-        text="video sig and cutpoint extraction took {:0.3f}s", logger=log.debug
-    ):
+    with Timer(text="{:0.4f}s for video sig and cutpoint extraction", logger=log.debug):
         subprocess.run(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
     with open(sig_path, "rb") as sigin:
         sigdata = sigin.read()
@@ -366,7 +364,7 @@ def detect_video_scenes(uri, **options):
     video_manager.set_downscale_factor()
     video_manager.start()
 
-    with Timer(text="video scene detection took {:0.4f}s", logger=log.debug):
+    with Timer(text="{:0.4f}s for video scene detection", logger=log.debug):
         scene_manager.detect_scenes(
             frame_source=video_manager,
             show_progress=False,
