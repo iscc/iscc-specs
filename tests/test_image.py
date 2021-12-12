@@ -1,17 +1,54 @@
 # -*- coding: utf-8 -*-
 import math
-
 import pytest
-
 import iscc
 import iscc.image
 from iscc_samples import images
 from iscc_core.codec import Code
+from iscc_core.code_content_image import soft_hash_image_v0
 from iscc.schema import Features
 from tests.test_readables import image_readables
+from PIL import Image
+import pathlib
 
 
-# TODO add testcase for images with alpha transparency
+HERE = pathlib.Path(__file__).parent.absolute()
+IMG_ALPHA = HERE / "alpha.png"
+
+
+def test_normalize_image_default():
+    img = Image.open(images()[0].as_posix())
+    pixels = iscc.image.normalize_image(img)
+    assert len(pixels) == 1024
+    assert pixels[0] == 23
+    assert pixels[-1] == 51
+    assert (
+        soft_hash_image_v0(pixels, bits=256).hex()
+        == "c343309e3c9e8e678687613c793c1ccf43309e3c9e8e65ce87613c793c1ccb8d"
+    )
+
+
+def test_normalize_image_opts_true():
+    imo = Image.open(IMG_ALPHA)
+    pixels = iscc.image.normalize_image(
+        imo, image_transpose=True, image_trim=True, image_fill=True
+    )
+    assert (
+        soft_hash_image_v0(pixels, bits=256).hex()
+        == "f165ce9b3464c319e3cb9c3669c9863267ce9b3466c3191ccb9c3669cd863239"
+    )
+
+
+def test_normalize_image_opts_false():
+    imo = Image.open(IMG_ALPHA)
+    pixels = iscc.image.normalize_image(
+        imo, image_transpose=False, image_trim=False, image_fill=False
+    )
+    # Note: transparency is rendered black by default so this creates an all black img.
+    assert (
+        soft_hash_image_v0(pixels, bits=256).hex()
+        == "0000000000000000000000000000000000000000000000000000000000000000"
+    )
 
 
 def test_code_image_plain():
