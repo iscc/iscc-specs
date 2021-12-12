@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import json
+from fractions import Fraction
 
-import iscc_core
 from codetiming import Timer
 from iscc_core.code_content_video import soft_hash_video_v0
 from loguru import logger as log
@@ -21,8 +21,8 @@ from iscc.schema import FeatureType, Readable, File, Uri
 from iscc_core.codec import encode_base64
 from iscc.mp7 import Frame
 from iscc.bin import ffmpeg_bin, ffprobe_bin
-import av
 import jmespath
+import iscc_core
 
 
 FFMPEG = ffmpeg_bin()
@@ -31,18 +31,17 @@ Scene = Union[Tuple["FrameTimecode", "FrameTimecode"], Tuple[float, float]]
 SceneSig = Tuple[List[str], List[int]]  # feature hashes, scene durations
 
 
-def extract_video_metadata2(file):
-    # type: (Union[File, Uri], **Any) -> Optional[bytes]
-    """Extract video metadata"""
+def extract_video_metadata(file):
+    # type: (Union[File, Uri]) -> dict
 
     infile = uread.open_data(file)
-
     if not hasattr(infile, "name"):
-        log.warning("Cannot extract preview without file.name")
-        return None
+        log.warning("Cannot extract video metadata without file.name")
+        return dict()
+    file_path = infile.name
 
     cmd = [
-        ffprobe_bin(),
+        FFPROBE,
         "-hide_banner",
         "-loglevel",
         "fatal",
@@ -56,75 +55,53 @@ def extract_video_metadata2(file):
         "-print_format",
         "json",
         "-i",
-        infile.name,
+        file_path,
     ]
     res = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     metadata = json.loads(res.stdout)
 
-    durations = [jmespath.search("format.duration", metadata)] or jmespath.search(
-        "streams[*].duration", metadata
+    video_streams = jmespath.search("streams[?codec_type=='video']", metadata)
+    n_streams = len(video_streams)
+    if n_streams == 0:
+        raise ValueError("No video stream detected")
+    if n_streams != 1:
+        log.warning(f"Detected {n_streams} video streams.")
+
+    vstream = video_streams[0]
+
+    result = iscc_core.ContentCodeVideo(iscc="dummy")
+
+    # Duration
+    duration_format = [jmespath.search("format.duration", metadata)]
+    duration_streams = jmespath.search(
+        "streams[?codec_type=='video'].duration", metadata
     )
+    durations = duration_format + duration_streams
     duration = max(round(float(d), 3) for d in durations)
-    return json.loads(res.stdout)
+    result.duration = duration
 
+    # Dimensions
+    result.height = vstream.get("height")
+    result.width = vstream.get("width")
 
-def extract_video_metadata(data):
-    # type: (Union[Readable]) -> dict
-    """Extract basic metadata from video files."""
-    video = uread.open_data(data)
-    with av.open(video) as v:
-        metadata = {}
-        c_duration = v.duration
-        # Lower Case all keys in metadata
-        c_metadata = {key.lower(): value for key, value in v.metadata.items()}
-        vstreams = 0
-        languages = set()
-        metadata_fields = ["title"]
-        for field in metadata_fields:
-            value = c_metadata.get(field)
-            if value:
-                metadata[field] = value
+    # FPS
+    fps = vstream.get("r_frame_rate")
+    if fps:
+        fps = round(float(Fraction(fps)), 3)
+        result.fps = fps
 
-        for stream in v.streams:
-            if stream.type == "video":
-                if vstreams == 0:
-                    # Stream Duration
-                    duration = stream.duration or c_duration
-                    ds = round(float(duration * stream.time_base), ndigits=3)
-                    if ds > 0:
-                        metadata["duration"] = ds
+    # Title
+    result.title = jmespath.search("format.tags.title", metadata)
 
-                    fps = stream.guessed_rate
-                    if fps:
-                        metadata["fps"] = round(float(fps), ndigits=3)
+    # Language
+    langs = jmespath.search("streams[*].tags.language", metadata)
+    lang = jmespath.search("format.tags.language", metadata)
+    if lang:
+        langs.insert(0, lang)
+    if langs:
+        result.language = standardize_tag(langs[0])
 
-                    # Stream Language
-                    if stream.language and stream.language != "und":
-                        languages.add(standardize_tag(stream.language))
-
-                    # Stream Dimensions and FPS
-                    format_attrs = ("width", "height")
-                    for attr in format_attrs:
-                        value = getattr(stream.format, attr)
-                        if value:
-                            metadata[attr] = value
-                vstreams += 1
-            if stream.type == "audio":
-                # Add languages of audio streams
-                if stream.language and stream.language != "und":
-                    languages.add(standardize_tag(stream.language))
-                if "duration" not in metadata:
-                    # Stream Duration
-                    duration = stream.duration or c_duration
-                    ds = round(float(duration * stream.time_base), ndigits=3)
-                    if ds > 0:
-                        metadata["duration"] = ds
-
-        lng = languages.pop() if len(languages) == 1 else list(languages)
-        if lng:
-            metadata["language"] = lng
-
-        return dict(sorted(metadata.items()))
+    return result.dict(exclude={"iscc"})
 
 
 def extract_video_preview(file, **options):

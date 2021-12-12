@@ -68,7 +68,7 @@ def test_code_iscc_video():
         "version": "0-0-0",
         "tophash": "27afa05e42a2bfd756317f31713b01bd4cad1b768d49c2644dbee53ef0030e5b",
         "datahash": "c9a8c0806046de30261e3b31c12e8e8a8392c73e2faae3f822f8913dc6ba0931",
-        "duration": 60.042,
+        "duration": 60.146,
         "filename": "demo.3g2",
         "filesize": 1797418,
         "fps": 24.0,
@@ -208,7 +208,7 @@ def test_code_iscc_video_granular():
     )
     assert result == {
         "datahash": "c9a8c0806046de30261e3b31c12e8e8a8392c73e2faae3f822f8913dc6ba0931",
-        "duration": 60.042,
+        "duration": 60.146,
         "features": [
             {
                 "features": [

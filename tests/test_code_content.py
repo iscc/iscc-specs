@@ -42,7 +42,7 @@ def test_content_code_with_video_nogran():
     tc = iscc.code_content(s.videos()[0], video_granular=False, video_preview=False)
     assert tc == {
         "iscc": "EMAVNGMC7RMJFOWZ",
-        "duration": 60.042,
+        "duration": 60.146,
         "fps": 24.0,
         "gmt": "video",
         "height": 288,
