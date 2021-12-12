@@ -24,10 +24,18 @@ def extract_audio_metadata(file):
         return dict()
     file_path = infile.name
 
-    tag = tinytag.TinyTag.get(file_path)
+    try:
+        tag = tinytag.TinyTag.get(file_path)
+    except Exception as e:
+        log.error(f'failed audio metadata extraction: {e}')
+        return dict()
     result = iscc_core.ContentCodeAudio(iscc="dummy")
     result.title = tag.title
-    result.duration = round(float(tag.duration), 3)
+    if tag.duration:
+        result.duration = round(float(tag.duration), 3)
+    else:
+        log.warning("failed to extract duration")
+
     return dict(sorted(result.dict(exclude={"iscc"}).items()))
 
 
