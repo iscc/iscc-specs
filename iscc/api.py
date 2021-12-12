@@ -257,12 +257,7 @@ def code_audio(data, **options):
         chroma = dict(fingerprint=data)
     else:
         chroma = iscc.audio.extract_audio_features(data, **options)
-        # TODO: implement custom audio metadata extraction
-        metadata = iscc.video.extract_video_metadata(data)
-        # We remove video related keys that are detected in some audio files.
-        metadata.pop("fps", None)
-        metadata.pop("width", None)
-        metadata.pop("height", None)
+        metadata = iscc.audio.extract_audio_metadata(data)
         result.update(metadata)
 
     audio_code = iscc_core.gen_audio_code_v0(

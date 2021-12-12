@@ -44,6 +44,7 @@ opencv-contrib-python-headless = { version = "^4.5", optional = true }
 mobi = "^0.3"
 iscc-core = "^0.1"
 Pillow = "^8.4.0"
+tinytag = "^1.6.0"
 
 [tool.poetry.extras]
 turbo = ["cython", "pybase64"]

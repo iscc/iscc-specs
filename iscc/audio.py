@@ -9,6 +9,26 @@ from iscc.options import SdkOptions
 from iscc_core.codec import encode_base64
 from typing import Any, List
 from iscc import uread
+import tinytag
+import iscc_core
+from loguru import logger as log
+from schema import Uri
+
+
+def extract_audio_metadata(file):
+    # type: (Union[File, Uri]) -> dict
+
+    infile = uread.open_data(file)
+    if not hasattr(infile, "name"):
+        log.warning("Cannot extract audio metadata without file.name")
+        return dict()
+    file_path = infile.name
+
+    tag = tinytag.TinyTag.get(file_path)
+    result = iscc_core.ContentCodeAudio(iscc='dummy')
+    result.title = tag.title
+    result.duration = round(float(tag.duration), 3)
+    return dict(sorted(result.dict(exclude={'iscc'}).items()))
 
 
 def extract_audio_features(data, **options):
