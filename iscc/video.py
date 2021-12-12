@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 import json
 from fractions import Fraction
-
 from codetiming import Timer
 from iscc_core.code_content_video import soft_hash_video_v0
 from loguru import logger as log
@@ -72,13 +71,18 @@ def extract_video_metadata(file):
     result = iscc_core.ContentCodeVideo(iscc="dummy")
 
     # Duration
-    duration_format = [jmespath.search("format.duration", metadata)]
+    duration_format = jmespath.search("format.duration", metadata)
     duration_streams = jmespath.search(
         "streams[?codec_type=='video'].duration", metadata
     )
-    durations = duration_format + duration_streams
-    duration = max(round(float(d), 3) for d in durations)
-    result.duration = duration
+    durations = (
+        [duration_format] + duration_streams if duration_format else duration_streams
+    )
+    if durations:
+        duration = max(round(float(d), 3) for d in durations)
+        result.duration = duration
+    else:
+        log.warning("failed to extract duration")
 
     # Dimensions
     result.height = vstream.get("height")
@@ -472,11 +476,3 @@ def compute_video_features_scenes(frames, scenes):
         sizes = [round(float(frames[-1].elapsed), 3)]
 
     return dict(kind=FeatureType.video.value, version=0, features=features, sizes=sizes)
-
-
-if __name__ == "__main__":
-    from iscc_samples import videos
-    from pprint import pprint
-
-    r = extract_video_metadata2(videos()[1])
-    pprint(r, sort_dicts=False)
