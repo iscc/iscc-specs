@@ -1,15 +1,13 @@
 # -*- coding: utf-8 -*-
 import io
-from typing import Union
 from iscc.schema import Readable, Uri, File, Data
-from typing import BinaryIO
 from iscc.utils import download_file
 from tempfile import gettempdir
 
 
 def open_data(data):
-    # type: (Readable) -> Union[BinaryIO]
-    """Open filepath, rawdata or file-like object."""
+    # type: (Readable) -> Readable
+    """Open filepath, uri, rawdata or file-like object."""
     if isinstance(data, Uri.__args__):
         if isinstance(data, str) and (
             data.startswith("http://") or data.startswith("https://")
