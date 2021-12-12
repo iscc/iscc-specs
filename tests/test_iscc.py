@@ -133,11 +133,11 @@ def test_content_id_image_robust():
     img4 = io.BytesIO()
     img4_obj.save(img4, format="JPEG")
 
-    cid1 = iscc_core.gen_image_code_v0(open("file_image_lenna.jpg", "rb"))
-    cid2 = iscc_core.gen_image_code_v0(img2)
-    cid3 = iscc_core.gen_image_code_v0(img3)
-    cid4 = iscc_core.gen_image_code_v0(img4)
+    cid1 = iscc.code_image(open("file_image_lenna.jpg", "rb"))["iscc"]
+    cid2 = iscc.code_image(img2)["iscc"]
+    cid3 = iscc.code_image(img3)["iscc"]
+    cid4 = iscc.code_image(img4)["iscc"]
 
-    assert iscc.metrics.distance(cid1.iscc, cid2.iscc) == 0
-    assert iscc.metrics.distance(cid1.iscc, cid3.iscc) == 2
-    assert iscc.metrics.distance(cid1.iscc, cid4.iscc) == 0
+    assert iscc.metrics.distance(cid1, cid2) == 0
+    assert iscc.metrics.distance(cid1, cid3) == 2
+    assert iscc.metrics.distance(cid1, cid4) == 0

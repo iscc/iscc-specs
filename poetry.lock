@@ -321,7 +321,7 @@ python-versions = "*"
 
 [[package]]
 name = "iscc-core"
-version = "0.1.7"
+version = "0.1.8"
 description = "ISCC - Core Algorithms"
 category = "main"
 optional = false
@@ -330,8 +330,8 @@ python-versions = ">=3.6.1,<4.0"
 [package.dependencies]
 bitarray-hardbyte = "*"
 blake3 = "*"
+loguru = ">=0.5.3,<0.6.0"
 more-itertools = "*"
-Pillow = "*"
 pydantic = {version = ">=1.8.2,<2.0.0", extras = ["dotenv"]}
 uvarint = ">=1.2.0,<2.0.0"
 xxhash = "*"
@@ -995,7 +995,7 @@ turbo = []
 [metadata]
 lock-version = "1.1"
 python-versions = ">=3.6.1,<3.10"
-content-hash = "d8e5fc9c59209bfbc8c3568f0a50073e27c4f436eed2ac934c7d317d48aed4aa"
+content-hash = "7564949e4f2081fde2a304e260ab1c43340d1a5e1d5a84e9d44539a7311b8cd6"
 
 [metadata.files]
 aiocontextvars = [
@@ -1272,7 +1272,7 @@ iniconfig = [
     {file = "iniconfig-1.1.1.tar.gz", hash = "sha256:bc3af051d7d14b2ee5ef9969666def0cd1a000e121eaea580d4a313df4b37f32"},
 ]
 iscc-core = [
-    {file = "iscc-core-0.1.7.tar.gz", hash = "sha256:985dafa8106cceba71698e11402243ceb0763fea0a86493ea82f48e14ba4676b"},
+    {file = "iscc-core-0.1.8.tar.gz", hash = "sha256:feb370e02c9cd9e70f0a39eb60528d6d7647ea7f2d785f7765e08ecc01ce2983"},
 ]
 iscc-samples = [
     {file = "iscc-samples-0.4.0.tar.gz", hash = "sha256:98925bec8adcc8c843ddd42b32d0c7972ed1c2ff635cb44144fd7c08929d2a2f"},

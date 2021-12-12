@@ -60,9 +60,7 @@ class SdkOptions(CoreOptions):
         True, description="Add gray background to image if it has alpha transparency"
     )
 
-    image_trim: bool = Field(
-        True, description="Crop empty borders of images"
-    )
+    image_trim: bool = Field(True, description="Crop empty borders of images")
 
     image_granular: bool = Field(
         True, description="Calculate and return granular image features"

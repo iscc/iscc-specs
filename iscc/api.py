@@ -27,7 +27,7 @@ from iscc.schema import (
     Readable,
     ISCC,
 )
-from iscc.options import SdkOptions
+from iscc.options import SdkOptions, sdk_opts
 from iscc.mediatype import mime_guess, mime_to_gmt
 from iscc import uread
 from iscc.wrappers import decompose
@@ -202,7 +202,7 @@ def code_image(data, **options):
     :key bool image_granular: Wether to compute granular image features
     :key int image_granular_n: Number of features to compute (default 32)
     """
-    opts = SdkOptions(**options)
+    opts = SdkOptions(**options) if options else sdk_opts
 
     try:
         result = iscc.image.extract_image_metadata(data) or {}
@@ -211,7 +211,10 @@ def code_image(data, **options):
         result = {}
 
     stream = uread.open_data(data)
-    image_code = iscc_core.gen_image_code_v0(stream, bits=opts.image_bits)
+    imo = Image.open(stream)
+    pixels = iscc.image.normalize_image(imo, **options)
+    image_code = iscc_core.gen_image_code_v0(pixels, bits=opts.image_bits)
+    image_code.width, image_code.height = imo.size
     result.update(image_code.dict(exclude_unset=True))
 
     if isinstance(data, Image.Image):
