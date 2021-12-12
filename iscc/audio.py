@@ -27,7 +27,7 @@ def extract_audio_metadata(file):
     try:
         tag = tinytag.TinyTag.get(file_path)
     except Exception as e:
-        log.error(f'failed audio metadata extraction: {e}')
+        log.error(f"failed audio metadata extraction: {e}")
         return dict()
     result = iscc_core.ContentCodeAudio(iscc="dummy")
     result.title = tag.title
