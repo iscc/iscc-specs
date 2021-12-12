@@ -302,7 +302,7 @@ def code_video(uri, **options):
 
     with Timer(text="{:0.4f}s for video signature decoding", logger=log.debug):
         frames = read_ffmpeg_signature(signature)
-    log.debug(f"video sig {naturalsize(len(signature))} with {len(frames)} frames")
+    log.debug(f"{naturalsize(len(signature))} video sig with {len(frames)} frames")
     features = [tuple(sig.vector.tolist()) for sig in frames]
     video_code = iscc_core.gen_video_code_v0(features, bits=opts.video_bits)
     result["iscc"] = video_code.iscc
