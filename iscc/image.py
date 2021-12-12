@@ -7,14 +7,14 @@ import pyexiv2
 from iscc_core.codec import encode_base64
 from loguru import logger
 from pathlib import Path
-from typing import Any, List, Optional, Union
-from PIL import Image, ImageChops, ImageEnhance
+from typing import Any, Optional, Sequence, Union
+from PIL import Image, ImageChops, ImageEnhance, ImageOps
 import numpy as np
 from more_itertools import chunked
 from iscc.schema import FeatureType, Readable
 from iscc_core.simhash import similarity_hash
 from iscc.text import normalize_text
-from iscc.options import SdkOptions
+from iscc.options import SdkOptions, sdk_opts
 from iscc import uread
 
 
@@ -144,7 +144,7 @@ def extract_image_features(data, n=32):
 def extract_image_preview(img, **options):
     # type: (Union[str, Path, Image.Image], **Any) -> Image.Image
     """Create a thumbnail for an image."""
-    opts = SdkOptions(**options)
+    opts = SdkOptions(**options) if options else sdk_opts
     size = opts.image_preview_size
     if not isinstance(img, Image.Image):
         img = Image.open(img)
@@ -158,7 +158,8 @@ def extract_image_preview(img, **options):
 def encode_image_to_data_uri(img, **options):
     # type: (Union[str, Path, Image.Image, bytes, io.BytesIO], **Any) -> str
     """Converts image to WebP data-uri."""
-    opts = SdkOptions(**options)
+    opts = SdkOptions(**options) if options else sdk_opts
+
     quality = opts.image_preview_quality
 
     if isinstance(img, bytes):
@@ -174,18 +175,91 @@ def encode_image_to_data_uri(img, **options):
     return "data:image/webp;base64," + enc
 
 
-def trim_image(img):
-    # type: (Union[str, Path, Image.Image]) -> Image.Image
-    """Trim uniform colored (empty) border."""
+def normalize_image(imo, **options):
+    # type: (Image.Image, **bool) -> Sequence[int]
+    """Normalize image for hash calculation.
 
-    if not isinstance(img, Image.Image):
-        img = Image.open(img)
+    :param Image.Image imo: Pillow Image Object
+    :key bool image_transpose: Transpose image according to EXIF Orientation
+    :key bool image_fill: Add gray background to image if it has alpha transparency
+    :key bool image_trim: Crop empty borders of image
+    :return: Normalized and flattened image 1024-pixel array (from 32x32 gray pixels)
+    :rtype: Sequence[int]
+    """
+    opts = SdkOptions(**options) if options else sdk_opts
 
-    bg = Image.new(img.mode, img.size, img.getpixel((0, 0)))
-    diff = ImageChops.difference(img, bg)
+    # Transpose image according to EXIF Orientation tag
+    if opts.image_transpose:
+        imo = transpose_image(imo)
+
+    # Add gray background to image if it has alpha transparency
+    if opts.image_fill:
+        imo = fill_image(imo)
+
+    # Trim uniform colored (empty) border if there is one
+    if opts.image_trim:
+        imo = trim_image(imo)
+
+    # Convert to grayscale
+    imo = imo.convert("L")
+
+    # Resize to 32x32
+    im = imo.resize((32, 32), Image.BICUBIC)
+
+    # A flattened sequence of grayscale pixel values (1024 pixels)
+    pixels = im.getdata()
+
+    return pixels
+
+
+def transpose_image(imo):
+    # type: (Image.Image) -> Image.Image
+    """
+    Transpose image according to EXIF Orientation tag
+
+    :param Image.Image imo: Pillow Image Object
+    :return: EXIF transposed image
+    :rtype: Image.Image
+    """
+    imo = ImageOps.exif_transpose(imo)
+    logger.debug(f"Image exif transpose applied")
+    return imo
+
+
+def fill_image(imo):
+    # type: (Image.Image) -> Image.Image
+    """
+    Add gray background to image if it has alpha transparency
+
+    :param Image.Image imo: Pillow Image Object
+    :return: Image where alpha transparency is replaced with gray background.
+    :rtype: Image.Image
+    """
+    if imo.mode in ("RGBA", "LA") or (imo.mode == "P" and "transparency" in imo.info):
+        if imo.mode != "RGBA":
+            imo = imo.convert("RGBA")
+        bg = Image.new("RGBA", imo.size, (126, 126, 126))
+        imo = Image.alpha_composite(bg, imo)
+        logger.debug(f"Image transparency filled with gray")
+    return imo
+
+
+def trim_image(imo):
+    # type: (Image.Image) -> Image.Image
+    """Trim uniform colored (empty) border.
+
+    Takes the upper left pixel as reference to
+
+    :param Image.Image imo: Pillow Image Object
+    :return: Image with uniform colored (empty) border removed.
+    :rtype: Image.Image
+    """
+
+    bg = Image.new(imo.mode, imo.size, imo.getpixel((0, 0)))
+    diff = ImageChops.difference(imo, bg)
     diff = ImageChops.add(diff, diff)
     bbox = diff.getbbox()
     if bbox:
-        logger.debug(f"Image has been trimmed: {img}")
-        return img.crop(bbox)
-    return img
+        logger.debug(f"Image has been trimmed")
+        return imo.crop(bbox)
+    return imo

@@ -219,16 +219,6 @@ def code_image(data, **options):
     else:
         img_obj = Image.open(io.BytesIO(uread.open_data(data).read()))
 
-    # TODO review  image exif_transpose and trimming
-    # if opts.image_exif_transpose:
-    #     img_obj = exif_transpose(img_obj)
-    #
-    # if opts.image_trim:
-    #     img_obj = image.trim_image(img_obj)
-    #     # if img_obj.size != result.values():
-    #     #     tw, th = img_obj.size
-    #     #     result["trimmed"] = dict(width=tw, height=th)
-
     granular = (
         opts.all_granular
         if isinstance(opts.all_granular, bool)

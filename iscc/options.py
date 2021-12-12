@@ -51,9 +51,17 @@ class SdkOptions(CoreOptions):
         description="Store extracted paintext (with filename: <datahash>.txt.gz).",
     )
 
+    image_transpose: bool = Field(
+        True,
+        description="Transpose image according to EXIF Orientation tag",
+    )
+
+    image_fill: bool = Field(
+        True, description="Add gray background to image if it has alpha transparency"
+    )
+
     image_trim: bool = Field(
-        False,
-        description="Autocrop empty borders of images before Image-Code generation",
+        True, description="Crop empty borders of images"
     )
 
     image_granular: bool = Field(
@@ -70,11 +78,6 @@ class SdkOptions(CoreOptions):
 
     image_preview_quality: int = Field(
         30, description="Image compression setting (0-100)"
-    )
-
-    image_exif_transpose: bool = Field(
-        True,
-        description="Transpose according to EXIF Orientation tag before hashing",
     )
 
     audio_granular: bool = Field(
@@ -165,3 +168,6 @@ class SdkOptions(CoreOptions):
     )
 
     index_metadata: bool = Field(False, description="Store metadata in index")
+
+
+sdk_opts = SdkOptions()
