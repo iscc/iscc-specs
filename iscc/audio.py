@@ -7,12 +7,12 @@ from iscc.bin import fpcalc_bin, fpcalc_install
 from iscc.schema import FeatureType, Readable
 from iscc.options import SdkOptions
 from iscc_core.codec import encode_base64
-from typing import Any, List
+from typing import Any, List, Union
 from iscc import uread
 import tinytag
 import iscc_core
 from loguru import logger as log
-from schema import Uri
+from iscc.schema import File, Uri
 
 
 def extract_audio_metadata(file):
@@ -25,10 +25,10 @@ def extract_audio_metadata(file):
     file_path = infile.name
 
     tag = tinytag.TinyTag.get(file_path)
-    result = iscc_core.ContentCodeAudio(iscc='dummy')
+    result = iscc_core.ContentCodeAudio(iscc="dummy")
     result.title = tag.title
     result.duration = round(float(tag.duration), 3)
-    return dict(sorted(result.dict(exclude={'iscc'}).items()))
+    return dict(sorted(result.dict(exclude={"iscc"}).items()))
 
 
 def extract_audio_features(data, **options):
