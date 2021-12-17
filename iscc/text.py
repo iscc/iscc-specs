@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import subprocess
 from loguru import logger
 import unicodedata
 from os.path import basename, splitext
@@ -8,13 +9,14 @@ import langdetect
 import xxhash
 from functools import lru_cache
 import langcodes
+import iscc.bin
 from iscc.schema import FeatureType
 from iscc_core.cdc import data_chunks
-from iscc.options import SdkOptions
+from iscc.options import SdkOptions, sdk_opts
 from iscc import uread
 from iscc.utils import sliding_window
 from iscc_core.codec import encode_base64
-from iscc.schema import Readable
+from iscc.schema import Readable, File, Uri
 from iscc.mediatype import mime_clean, mime_to_gmt
 from iscc_core.minhash import minhash_64, minhash_256
 from tika import parser as tika_parser
@@ -53,11 +55,26 @@ UNICODE_FILTER = frozenset(
 )
 
 
-def extract_text(data):
-    # type: (Readable) -> str
+@lru_cache(typed=True)
+def extract_text(file):
+    # type: (Union[File, Uri]) -> str
     """Extract plaintext from a text document file."""
-    text = _extract_with_tika(data).get("content", "")
-    return text or ""
+
+    data = uread.open_data(file).read()
+    cmd = [
+        "java",
+        "-jar",
+        iscc.bin.tika_bin(),
+        "--text",
+        "--encoding=utf8",
+    ]
+    try:
+        result = subprocess.run(cmd, input=data, text=False, capture_output=True)
+    except FileNotFoundError:
+        iscc.bin.tika_install()
+        result = subprocess.run(cmd, input=data, text=False, capture_output=True)
+
+    return result.stdout.decode("utf-8")
 
 
 def extract_text_metadata(data, **options):
@@ -67,7 +84,7 @@ def extract_text_metadata(data, **options):
     :param data: File with textual content
     :key text_guess_title: Guess title from content if not found in metadata.
     """
-    opts = SdkOptions(**options)
+    opts = SdkOptions(**options) if options else sdk_opts
     file = uread.open_data(data)
     tika_result = _extract_with_tika(file)
 
