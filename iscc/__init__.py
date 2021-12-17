@@ -4,7 +4,6 @@ import os
 from pathlib import Path
 import click
 
-
 HERE = Path(__file__).parent
 APP_NAME = "iscc"
 APP_DIR = click.get_app_dir(APP_NAME, roaming=False)
@@ -12,9 +11,6 @@ os.makedirs(APP_DIR, exist_ok=True)
 os.environ["TIKA_STARTUP_MAX_RETRY"] = "20"
 os.environ["LOGURU_AUTOINIT"] = "False"
 
-from tika import tika
-
-tika.log.disabled = True
 
 from iscc.api import (
     code_iscc,

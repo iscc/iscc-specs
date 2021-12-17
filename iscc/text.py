@@ -17,7 +17,6 @@ from iscc_core.codec import encode_base64
 from iscc.schema import Readable
 from iscc.mediatype import mime_clean, mime_to_gmt
 from iscc_core.minhash import minhash_64, minhash_256
-from tika import parser as tika_parser
 
 
 # Set for deterministic language detection
@@ -67,6 +66,7 @@ def extract_text_metadata(data, **options):
     :param data: File with textual content
     :key text_guess_title: Guess title from content if not found in metadata.
     """
+
     opts = SdkOptions(**options)
     file = uread.open_data(data)
     tika_result = _extract_with_tika(file)
@@ -200,9 +200,12 @@ def _extract_with_tika(data):
     Result:
         {"content": "...", "metadata": "..."}
     """
+    from tika import tika
+    tika.log.disabled = True
+    from tika import parser
     file = uread.open_data(data)
     buffer = file.read()
-    return tika_parser.from_buffer(buffer)
+    return parser.from_buffer(buffer)
 
 
 def _title_from_tika(tika_result, **options):
