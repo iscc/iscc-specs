@@ -63,7 +63,7 @@ def extract_text(file):
     """Extract plaintext from a text document file."""
 
     data = uread.open_data(file).read()
-    cmd = ["java", "-jar", iscc.bin.tika_bin(), "--text", "--encoding=UTF-8"]
+    cmd = ["java", "-jar", iscc.bin.tika_bin(), "-A"]
 
     try:
         result = subprocess.run(
@@ -81,7 +81,7 @@ def extract_text(file):
             stderr=subprocess.DEVNULL,
         )
 
-    return result.stdout.decode("utf-8")
+    return result.stdout.decode(encoding=sys.stdout.encoding)
 
 
 def extract_text_metadata(data, **options):
