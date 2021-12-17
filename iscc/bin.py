@@ -40,6 +40,10 @@ FPCALC_OS_MAP = {
     "Windows": "chromaprint-fpcalc-{}-windows-x86_64.zip".format(FPCALC_VERSION),
 }
 
+TIKA_VERSION = "2.2.0"
+TIKA_URL = f"https://dlcdn.apache.org/tika/{TIKA_VERSION}/tika-app-{TIKA_VERSION}.jar"
+TIKA_CHECKSUM = "62ba528230481c9917f2dcbf3524e63d"
+
 
 def install():
     """Install binary tools for content extraction"""
@@ -233,6 +237,62 @@ def ffmpeg_version_info():
         return "ffmpeg not installed"
 
 
+########################################################################################
+# Apache Tika                                                                          #
+########################################################################################
+
+
+def tika_bin():
+    # type: () -> str
+    """Returns path to java tika app call"""
+    return os.path.join(iscc.APP_DIR, f"tika-app-{TIKA_VERSION}.jar")
+
+
+def tika_is_installed():
+    # type: () -> bool
+    """Check if tika is installed"""
+    return os.path.exists(tika_bin())
+
+
+def tika_download_url():
+    # type: () -> str
+    """Return tika download url"""
+    return TIKA_URL
+
+
+def tika_download():
+    # type: () -> str
+    """Download tika-app.jar and return local path"""
+    return download_file(tika_download_url(), md5=TIKA_CHECKSUM)
+
+
+def tika_install():
+    # type: () -> str
+    """Install tika-app.jar if not installed yet."""
+    if tika_is_installed():
+        log.debug("Tika is already installed")
+        return tika_bin()
+    else:
+        return tika_download()
+
+
+def tika_version_info():
+    # type: () -> str
+    """
+    Check tika-app version
+
+    :return: Tika version info string
+    :rtype: str
+    """
+    try:
+        r = subprocess.run(
+            ["java.exe", "-jar", tika_bin(), "--version"], stdout=subprocess.PIPE
+        )
+        return r.stdout.decode("utf-8")
+    except FileNotFoundError:
+        return "Tika not installed"
+
+
 def system_tag():
     os_tag = system().lower()
     if os_tag == "darwin":
@@ -242,5 +302,7 @@ def system_tag():
 
 
 if __name__ == "__main__":
-    ffmpeg_install()
-    print(ffmpeg_version_info())
+    print(tika_is_installed())
+    print(tika_install())
+    print(tika_is_installed())
+    print(tika_version_info())

@@ -36,13 +36,13 @@ def download_file(url, folder=None, md5=None, sanitize=False):
     out_dir = folder or APP_DIR
     out_path = os.path.join(out_dir, file_name)
     if os.path.exists(out_path):
-        logger.debug(f"Already downloaded: {file_name}")
+        logger.info(f"Already downloaded: {file_name}")
         if md5:
             md5_calc = hashlib.md5(open(out_path, "rb").read()).hexdigest()
             assert md5 == md5_calc, f"Integrity error for {out_path}"
             return out_path
 
-    log.debug(f"downloading {url} to {out_path}")
+    log.info(f"downloading {url} to {out_path}")
     r = requests.get(url, stream=True)
     chunk_size = 1024 * 1024
     iter_size = 0
@@ -52,6 +52,7 @@ def download_file(url, folder=None, md5=None, sanitize=False):
             iter_size += chunk_size
 
     if md5:
+        log.info(f"verifying {out_path}")
         md5_calc = hashlib.md5(open(out_path, "rb").read()).hexdigest()
         assert md5 == md5_calc, f"Integrity error for {out_path}"
     return out_path
