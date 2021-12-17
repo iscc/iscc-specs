@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 import subprocess
+import sys
+
 from loguru import logger
 import unicodedata
 from os.path import basename, splitext
@@ -61,21 +63,17 @@ def extract_text(file):
     """Extract plaintext from a text document file."""
 
     data = uread.open_data(file).read()
-    cmd = [
-        "java",
-        "-jar",
-        iscc.bin.tika_bin(),
-        "--text",
-        "--encoding=utf8",
-    ]
+    java = '/opt/jdk/bin/java' if sys.platform == 'linux2' else 'java'
+    cmd = [java, "-jar", iscc.bin.tika_bin(), "--text", "--encoding=UTF-8"]
+
     try:
         result = subprocess.run(
-            cmd, input=data, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True
+            cmd, input=data, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL,
         )
     except FileNotFoundError:
         iscc.bin.tika_install()
         result = subprocess.run(
-            cmd, input=data, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True
+            cmd, input=data, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL,
         )
 
     return result.stdout.decode("utf-8")
