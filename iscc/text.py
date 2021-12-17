@@ -70,12 +70,12 @@ def extract_text(file):
     ]
     try:
         result = subprocess.run(
-            cmd, input=data, stdout=subprocess.PIPE, stderr=subprocess.PIPE
+            cmd, input=data, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True
         )
     except FileNotFoundError:
         iscc.bin.tika_install()
         result = subprocess.run(
-            cmd, input=data, stdout=subprocess.PIPE, stderr=subprocess.PIPE
+            cmd, input=data, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True
         )
 
     return result.stdout.decode("utf-8")
