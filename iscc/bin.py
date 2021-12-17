@@ -273,7 +273,10 @@ def tika_install():
         log.debug("Tika is already installed")
         return tika_bin()
     else:
-        return tika_download()
+        path = tika_download()
+        st = os.stat(tika_bin())
+        os.chmod(tika_bin(), st.st_mode | stat.S_IEXEC)
+        return path
 
 
 def tika_version_info():
