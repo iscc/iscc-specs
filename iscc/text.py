@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 import json
 import subprocess
-import sys
 import iscc_core.code_content_text
 from iscc_core.code_content_text import Text
 from loguru import logger as log
@@ -19,7 +18,7 @@ from iscc.options import SdkOptions, sdk_opts
 from iscc import uread
 from iscc.utils import sliding_window
 from iscc_core.codec import encode_base64
-from iscc.schema import Readable, File, Uri
+from iscc.schema import Readable
 from iscc_core.minhash import minhash_64, minhash_256
 
 
@@ -71,26 +70,42 @@ def extract_text_metadata(data, text=None, **options):
     :key bool text_guess_title: Guess title from content if not found in metadata.
     """
     opts = SdkOptions(**options) if options else sdk_opts
-    file = uread.open_data(data)
-    data = file.read()
-    if not data:
-        log.warning(f"No data to extract text metadata from {type(file)}")
-        return {"characters": 0}
+    ufile = uread.open_data(data)
+    cmd = [
+        iscc.bin.java_bin(),
+        "-jar",
+        iscc.bin.tika_bin(),
+        "--metadata",
+        "-j",
+        "--encoding=UTF-8",
+    ]
 
-    meta = {}
-
-    cmd = [iscc.bin.java_bin(), "-jar", iscc.bin.tika_bin(), "--metadata", "-j"]
+    if hasattr(ufile, "name"):
+        cmd.append(ufile.name)
+    else:
+        data = ufile.read()
+        if not data:
+            log.warning(f"No data to extract text metadata from {type(data)}")
+            return {"characters": 0}
 
     try:
-        result = subprocess.run(cmd, input=data, stdout=subprocess.PIPE, check=True)
+        if hasattr(ufile, "name"):
+            result = subprocess.run(cmd, stdout=subprocess.PIPE, check=True)
+        else:
+            result = subprocess.run(cmd, input=data, stdout=subprocess.PIPE, check=True)
     except subprocess.CalledProcessError:
         iscc.bin.tika_install()
-        result = subprocess.run(cmd, input=data, stdout=subprocess.PIPE, check=True)
+        if hasattr(ufile, "name"):
+            result = subprocess.run(cmd, stdout=subprocess.PIPE, check=True)
+        else:
+            result = subprocess.run(cmd, input=data, stdout=subprocess.PIPE, check=True)
 
     try:
         metadata = json.loads(result.stdout)
     except json.JSONDecodeError:
+        log.error("tike metadata json decode failed")
         metadata = {}
+
     title = metadata.get("dc:title", "")
     norm_title = normalize_text(title)
 
@@ -103,6 +118,7 @@ def extract_text_metadata(data, text=None, **options):
 
     norm_title = iscc_core.code_meta.trim_text(norm_title, opts.meta_trim_title)
 
+    meta = {}
     if norm_title:
         meta["title"] = norm_title
 
