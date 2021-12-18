@@ -1,4 +1,11 @@
 # -*- coding: utf-8 -*-
+"""
+Print application directory. Usefull for CI.
+
+Usage:
+
+$python -m iscc.app_dir
+"""
 import iscc
 
 
