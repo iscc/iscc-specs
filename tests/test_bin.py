@@ -4,8 +4,15 @@ from iscc import bin
 
 
 def test_java_version_info():
-    assert 'java' in bin.java_version_info().lower()
+    vi = bin.java_version_info().lower()
+    assert 'java' in vi
+    assert len(vi.splitlines()) == 1
 
+
+def test_tika_version_info():
+    vi = bin.tika_version_info().lower()
+    assert 'tika' in vi
+    assert len(vi.splitlines()) == 1
 
 def test_ffprobe_bin():
     assert "ffprobe" in bin.ffprobe_bin()

@@ -342,8 +342,8 @@ def tika_version_info():
         r = subprocess.run(
             [java_bin(), "-jar", tika_bin(), "--version"], stdout=subprocess.PIPE
         )
-        return r.stdout.decode("utf-8")
-    except FileNotFoundError:
+        return r.stdout.decode(sys.stdout.encoding).strip()
+    except subprocess.CalledProcessError:
         return "Tika not installed"
 
 
