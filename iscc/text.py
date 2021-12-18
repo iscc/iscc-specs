@@ -27,24 +27,39 @@ from iscc_core.minhash import minhash_64, minhash_256
 langdetect.DetectorFactory.seed = 0
 
 
-def extract_text(file):
-    # type: (Union[File, Uri]) -> str
+def extract_text(data):
+    # type: (Readable) -> str
     """Extract plaintext from a text document."""
 
-    data = uread.open_data(file).read()
-    if not data:
-        log.warning(f"No data to extract text from {type(file)}")
-        return ""
-
-    cmd = [iscc.bin.java_bin(), "-jar", iscc.bin.tika_bin(), "-A"]
+    ufile = uread.open_data(data)
+    cmd = [
+        iscc.bin.java_bin(),
+        "-jar",
+        iscc.bin.tika_bin(),
+        "--text",
+        "--encoding=UTF-8",
+    ]
+    if hasattr(ufile, "name"):
+        cmd.append(ufile.name)
+    else:
+        data = ufile.read()
+        if not data:
+            log.warning(f"No data to extract text from {type(data)}")
+            return ""
 
     try:
-        result = subprocess.run(cmd, input=data, stdout=subprocess.PIPE, check=True)
+        if hasattr(ufile, "name"):
+            result = subprocess.run(cmd, stdout=subprocess.PIPE, check=True)
+        else:
+            result = subprocess.run(cmd, input=data, stdout=subprocess.PIPE, check=True)
     except subprocess.CalledProcessError:
         iscc.bin.tika_install()
-        result = subprocess.run(cmd, input=data, stdout=subprocess.PIPE, check=True)
+        if hasattr(ufile, "name"):
+            result = subprocess.run(cmd, stdout=subprocess.PIPE, check=True)
+        else:
+            result = subprocess.run(cmd, input=data, stdout=subprocess.PIPE, check=True)
 
-    return result.stdout.decode(encoding=sys.stdout.encoding)
+    return result.stdout.decode(encoding="UTF-8")
 
 
 def extract_text_metadata(data, text=None, **options):

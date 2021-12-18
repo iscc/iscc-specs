@@ -6,7 +6,7 @@ import iscc_samples as s
 def test_content_code_with_text_nogran():
     tc = iscc.code_content(s.texts()[0], text_granular=False)
     assert tc == {
-        "characters": 6068,
+        "characters": 6048,
         "iscc": "EAASS2POFKWX7KDJ",
         "gmt": "text",
         "language": "ca",

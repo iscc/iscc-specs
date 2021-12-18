@@ -38,7 +38,7 @@ def test_extract_text_readables():
         if not isinstance(readable, bytearray):
             result = iscc.text.extract_text(readable)
             assert type(result) == str
-            assert len(result) == 6109
+            assert len(result) == 6070
 
 
 def test_extract_text_filetypes():
@@ -53,7 +53,7 @@ def test_extract_text_metadata():
     text = iscc.text.extract_text(src)
     # Call with text
     assert iscc.text.extract_text_metadata(src, text) == {
-        "characters": 292732,
+        "characters": 292710,
         "language": "en",
         "title": "Children's Literature",
     }
@@ -190,7 +190,7 @@ def test_chunk_text():
 def test_chunkt_text_options():
     txt = iscc.text.extract_text(texts()[0])
     ntxt = iscc.text.normalize_text(txt)
-    assert len(ntxt) == 6068
+    assert len(ntxt) == 6048
     chunks = list(iscc.text.chunk_text(ntxt, text_avg_chunk_size=512))
     assert len(chunks) == 7
 
