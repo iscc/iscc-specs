@@ -3,7 +3,6 @@ import pytest
 from iscc_core import ContentCodeText
 
 import iscc
-from iscc.text import _extract_with_tika
 from iscc_core.codec import Code
 from fauxfactory.factories.strings import gen_utf8
 from iscc_samples import texts
@@ -39,20 +38,29 @@ def test_extract_text_readables():
         if not isinstance(readable, bytearray):
             result = iscc.text.extract_text(readable)
             assert type(result) == str
-            assert len(result) == 6135
+            assert len(result) == 6070
 
 
 def test_extract_text_filetypes():
     for tf in texts():
-        result = iscc.text.extract_text(tf)
-        assert isinstance(result, str)
+        if tf.suffix != ".mobi":
+            result = iscc.text.extract_text(tf)
+            assert isinstance(result, str)
 
 
 def test_extract_text_metadata():
-    assert iscc.text.extract_text_metadata(texts()[2]) == {
-        "characters": 292732,
+    src = texts()[2]
+    text = iscc.text.extract_text(src)
+    # Call with text
+    assert iscc.text.extract_text_metadata(src, text) == {
+        "characters": 292710,
         "language": "en",
         "title": "Children's Literature",
+    }
+    # Call without text
+    assert iscc.text.extract_text_metadata(src) == {
+        "title": "Children's Literature",
+        "characters": 0,
     }
 
 
@@ -182,7 +190,7 @@ def test_chunk_text():
 def test_chunkt_text_options():
     txt = iscc.text.extract_text(texts()[0])
     ntxt = iscc.text.normalize_text(txt)
-    assert len(ntxt) == 6068
+    assert len(ntxt) == 6048
     chunks = list(iscc.text.chunk_text(ntxt, text_avg_chunk_size=512))
     assert len(chunks) == 7
 
@@ -213,11 +221,3 @@ def test_normalize_text():
     assert iscc.text.normalize_text(" ") == ""
     assert iscc.text.normalize_text("  Hello  World ? ") == "Hello World ?"
     assert iscc.text.normalize_text("Hello\nWorld") == "Hello World"
-
-
-def test__extract_with_tika():
-    ref = _extract_with_tika(texts()[0])
-    for readable in text_readables():
-        if not isinstance(readable, bytearray):
-            result = _extract_with_tika(readable)
-            assert result["content"] == ref["content"]

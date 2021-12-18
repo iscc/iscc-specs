@@ -11,6 +11,7 @@ from loguru import logger as log
 import iscc
 from iscc.utils import download_file
 import stat
+import jdk
 
 
 FFPROBE_VERSION = "4.2.1"
@@ -40,12 +41,18 @@ FPCALC_OS_MAP = {
     "Windows": "chromaprint-fpcalc-{}-windows-x86_64.zip".format(FPCALC_VERSION),
 }
 
+TIKA_VERSION = "2.2.0"
+TIKA_URL = f"https://dlcdn.apache.org/tika/{TIKA_VERSION}/tika-app-{TIKA_VERSION}.jar"
+TIKA_CHECKSUM = "62ba528230481c9917f2dcbf3524e63d"
+
 
 def install():
     """Install binary tools for content extraction"""
     fpcalc_install()
     ffprobe_install()
     ffmpeg_install()
+    java_install()
+    tika_install()
 
 
 def fpcalc_bin():
@@ -97,6 +104,7 @@ def fpcalc_install():
     if fpcalc_is_installed():
         log.debug("Fpcalc is already installed.")
         return fpcalc_bin()
+    log.critical("installing fpcalc")
     archive_path = fpcalc_download()
     fpcalc_extract(archive_path)
     st = os.stat(fpcalc_bin())
@@ -180,6 +188,7 @@ def ffprobe_install():
     if is_installed(ffprobe_bin()):
         log.debug("ffprobe is already installed")
         return ffprobe_bin()
+    log.critical("installing ffprobe")
     archive_path = ffprobe_download()
     ffprobe_extract(archive_path)
     st = os.stat(ffprobe_bin())
@@ -193,6 +202,7 @@ def ffmpeg_install():
     if is_installed(ffmpeg_bin()):
         log.debug("ffmpeg is already installed")
         return ffmpeg_bin()
+    log.critical("installing ffmpeg")
     archive_path = ffmpeg_download()
     ffmpeg_extract(archive_path)
     st = os.stat(ffmpeg_bin())
@@ -233,6 +243,109 @@ def ffmpeg_version_info():
         return "ffmpeg not installed"
 
 
+########################################################################################
+# Java                                                                                 #
+########################################################################################
+
+
+def java_bin():
+    java_path = shutil.which("java")
+    if not java_path:
+        java_path = java_custom_path()
+    return java_path
+
+
+def java_custom_path():
+    if platform.system() == "Windows":
+        java_path = os.path.join(iscc.APP_DIR, "jdk-16.0.2+7-jre", "bin", "java.exe")
+    else:
+        java_path = os.path.join(iscc.APP_DIR, "jdk-16.0.2+7-jre", "bin", "java")
+    return java_path
+
+
+def java_is_installed():
+    return bool(shutil.which("java")) or is_installed(java_custom_path())
+
+
+def java_install():
+    if java_is_installed():
+        log.debug("java already installed")
+        return java_bin()
+    log.critical("installing java")
+    return jdk.install("16", impl="openj9", jre=True, path=iscc.APP_DIR)
+
+
+def java_version_info():
+    try:
+        r = subprocess.run([java_bin(), "--version"], stdout=subprocess.PIPE)
+        return r.stdout.decode("utf-8")
+    except FileNotFoundError:
+        return "JAVA not installed"
+
+
+########################################################################################
+# Apache Tika                                                                          #
+########################################################################################
+
+
+def tika_bin():
+    # type: () -> str
+    """Returns path to java tika app call"""
+    return os.path.join(iscc.APP_DIR, f"tika-app-{TIKA_VERSION}.jar")
+
+
+def tika_is_installed():
+    # type: () -> bool
+    """Check if tika is installed"""
+    return os.path.exists(tika_bin())
+
+
+def tika_download_url():
+    # type: () -> str
+    """Return tika download url"""
+    return TIKA_URL
+
+
+def tika_download():
+    # type: () -> str
+    """Download tika-app.jar and return local path"""
+    return download_file(tika_download_url(), md5=TIKA_CHECKSUM)
+
+
+def tika_install():
+    # type: () -> str
+    """Install tika-app.jar if not installed yet."""
+    # Ensure JAVA is installed
+    java_install()
+
+    if tika_is_installed():
+        log.debug("Tika is already installed")
+        return tika_bin()
+    else:
+        log.critical("installing tika")
+        path = tika_download()
+        st = os.stat(tika_bin())
+        os.chmod(tika_bin(), st.st_mode | stat.S_IEXEC)
+        return path
+
+
+def tika_version_info():
+    # type: () -> str
+    """
+    Check tika-app version
+
+    :return: Tika version info string
+    :rtype: str
+    """
+    try:
+        r = subprocess.run(
+            [java_bin(), "-jar", tika_bin(), "--version"], stdout=subprocess.PIPE
+        )
+        return r.stdout.decode("utf-8")
+    except FileNotFoundError:
+        return "Tika not installed"
+
+
 def system_tag():
     os_tag = system().lower()
     if os_tag == "darwin":
@@ -242,5 +355,9 @@ def system_tag():
 
 
 if __name__ == "__main__":
-    ffmpeg_install()
-    print(ffmpeg_version_info())
+    print(java_version_info())
+    print(tika_version_info())
+    # print(tika_is_installed())
+    # print(tika_install())
+    # print(tika_is_installed())
+    # print(tika_version_info())

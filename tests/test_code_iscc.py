@@ -9,7 +9,7 @@ import iscc_samples as s
 def test_code_iscc_text():
     result = iscc.code_iscc(s.texts()[0], text_granular=False)
     assert result == {
-        "characters": 6068,
+        "characters": 6048,
         "datahash": "46d1ebd64f515371c88d1df5bc0d43893b1fa1e58654b2c4244e491d06007a61",
         "filename": "demo.doc",
         "filesize": 40448,
@@ -88,12 +88,12 @@ def test_code_iscc_text_granular():
 
     result = iscc.code_iscc(s.texts()[0], text_granular=True, text_avg_chunk_size=512)
     assert result == {
-        "characters": 6068,
+        "characters": 6048,
         "datahash": "46d1ebd64f515371c88d1df5bc0d43893b1fa1e58654b2c4244e491d06007a61",
         "features": [
             {
                 "features": [
-                    "JUzOuCoesHA",
+                    "pUzOuCoesHA",
                     "6eo7KI3_4e8",
                     "aWurLq366Ok",
                     "pWzei6kfs3E",
@@ -102,7 +102,7 @@ def test_code_iscc_text_granular():
                     "jp3dJyg55jo",
                 ],
                 "kind": "text",
-                "sizes": [1014, 455, 667, 2809, 455, 667, 1],
+                "sizes": [994, 455, 667, 2809, 455, 667, 1],
                 "version": 0,
             }
         ],

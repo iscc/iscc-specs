@@ -3,7 +3,6 @@
 import gzip
 import os.path
 import iscc_core
-from iscc_core.code_content_text import normalize_text
 from os.path import basename
 import base64
 import io
@@ -92,7 +91,7 @@ def code_iscc(uri, title=None, extra=None, **options):
     if not title:
         title = content.get("title")
     if not title and file_name:
-        title = iscc.text.name_from_uri(file_name)
+        title = iscc.text.title_from_uri(file_name)
 
     meta = code_meta(title, extra, **options)
     result.update(meta)
@@ -166,25 +165,34 @@ def code_content(data, **options):
 
 def code_text(data, **options):
     # type: (Readable, **Any) -> dict
-    """Generate Content-ID Text
+    """Generate Content-Code Text
 
     :param data: Any kind of text document
     """
-    opts = SdkOptions(**options)
+    opts = SdkOptions(**options) if options else sdk_opts
     result = {}
 
-    f = uread.open_data(data)
-    metadata = iscc.text.extract_text_metadata(f, **options)
+    # f = uread.open_data(data)
+    text_raw = iscc.text.extract_text(data)
+    metadata = iscc.text.extract_text_metadata(data, text_raw, **options)
     result.update(metadata)
-    text_raw = iscc.text.extract_text(f)
-    text_code = iscc_core.gen_text_code_v0(text_raw, bits=opts.text_bits)
-    result.update(text_code.dict(exclude_unset=True))
+
+    text_norm = iscc.text.normalize_text(text_raw)
+    digest_256 = iscc_core.code_content_text.soft_hash_text_v0(text_norm.lower())
+
+    text_code = iscc_core.codec.encode_component(
+        mtype=iscc_core.codec.MT.CONTENT,
+        stype=iscc_core.codec.ST_CC.TEXT,
+        version=codec.VS.V0,
+        length=opts.text_bits,
+        digest=digest_256,
+    )
+    result["iscc"] = text_code
 
     granular = (
         opts.all_granular if isinstance(opts.all_granular, bool) else opts.text_granular
     )
     if granular:
-        text_norm = normalize_text(text_raw)
         features = iscc.text.extract_text_features(text_norm, **options)
         result["features"] = features
 

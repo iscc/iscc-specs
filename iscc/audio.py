@@ -49,23 +49,26 @@ def extract_audio_features(data, **options):
     """
     opts = SdkOptions(**options)
     length = str(opts.audio_max_duration)
-    file = uread.open_data(data)
-    cmd = [fpcalc_bin(), "-raw", "-json", "-signed", "-length", length, "-"]
+    ufile = uread.open_data(data)
+    cmd = [fpcalc_bin(), "-raw", "-json", "-signed", "-length", length]
+    if hasattr(ufile, "name"):
+        cmd.append(ufile.name)
+        data = None
+    else:
+        data = ufile.read()
+        cmd.append("-")
+
     try:
-        res = subprocess.run(
-            cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, input=file.read()
-        )
+        res = subprocess.run(cmd, input=data, stdout=subprocess.PIPE, check=True)
     except FileNotFoundError:
         fpcalc_install()
-        file.seek(0)
-        res = subprocess.run(
-            cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, input=file.read()
-        )
+        res = subprocess.run(cmd, input=data, stdout=subprocess.PIPE, check=True)
+
     output = res.stdout.decode("utf-8")
     try:
         result = json.loads(output)
     except JSONDecodeError:
-        raise RuntimeError(f'Fpcalc error: {res.stderr.decode("utf-8")}')
+        raise RuntimeError(f'Fpcalc decode error: {res.stderr.decode("utf-8")}')
 
     return result
 

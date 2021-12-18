@@ -1,21 +1,24 @@
 # -*- coding: utf-8 -*-
-from loguru import logger
-import unicodedata
+import json
+import subprocess
+import iscc_core.code_content_text
+from iscc_core.code_content_text import Text
+from loguru import logger as log
 from os.path import basename, splitext
-from typing import Any, Generator, Union
+from typing import Any, Generator, Optional, Union
 from urllib.parse import urlparse
 import langdetect
 import xxhash
 from functools import lru_cache
 import langcodes
+import iscc.bin
 from iscc.schema import FeatureType
 from iscc_core.cdc import data_chunks
-from iscc.options import SdkOptions
+from iscc.options import SdkOptions, sdk_opts
 from iscc import uread
 from iscc.utils import sliding_window
 from iscc_core.codec import encode_base64
 from iscc.schema import Readable
-from iscc.mediatype import mime_clean, mime_to_gmt
 from iscc_core.minhash import minhash_64, minhash_256
 
 
@@ -23,78 +26,103 @@ from iscc_core.minhash import minhash_64, minhash_256
 langdetect.DetectorFactory.seed = 0
 
 
-# Common Control Characters considered whitespace
-CC_WHITESPACE = (
-    "\u0009",  # Horizontal Tab (TAB)
-    "\u000A",  # Linefeed (LF)
-    "\u000D",  # Carriage Return (CR)
-)
-
-
-# Unicode categories to remove during text normalization
-UNICODE_FILTER = frozenset(
-    {
-        "Cc",
-        "Cf",
-        "Cn",
-        "Co",
-        "Cs",
-        "Mc",
-        "Me",
-        "Mn",
-        "Pc",
-        "Pd",
-        "Pe",
-        "Pf",
-        "Pi",
-        "Ps",
-    }
-)
-
-
 def extract_text(data):
     # type: (Readable) -> str
-    """Extract plaintext from a text document file."""
-    text = _extract_with_tika(data).get("content", "")
-    return text or ""
+    """Extract plaintext from a text document."""
 
-
-def extract_text_metadata(data, **options):
-    # type: (Readable, **Any) -> dict
-    """Extract metadata from text document (title, language, characters).
-
-    :param data: File with textual content
-    :key text_guess_title: Guess title from content if not found in metadata.
-    """
-
-    opts = SdkOptions(**options)
-    file = uread.open_data(data)
-    tika_result = _extract_with_tika(file)
-
-    result = {}
-
-    # Aquire title
-    title = _title_from_tika(tika_result, **opts.dict())
-    if title:
-        result["title"] = title
-
-    txt_raw = tika_result.get("content") or ""
-    txt_norm = normalize_text(txt_raw)
-
-    # Number of characters
-    result["characters"] = len(txt_norm)
-
-    if not txt_norm:
-        return result
+    ufile = uread.open_data(data)
+    cmd = [
+        iscc.bin.java_bin(),
+        "-jar",
+        iscc.bin.tika_bin(),
+        "--text",
+        "--encoding=UTF-8",
+    ]
+    if hasattr(ufile, "name"):
+        cmd.append(ufile.name)
+        data = None
+    else:
+        data = ufile.read()
+        if not data:
+            log.warning(f"No data to extract text from {type(data)}")
+            return ""
 
     try:
-        lang = langdetect.detect(txt_norm)
-        logger.debug(f"Detected langauge: {lang}")
-        result["language"] = langcodes.standardize_tag(lang)
-    except Exception as e:
-        logger.warning(f"Language detection failed: {e}")
+        result = subprocess.run(cmd, input=data, stdout=subprocess.PIPE, check=True)
+    except subprocess.CalledProcessError:
+        iscc.bin.tika_install()
+        result = subprocess.run(cmd, input=data, stdout=subprocess.PIPE, check=True)
 
-    return result
+    return result.stdout.decode(encoding="UTF-8")
+
+
+def extract_text_metadata(data, text=None, **options):
+    # type: (Readable, Optional[str], **Any) -> dict
+    """Extract metadata from text document (title, language, characters).
+
+    :param Readable data: Readable with textual content
+    :param str text: Extracted text
+    :key bool text_guess_title: Guess title from content if not found in metadata.
+    """
+    opts = SdkOptions(**options) if options else sdk_opts
+    ufile = uread.open_data(data)
+    cmd = [
+        iscc.bin.java_bin(),
+        "-jar",
+        iscc.bin.tika_bin(),
+        "--metadata",
+        "-j",
+        "--encoding=UTF-8",
+    ]
+
+    if hasattr(ufile, "name"):
+        cmd.append(ufile.name)
+        data = None
+    else:
+        data = ufile.read()
+        if not data:
+            log.warning(f"No data to extract text metadata from {type(data)}")
+            return {"characters": 0}
+
+    try:
+        result = subprocess.run(cmd, input=data, stdout=subprocess.PIPE, check=True)
+    except subprocess.CalledProcessError:
+        iscc.bin.tika_install()
+        result = subprocess.run(cmd, input=data, stdout=subprocess.PIPE, check=True)
+
+    try:
+        metadata = json.loads(result.stdout)
+    except json.JSONDecodeError:
+        log.error("tike metadata json decode failed")
+        metadata = {}
+
+    title = metadata.get("dc:title", "")
+    norm_title = normalize_text(title)
+
+    # Falback to get title from content
+    norm_text = normalize_text(text) if text else ""
+
+    if not norm_title and opts.text_guess_title and text:
+        title = text.strip().splitlines()[0]
+        norm_title = normalize_text(title)
+
+    norm_title = iscc_core.code_meta.trim_text(norm_title, opts.meta_trim_title)
+
+    meta = {}
+    if norm_title:
+        meta["title"] = norm_title
+
+    # Number of characters
+    meta["characters"] = len(norm_text)
+
+    try:
+        lang = langdetect.detect(text)
+        log.info(f"Detected langauge: {lang}")
+        meta["language"] = langcodes.standardize_tag(lang)
+    except Exception as e:
+        log.warning(f"Language detection failed: {e}")
+
+    return meta
 
 
 def extract_text_features(text, **options):
@@ -124,37 +152,26 @@ def extract_text_features(text, **options):
     return dict(kind=FeatureType.text.value, version=0, features=feats, sizes=sizes)
 
 
+@lru_cache(maxsize=4, typed=True)
 def normalize_text(text):
-    # type: (Union[str, bytes], bool) -> str
-    """Unicode normalization and character filtering."""
+    # type: (Text) -> str
+    """
+    Apply Unicode normalization and character filtering.
 
-    # 1. Convert bytes to str
-    if isinstance(text, bytes):
-        text = text.decode("utf-8")
+    Wraps iscc_core.normalize_text to support caching
 
-    # 2. Remove leading/trailing whitespace
-    text_stripped = text.strip()
+    - Decode bytes to Unicode (assuming UTF-8 encoded text).
+    - Remove leading/trailing whitespace.
+    - Decompose with NFD normalization.
+    - Filter special characters and whitespace.
+    - Remove duplicate whitespace.
+    - Recombine with NFKC normalization.
 
-    # 3. Decompose with NFD
-    text_decomposed = unicodedata.normalize("NFD", text_stripped)
-
-    # 4. Filter
-    chars = []
-    for c in text_decomposed:
-        cat = unicodedata.category(c)
-        if cat not in UNICODE_FILTER:
-            chars.append(c)
-        elif c in CC_WHITESPACE:
-            chars.append(c)
-    text_filtered = "".join(chars)
-
-    # 5. Collapse consecutive whitespace
-    wsproc_text = " ".join(text_filtered.split())
-
-    # 6. Recombine
-    recombined = unicodedata.normalize("NFKC", wsproc_text)
-
-    return recombined
+    :param Text text: Plain text to be normalized.
+    :return: Normalized plain text.
+    :rtype: str
+    """
+    return iscc_core.code_content_text.normalize_text(text)
 
 
 def hash_text(text, **options):
@@ -193,60 +210,7 @@ def trim_text(text, nbytes):
     return text.encode("utf-8")[:nbytes].decode("utf-8", "ignore").strip()
 
 
-@lru_cache(typed=True)
-def _extract_with_tika(data):
-    # type: (Readable) -> dict
-    """Extract text and metadata from a 'text'-file via Tika.
-    Result:
-        {"content": "...", "metadata": "..."}
-    """
-    from tika import tika
-    tika.log.disabled = True
-    from tika import parser
-    file = uread.open_data(data)
-    buffer = file.read()
-    return parser.from_buffer(buffer)
-
-
-def _title_from_tika(tika_result, **options):
-    # type: (dict, **Any) -> str
-    """Extract title from tika result.
-
-    Extraction is atempted in the following order
-        - try to find title in tika metadata
-        - use first line from text content
-
-    :param tika_result: result from tika parsing
-    :key: text_guess_title: whether to guess the title from the text itself as fallback.
-    :key: meta_trim_title: Max number of bytes for utf-8 encoded title.
-    """
-    opts = SdkOptions(**options)
-    title = ""
-    meta = tika_result.get("metadata")
-    mime_type = mime_clean(meta.get("Content-Type"))
-    gmt = mime_to_gmt(mime_type)
-
-    if meta:
-        title = meta.get("dc:title", "")
-        title = title[0].strip() if isinstance(title, list) else title.strip()
-        if not title:
-            title = meta.get("title", "")
-            title = title[0].strip() if isinstance(title, list) else title.strip()
-
-    # See if string would survive normalization
-    norm_title = normalize_text(title)
-
-    # Falback to get title from content
-    if not norm_title and opts.text_guess_title and gmt == "text":
-        content = tika_result.get("content", "")
-        if content is not None:
-            first_line = content.strip().splitlines()[0]
-            title = trim_text(normalize_text(first_line), opts.meta_trim_title)
-
-    return title
-
-
-def name_from_uri(uri):
+def title_from_uri(uri):
     """Extract "filename" part of an uri without file extension to be uses as fallback
     title for an asset if no title information can be aquired.
     """
