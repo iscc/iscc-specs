@@ -104,6 +104,7 @@ def fpcalc_install():
     if fpcalc_is_installed():
         log.debug("Fpcalc is already installed.")
         return fpcalc_bin()
+    log.critical("installing fpcalc")
     archive_path = fpcalc_download()
     fpcalc_extract(archive_path)
     st = os.stat(fpcalc_bin())
@@ -187,6 +188,7 @@ def ffprobe_install():
     if is_installed(ffprobe_bin()):
         log.debug("ffprobe is already installed")
         return ffprobe_bin()
+    log.critical('installing ffprobe')
     archive_path = ffprobe_download()
     ffprobe_extract(archive_path)
     st = os.stat(ffprobe_bin())
@@ -200,6 +202,7 @@ def ffmpeg_install():
     if is_installed(ffmpeg_bin()):
         log.debug("ffmpeg is already installed")
         return ffmpeg_bin()
+    log.critical('installing ffmpeg')
     archive_path = ffmpeg_download()
     ffmpeg_extract(archive_path)
     st = os.stat(ffmpeg_bin())
@@ -268,6 +271,7 @@ def java_install():
     if java_is_installed():
         log.debug("java already installed")
         return java_bin()
+    log.critical('installing java')
     return jdk.install("16", impl="openj9", jre=True, path=iscc.APP_DIR)
 
 
@@ -318,6 +322,7 @@ def tika_install():
         log.debug("Tika is already installed")
         return tika_bin()
     else:
+        log.critical('installing tika')
         path = tika_download()
         st = os.stat(tika_bin())
         os.chmod(tika_bin(), st.st_mode | stat.S_IEXEC)
