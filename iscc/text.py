@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 import json
+import logging
 import subprocess
 import sys
-
 import iscc_core.code_content_text
 from iscc_core.code_content_text import Text
-from loguru import logger
+from loguru import logger as log
 from os.path import basename, splitext
 from typing import Any, Generator, Optional, Union
 from urllib.parse import urlparse
@@ -33,23 +33,17 @@ def extract_text(file):
     """Extract plaintext from a text document."""
 
     data = uread.open_data(file).read()
+    if not data:
+        log.warning(f"No data to extract text from {type(file)}")
+        return ""
+
     cmd = [iscc.bin.java_bin(), "-jar", iscc.bin.tika_bin(), "-A"]
 
     try:
-        result = subprocess.run(
-            cmd,
-            input=data,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.DEVNULL,
-        )
-    except Exception:
+        result = subprocess.run(cmd, input=data, stdout=subprocess.PIPE, check=True)
+    except subprocess.CalledProcessError:
         iscc.bin.tika_install()
-        result = subprocess.run(
-            cmd,
-            input=data,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.DEVNULL,
-        )
+        result = subprocess.run(cmd, input=data, stdout=subprocess.PIPE, check=True)
 
     return result.stdout.decode(encoding=sys.stdout.encoding)
 
@@ -65,25 +59,19 @@ def extract_text_metadata(data, text=None, **options):
     opts = SdkOptions(**options) if options else sdk_opts
     file = uread.open_data(data)
     data = file.read()
+    if not data:
+        log.warning(f"No data to extract text metadata from {type(file)}")
+        return {"characters": 0}
+
     meta = {}
 
     cmd = [iscc.bin.java_bin(), "-jar", iscc.bin.tika_bin(), "--metadata", "-j"]
 
     try:
-        result = subprocess.run(
-            cmd,
-            input=data,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.DEVNULL,
-        )
-    except Exception:
+        result = subprocess.run(cmd, input=data, stdout=subprocess.PIPE, check=True)
+    except subprocess.CalledProcessError:
         iscc.bin.tika_install()
-        result = subprocess.run(
-            cmd,
-            input=data,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.DEVNULL,
-        )
+        result = subprocess.run(cmd, input=data, stdout=subprocess.PIPE, check=True)
 
     try:
         metadata = json.loads(result.stdout)
@@ -109,10 +97,10 @@ def extract_text_metadata(data, text=None, **options):
 
     try:
         lang = langdetect.detect(text)
-        logger.debug(f"Detected langauge: {lang}")
+        log.info(f"Detected langauge: {lang}")
         meta["language"] = langcodes.standardize_tag(lang)
     except Exception as e:
-        logger.warning(f"Language detection failed: {e}")
+        log.warning(f"Language detection failed: {e}")
 
     return meta
 
