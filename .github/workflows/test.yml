@@ -6,10 +6,10 @@ jobs:
   Tests:
 
     name: ${{ matrix.os }} / ${{ matrix.python-version }}
-    runs-on: ${{ matrix.os }}-latest
+    runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [Ubuntu, MacOS, Windows]
+        os: [ubuntu-latest, macos-latest, windows-latest]
         python-version: [3.9]
 
     steps:
@@ -28,6 +28,20 @@ jobs:
 
     - name: Install dependencies
       run: poetry install
+
+    - name: Get cache dir
+      id: bin-cache
+      run: |
+        echo "::set-output name=dir::$(poetry run python -m iscc.app_dir)"
+
+    - name: Cache binary dependencies
+      id: cache-bins
+      uses: actions/cache@v2
+      with:
+        path: ${{ steps.bin-cache.outputs.dir }
+        key: ${{ runner.os }}-bins-${{ hashFiles('${{ steps.bin-cache.outputs.dir }/*') }}
+        restore-keys: |
+         ${{ runner.os }}-bins-
 
     - name: Run pytest
       run: poetry run pytest -q  -m "not optional" tests
