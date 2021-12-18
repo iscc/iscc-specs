@@ -11,6 +11,7 @@ from loguru import logger as log
 import iscc
 from iscc.utils import download_file
 import stat
+import jdk
 
 
 FFPROBE_VERSION = "4.2.1"
@@ -50,6 +51,8 @@ def install():
     fpcalc_install()
     ffprobe_install()
     ffmpeg_install()
+    java_install()
+    tika_install()
 
 
 def fpcalc_bin():
@@ -238,6 +241,36 @@ def ffmpeg_version_info():
 
 
 ########################################################################################
+# Java                                                                                 #
+########################################################################################
+
+
+def java_bin():
+    if platform.system() == "Windows":
+        return os.path.join(iscc.APP_DIR, "jdk-16.0.2+7-jre", "bin", "java.exe")
+    return os.path.join(iscc.APP_DIR, "jdk-16.0.2+7-jre", "bin", "java")
+
+
+def java_is_installed():
+    return is_installed(java_bin())
+
+
+def java_install():
+    if java_is_installed():
+        log.debug("java already installed")
+        return java_bin()
+    return jdk.install("16", impl="openj9", jre=True, path=iscc.APP_DIR)
+
+
+def java_version_info():
+    try:
+        r = subprocess.run([java_bin(), "--version"], stdout=subprocess.PIPE)
+        return r.stdout.decode("utf-8")
+    except FileNotFoundError:
+        return "JAVA not installed"
+
+
+########################################################################################
 # Apache Tika                                                                          #
 ########################################################################################
 
@@ -269,6 +302,9 @@ def tika_download():
 def tika_install():
     # type: () -> str
     """Install tika-app.jar if not installed yet."""
+    # Ensure JAVA is installed
+    java_install()
+
     if tika_is_installed():
         log.debug("Tika is already installed")
         return tika_bin()
@@ -289,7 +325,7 @@ def tika_version_info():
     """
     try:
         r = subprocess.run(
-            ["java.exe", "-jar", tika_bin(), "--version"], stdout=subprocess.PIPE
+            [java_bin(), "-jar", tika_bin(), "--version"], stdout=subprocess.PIPE
         )
         return r.stdout.decode("utf-8")
     except FileNotFoundError:
@@ -305,7 +341,9 @@ def system_tag():
 
 
 if __name__ == "__main__":
-    print(tika_is_installed())
-    print(tika_install())
-    print(tika_is_installed())
+    print(java_version_info())
     print(tika_version_info())
+    # print(tika_is_installed())
+    # print(tika_install())
+    # print(tika_is_installed())
+    # print(tika_version_info())

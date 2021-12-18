@@ -1,11 +1,13 @@
 # -*- coding: utf-8 -*-
+import json
 import subprocess
 import sys
 
+import iscc_core.code_content_text
+from iscc_core.code_content_text import Text
 from loguru import logger
-import unicodedata
 from os.path import basename, splitext
-from typing import Any, Generator, Union
+from typing import Any, Generator, Optional, Union
 from urllib.parse import urlparse
 import langdetect
 import xxhash
@@ -19,51 +21,19 @@ from iscc import uread
 from iscc.utils import sliding_window
 from iscc_core.codec import encode_base64
 from iscc.schema import Readable, File, Uri
-from iscc.mediatype import mime_clean, mime_to_gmt
 from iscc_core.minhash import minhash_64, minhash_256
-from tika import parser as tika_parser
 
 
 # Set for deterministic language detection
 langdetect.DetectorFactory.seed = 0
 
 
-# Common Control Characters considered whitespace
-CC_WHITESPACE = (
-    "\u0009",  # Horizontal Tab (TAB)
-    "\u000A",  # Linefeed (LF)
-    "\u000D",  # Carriage Return (CR)
-)
-
-
-# Unicode categories to remove during text normalization
-UNICODE_FILTER = frozenset(
-    {
-        "Cc",
-        "Cf",
-        "Cn",
-        "Co",
-        "Cs",
-        "Mc",
-        "Me",
-        "Mn",
-        "Pc",
-        "Pd",
-        "Pe",
-        "Pf",
-        "Pi",
-        "Ps",
-    }
-)
-
-
-@lru_cache(typed=True)
 def extract_text(file):
     # type: (Union[File, Uri]) -> str
-    """Extract plaintext from a text document file."""
+    """Extract plaintext from a text document."""
 
     data = uread.open_data(file).read()
-    cmd = ["java", "-jar", iscc.bin.tika_bin(), "-A"]
+    cmd = [iscc.bin.java_bin(), "-jar", iscc.bin.tika_bin(), "-A"]
 
     try:
         result = subprocess.run(
@@ -72,7 +42,7 @@ def extract_text(file):
             stdout=subprocess.PIPE,
             stderr=subprocess.DEVNULL,
         )
-    except FileNotFoundError:
+    except Exception:
         iscc.bin.tika_install()
         result = subprocess.run(
             cmd,
@@ -84,41 +54,67 @@ def extract_text(file):
     return result.stdout.decode(encoding=sys.stdout.encoding)
 
 
-def extract_text_metadata(data, **options):
-    # type: (Readable, **Any) -> dict
+def extract_text_metadata(data, text=None, **options):
+    # type: (Readable, Optional[str], **Any) -> dict
     """Extract metadata from text document (title, language, characters).
 
-    :param data: File with textual content
-    :key text_guess_title: Guess title from content if not found in metadata.
+    :param Readable data: Readable with textual content
+    :param str text: Extracted text
+    :key bool text_guess_title: Guess title from content if not found in metadata.
     """
     opts = SdkOptions(**options) if options else sdk_opts
     file = uread.open_data(data)
-    tika_result = _extract_with_tika(file)
+    data = file.read()
+    meta = {}
 
-    result = {}
-
-    # Aquire title
-    title = _title_from_tika(tika_result, **opts.dict())
-    if title:
-        result["title"] = title
-
-    txt_raw = tika_result.get("content") or ""
-    txt_norm = normalize_text(txt_raw)
-
-    # Number of characters
-    result["characters"] = len(txt_norm)
-
-    if not txt_norm:
-        return result
+    cmd = [iscc.bin.java_bin(), "-jar", iscc.bin.tika_bin(), "--metadata", "-j"]
 
     try:
-        lang = langdetect.detect(txt_norm)
+        result = subprocess.run(
+            cmd,
+            input=data,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.DEVNULL,
+        )
+    except Exception:
+        iscc.bin.tika_install()
+        result = subprocess.run(
+            cmd,
+            input=data,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.DEVNULL,
+        )
+
+    try:
+        metadata = json.loads(result.stdout)
+    except json.JSONDecodeError:
+        metadata = {}
+    title = metadata.get("dc:title", "")
+    norm_title = normalize_text(title)
+
+    # Falback to get title from content
+    norm_text = normalize_text(text) if text else ""
+
+    if not norm_title and opts.text_guess_title and text:
+        title = text.strip().splitlines()[0]
+        norm_title = normalize_text(title)
+
+    norm_title = iscc_core.code_meta.trim_text(norm_title, opts.meta_trim_title)
+
+    if norm_title:
+        meta["title"] = norm_title
+
+    # Number of characters
+    meta["characters"] = len(norm_text)
+
+    try:
+        lang = langdetect.detect(text)
         logger.debug(f"Detected langauge: {lang}")
-        result["language"] = langcodes.standardize_tag(lang)
+        meta["language"] = langcodes.standardize_tag(lang)
     except Exception as e:
         logger.warning(f"Language detection failed: {e}")
 
-    return result
+    return meta
 
 
 def extract_text_features(text, **options):
@@ -148,37 +144,26 @@ def extract_text_features(text, **options):
     return dict(kind=FeatureType.text.value, version=0, features=feats, sizes=sizes)
 
 
+@lru_cache(maxsize=4, typed=True)
 def normalize_text(text):
-    # type: (Union[str, bytes], bool) -> str
-    """Unicode normalization and character filtering."""
+    # type: (Text) -> str
+    """
+    Apply Unicode normalization and character filtering.
 
-    # 1. Convert bytes to str
-    if isinstance(text, bytes):
-        text = text.decode("utf-8")
+    Wraps iscc_core.normalize_text to support caching
 
-    # 2. Remove leading/trailing whitespace
-    text_stripped = text.strip()
+    - Decode bytes to Unicode (assuming UTF-8 encoded text).
+    - Remove leading/trailing whitespace.
+    - Decompose with NFD normalization.
+    - Filter special characters and whitespace.
+    - Remove duplicate whitespace.
+    - Recombine with NFKC normalization.
 
-    # 3. Decompose with NFD
-    text_decomposed = unicodedata.normalize("NFD", text_stripped)
-
-    # 4. Filter
-    chars = []
-    for c in text_decomposed:
-        cat = unicodedata.category(c)
-        if cat not in UNICODE_FILTER:
-            chars.append(c)
-        elif c in CC_WHITESPACE:
-            chars.append(c)
-    text_filtered = "".join(chars)
-
-    # 5. Collapse consecutive whitespace
-    wsproc_text = " ".join(text_filtered.split())
-
-    # 6. Recombine
-    recombined = unicodedata.normalize("NFKC", wsproc_text)
-
-    return recombined
+    :param Text text: Plain text to be normalized.
+    :return: Normalized plain text.
+    :rtype: str
+    """
+    return iscc_core.code_content_text.normalize_text(text)
 
 
 def hash_text(text, **options):
@@ -217,57 +202,7 @@ def trim_text(text, nbytes):
     return text.encode("utf-8")[:nbytes].decode("utf-8", "ignore").strip()
 
 
-@lru_cache(typed=True)
-def _extract_with_tika(data):
-    # type: (Readable) -> dict
-    """Extract text and metadata from a 'text'-file via Tika.
-    Result:
-        {"content": "...", "metadata": "..."}
-    """
-    file = uread.open_data(data)
-    buffer = file.read()
-    return tika_parser.from_buffer(buffer)
-
-
-def _title_from_tika(tika_result, **options):
-    # type: (dict, **Any) -> str
-    """Extract title from tika result.
-
-    Extraction is atempted in the following order
-        - try to find title in tika metadata
-        - use first line from text content
-
-    :param tika_result: result from tika parsing
-    :key: text_guess_title: whether to guess the title from the text itself as fallback.
-    :key: meta_trim_title: Max number of bytes for utf-8 encoded title.
-    """
-    opts = SdkOptions(**options)
-    title = ""
-    meta = tika_result.get("metadata")
-    mime_type = mime_clean(meta.get("Content-Type"))
-    gmt = mime_to_gmt(mime_type)
-
-    if meta:
-        title = meta.get("dc:title", "")
-        title = title[0].strip() if isinstance(title, list) else title.strip()
-        if not title:
-            title = meta.get("title", "")
-            title = title[0].strip() if isinstance(title, list) else title.strip()
-
-    # See if string would survive normalization
-    norm_title = normalize_text(title)
-
-    # Falback to get title from content
-    if not norm_title and opts.text_guess_title and gmt == "text":
-        content = tika_result.get("content", "")
-        if content is not None:
-            first_line = content.strip().splitlines()[0]
-            title = trim_text(normalize_text(first_line), opts.meta_trim_title)
-
-    return title
-
-
-def name_from_uri(uri):
+def title_from_uri(uri):
     """Extract "filename" part of an uri without file extension to be uses as fallback
     title for an asset if no title information can be aquired.
     """
