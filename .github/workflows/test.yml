@@ -9,7 +9,7 @@ jobs:
     runs-on: ${{ matrix.os }}-latest
     strategy:
       matrix:
-        os: [Windows]
+        os: [Ubuntu, MacOS, Windows]
         python-version: [3.9]
 
     steps:
