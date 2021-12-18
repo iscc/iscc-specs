@@ -246,13 +246,22 @@ def ffmpeg_version_info():
 
 
 def java_bin():
+    java_path = shutil.which("java")
+    if not java_path:
+        java_path = java_custom_path()
+    return java_path
+
+
+def java_custom_path():
     if platform.system() == "Windows":
-        return os.path.join(iscc.APP_DIR, "jdk-16.0.2+7-jre", "bin", "java.exe")
-    return os.path.join(iscc.APP_DIR, "jdk-16.0.2+7-jre", "bin", "java")
+        java_path = os.path.join(iscc.APP_DIR, "jdk-16.0.2+7-jre", "bin", "java.exe")
+    else:
+        java_path = os.path.join(iscc.APP_DIR, "jdk-16.0.2+7-jre", "bin", "java")
+    return java_path
 
 
 def java_is_installed():
-    return is_installed(java_bin())
+    return bool(shutil.which("java")) or is_installed(java_custom_path())
 
 
 def java_install():
