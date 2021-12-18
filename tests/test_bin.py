@@ -3,6 +3,10 @@ import os
 from iscc import bin
 
 
+def test_java_version_info():
+    assert 'java' in bin.java_version_info().lower()
+
+
 def test_ffprobe_bin():
     assert "ffprobe" in bin.ffprobe_bin()
 

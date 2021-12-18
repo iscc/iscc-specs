@@ -3,6 +3,7 @@ import os
 import platform
 import shutil
 import subprocess
+import sys
 import tarfile
 import zipfile
 from platform import system, architecture
@@ -277,9 +278,9 @@ def java_install():
 
 def java_version_info():
     try:
-        r = subprocess.run([java_bin(), "--version"], stdout=subprocess.PIPE)
-        return r.stdout.decode("utf-8")
-    except FileNotFoundError:
+        r = subprocess.run([java_bin(), "-version"], stderr=subprocess.PIPE)
+        return r.stderr.decode(sys.stdout.encoding).splitlines()[0]
+    except subprocess.CalledProcessError:
         return "JAVA not installed"
 
 
