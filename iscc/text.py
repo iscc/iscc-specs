@@ -40,6 +40,7 @@ def extract_text(data):
     ]
     if hasattr(ufile, "name"):
         cmd.append(ufile.name)
+        data = None
     else:
         data = ufile.read()
         if not data:
@@ -47,16 +48,10 @@ def extract_text(data):
             return ""
 
     try:
-        if hasattr(ufile, "name"):
-            result = subprocess.run(cmd, stdout=subprocess.PIPE, check=True)
-        else:
-            result = subprocess.run(cmd, input=data, stdout=subprocess.PIPE, check=True)
+        result = subprocess.run(cmd, input=data, stdout=subprocess.PIPE, check=True)
     except subprocess.CalledProcessError:
         iscc.bin.tika_install()
-        if hasattr(ufile, "name"):
-            result = subprocess.run(cmd, stdout=subprocess.PIPE, check=True)
-        else:
-            result = subprocess.run(cmd, input=data, stdout=subprocess.PIPE, check=True)
+        result = subprocess.run(cmd, input=data, stdout=subprocess.PIPE, check=True)
 
     return result.stdout.decode(encoding="UTF-8")
 
@@ -82,6 +77,7 @@ def extract_text_metadata(data, text=None, **options):
 
     if hasattr(ufile, "name"):
         cmd.append(ufile.name)
+        data = None
     else:
         data = ufile.read()
         if not data:
@@ -89,16 +85,10 @@ def extract_text_metadata(data, text=None, **options):
             return {"characters": 0}
 
     try:
-        if hasattr(ufile, "name"):
-            result = subprocess.run(cmd, stdout=subprocess.PIPE, check=True)
-        else:
-            result = subprocess.run(cmd, input=data, stdout=subprocess.PIPE, check=True)
+        result = subprocess.run(cmd, input=data, stdout=subprocess.PIPE, check=True)
     except subprocess.CalledProcessError:
         iscc.bin.tika_install()
-        if hasattr(ufile, "name"):
-            result = subprocess.run(cmd, stdout=subprocess.PIPE, check=True)
-        else:
-            result = subprocess.run(cmd, input=data, stdout=subprocess.PIPE, check=True)
+        result = subprocess.run(cmd, input=data, stdout=subprocess.PIPE, check=True)
 
     try:
         metadata = json.loads(result.stdout)
