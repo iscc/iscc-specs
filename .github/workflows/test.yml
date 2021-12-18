@@ -9,8 +9,8 @@ jobs:
     runs-on: ${{ matrix.os }}-latest
     strategy:
       matrix:
-        os: [MacOS, Windows]
-        python-version: [3.7, 3.8, 3.9]
+        os: [Windows]
+        python-version: [3.9]
 
     steps:
     - uses: actions/checkout@v2
