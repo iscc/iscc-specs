@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 import json
-import logging
 import subprocess
 import sys
 import iscc_core.code_content_text
