@@ -39,7 +39,7 @@ jobs:
       uses: actions/cache@v2
       with:
         path: ${{ steps.bin-cache.outputs.dir }}
-        key: ${{ format('{0}-bins-{1}', runner.os, hashFiles(format('{}/*', steps.bin-cache.outputs.dir)) }}
+        key: ${{ format('{0}-bins-{1}', runner.os, hashFiles(format('{}/*', steps.bin-cache.outputs.dir))) }}
         restore-keys: |
          ${{ runner.os }}-bins-
 
