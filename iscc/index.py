@@ -263,8 +263,6 @@ class Index:
 
         matches = set()
 
-        db = self._db_features(kind)
-
         if ft == 0:
             # Simple lookup with zero threshold
             lookup = self._get_feature(kind, feature_raw)
@@ -297,9 +295,11 @@ class Index:
                     mfeatures_raw.append(mfraw)
                     mfeatures_b64.append(encode_base64(mfraw))
                     distances.append(int(dist))
-            # lookup matchesd features in lmdb
+            # lookup matched features in lmdb
+            dbf = self._db_features(kind)
+            dbi = self._db_isccs()
             with self.env.begin() as txn:
-                with txn.cursor(db=db) as c:
+                with txn.cursor(db=dbf) as c:
                     refs = c.getmulti(mfeatures_raw, dupdata=True)
                 # decode refs > [(mfeature_raw, msgpack_coded(fkey, pos)), ...]
                 isccs_raw, fkeys, positions = [], [], []
@@ -308,7 +308,7 @@ class Index:
                     fkeys.append(fkey)
                     positions.append(pos)
                 # deference and decode matched ISCCs
-                with txn.cursor(self._db_isccs()) as c:
+                with txn.cursor(dbi) as c:
                     isccs = [Code(v).code for _, v in c.getmulti(fkeys)]
             # Build FeatureMatch objects
             # iscc str, kind, src_feat, src_pos, mat_feat, mat_pos
@@ -329,10 +329,10 @@ class Index:
                 )
                 matches.add(fm)
         else:
-            # Fallback full scan with non-zero threshold an no ANNS index
-            db = self._db_features(kind)
-            with self.env.begin(db) as txn:
-                with txn.cursor(db) as c:
+            # Fallback full scan with non-zero threshold and no ANNS index
+            dbf = self._db_features(kind)
+            with self.env.begin(dbf) as txn:
+                with txn.cursor(dbf) as c:
                     while c.next_nodup():
                         candidate_feature = c.key()
                         distance = distance_bytes(feature_raw, candidate_feature)
@@ -344,7 +344,7 @@ class Index:
                                 continue
                             fm = FeatureMatch(
                                 key=msgpack.unpackb(fkey),
-                                matched_iscc=self.get_iscc(fkey).code,
+                                matched_iscc=self.get_iscc(fkey, txn).code,
                                 kind=kind,
                                 source_feature=feature_str,
                                 source_pos=src_pos,
@@ -361,28 +361,28 @@ class Index:
         components = decompose(code)
         idxs = []
 
-        with self.env.begin() as txn:
-            for comp_code in components:
-                db = self._db_components(comp_code.type_id)
-                # TODO fails with InvalidParameterError after DB reopen
-                idx = txn.get(comp_code.hash_bytes, db=db)
+        for comp_code in components:
+            db = self._db_components(comp_code.type_id)
+            with self.env.begin(db=db) as txn:
+                idx = txn.get(comp_code.hash_bytes)
                 if idx is not None:
                     idxs.append(idx)
-            # Check if any of the full code entries is an exact match
-            full_code_bytes = iscc_core.gen_iscc_code_v0(
-                [c.code for c in components]
-            ).code_obj.bytes
-            db = self._db_isccs()
+        # Check if any of the full code entries is an exact match
+        full_code_bytes = iscc_core.gen_iscc_code_v0(
+            [c.code for c in components]
+        ).code_obj.bytes
+        db = self._db_isccs()
+        with self.env.begin(db=db) as txn:
             for idx in idxs:
-                if txn.get(idx, db=db) == full_code_bytes:
+                if txn.get(idx) == full_code_bytes:
                     return msgpack.loads(idx)
 
-    def get_iscc(self, key):
+    def get_iscc(self, key, txn=None):
         # type: (Key) -> Code
         """Get ISCC by index key"""
         if not isinstance(key, bytes):
             key = msgpack.dumps(key)
-        db = self._db_isccs()
+        db = self._db_isccs(txn)
         with self.env.begin(db) as txn:
             iscc_bytes = txn.get(key)
             if iscc_bytes:
@@ -504,13 +504,14 @@ class Index:
                 result[db_name.decode("ascii")] = entries
         return result
 
-    def _db_isccs(self) -> lmdb._Database:
-        return self.env.open_db(b"isccs", integerkey=False, create=True)
+    def _db_isccs(self, txn=None) -> lmdb._Database:
+        return self.env.open_db(b"isccs", txn=txn, integerkey=False, create=True)
 
-    def _db_components(self, type_id: str) -> lmdb._Database:
+    def _db_components(self, type_id: str, txn=None) -> lmdb._Database:
         """Return componets database."""
         return self.env.open_db(
             b"comp-" + type_id.encode("ascii"),
+            txn=txn,
             dupsort=True,  # Duplicate keys allowed
             create=True,  # Create table if required
             integerkey=False,  # Keys are component raw bytes
@@ -518,9 +519,10 @@ class Index:
             dupfixed=False,  # Variable length values
         )
 
-    def _db_features(self, kind: str) -> lmdb._Database:
+    def _db_features(self, kind: str, txn=None) -> lmdb._Database:
         return self.env.open_db(
             b"feat-" + kind.encode("utf-8"),
+            txn=txn,
             dupsort=True,  # Duplicate keys allowed
             create=True,  # Create table if required
             integerkey=False,  # Keys are raw byte feature hashes
@@ -528,8 +530,8 @@ class Index:
             dupfixed=False,  # Variable length values
         )
 
-    def _db_metadata(self) -> lmdb._Database:
-        return self.env.open_db(b"metadata", integerkey=False, create=True)
+    def _db_metadata(self, txn=None) -> lmdb._Database:
+        return self.env.open_db(b"metadata", txn=txn, integerkey=False, create=True)
 
     def _add_component(self, code: Code, fkey: bytes) -> bool:
         """

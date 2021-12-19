@@ -74,14 +74,13 @@ def test_index_get_key(idx, full_iscc):
     assert idx.get_key(i2) == 1 == key
 
 
-# TODO: pass db.get_key after reopen
-# def test_index_get_key_after_reopen(idx, full_iscc):
-#     assert len(idx) == 0
-#     key = idx.add(full_iscc)
-#     assert idx.get_key(full_iscc) == 0 == key
-#     idx.close()
-#     idx = iscc.Index("test-db")
-#     assert idx.get_key(full_iscc) == 0 == key
+def test_index_get_key_after_reopen(idx, full_iscc):
+    assert len(idx) == 0
+    key = idx.add(full_iscc)
+    assert idx.get_key(full_iscc) == 0 == key
+    idx.close()
+    idx = iscc.index.Index("test-db")
+    assert idx.get_key(full_iscc) == 0 == key
 
 
 def test_index_len_autoid(idx, full_iscc):
