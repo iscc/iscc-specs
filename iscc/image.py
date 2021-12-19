@@ -43,7 +43,7 @@ def extract_image_metadata(data):
     # type: (Readable) -> Optional[dict]
     """Extract and normalize seed metadata from image files (exif, iptc, xmp)"""
     ufile = uread.open_data(data)
-    if hasattr(ufile, 'name'):
+    if hasattr(ufile, "name"):
         arg = ufile.name
     else:
         arg = ufile.read()
