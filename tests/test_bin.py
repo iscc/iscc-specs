@@ -5,7 +5,7 @@ from iscc import bin
 
 def test_java_version_info():
     vi = bin.java_version_info().lower()
-    assert "java" in vi
+    assert "java" in vi or "openjdk" in vi
     assert len(vi.splitlines()) == 1
 
 
