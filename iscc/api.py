@@ -222,6 +222,7 @@ def code_image(data, **options):
     imo = Image.open(stream)
     pixels = iscc.image.normalize_image(imo, **options)
     image_code = iscc_core.gen_image_code_v0(pixels, bits=opts.image_bits)
+    # TODO: move this to .extract_image_metadata
     image_code.width, image_code.height = imo.size
     result.update(image_code.dict(exclude_unset=True))
 
