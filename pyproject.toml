@@ -27,7 +27,6 @@ python-magic-bin = { version = "^0.4.14", markers = "sys_platform == 'win32' or 
 python-magic = { version = "^0.4.22", markers = "sys_platform == 'linux'" }
 langcodes = "^3.3"
 langdetect = "^1.0"
-pyexiv2 = "2.7.1"
 requests = "^2.26"
 humanize = "^3.12"
 codetiming = "^1.3"
@@ -42,6 +41,7 @@ iscc-core = "^0.1"
 Pillow = "^8.4"
 tinytag = "^1.6"
 install-jdk = "^0.3.0"
+python-exiv2 = "^0.8.3"
 
 [tool.poetry.extras]
 turbo = ["cython", "pybase64"]

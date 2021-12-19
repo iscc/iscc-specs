@@ -3,7 +3,6 @@
 import base64
 from collections import defaultdict
 import io
-import pyexiv2
 from iscc_core.codec import encode_base64
 from loguru import logger
 from pathlib import Path
@@ -16,7 +15,7 @@ from iscc_core.simhash import similarity_hash
 from iscc.text import normalize_text
 from iscc.options import SdkOptions, sdk_opts
 from iscc import uread
-
+import exiv2
 
 IMAGE_META_MAP = {
     "Xmp.dc.title": "title",
@@ -28,57 +27,47 @@ IMAGE_META_MAP = {
     "Xmp.photoshop.Headline": "title",
     "Xmp.iptcExt.AOTitle": "title",
     "Iptc.Application2.Headline": "title",
+    "Iptc.Application2.BylineTitle": "title",
     "Iptc.Application2.ObjectName": "title",
     "Iptc.Application2.Language": "language",
     "Exif.Image.ImageID": "identifier",
     "Exif.Image.XPTitle": "title",
     "Exif.Photo.ImageUniqueID": "identifier",
+    # "Exif.Image.Artist": "creator",
+    # "Iptc.Application2.Byline": "creator",
+    # "Xmp.dc.creator": "creator",
 }
 
 
 def extract_image_metadata(data):
     # type: (Readable) -> Optional[dict]
-    """Extracts and normalizes seed metadata from image files (exif, iptc, xmp).
+    """Extract and normalize seed metadata from image files (exif, iptc, xmp)"""
+    ufile = uread.open_data(data)
+    if hasattr(ufile, 'name'):
+        arg = ufile.name
+    else:
+        arg = ufile.read()
 
-    TODO: Create a more advanced cross-standard metadata mapping.
-    Returns an optional dictionary with the following possible fields:
-        - title
-        - identifier
-        - langauge
-    """
-    file = uread.open_data(data)
-    try:
-        img_obj = pyexiv2.ImageData(file.read())
-        meta = {}
-        meta.update(img_obj.read_exif())
-        meta.update(img_obj.read_iptc())
-        meta.update(img_obj.read_xmp())
-    except Exception as e:
-        logger.warning(f"Image metadata extraction failed: {e}")
-        return None
+    # Collect all metadata
+    image = exiv2.ImageFactory.open(arg)
+    image.readMetadata()
+    methods = [image.exifData, image.iptcData, image.xmpData]
+    meta = {}
+    for method in methods:
+        data = method()
+        for item in data:
+            meta[item.key()] = item.value()
 
     selected_meta = defaultdict(set)
     for k, v in meta.items():
         if k not in IMAGE_META_MAP:
             continue
-        if isinstance(v, list):
-            v = tuple(normalize_text(item) for item in v)
-            if not v:
-                continue
-            v = ";".join(v)
-            v = v.replace('lang="xdefault"', "").strip()
-        elif isinstance(v, str):
-            v = normalize_text(v)
-            v = v.replace('lang="xdefault"', "").strip()
-            if not v:
-                continue
-        elif isinstance(v, dict):
-            v = v.get('lang="x-default"', None)
-        else:
-            raise ValueError(f"missed type {type(v)}")
+        value = normalize_text(str(v)).replace('lang="xdefault"', "").strip()
+        if not value:
+            continue
 
         field = IMAGE_META_MAP[k]
-        selected_meta[field].add(v)
+        selected_meta[field].add(value)
 
     longest_meta = {}
     for k, v in selected_meta.items():
