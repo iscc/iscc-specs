@@ -26,18 +26,18 @@ from subprocess import run, PIPE, CalledProcessError, DEVNULL
 langdetect.DetectorFactory.seed = 0
 
 
-def extract_text(file, **options):
+def extract_text(data, **options):
     # type: (Readable, **Any) -> str
     """Extract plaintext from a text document.
 
 
-    :param Readable file: Text document file for plaintext extraction
+    :param Readable data: Text document file for plaintext extraction
     :key bool pipe_command_errors: Output error messages from tika
     :return: Extracted plaintext
     :rtype: str
     """
     opts = SdkOptions(**options) if options else sdk_opts
-    ufile = uread.open_data(file)
+    ufile = uread.open_data(data)
     cmd = [
         iscc.bin.java_bin(),
         "-jar",
@@ -65,17 +65,17 @@ def extract_text(file, **options):
     return result.stdout.decode(encoding="UTF-8")
 
 
-def extract_text_metadata(file, text=None, **options):
+def extract_text_metadata(data, text=None, **options):
     # type: (Readable, Optional[str], **Any) -> dict
     """Extract metadata from text document (title, language, characters).
 
-    :param Readable file: Readable with textual content
+    :param Readable data: Readable with textual content
     :param str text: Extracted text as fallback for title extraction
     :key bool text_guess_title: Guess title from content if not found in metadata.
     :key bool pipe_command_errors: Output error messages from Tika
     """
     opts = SdkOptions(**options) if options else sdk_opts
-    ufile = uread.open_data(file)
+    ufile = uread.open_data(data)
     cmd = [
         iscc.bin.java_bin(),
         "-jar",
@@ -87,20 +87,20 @@ def extract_text_metadata(file, text=None, **options):
 
     if hasattr(ufile, "name"):
         cmd.append(ufile.name)
-        file = None
+        data = None
     else:
-        file = ufile.read()
-        if not file:
-            log.warning(f"No data to extract text metadata from {type(file)}")
+        data = ufile.read()
+        if not data:
+            log.warning(f"No data to extract text metadata from {type(data)}")
             return {"characters": 0}
 
     stderr = PIPE if opts.pipe_command_errors else DEVNULL
 
     try:
-        result = run(cmd, input=file, stdout=PIPE, stderr=stderr, check=True)
+        result = run(cmd, input=data, stdout=PIPE, stderr=stderr, check=True)
     except CalledProcessError:
         iscc.bin.tika_install()
-        result = run(cmd, input=file, stdout=PIPE, stderr=stderr, check=True)
+        result = run(cmd, input=data, stdout=PIPE, stderr=stderr, check=True)
 
     try:
         metadata = json.loads(result.stdout)
