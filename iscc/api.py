@@ -172,12 +172,16 @@ def code_text(data, **options):
     opts = SdkOptions(**options) if options else sdk_opts
     result = {}
 
-    text_raw = iscc.text.extract_text(data, **options)
-    metadata = iscc.text.extract_text_metadata(data, text_raw, **options)
+    with Timer(text="{:0.4f}s for text extraction", logger=log.debug):
+        text_raw = iscc.text.extract_text(data, **options)
+    with Timer(text="{:0.4f}s for text metadata extraction", logger=log.debug):
+        metadata = iscc.text.extract_text_metadata(data, text_raw, **options)
     result.update(metadata)
 
-    text_norm = iscc.text.normalize_text(text_raw)
-    digest_256 = iscc_core.code_content_text.soft_hash_text_v0(text_norm.lower())
+    with Timer(text="{:0.4f}s for text normalization", logger=log.debug):
+        text_norm = iscc.text.normalize_text(text_raw)
+    with Timer(text="{:0.4f}s for text hashing", logger=log.debug):
+        digest_256 = iscc_core.code_content_text.soft_hash_text_v0(text_norm.lower())
 
     text_code = iscc_core.codec.encode_component(
         mtype=iscc_core.codec.MT.CONTENT,
@@ -192,7 +196,10 @@ def code_text(data, **options):
         opts.all_granular if isinstance(opts.all_granular, bool) else opts.text_granular
     )
     if granular:
-        features = iscc.text.extract_text_features(text_norm, **options)
+        with Timer(
+            text="{:0.4f}s for text granular feature extraction", logger=log.debug
+        ):
+            features = iscc.text.extract_text_features(text_norm, **options)
         result["features"] = features
 
     if opts.text_store:
@@ -212,15 +219,18 @@ def code_image(data, **options):
     opts = SdkOptions(**options) if options else sdk_opts
 
     try:
-        result = iscc.image.extract_image_metadata(data) or {}
+        with Timer(text="{:0.4f}s for image metadata extraction", logger=log.debug):
+            result = iscc.image.extract_image_metadata(data) or {}
     except Exception as e:
         log.error(f"Failed image metadata extraction: {e}")
         result = {}
 
     stream = uread.open_data(data)
     imo = Image.open(stream)
-    pixels = iscc.image.normalize_image(imo, **options)
-    image_code = iscc_core.gen_image_code_v0(pixels, bits=opts.image_bits)
+    with Timer(text="{:0.4f}s for image normalization", logger=log.debug):
+        pixels = iscc.image.normalize_image(imo, **options)
+    with Timer(text="{:0.4f}s for image hashing", logger=log.debug):
+        image_code = iscc_core.gen_image_code_v0(pixels, bits=opts.image_bits)
     # TODO: move this to .extract_image_metadata
     image_code.width, image_code.height = imo.size
     result.update(image_code.dict(exclude_unset=True))
@@ -237,7 +247,12 @@ def code_image(data, **options):
     )
     if granular:
         try:
-            feat_obj = iscc.image.extract_image_features(data, n=opts.image_granular_n)
+            with Timer(
+                text="{:0.4f}s for image granular feature extraction", logger=log.debug
+            ):
+                feat_obj = iscc.image.extract_image_features(
+                    data, n=opts.image_granular_n
+                )
             result["features"] = feat_obj
         except Exception as e:
             log.error("image feature extraction failed")
@@ -248,8 +263,9 @@ def code_image(data, **options):
     )
 
     if do_preview:
-        preview = iscc.image.extract_image_preview(img_obj, **options)
-        preview_uri = iscc.image.encode_image_to_data_uri(preview, **options)
+        with Timer(text="{:0.4f}s for image preview extraction", logger=log.debug):
+            preview = iscc.image.extract_image_preview(img_obj, **options)
+            preview_uri = iscc.image.encode_image_to_data_uri(preview, **options)
         result["preview"] = preview_uri
 
     return result
@@ -264,20 +280,26 @@ def code_audio(data, **options):
     if isinstance(data, list):
         chroma = dict(fingerprint=data)
     else:
-        chroma = iscc.audio.extract_audio_features(data, **options)
-        metadata = iscc.audio.extract_audio_metadata(data)
+        with Timer(text="{:0.4f}s for audio feature extraction", logger=log.debug):
+            chroma = iscc.audio.extract_audio_features(data, **options)
+        with Timer(text="{:0.4f}s for audio metadata extraction", logger=log.debug):
+            metadata = iscc.audio.extract_audio_metadata(data)
         result.update(metadata)
 
-    audio_code = iscc_core.gen_audio_code_v0(
-        cv=chroma["fingerprint"], bits=opts.audio_bits
-    )
+    with Timer(text="{:0.4f}s for audio hashing", logger=log.debug):
+        audio_code = iscc_core.gen_audio_code_v0(
+            cv=chroma["fingerprint"], bits=opts.audio_bits
+        )
     granular = (
         opts.all_granular
         if isinstance(opts.all_granular, bool)
         else opts.audio_granular
     )
     if granular:
-        features = iscc.audio.encode_audio_features(chroma["fingerprint"])
+        with Timer(
+            text="{:0.4f}s for audio granular feature encoding", logger=log.debug
+        ):
+            features = iscc.audio.encode_audio_features(chroma["fingerprint"])
         result["features"] = features
 
     result["iscc"] = audio_code.iscc
@@ -287,12 +309,16 @@ def code_audio(data, **options):
 def code_video(uri, **options):
     # type: (Union[Uri, File], **Any) -> dict
     """Compute Content-ID video."""
-    opts = SdkOptions(**options)
+    opts = SdkOptions(**options) if options else sdk_opts
     result = {}
-    metadata = iscc.video.extract_video_metadata(uri)
+    with Timer(text="{:0.4f}s for video metadata extraction", logger=log.debug):
+        metadata = iscc.video.extract_video_metadata(uri)
     result.update(metadata)
 
-    crop_value = iscc.video.detect_video_crop(uri) if opts.video_crop else None
+    crop_value = None
+    if opts.video_crop:
+        with Timer(text="{:0.4f}s for video crop detection", logger=log.debug):
+            crop_value = iscc.video.detect_video_crop(uri)
 
     granular = (
         opts.all_granular
@@ -302,17 +328,23 @@ def code_video(uri, **options):
     do_ffmpeg_scenes = granular and opts.video_scenes_ffmpeg
 
     if do_ffmpeg_scenes:
-        signature, cutpoints = iscc.video.extract_video_signature_cutpoints(
-            uri, crop_value, **options
-        )
+        with Timer(
+            text="{:0.4f}s for video signature and scene extraction", logger=log.debug
+        ):
+            signature, cutpoints = iscc.video.extract_video_signature_cutpoints(
+                uri, crop_value, **options
+            )
     else:
-        signature = iscc.video.extract_video_signature(uri, crop_value, **options)
+        with Timer(text="{:0.4f}s for video signature extraction", logger=log.debug):
+            signature = iscc.video.extract_video_signature(uri, crop_value, **options)
 
     with Timer(text="{:0.4f}s for video signature decoding", logger=log.debug):
         frames = read_ffmpeg_signature(signature)
     log.debug(f"{naturalsize(len(signature))} video sig with {len(frames)} frames")
-    features = [tuple(sig.vector.tolist()) for sig in frames]
-    video_code = iscc_core.gen_video_code_v0(features, bits=opts.video_bits)
+
+    with Timer(text="{:0.4f}s for video hashing", logger=log.debug):
+        features = [tuple(sig.vector.tolist()) for sig in frames]
+        video_code = iscc_core.gen_video_code_v0(features, bits=opts.video_bits)
     result["iscc"] = video_code.iscc
 
     if opts.video_include_fingerprint:
@@ -323,7 +355,8 @@ def code_video(uri, **options):
     )
 
     if do_preview:
-        img_raw = iscc.video.extract_video_preview(uri)
+        with Timer(text="{:0.4f}s for video preview extraction", logger=log.debug):
+            img_raw = iscc.video.extract_video_preview(uri)
         result["preview"] = iscc.image.encode_image_to_data_uri(img_raw)
 
     if not granular:
@@ -331,10 +364,19 @@ def code_video(uri, **options):
 
     if opts.video_scenes:
         if not opts.video_scenes_ffmpeg:
-            cutpoints = iscc.video.detect_video_scenes(uri, **options)
-        features = iscc.video.compute_video_features_scenes(frames, cutpoints)
+            with Timer(text="{:0.4f}s for video scene detection", logger=log.debug):
+                cutpoints = iscc.video.detect_video_scenes(uri, **options)
+        with Timer(
+            text="{:0.4f}s for video granular scene feature extraction",
+            logger=log.debug,
+        ):
+            features = iscc.video.compute_video_features_scenes(frames, cutpoints)
     else:
-        features = iscc.video.compute_video_features_rolling(frames, **options)
+        with Timer(
+            text="{:0.4f}s for video granular rolling feature extraction ",
+            logger=log.debug,
+        ):
+            features = iscc.video.compute_video_features_rolling(frames, **options)
 
     result["features"] = features
 
@@ -360,13 +402,16 @@ def code_data(data, **options):
     stream = uread.open_data(data)
 
     hasher = DataHasherV0()
-    data = stream.read(opts.io_read_size)
 
-    while data:
-        hasher.push(data)
+    with Timer(text="{:0.4f}s for data hash", logger=log.debug):
         data = stream.read(opts.io_read_size)
 
-    code = hasher.code(bits=opts.data_bits)
+        while data:
+            hasher.push(data)
+            data = stream.read(opts.io_read_size)
+
+        code = hasher.code(bits=opts.data_bits)
+
     result = dict(iscc=code)
 
     granular = (
@@ -374,9 +419,10 @@ def code_data(data, **options):
     )
 
     if granular:
-        features = iscc.data.encode_data_features(
-            hasher.chunk_sizes, hasher.chunk_features
-        )
+        with Timer(text="{:0.4f}s for data granular feature hashing", logger=log.debug):
+            features = iscc.data.encode_data_features(
+                hasher.chunk_sizes, hasher.chunk_features
+            )
         result["features"] = features
 
     return result
@@ -399,7 +445,8 @@ def code_instance(data, **options):
     """
     opts = SdkOptions(**options)
     stream = uread.open_data(data)
-    code = iscc_core.gen_instance_code_v0(stream, opts.instance_bits)
+    with Timer(text="{:0.4f}s for instance code hashing", logger=log.debug):
+        code = iscc_core.gen_instance_code_v0(stream, opts.instance_bits)
     return code.dict()
 
 
