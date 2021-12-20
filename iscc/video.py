@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 import json
 from fractions import Fraction
-from codetiming import Timer
 from iscc_core.code_content_video import soft_hash_video_v0
 from loguru import logger as log
 import subprocess
@@ -9,7 +8,7 @@ from pathlib import Path
 from tempfile import mkdtemp
 import os
 import sys
-from subprocess import Popen, PIPE, DEVNULL
+from subprocess import Popen, PIPE, DEVNULL, run
 from secrets import token_hex
 from typing import Any, Generator, List, Tuple, Optional, Union
 from statistics import mode
@@ -30,9 +29,10 @@ Scene = Union[Tuple["FrameTimecode", "FrameTimecode"], Tuple[float, float]]
 SceneSig = Tuple[List[str], List[int]]  # feature hashes, scene durations
 
 
-def extract_video_metadata(file):
+def extract_video_metadata(file, **options):
     # type: (Union[File, Uri]) -> dict
 
+    opts = SdkOptions(**options) if options else sdk_opts
     infile = uread.open_data(file)
     if not hasattr(infile, "name"):
         log.warning("Cannot extract video metadata without file.name")
@@ -56,7 +56,9 @@ def extract_video_metadata(file):
         "-i",
         file_path,
     ]
-    res = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+
+    stderr = PIPE if opts.pipe_command_errors else DEVNULL
+    res = run(cmd, stdout=PIPE, stderr=stderr, check=True)
     metadata = json.loads(res.stdout)
 
     video_streams = jmespath.search("streams[?codec_type=='video']", metadata)
@@ -135,8 +137,10 @@ def extract_video_preview(file, **options):
         "image2pipe",
         "-",
     ]
-    with Timer(text="{:0.4f}s for video preview extraction", logger=log.debug):
-        result = subprocess.run(cmd, stdout=PIPE, stderr=DEVNULL)
+
+    stderr = PIPE if opts.pipe_command_errors else DEVNULL
+    result = subprocess.run(cmd, stdout=PIPE, stderr=stderr, check=True)
+
     return result.stdout
 
 
@@ -177,8 +181,10 @@ def extract_video_signature(uri, crop=None, **options):
     cmd.extend(["-i", infile_path, "-vf", vf, "-f", "null", "-"])
 
     log.debug(f"video sig extraction with {cmd}")
-    with Timer(text="{:0.4f}s for video sig extraction", logger=log.debug):
-        subprocess.run(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+
+    stderr = PIPE if opts.pipe_command_errors else DEVNULL
+    subprocess.run(cmd, stdout=DEVNULL, stderr=stderr, check=True)
+
     with open(sigfile_path, "rb") as sig:
         sigdata = sig.read()
     os.remove(sigfile_path)
@@ -247,8 +253,8 @@ def extract_video_signature_cutpoints(uri, crop=None, **options):
     )
 
     log.debug(f"video sig and cutpoint extraction with {subprocess.list2cmdline(cmd)}")
-    with Timer(text="{:0.4f}s for video sig and cutpoint extraction", logger=log.debug):
-        subprocess.run(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    stderr = PIPE if opts.pipe_command_errors else DEVNULL
+    subprocess.run(cmd, stdout=DEVNULL, stderr=stderr, check=True)
     with open(sig_path, "rb") as sigin:
         sigdata = sigin.read()
     with open(scene_path, "rt", encoding="utf-8") as scenein:
@@ -316,7 +322,7 @@ def detect_video_crop(uri):
         "null",
         "-",
     ]
-    res = subprocess.run(cmd, stderr=subprocess.PIPE)
+    res = subprocess.run(cmd, stderr=PIPE)
     text = res.stderr.decode(encoding=sys.stdout.encoding)
     crops = [
         line.split()[-1]
@@ -368,12 +374,11 @@ def detect_video_scenes(uri, **options):
     video_manager.set_downscale_factor()
     video_manager.start()
 
-    with Timer(text="{:0.4f}s for video scene detection", logger=log.debug):
-        scene_manager.detect_scenes(
-            frame_source=video_manager,
-            show_progress=False,
-            frame_skip=opts.video_scenes_fs,
-        )
+    scene_manager.detect_scenes(
+        frame_source=video_manager,
+        show_progress=False,
+        frame_skip=opts.video_scenes_fs,
+    )
     # Use end frames from scene_list to exclude 0 and include last frame time
     scenes = scene_manager.get_scene_list(base_timecode)
     cutlist = [round(float(scene[1].get_seconds()), 3) for scene in scenes]

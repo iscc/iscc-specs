@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from json import JSONDecodeError
 import json
-import subprocess
+from subprocess import run, PIPE, DEVNULL
 from more_itertools import chunked
 from iscc.bin import fpcalc_bin, fpcalc_install
 from iscc.schema import FeatureType, Readable
@@ -58,11 +58,12 @@ def extract_audio_features(data, **options):
         data = ufile.read()
         cmd.append("-")
 
+    stderr = PIPE if opts.pipe_command_errors else DEVNULL
     try:
-        res = subprocess.run(cmd, input=data, stdout=subprocess.PIPE, check=True)
+        res = run(cmd, input=data, stdout=PIPE, stderr=stderr, check=True)
     except FileNotFoundError:
         fpcalc_install()
-        res = subprocess.run(cmd, input=data, stdout=subprocess.PIPE, check=True)
+        res = run(cmd, input=data, stdout=PIPE, stderr=stderr, check=True)
 
     output = res.stdout.decode("utf-8")
     try:
