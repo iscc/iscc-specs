@@ -49,7 +49,7 @@ def code_iscc(uri, title=None, extra=None, **options):
     :param extra: Metadata to be used for Meta-Code generation
     :param options: See iscc.schema.Options for detailed ISCC generator options.
     """
-    opts = SdkOptions(**options)
+    opts = SdkOptions(**options) if options else sdk_opts
     result = {"version": "0-0-0"}
     features = []
 
@@ -119,7 +119,7 @@ def code_meta(title, extra=None, **options):
     :key meta_trim_extra: Trim extra data to this number of bytes
     :returns: Dict keys: code, title, matahash, (extra)
     """
-    opts = SdkOptions(**options)
+    opts = SdkOptions(**options) if options else sdk_opts
     extra = None if extra in (b"", "", bytearray(), None) else extra
 
     if isinstance(extra, dict):
@@ -274,7 +274,7 @@ def code_image(data, **options):
 def code_audio(data, **options):
     # type: (Union[Uri, Data, List], **Any) -> dict
     """Generate Audio-ID from file(path) or Chromaprint features"""
-    opts = SdkOptions(**options)
+    opts = SdkOptions(**options) if options else sdk_opts
     result = dict()
 
     if isinstance(data, list):
@@ -398,7 +398,7 @@ def code_data(data, **options):
     :rtype: dict
     """
 
-    opts = SdkOptions(**options)
+    opts = SdkOptions(**options) if options else sdk_opts
     stream = uread.open_data(data)
 
     hasher = DataHasherV0()
@@ -443,7 +443,7 @@ def code_instance(data, **options):
     :return: An InstanceCode conformant dict with attributes: code, datahash, filesize
     :rtype: dict
     """
-    opts = SdkOptions(**options)
+    opts = SdkOptions(**options) if options else sdk_opts
     stream = uread.open_data(data)
     with Timer(text="{:0.4f}s for instance code hashing", logger=log.debug):
         code = iscc_core.gen_instance_code_v0(stream, opts.instance_bits)

@@ -148,7 +148,7 @@ def extract_text_features(text, **options):
     :key text_ngram_size: Sliding window size in number of characters.
     :returns dict: Dictionary with 'sizes' and 'features'.
     """
-    opts = SdkOptions(**options)
+    opts = SdkOptions(**options) if options else sdk_opts
     text = text.lower()
     chunks = chunk_text(text, text_avg_chunk_size=opts.text_avg_chunk_size)
     sizes = []
@@ -192,7 +192,7 @@ def hash_text(text, **options):
     Create a 256-bit similarity preserving hash for text input.
     Text should be normalized before hash creation.
     """
-    opts = SdkOptions(**options)
+    opts = SdkOptions(**options) if options else sdk_opts
     text = text.lower()
     ngrams = ("".join(chars) for chars in sliding_window(text, opts.text_ngram_size))
     features = [xxhash.xxh32_intdigest(s.encode("utf-8")) for s in ngrams]
@@ -208,7 +208,7 @@ def chunk_text(text, **options):
     :param text: normalized plaintext
     :key: text_avg_chunk_size: Targeted average size of text chunks in bytes.
     """
-    opts = SdkOptions(**options)
+    opts = SdkOptions(**options) if options else sdk_opts
     avg_size = opts.text_avg_chunk_size
     data = text.encode("utf-32-be")
     avg_size *= 4  # 4 bytes per character

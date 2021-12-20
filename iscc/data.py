@@ -7,7 +7,7 @@ from more_itertools import chunked
 from iscc_core.minhash import minhash_64
 from iscc_core.codec import encode_base64
 from iscc.schema import FeatureType
-from iscc.options import SdkOptions
+from iscc.options import SdkOptions, sdk_opts
 
 
 def encode_data_features(sizes, features, **options):
@@ -16,13 +16,12 @@ def encode_data_features(sizes, features, **options):
 
     :return: dicttionary with {"sizes": ..., "features": ...}
     """
-    opts = SdkOptions(**options)
-    with Timer(text="{:0.4f}s for data features encoding", logger=log.debug):
-        encoded_sizes = [sum(fh) for fh in chunked(sizes, opts.data_granular_factor)]
-        encoded_features = [
-            encode_base64(minhash_64(cf))
-            for cf in chunked(features, opts.data_granular_factor)
-        ]
+    opts = SdkOptions(**options) if options else sdk_opts
+    encoded_sizes = [sum(fh) for fh in chunked(sizes, opts.data_granular_factor)]
+    encoded_features = [
+        encode_base64(minhash_64(cf))
+        for cf in chunked(features, opts.data_granular_factor)
+    ]
     return dict(
         kind=FeatureType.data.value,
         version=0,

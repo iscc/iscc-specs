@@ -1,9 +1,6 @@
 # -*- coding: utf-8 -*-
 import os
-
-import iscc_core
 from iscc_core.code_content_audio import soft_hash_audio_v0
-
 import iscc
 from iscc_samples import audios
 from iscc import audio
