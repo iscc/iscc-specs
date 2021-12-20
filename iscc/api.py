@@ -173,7 +173,7 @@ def code_text(data, **options):
     result = {}
 
     # f = uread.open_data(data)
-    text_raw = iscc.text.extract_text(data)
+    text_raw = iscc.text.extract_text(data, **options)
     metadata = iscc.text.extract_text_metadata(data, text_raw, **options)
     result.update(metadata)
 

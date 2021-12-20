@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 import json
-import subprocess
 import iscc_core.code_content_text
 from iscc_core.code_content_text import Text
 from loguru import logger as log
@@ -20,17 +19,25 @@ from iscc.utils import sliding_window
 from iscc_core.codec import encode_base64
 from iscc.schema import Readable
 from iscc_core.minhash import minhash_64, minhash_256
+from subprocess import run, PIPE, CalledProcessError, DEVNULL
 
 
 # Set for deterministic language detection
 langdetect.DetectorFactory.seed = 0
 
 
-def extract_text(data):
-    # type: (Readable) -> str
-    """Extract plaintext from a text document."""
+def extract_text(file, **options):
+    # type: (Readable, **Any) -> str
+    """Extract plaintext from a text document.
 
-    ufile = uread.open_data(data)
+
+    :param Readable file: Text document file for plaintext extraction
+    :key bool pipe_command_errors: Output error messages from tika
+    :return: Extracted plaintext
+    :rtype: str
+    """
+    opts = SdkOptions(**options) if options else sdk_opts
+    ufile = uread.open_data(file)
     cmd = [
         iscc.bin.java_bin(),
         "-jar",
@@ -47,25 +54,28 @@ def extract_text(data):
             log.warning(f"No data to extract text from {type(data)}")
             return ""
 
+    stderr = PIPE if opts.pipe_command_errors else DEVNULL
+
     try:
-        result = subprocess.run(cmd, input=data, stdout=subprocess.PIPE, check=True)
-    except subprocess.CalledProcessError:
+        result = run(cmd, input=data, stdout=PIPE, stderr=stderr, check=True)
+    except CalledProcessError:
         iscc.bin.tika_install()
-        result = subprocess.run(cmd, input=data, stdout=subprocess.PIPE, check=True)
+        result = run(cmd, input=data, stdout=PIPE, stderr=stderr, check=True)
 
     return result.stdout.decode(encoding="UTF-8")
 
 
-def extract_text_metadata(data, text=None, **options):
+def extract_text_metadata(file, text=None, **options):
     # type: (Readable, Optional[str], **Any) -> dict
     """Extract metadata from text document (title, language, characters).
 
-    :param Readable data: Readable with textual content
-    :param str text: Extracted text
+    :param Readable file: Readable with textual content
+    :param str text: Extracted text as fallback for title extraction
     :key bool text_guess_title: Guess title from content if not found in metadata.
+    :key bool pipe_command_errors: Output error messages from Tika
     """
     opts = SdkOptions(**options) if options else sdk_opts
-    ufile = uread.open_data(data)
+    ufile = uread.open_data(file)
     cmd = [
         iscc.bin.java_bin(),
         "-jar",
@@ -77,18 +87,20 @@ def extract_text_metadata(data, text=None, **options):
 
     if hasattr(ufile, "name"):
         cmd.append(ufile.name)
-        data = None
+        file = None
     else:
-        data = ufile.read()
-        if not data:
-            log.warning(f"No data to extract text metadata from {type(data)}")
+        file = ufile.read()
+        if not file:
+            log.warning(f"No data to extract text metadata from {type(file)}")
             return {"characters": 0}
 
+    stderr = PIPE if opts.pipe_command_errors else DEVNULL
+
     try:
-        result = subprocess.run(cmd, input=data, stdout=subprocess.PIPE, check=True)
-    except subprocess.CalledProcessError:
+        result = run(cmd, input=file, stdout=PIPE, stderr=stderr, check=True)
+    except CalledProcessError:
         iscc.bin.tika_install()
-        result = subprocess.run(cmd, input=data, stdout=subprocess.PIPE, check=True)
+        result = run(cmd, input=file, stdout=PIPE, stderr=stderr, check=True)
 
     try:
         metadata = json.loads(result.stdout)

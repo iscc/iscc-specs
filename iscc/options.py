@@ -167,5 +167,9 @@ class SdkOptions(CoreOptions):
 
     index_metadata: bool = Field(False, description="Store metadata in index")
 
+    pipe_command_errors: bool = Field(
+        False, description="Whether to output error messages from external commands"
+    )
+
 
 sdk_opts = SdkOptions()
