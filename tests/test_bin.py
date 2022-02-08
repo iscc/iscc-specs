@@ -38,4 +38,4 @@ def test_ffmpeg_install():
 
 def test_ffprobe_get_version_info():
     vi = bin.ffprobe_version_info()
-    assert vi == bin.FFPROBE_VERSION
+    assert bin.FFPROBE_VERSION in vi

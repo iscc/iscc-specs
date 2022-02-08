@@ -187,8 +187,8 @@ def test_code_image_bits32():
 def test_code_image_preview():
     cidi = iscc.code_image(images()[0], image_preview=True, image_granular=False)
     preview = cidi["preview"]
-    assert preview.startswith("data:image/webp;base64,UklGRl4DAABXRUJQVlA4IFIDAACQEwCd")
-    assert preview.endswith("U0YXrp8k4FtKO0FRbKeE7aFq4V66Ybga9t8TC+QV/hK62WDyAxPciuoAA")
+    assert preview.startswith("data:image/webp;base64,UklGRhgIAABXRUJQVlA4IAwIAABQJQCd")
+    assert preview.endswith("qSUQvbU+gC4ShEuIP+R7+yyFAjDVUbFMfQod4cLwg7wmO7EgOWgAAAA==")
 
 
 def test_extract_image_metadata():

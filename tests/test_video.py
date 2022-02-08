@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 from io import BytesIO
 from mmap import mmap
-
-import iscc_core
 import pytest
 from iscc_core.code_content_video import soft_hash_video_v0
 
@@ -231,8 +229,8 @@ def test_code_video_include_mp7sig():
 def test_code_video_preview():
     result = code_video(SAMPLE, video_preview=True)
     preview = result["preview"]
-    assert preview.startswith("data:image/webp;base64,UklGRpoCAABXRUJQVlA4II4CAACQDQCd")
-    assert preview.endswith("GvkEq8A/EtLg6gfFTFgDZr++JWCKAbvgD3Qmv6NBCua61VsXvvDGIAAA=")
+    assert preview.startswith("data:image/webp;base64,UklGRgIFAABXRUJQVlA4IPYEAACwGACd")
+    assert preview.endswith("yzGD86/4RwK7Jsmj95u6nXxIjC8dmulEuleMbaS3rE4m3gtS05iAAAAAA")
 
 
 def test_code_video_global_preview_overrides():
