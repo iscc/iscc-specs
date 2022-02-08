@@ -18,20 +18,20 @@ import jdk
 FFPROBE_VERSION = "4.2.1"
 FFPROBE_API_URL = "https://ffbinaries.com/api/v1/version/" + FFPROBE_VERSION
 FFPROBE_CHECKSUMS = {
-    "windows-64": "d13e513cbe25df56f2a003740dbfa3c9",
-    "linux-64": "d16c0f22a4d86653f9a11ef9da74f644",
-    "osx-64": "6cafd5ceede9d4e5bb2a241c9f22efd5",
+    "windows-64": "5bd8d3d92329861e008555bdab68f5a3556841124eb863de2f2252ca6a0d4f7a",
+    "linux-64": "49cd333cf1997799eff7231d3f0ede8830c67413fa7fba09a0c476c430fec38a",
+    "osx-64": "96afd9e5462676c6f6c02563eb63f368ecd566b80fc70c7e890346a5a1c65cbd",
 }
 
 FFMPEG_VERSION = "4.2.1"
 FFMPEG_API_URL = "https://ffbinaries.com/api/v1/version/" + FFMPEG_VERSION
 FFMPEG_CHECKSUMS = {
-    "windows-64": "6d5dc6d2bb579ac3f78fda858f07bc5b",
-    "linux-64": "01fb50166b77dd128dca786fe152ac2c",
-    "osx-64": "c882209d862e33e9dc4f7abe1adb5e1b",
+    "windows-64": "7a5ed02a756e5d43cd09360b1cbd3235a08e2d640224f34764af33ed01c50afe",
+    "linux-64": "0aeb59f00861e34892086cb4533fbb3a47bfd588d322d736300b5b4ef9beee84",
+    "osx-64": "b9e68ad9bc1ed7db39b6002ce34bbe5ab0ac9c501a4613e2ae645e1a4cfc5a12",
 }
 
-FPCALC_VERSION = "1.5.0"
+FPCALC_VERSION = "1.5.1"
 FPCALC_URL_BASE = (
     f"https://github.com/acoustid/chromaprint/releases/download/v{FPCALC_VERSION}/"
 )
@@ -41,10 +41,17 @@ FPCALC_OS_MAP = {
     "Darwin": "chromaprint-fpcalc-{}-macos-x86_64.tar.gz".format(FPCALC_VERSION),
     "Windows": "chromaprint-fpcalc-{}-windows-x86_64.zip".format(FPCALC_VERSION),
 }
+FPCALC_CHECKSUMS = {
+    "windows-64": "e29364a879ddf7bea403b0474a556e43f40d525e0d8d5adb81578f1fbf16d9ba",
+    "linux-64": "190977d9419daed8a555240b9c6ddf6a12940c5ff470647095ee6242e217de5c",
+    "osx-64": "afea164b0bc9b91e5205d126f96a21836a91ea2d24200e1b7612a7304ea3b4f1",
+}
 
-TIKA_VERSION = "2.2.0"
-TIKA_URL = f"https://dlcdn.apache.org/tika/{TIKA_VERSION}/tika-app-{TIKA_VERSION}.jar"
-TIKA_CHECKSUM = "62ba528230481c9917f2dcbf3524e63d"
+TIKA_VERSION = "2.3.0"
+TIKA_URL = (
+    f"https://archive.apache.org/dist/tika/{TIKA_VERSION}/tika-app-{TIKA_VERSION}.jar"
+)
+TIKA_CHECKSUM = "e3f6ff0841b9014333fc6de4b849704384abf362100edfa573a6e4104b654491"
 
 
 def install():
@@ -76,7 +83,8 @@ def fpcalc_download_url():
 
 def fpcalc_download():
     """Download fpcalc and return path to archive file."""
-    return download_file(fpcalc_download_url())
+    b3 = FPCALC_CHECKSUMS.get(system_tag())
+    return download_file(fpcalc_download_url(), checksum=b3)
 
 
 def fpcalc_extract(archive):
@@ -158,14 +166,14 @@ def ffmpeg_download_url():
 
 def ffprobe_download():
     """Download ffprobe and return path to archive file."""
-    md5 = FFPROBE_CHECKSUMS.get(system_tag())
-    return download_file(ffprobe_download_url(), md5=md5)
+    b3 = FFPROBE_CHECKSUMS.get(system_tag())
+    return download_file(ffprobe_download_url(), checksum=b3)
 
 
 def ffmpeg_download():
     """Download ffmpeg and return path to archive file."""
-    md5 = FFMPEG_CHECKSUMS.get(system_tag())
-    return download_file(ffmpeg_download_url(), md5=md5)
+    b3 = FFMPEG_CHECKSUMS.get(system_tag())
+    return download_file(ffmpeg_download_url(), checksum=b3)
 
 
 def ffprobe_extract(archive: str):
@@ -310,7 +318,7 @@ def tika_download_url():
 def tika_download():
     # type: () -> str
     """Download tika-app.jar and return local path"""
-    return download_file(tika_download_url(), md5=TIKA_CHECKSUM)
+    return download_file(tika_download_url(), checksum=TIKA_CHECKSUM)
 
 
 def tika_install():

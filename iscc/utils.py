@@ -1,4 +1,7 @@
 # -*- coding: utf-8 -*-
+from pathlib import Path
+
+from blake3 import blake3
 from loguru import logger as log
 import requests
 from loguru import logger
@@ -6,7 +9,7 @@ import hashlib
 import io
 import os
 import re
-from typing import Sequence, Generator
+from typing import Sequence, Generator, Optional, Union
 from urllib.parse import urlparse
 from iscc import APP_DIR
 
@@ -26,9 +29,11 @@ def sliding_window(seq, width):
     return (seq[i : i + width] for i in idx)
 
 
-def download_file(url, folder=None, md5=None, sanitize=False):
-    # type: (str, Optional[Union[str, Path]], Optional[str], bool) -> str
-    """Download file to `folder` (default app_dir) and return file path."""
+def download_file(url, folder=None, checksum=None, sanitize=False):
+    # type: (str, Optional[Union[str, Path]], Optional[str], Optional[bool]) -> str
+    """
+    Download file to `folder` (default app_dir) and return file path.
+    """
     url_obj = urlparse(url)
     file_name = os.path.basename(url_obj.path or url_obj.netloc)
     if sanitize:
@@ -37,9 +42,9 @@ def download_file(url, folder=None, md5=None, sanitize=False):
     out_path = os.path.join(out_dir, file_name)
     if os.path.exists(out_path):
         logger.info(f"Already downloaded: {file_name}")
-        if md5:
-            md5_calc = hashlib.md5(open(out_path, "rb").read()).hexdigest()
-            assert md5 == md5_calc, f"Integrity error for {out_path}"
+        if checksum:
+            b3_calc = blake3(open(out_path, "rb").read()).hexdigest()
+            assert checksum == b3_calc, f"Integrity error for {out_path}"
             return out_path
 
     log.info(f"downloading {url} to {out_path}")
@@ -51,10 +56,10 @@ def download_file(url, folder=None, md5=None, sanitize=False):
             fd.write(chunk)
             iter_size += chunk_size
 
-    if md5:
+    if checksum:
         log.info(f"verifying {out_path}")
-        md5_calc = hashlib.md5(open(out_path, "rb").read()).hexdigest()
-        assert md5 == md5_calc, f"Integrity error for {out_path}"
+        b3_calc = blake3(open(out_path, "rb").read()).hexdigest()
+        assert checksum == b3_calc, f"Integrity error for {out_path}"
     return out_path
 
 
