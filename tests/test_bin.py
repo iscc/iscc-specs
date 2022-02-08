@@ -10,6 +10,8 @@ def test_java_version_info():
 
 
 def test_tika_version_info():
+    bin.java_install()
+    bin.tika_install()
     vi = bin.tika_version_info().lower()
     assert "tika" in vi
     assert len(vi.splitlines()) == 1
