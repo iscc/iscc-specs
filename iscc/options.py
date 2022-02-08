@@ -71,11 +71,11 @@ class SdkOptions(CoreOptions):
     image_preview: bool = Field(True, description="Generate image preview thumbnail")
 
     image_preview_size: int = Field(
-        96, description="Size of larger side of thumbnail in pixels"
+        128, description="Size of larger side of thumbnail in pixels"
     )
 
     image_preview_quality: int = Field(
-        30, description="Image compression setting (0-100)"
+        60, description="Image compression setting (0-100)"
     )
 
     audio_granular: bool = Field(
