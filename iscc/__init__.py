@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-__version__ = "1.1.0b15"
+__version__ = "1.1.0b16"
 import os
 from pathlib import Path
 import click
