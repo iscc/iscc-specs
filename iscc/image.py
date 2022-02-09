@@ -1,8 +1,15 @@
 # -*- coding: utf-8 -*-
 """Content-ID Image functions"""
 import base64
+import json
+import os
+import subprocess
+import sys
 from collections import defaultdict
 import io
+from tempfile import NamedTemporaryFile
+from loguru import logger as log
+import jmespath
 from iscc_core.codec import encode_base64
 from loguru import logger
 from pathlib import Path
@@ -10,12 +17,13 @@ from typing import Any, Optional, Sequence, Union
 from PIL import Image, ImageChops, ImageEnhance, ImageOps
 import numpy as np
 from more_itertools import chunked
+from bin import exiv2_bin
 from iscc.schema import FeatureType, Readable
 from iscc_core.simhash import similarity_hash
 from iscc.text import normalize_text
 from iscc.options import SdkOptions, sdk_opts
 from iscc import uread
-import exiv2
+
 
 IMAGE_META_MAP = {
     "Xmp.dc.title": "title",
@@ -40,6 +48,45 @@ IMAGE_META_MAP = {
 
 
 def extract_image_metadata(data):
+    # type: (Readable) -> Optional[dict]
+    ufile = uread.open_data(data)
+    is_tempfile = False
+    if hasattr(ufile, "name"):
+        path = ufile.name
+    else:
+        arg = ufile.read()
+        tmp = NamedTemporaryFile("wb", delete=False)
+        tmp.write(arg)
+        path = tmp.name
+        tmp.close()
+        is_tempfile = True
+
+    cmd = [exiv2_bin(), "--all", path]
+    result = subprocess.run(cmd, capture_output=True)
+
+    text = result.stdout.decode(sys.stdout.encoding)
+
+    # We may get all sorts of crazy control-chars, delete them.
+    mpa = dict.fromkeys(range(32))
+    clean = text.translate(mpa)
+    meta = json.loads(clean)
+
+    mapped = defaultdict(str)
+    for tag, mapped_name in IMAGE_META_MAP.items():
+        value = jmespath.search(tag, meta)
+        if value:
+            if isinstance(value, dict):
+                log.critical(f"Structured image metdata skipped: {value}")
+                continue
+            log.debug(f"Mapping metadata: {tag} -> {mapped_name} -> {value}")
+            mapped[mapped_name] += value
+
+    if is_tempfile:
+        os.remove(path)
+    return dict(mapped) or None
+
+
+def _extract_image_metadata(data):
     # type: (Readable) -> Optional[dict]
     """Extract and normalize seed metadata from image files (exif, iptc, xmp)"""
     ufile = uread.open_data(data)
