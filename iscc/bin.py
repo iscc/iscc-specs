@@ -6,6 +6,7 @@ import subprocess
 import sys
 import tarfile
 import zipfile
+from pathlib import Path
 from platform import system, architecture
 import requests
 from loguru import logger as log
@@ -53,14 +54,108 @@ TIKA_URL = (
 )
 TIKA_CHECKSUM = "e3f6ff0841b9014333fc6de4b849704384abf362100edfa573a6e4104b654491"
 
+EXIV2_VERSION = "0.27.5"
+EXIV2_BASE = "http://github.com/Exiv2/exiv2/releases/download/v"
+EXIV2_URLS = {
+    "windows-64": f"{EXIV2_BASE}{EXIV2_VERSION}/exiv2-{EXIV2_VERSION}-2019msvc64.zip",
+    "linux-64": f"{EXIV2_BASE}{EXIV2_VERSION}/exiv2-{EXIV2_VERSION}-Darwin.tar.gz",
+    "osx-64": f"{EXIV2_BASE}{EXIV2_VERSION}/exiv2-{EXIV2_VERSION}-Linux64.tar.gz",
+}
+
+EXIV2_CHECKSUMS = {
+    "windows-64": "3e00112648ed98a60a381fc3c6dd10ec263b1d56dec4f07dce86a7736517ebcd",
+    "linux-64": "6c6339f7f575ed794c4669e7eab4ef400a6cf7981f78ea26fc985d24d9620d58",
+    "osx-64": "aaf574fa910721fdc653519a2ca8ecf3d4e9b06213167ad630fcb9e18d329af4",
+}
+
+EXIV2_RELPATH = {
+    "windows-64": f"exiv2-{EXIV2_VERSION}-2019msvc64/bin/exiv2.exe",
+    "linux-64": f"exiv2-{EXIV2_VERSION}-Linux64/bin/exiv2",
+    "osx-64": f"exiv2-{EXIV2_VERSION}-Darwin/bin/exiv2.exe",
+}
+
 
 def install():
     """Install binary tools for content extraction"""
+    exiv2_install()
     fpcalc_install()
     ffprobe_install()
     ffmpeg_install()
     java_install()
     tika_install()
+
+
+def system_tag():
+    os_tag = system().lower()
+    if os_tag == "darwin":
+        os_tag = "osx"
+    os_bits = architecture()[0].rstrip("bit")
+    return f"{os_tag}-{os_bits}"
+
+
+def is_installed(fp: str) -> bool:
+    """"Check if binary at `fp` exists and is executable"""
+    return os.path.isfile(fp) and os.access(fp, os.X_OK)
+
+
+########################################################################################
+# Exiv2                                                                                #
+########################################################################################
+
+
+def exiv2_download_url() -> str:
+    """Return system and version dependant exiv2 download url"""
+    return EXIV2_URLS[system_tag()]
+
+
+def exiv2_bin() -> str:
+    """Returns local path to exiv2 executable."""
+    return os.path.join(iscc.APP_DIR, EXIV2_RELPATH[system_tag()])
+
+
+def exiv2_is_installed():
+    """Check if exiv2 is installed"""
+    fp = exiv2_bin()
+    return os.path.isfile(fp) and os.access(fp, os.X_OK)
+
+
+def exiv2_download():
+    b3 = EXIV2_CHECKSUMS[system_tag()]
+    return download_file(exiv2_download_url(), checksum=b3)
+
+
+def exiv2_extract(archive):
+    if archive.endswith(".zip"):
+        with zipfile.ZipFile(archive, "r") as zip_file:
+            zip_file.extractall(Path(archive).parent.absolute())
+
+
+def exiv2_install():
+    """Install exiv2 command line tool and return path to executable."""
+    if exiv2_is_installed():
+        log.debug("Exiv2 is already installed.")
+        return exiv2_bin()
+    log.critical("installing exiv2")
+    archive_path = exiv2_download()
+    exiv2_extract(archive_path)
+    st = os.stat(exiv2_bin())
+    os.chmod(exiv2_bin(), st.st_mode | stat.S_IEXEC)
+    return exiv2_bin()
+
+
+def exiv2_version_info():
+    """Get exiv2 version info"""
+    try:
+        r = subprocess.run([exiv2_bin(), "--version"], stdout=subprocess.PIPE)
+        vi = r.stdout.decode("utf-8").splitlines()[0].strip()
+        return vi
+    except FileNotFoundError:
+        return "exiv2 not installed"
+
+
+########################################################################################
+# Fpcalc                                                                               #
+########################################################################################
 
 
 def fpcalc_bin():
@@ -131,25 +226,9 @@ def fpcalc_version_info():
         return "FPCALC not installed"
 
 
-def ffprobe_bin() -> str:
-    """Returns local path to ffprobe executable."""
-    path = os.path.join(iscc.APP_DIR, "ffprobe-{}".format(FFPROBE_VERSION))
-    if system() == "Windows":
-        path += ".exe"
-    return path
-
-
-def ffmpeg_bin() -> str:
-    """Returns local path to ffmpeg executable."""
-    path = os.path.join(iscc.APP_DIR, "ffmpeg-{}".format(FFMPEG_VERSION))
-    if system() == "Windows":
-        path += ".exe"
-    return path
-
-
-def is_installed(fp: str) -> bool:
-    """"Check if binary at `fp` exists and is executable"""
-    return os.path.isfile(fp) and os.access(fp, os.X_OK)
+########################################################################################
+# ffprobe                                                                              #
+########################################################################################
 
 
 def ffprobe_download_url():
@@ -158,10 +237,12 @@ def ffprobe_download_url():
     return urls["bin"][system_tag()]["ffprobe"]
 
 
-def ffmpeg_download_url():
-    """Return system dependant download url."""
-    urls = requests.get(FFPROBE_API_URL).json()
-    return urls["bin"][system_tag()]["ffmpeg"]
+def ffprobe_bin() -> str:
+    """Returns local path to ffprobe executable."""
+    path = os.path.join(iscc.APP_DIR, "ffprobe-{}".format(FFPROBE_VERSION))
+    if system() == "Windows":
+        path += ".exe"
+    return path
 
 
 def ffprobe_download():
@@ -170,25 +251,11 @@ def ffprobe_download():
     return download_file(ffprobe_download_url(), checksum=b3)
 
 
-def ffmpeg_download():
-    """Download ffmpeg and return path to archive file."""
-    b3 = FFMPEG_CHECKSUMS.get(system_tag())
-    return download_file(ffmpeg_download_url(), checksum=b3)
-
-
 def ffprobe_extract(archive: str):
     """Extract ffprobe from archive."""
     fname = "ffprobe.exe" if system() == "Windows" else "ffprobe"
     with zipfile.ZipFile(archive) as zip_file:
         with zip_file.open(fname) as zf, open(ffprobe_bin(), "wb") as lf:
-            shutil.copyfileobj(zf, lf)
-
-
-def ffmpeg_extract(archive: str):
-    """Extract ffprobe from archive."""
-    fname = "ffmpeg.exe" if system() == "Windows" else "ffmpeg"
-    with zipfile.ZipFile(archive) as zip_file:
-        with zip_file.open(fname) as zf, open(ffmpeg_bin(), "wb") as lf:
             shutil.copyfileobj(zf, lf)
 
 
@@ -206,20 +273,6 @@ def ffprobe_install():
     return ffprobe_bin()
 
 
-def ffmpeg_install():
-    """Install ffmpeg command line tool and return path to executable."""
-    if is_installed(ffmpeg_bin()):
-        log.debug("ffmpeg is already installed")
-        return ffmpeg_bin()
-    log.critical("installing ffmpeg")
-    archive_path = ffmpeg_download()
-    ffmpeg_extract(archive_path)
-    st = os.stat(ffmpeg_bin())
-    os.chmod(ffmpeg_bin(), st.st_mode | stat.S_IEXEC)
-    assert is_installed(ffmpeg_bin())
-    return ffmpeg_bin()
-
-
 def ffprobe_version_info():
     """Get ffprobe version"""
     try:
@@ -234,6 +287,53 @@ def ffprobe_version_info():
         )
     except FileNotFoundError:
         return "ffprobe not installed"
+
+
+########################################################################################
+# ffmpeg                                                                               #
+########################################################################################
+
+
+def ffmpeg_download_url():
+    """Return system dependant download url."""
+    urls = requests.get(FFPROBE_API_URL).json()
+    return urls["bin"][system_tag()]["ffmpeg"]
+
+
+def ffmpeg_bin() -> str:
+    """Returns local path to ffmpeg executable."""
+    path = os.path.join(iscc.APP_DIR, "ffmpeg-{}".format(FFMPEG_VERSION))
+    if system() == "Windows":
+        path += ".exe"
+    return path
+
+
+def ffmpeg_download():
+    """Download ffmpeg and return path to archive file."""
+    b3 = FFMPEG_CHECKSUMS.get(system_tag())
+    return download_file(ffmpeg_download_url(), checksum=b3)
+
+
+def ffmpeg_extract(archive: str):
+    """Extract ffprobe from archive."""
+    fname = "ffmpeg.exe" if system() == "Windows" else "ffmpeg"
+    with zipfile.ZipFile(archive) as zip_file:
+        with zip_file.open(fname) as zf, open(ffmpeg_bin(), "wb") as lf:
+            shutil.copyfileobj(zf, lf)
+
+
+def ffmpeg_install():
+    """Install ffmpeg command line tool and return path to executable."""
+    if is_installed(ffmpeg_bin()):
+        log.debug("ffmpeg is already installed")
+        return ffmpeg_bin()
+    log.critical("installing ffmpeg")
+    archive_path = ffmpeg_download()
+    ffmpeg_extract(archive_path)
+    st = os.stat(ffmpeg_bin())
+    os.chmod(ffmpeg_bin(), st.st_mode | stat.S_IEXEC)
+    assert is_installed(ffmpeg_bin())
+    return ffmpeg_bin()
 
 
 def ffmpeg_version_info():
@@ -355,17 +455,11 @@ def tika_version_info():
         return "Tika not installed"
 
 
-def system_tag():
-    os_tag = system().lower()
-    if os_tag == "darwin":
-        os_tag = "osx"
-    os_bits = architecture()[0].rstrip("bit")
-    return f"{os_tag}-{os_bits}"
-
-
 if __name__ == "__main__":
-    print(java_version_info())
-    print(tika_version_info())
+    exiv2_install()
+    print(exiv2_version_info())
+    # print(java_version_info())
+    # print(tika_version_info())
     # print(tika_is_installed())
     # print(tika_install())
     # print(tika_is_installed())

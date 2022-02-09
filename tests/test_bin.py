@@ -41,3 +41,24 @@ def test_ffmpeg_install():
 def test_ffprobe_get_version_info():
     vi = bin.ffprobe_version_info()
     assert bin.FFPROBE_VERSION in vi
+
+
+def test_exiv2_download_url():
+    durl = bin.exiv2_download_url()
+    assert durl.startswith("http://github.com/Exiv2/exiv2/releases")
+    assert bin.EXIV2_VERSION in durl
+
+
+def test_exiv2_bin():
+    bpath = bin.exiv2_bin()
+    assert os.path.basename(bpath).startswith("exiv2")
+
+
+def test_exiv2_install():
+    bin.exiv2_install()
+    assert bin.exiv2_is_installed()
+
+
+def test_exiv2_version_info():
+    vs = bin.exiv2_version_info()
+    assert vs.startswith("exiv2 ")
