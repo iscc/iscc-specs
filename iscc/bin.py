@@ -163,7 +163,7 @@ def exiv2_install():
 def exiv2_version_info():
     """Get exiv2 version info"""
     try:
-        r = subprocess.run([exiv2_bin(), "--version"], stdout=subprocess.PIPE)
+        r = subprocess.run([exiv2_bin(), "--version"], capture_output=True)
         vi = r.stdout.decode(sys.stdout.encoding)
         return vi
     except FileNotFoundError:

@@ -42,17 +42,17 @@ jobs:
       run: poetry install
       if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
 
-#    - name: Get cache dir for binaries
-#      id: bin-cache
-#      run: |
-#        echo "::set-output name=dir::$(poetry run python -m iscc.app_dir)"
-#
-#    - name: Cache binary dependencies
-#      id: cache-bins
-#      uses: actions/cache@v2
-#      with:
-#        path: ${{ steps.bin-cache.outputs.dir }}
-#        key: ${{ runner.os }}-bins-1
+    - name: Get cache dir for binaries
+      id: bin-cache
+      run: |
+        echo "::set-output name=dir::$(poetry run python -m iscc.app_dir)"
+
+    - name: Cache binary dependencies
+      id: cache-bins
+      uses: actions/cache@v2
+      with:
+        path: ${{ steps.bin-cache.outputs.dir }}
+        key: ${{ runner.os }}-bins-1
 
     - name: Run pytest
       run: poetry run pytest -q  -m "not optional" tests
