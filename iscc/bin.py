@@ -58,8 +58,8 @@ EXIV2_VERSION = "0.27.5"
 EXIV2_BASE = "http://github.com/Exiv2/exiv2/releases/download/v"
 EXIV2_URLS = {
     "windows-64": f"{EXIV2_BASE}{EXIV2_VERSION}/exiv2-{EXIV2_VERSION}-2019msvc64.zip",
-    "linux-64": f"{EXIV2_BASE}{EXIV2_VERSION}/exiv2-{EXIV2_VERSION}-Darwin.tar.gz",
-    "osx-64": f"{EXIV2_BASE}{EXIV2_VERSION}/exiv2-{EXIV2_VERSION}-Linux64.tar.gz",
+    "linux-64": f"{EXIV2_BASE}{EXIV2_VERSION}/exiv2-{EXIV2_VERSION}-Linux64.tar.gz",
+    "osx-64": f"{EXIV2_BASE}{EXIV2_VERSION}/exiv2-{EXIV2_VERSION}-Darwin.tar.gz",
 }
 
 EXIV2_CHECKSUMS = {
@@ -151,7 +151,7 @@ def exiv2_install():
 def exiv2_version_info():
     """Get exiv2 version info"""
     exe = Path(exiv2_bin())
-    exe = exe.parent / 'exiv2'
+    exe = exe.parent / "exiv2"
     try:
         r = subprocess.run([exe, "--version"], stdout=subprocess.PIPE)
         vi = r.stdout.decode("utf-8").splitlines()[0].strip()
