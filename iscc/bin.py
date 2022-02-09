@@ -94,7 +94,7 @@ def system_tag():
 
 
 def is_installed(fp: str) -> bool:
-    """"Check if binary at `fp` exists and is executable"""
+    """ "Check if binary at `fp` exists and is executable"""
     return os.path.isfile(fp) and os.access(fp, os.X_OK)
 
 
@@ -150,8 +150,13 @@ def exiv2_install():
 
 def exiv2_version_info():
     """Get exiv2 version info"""
+
     exe = Path(exiv2_bin())
-    exe = exe.parent / "exiv2"
+    if system_tag() == "windows-64":
+        exe = exe.parent / "exiv2.exe"
+    else:
+        exe = exe.parent / "exiv2"
+
     try:
         r = subprocess.run([exe, "--version"], stdout=subprocess.PIPE)
         vi = r.stdout.decode(sys.stdout.encoding)
@@ -173,7 +178,7 @@ def fpcalc_bin():
 
 
 def fpcalc_is_installed():
-    """"Check if fpcalc is installed."""
+    """ "Check if fpcalc is installed."""
     fp = fpcalc_bin()
     return os.path.isfile(fp) and os.access(fp, os.X_OK)
 
