@@ -154,7 +154,7 @@ def exiv2_version_info():
     exe = exe.parent / "exiv2"
     try:
         r = subprocess.run([exe, "--version"], stdout=subprocess.PIPE)
-        vi = r.stdout.decode("utf-8").splitlines()[0].strip()
+        vi = r.stdout.decode(sys.stdout.encoding)
         return vi
     except FileNotFoundError:
         return "exiv2 not installed"
