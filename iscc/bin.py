@@ -69,6 +69,12 @@ EXIV2_CHECKSUMS = {
 }
 
 EXIV2_RELPATH = {
+    "windows-64": f"exiv2-{EXIV2_VERSION}-2019msvc64/bin/exiv2.exe",
+    "linux-64": f"exiv2-{EXIV2_VERSION}-Linux64/bin/exiv2",
+    "osx-64": f"exiv2-{EXIV2_VERSION}-Darwin/bin/exiv2",
+}
+
+EXIV2JSON_RELPATH = {
     "windows-64": f"exiv2-{EXIV2_VERSION}-2019msvc64/bin/exiv2json.exe",
     "linux-64": f"exiv2-{EXIV2_VERSION}-Linux64/bin/exiv2json",
     "osx-64": f"exiv2-{EXIV2_VERSION}-Darwin/bin/exiv2json",
@@ -113,6 +119,10 @@ def exiv2_bin() -> str:
     return os.path.join(iscc.APP_DIR, EXIV2_RELPATH[system_tag()])
 
 
+def exiv2json_bin() -> str:
+    return os.path.join(iscc.APP_DIR, EXIV2JSON_RELPATH[system_tag()])
+
+
 def exiv2_is_installed():
     """Check if exiv2 is installed"""
     fp = exiv2_bin()
@@ -145,20 +155,15 @@ def exiv2_install():
     exiv2_extract(archive_path)
     st = os.stat(exiv2_bin())
     os.chmod(exiv2_bin(), st.st_mode | stat.S_IEXEC)
+    st = os.stat(exiv2json_bin())
+    os.chmod(exiv2json_bin(), st.st_mode | stat.S_IEXEC)
     return exiv2_bin()
 
 
 def exiv2_version_info():
     """Get exiv2 version info"""
-
-    exe = Path(exiv2_bin())
-    if system_tag() == "windows-64":
-        exe = exe.parent / "exiv2.exe"
-    else:
-        exe = exe.parent / "exiv2"
-
     try:
-        r = subprocess.run([exe, "--version"], stdout=subprocess.PIPE)
+        r = subprocess.run([exiv2_bin(), "--version"], stdout=subprocess.PIPE)
         vi = r.stdout.decode(sys.stdout.encoding)
         return vi
     except FileNotFoundError:

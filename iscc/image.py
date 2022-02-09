@@ -7,6 +7,7 @@ import subprocess
 import sys
 from collections import defaultdict
 import io
+from json import JSONDecodeError
 from tempfile import NamedTemporaryFile
 from loguru import logger as log
 import jmespath
@@ -17,7 +18,7 @@ from typing import Any, Optional, Sequence, Union
 from PIL import Image, ImageChops, ImageEnhance, ImageOps
 import numpy as np
 from more_itertools import chunked
-from iscc.bin import exiv2_bin
+from iscc.bin import exiv2json_bin
 from iscc.schema import FeatureType, Readable
 from iscc_core.simhash import similarity_hash
 from iscc.text import normalize_text
@@ -61,7 +62,7 @@ def extract_image_metadata(data):
         tmp.close()
         is_tempfile = True
 
-    cmd = [exiv2_bin(), "--all", path]
+    cmd = [exiv2json_bin(), "--all", path]
     result = subprocess.run(cmd, capture_output=True)
 
     text = result.stdout.decode(sys.stdout.encoding)
@@ -69,7 +70,11 @@ def extract_image_metadata(data):
     # We may get all sorts of crazy control-chars, delete them.
     mpa = dict.fromkeys(range(32))
     clean = text.translate(mpa)
-    meta = json.loads(clean)
+    try:
+        meta = json.loads(clean)
+    except JSONDecodeError as e:
+        log.critical(f"failed to decode exiv2 result: {clean}")
+        return None
 
     mapped = defaultdict(str)
     for tag, mapped_name in IMAGE_META_MAP.items():
