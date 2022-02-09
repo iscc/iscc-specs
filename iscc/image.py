@@ -17,7 +17,7 @@ from typing import Any, Optional, Sequence, Union
 from PIL import Image, ImageChops, ImageEnhance, ImageOps
 import numpy as np
 from more_itertools import chunked
-from bin import exiv2_bin
+from iscc.bin import exiv2_bin
 from iscc.schema import FeatureType, Readable
 from iscc_core.simhash import similarity_hash
 from iscc.text import normalize_text
