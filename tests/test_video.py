@@ -355,15 +355,12 @@ def test_detect_video_crop():
 
 @pytest.mark.optional
 def test_detect_video_scenes_pyscene():
-    assert (
-        video.detect_video_scenes(
-            SAMPLE,
-            video_scenes_fs=0,
-            video_scenes_th=50,
-            video_scenes_min=15,
-        )
-        == [7.625, 10.125, 15.208, 16.458, 20.208, 23.0, 38.458, 46.625, 59.667, 60.042]
-    )
+    assert video.detect_video_scenes(
+        SAMPLE,
+        video_scenes_fs=0,
+        video_scenes_th=50,
+        video_scenes_min=15,
+    ) == [7.625, 10.125, 15.208, 16.458, 20.208, 23.0, 38.458, 46.625, 59.667, 60.042]
 
 
 def test_detect_video_scenes_ffmpeg():

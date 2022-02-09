@@ -73,7 +73,7 @@ class Index:
         os.makedirs(self.dbpath, exist_ok=True)
         self.env = lmdb.open(
             path=self.dbpath,
-            map_size=2 ** 20,
+            map_size=2**20,
             readonly=readonly,
             max_dbs=24,
             metasync=False,

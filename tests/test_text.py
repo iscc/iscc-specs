@@ -11,7 +11,7 @@ import iscc.text
 import iscc.metrics
 
 
-TEXT_A = u"""
+TEXT_A = """
     Their most significant and usefull property of similarity-preserving
     fingerprints gets lost in the fragmentation of individual, propietary and
     use case specific implementations. The real benefit lies in similarity
@@ -19,7 +19,7 @@ TEXT_A = u"""
     vendors.
 """
 
-TEXT_B = u"""
+TEXT_B = """
     The most significant and usefull property of similarity-preserving
     fingerprints gets lost in the fragmentation of individual, propietary and
     use case specific implementations. The real benefit lies in similarity
@@ -27,7 +27,7 @@ TEXT_B = u"""
     vendors.
 """
 
-TEXT_C = u"""
+TEXT_C = """
     A need for open standard fingerprinting. We don´t need the best
     Fingerprinting algorithm just an accessible and widely used one.
 """

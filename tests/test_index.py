@@ -140,7 +140,7 @@ def test_index_get_key(idx, ten_isccs):
 
 
 def test_index_map_size(idx):
-    assert idx.map_size == 2 ** 20
+    assert idx.map_size == 2**20
 
 
 def test_index_in(idx, full_iscc):

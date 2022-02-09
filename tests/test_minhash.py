@@ -9,7 +9,7 @@ def test_minhash_empty():
 
 
 def test_minhash_single_feature():
-    mh = minhash([2 ** 16])
+    mh = minhash([2**16])
     assert isinstance(mh, list)
     assert len(mh) == 64
     assert mh[0] == 1968499307
@@ -17,14 +17,14 @@ def test_minhash_single_feature():
 
 
 def test_minhash_32bit_features():
-    i32 = 2 ** 32 - 1
-    mh = minhash([2 ** 64 - 1])
+    i32 = 2**32 - 1
+    mh = minhash([2**64 - 1])
     for n in mh:
         assert n <= i32
 
 
 def test_minhash_compress():
-    mh = minhash([2 ** 16])
+    mh = minhash([2**16])
     digest = compress(mh)
     assert len(digest) == 32
     assert (
