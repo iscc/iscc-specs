@@ -49,7 +49,7 @@ FPCALC_CHECKSUMS = {
 
 TIKA_VERSION = "2.3.0"
 TIKA_URL = (
-    f"https://archive.apache.org/dist/tika/{TIKA_VERSION}/tika-app-{TIKA_VERSION}.jar"
+    f"http://archive.apache.org/dist/tika/{TIKA_VERSION}/tika-app-{TIKA_VERSION}.jar"
 )
 TIKA_CHECKSUM = "e3f6ff0841b9014333fc6de4b849704384abf362100edfa573a6e4104b654491"
 
