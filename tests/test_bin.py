@@ -61,4 +61,4 @@ def test_exiv2_install():
 
 def test_exiv2_version_info():
     vs = bin.exiv2_version_info()
-    assert vs.startswith("exiv2 ")
+    assert "exiv2" in vs.lower()
