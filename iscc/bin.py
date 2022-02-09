@@ -69,9 +69,9 @@ EXIV2_CHECKSUMS = {
 }
 
 EXIV2_RELPATH = {
-    "windows-64": f"exiv2-{EXIV2_VERSION}-2019msvc64/bin/exiv2.exe",
-    "linux-64": f"exiv2-{EXIV2_VERSION}-Linux64/bin/exiv2",
-    "osx-64": f"exiv2-{EXIV2_VERSION}-Darwin/bin/exiv2.exe",
+    "windows-64": f"exiv2-{EXIV2_VERSION}-2019msvc64/bin/exiv2json.exe",
+    "linux-64": f"exiv2-{EXIV2_VERSION}-Linux64/bin/exiv2json",
+    "osx-64": f"exiv2-{EXIV2_VERSION}-Darwin/bin/exiv2json",
 }
 
 
@@ -125,9 +125,14 @@ def exiv2_download():
 
 
 def exiv2_extract(archive):
+
     if archive.endswith(".zip"):
         with zipfile.ZipFile(archive, "r") as zip_file:
             zip_file.extractall(Path(archive).parent.absolute())
+
+    elif archive.endswith("tar.gz"):
+        with tarfile.open(archive, "r:gz") as tar_file:
+            tar_file.extractall(Path(archive).parent.absolute())
 
 
 def exiv2_install():
