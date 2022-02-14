@@ -45,7 +45,7 @@ The Content-Code is one component of the ISCC. It is a similarity-preserving has
 
 ## Content Variant Detection
 
-The similarity preserving hash of the Content-Code of the ISCC is able to cluster similar variants of content. It identifies the same or similar content and also shows on a scale from 1-64 (or 1-100%) how similar two content variants are. At the same time an application can distinguish between similar but not identical content through the Instance-ID component of the ISCC. This can help to identify e.g. watermarked files.
+The similarity preserving hash of the Content-Code of the ISCC is able to cluster similar variants of content. It identifies the same or similar content and also shows on a scale from 1-64 (or 1-100%) how similar two content variants are. At the same time an application can distinguish between similar but not identical content through the Instance-Code component of the ISCC. This can help to identify e.g. watermarked files.
 
 
 ## Proof of Data Possession

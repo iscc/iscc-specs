@@ -146,9 +146,9 @@ Before we settle on the details of the proposed ISCC identifier, we built a simp
 
 The minimal viable, first iteration ISCC will be a byte structure built from the following components:
 
-### Meta-ID
+### Meta-Code
 
-The Meta-ID will be generated as a similarity preserving hash from minimal generic metadata like *title *and *creators*. It operates on **Layer 1 ** and identifies an intangible creation. It is the first and most generic grouping element of the identifier. We will be experimenting with different n-gram sizes and bit-length to find the practical limits of precision and recall for generic metadata. We will also specify a process to disambiguate unintended collisions by adding optional metadata.
+The Meta-Code will be generated as a similarity preserving hash from minimal generic metadata like *title *and *creators*. It operates on **Layer 1 ** and identifies an intangible creation. It is the first and most generic grouping element of the identifier. We will be experimenting with different n-gram sizes and bit-length to find the practical limits of precision and recall for generic metadata. We will also specify a process to disambiguate unintended collisions by adding optional metadata.
 
 ### Partial Content Flag
 
@@ -162,12 +162,12 @@ The Media Type Flag is a 3 bit flag that allows us to distinguish between up to 
 
 The Content-Code operates on **Layer 3** and will be a GMT-specific similarity preserving hash generated from extracted content. It identifies the normalized content of a specific GMT, independent of file format or encoding. It relates to the structural essence of the content and groups similar GMT-specific manifestations of the abstract creation or parts of it (as indicated by the Partial Content Flag). For practical reasons we intentionally skip a **Layer 2** component at this time. It would add unnecessary complexity for a basic proof-of-concept implementation.
 
-### Data-ID
+### Data-Code
 
-The Data-ID operates on **Layer 4 **and will be a similarity preserving hash generated from shift-resistant content-defined chunks from the raw data of the encoded media blob. It groups complete encoded files with similar content and encoding. This component does not distinguish between GMTs as the files may include multiple different generic media types.
+The Data-Code operates on **Layer 4 **and will be a similarity preserving hash generated from shift-resistant content-defined chunks from the raw data of the encoded media blob. It groups complete encoded files with similar content and encoding. This component does not distinguish between GMTs as the files may include multiple different generic media types.
 
-### Instance-ID
+### Instance-Code
 
-The Instance-ID operates on **Layer 5 **and will be the top hash of a Merkle tree generated from (potentially content-defined) chunks of raw data of an encoded media blob. It identifies a concrete manifestation and proves the integrity of the full content. We use the Merkle tree structure because it also allows as to verify integrity of partial chunks without having to have the full data available. This will be very useful in any scenarios of distributed data storage.
+The Instance-Code operates on **Layer 5 **and will be the top hash of a Merkle tree generated from (potentially content-defined) chunks of raw data of an encoded media blob. It identifies a concrete manifestation and proves the integrity of the full content. We use the Merkle tree structure because it also allows as to verify integrity of partial chunks without having to have the full data available. This will be very useful in any scenarios of distributed data storage.
 
 We intentionally skip **Layer 6** at this stage as content ownership and location will be handled on the blockchain layer of the stack and not by the ISCC identifier itself.

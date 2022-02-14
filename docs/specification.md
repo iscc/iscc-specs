@@ -50,7 +50,7 @@ Digital Media Object:
 :    A blob of raw bytes with some media type specific encoding.
 
 Extended Metadata:
-:    Metadata that is not encoded within the ISCC Meta-ID but may be supplied together with the ISCC.
+:    Metadata that is not encoded within the ISCC Meta-Code but may be supplied together with the ISCC.
 
 Generic Media Type:
 :    A basic content type such as plain text in a normalized and *generic* ([UTF-8](https://en.wikipedia.org/wiki/UTF-8)) encoding format.
@@ -79,7 +79,7 @@ A **Fully Qualified ISCC Digest** is a fixed size sequence of **36 bytes (288 bi
 The ISCC Digest is built from multiple self-describing 72-bit components:
 
 
-| Components:     | Meta-ID             | Content-Code         | Data-ID           | Instance-ID   |
+| Components:     | Meta-Code             | Content-Code         | Data-Code           | Instance-Code   |
 | :-------------- | :------------------ | :----------------- | :---------------- | :------------ |
 | **Context:**    | Intangible creation | Content similarity | Data similarity   | Data checksum |
 | **Input:**      | Metadata            | Extracted  content | Raw data          | Raw data      |
@@ -90,15 +90,15 @@ ISCC components MAY be used separately or in combination by applications for var
 
 !!! example "Single component ISCC-Code (13 characters)"
 
-    **Meta-ID**: CCDFPFc87MhdT
+    **Meta-Code**: CCDFPFc87MhdT
 
-Combinations of components MUST include the Meta-ID component and MUST be ordered as **Meta-ID**, **Content-Code**, **Data-ID**, and **Instance-ID**. Individual components MAY be skipped and SHOULD be separated with hyphens. A combination of components SHOULD be prefixed with "ISCC".
+Combinations of components MUST include the Meta-Code component and MUST be ordered as **Meta-Code**, **Content-Code**, **Data-Code**, and **Instance-Code**. Individual components MAY be skipped and SHOULD be separated with hyphens. A combination of components SHOULD be prefixed with "ISCC".
 
 !!! example "Combination of ISCC-Code components"
 
     **ISCC**: CCPktvj3dVoVa-CTPCWTpGPMaLZ-CDL6QsUZdZzog
 
-A **Fully Qualified ISCC Code** is an ordered sequence of Meta-ID, Content-Code, Data-ID, and Instance-ID codes. It SHOULD be prefixed with ISCC and MAY be separated by hyphens.
+A **Fully Qualified ISCC Code** is an ordered sequence of Meta-Code, Content-Code, Data-Code, and Instance-Code codes. It SHOULD be prefixed with ISCC and MAY be separated by hyphens.
 
 !!! example "Fully Qualified ISCC-Code (52 characters)"
 
@@ -120,7 +120,7 @@ The header only needs to be carried in the encoded representation. As similarity
 
 | Component                | Nibble-1 | Nibble-2                        | Byte | Code |
 | :----------------------- | :------- | :------------------------------ | :--- | ---- |
-| **Meta-ID**              | 0000     | 0000 - Reserved                 | 0x00 | CC   |
+| **Meta-Code**              | 0000     | 0000 - Reserved                 | 0x00 | CC   |
 | **Content-Code-Text**      | 0001     | 0000 - Content Type Text        | 0x10 | CT   |
 | **Content-Code-Text PCF**  | 0001     | 0001 - Content Type Text  + PCF | 0x11 | Ct   |
 | **Content-Code-Image**     | 0001     | 0010 - Content Type Image       | 0x12 | CY   |
@@ -131,31 +131,31 @@ The header only needs to be carried in the encoded representation. As similarity
 | *Content-Code-Video PCF*   | 0001     | 0111 - Content Type Video + PCF | 0x17 | Cv   |
 | **Content-Code-Mixed**     | 0001     | 1000 - Content Type Mixed       | 0x18 | CM   |
 | **Content-Code Mixed PCF** | 0001     | 1001 - Content Type Mixed + PCF | 0x19 | Cm   |
-| **Data-ID**              | 0010     | 0000 - Reserved                 | 0x20 | CD   |
-| **Instance-ID**          | 0011     | 0000 - Reserved                 | 0x30 | CR   |
+| **Data-Code**              | 0010     | 0000 - Reserved                 | 0x20 | CD   |
+| **Instance-Code**          | 0011     | 0000 - Reserved                 | 0x30 | CR   |
 
 The body section of each component is specific to the component and always 8-bytes and can thus be fit into a 64-bit integer for efficient data processing. The following sections give an overview of how the different components work and how they are generated.
 
-### Meta-ID Component
+### Meta-Code Component
 
-The Meta-ID component starts with a 1-byte header `00000000`. The first nibble `0000` indicates that this is a Meta-ID component type. The second nibble is reserved for future extended features of the Meta-ID.
+The Meta-Code component starts with a 1-byte header `00000000`. The first nibble `0000` indicates that this is a Meta-Code component type. The second nibble is reserved for future extended features of the Meta-Code.
 
-The Meta-ID body is built from a 64-bit `similarity_hash` over 4-character n-grams of the basic metadata of the content to be identified.  The basic metadata supplied to the Meta-ID generating function is assumed to be UTF-8 encoded. Errors that occur during the decoding of such a byte string input to a native Unicode MUST terminate the process and must not be silenced. An ISCC generating application MUST provide a `meta_id` function that accepts minimal and generic metadata and returns a [Base58-ISCC encoded](#base58-iscc) Meta-ID component and trimmed metadata.
+The Meta-Code body is built from a 64-bit `similarity_hash` over 4-character n-grams of the basic metadata of the content to be identified.  The basic metadata supplied to the Meta-Code generating function is assumed to be UTF-8 encoded. Errors that occur during the decoding of such a byte string input to a native Unicode MUST terminate the process and must not be silenced. An ISCC generating application MUST provide a `meta_id` function that accepts minimal and generic metadata and returns a [Base58-ISCC encoded](#base58-iscc) Meta-Code component and trimmed metadata.
 
-#### Inputs to Meta-ID function
+#### Inputs to Meta-Code function
 
 | Name    | Type    | Required | Description                                                  |
 | :------ | :------ | :------- | :----------------------------------------------------------- |
 | title   | text    | Yes      | The title of an intangible creation.                         |
-| extra   | text    | No       | An optional short statement that distinguishes this intangible creation from another one for forced Meta-ID uniqueness. (default: empty string) |
+| extra   | text    | No       | An optional short statement that distinguishes this intangible creation from another one for forced Meta-Code uniqueness. (default: empty string) |
 
 !!! note
 
-    The basic metadata inputs are intentionally simple and generic. We abstain from more specific metadata for Meta-ID generation in favor of compatibility across industries. To support global clustering, it is **RECOMMENDED** to **only supply the title field** for Meta-ID generation. Imagine a *creator* input-field for metadata. Who would you list as the creators of a movie? The directors, writers, the main actors? Would you list some of them or if not how do you decide whom you will list. Global disambiguation of similar title data can be accomplished with the extra-field. Industry- and application-specific metadata requirements can be met by [extended metadata](#extended-metadata).
+    The basic metadata inputs are intentionally simple and generic. We abstain from more specific metadata for Meta-Code generation in favor of compatibility across industries. To support global clustering, it is **RECOMMENDED** to **only supply the title field** for Meta-Code generation. Imagine a *creator* input-field for metadata. Who would you list as the creators of a movie? The directors, writers, the main actors? Would you list some of them or if not how do you decide whom you will list. Global disambiguation of similar title data can be accomplished with the extra-field. Industry- and application-specific metadata requirements can be met by [extended metadata](#extended-metadata).
 
-#### Generate Meta-ID
+#### Generate Meta-Code
 
-An ISCC generating application must follow these steps in the given order to produce a stable Meta-ID:
+An ISCC generating application must follow these steps in the given order to produce a stable Meta-Code:
 
 1. Apply [`text_normalize`](#text_normalize) separately to the  `title` and `extra` inputs while keeping white space.
 2. Apply [`text_trim`](#text_trim) to the results of the previous step. *The results of this step MUST be supplied as basic metadata for ISCC registration.*
@@ -165,10 +165,10 @@ An ISCC generating application must follow these steps in the given order to pro
 6. Apply [`similarity_hash`](#similarity_hash) to the list of digests from the previous step.
 7. Prepend the 1-byte component header (`0x00`) to the results of the previous step.
 8. Encode the resulting 9 byte sequence with [`encode`](#encode)
-9. Return encoded Meta-ID, trimmed `title` and trimmed `extra` data.
+9. Return encoded Meta-Code, trimmed `title` and trimmed `extra` data.
 
 
-See also: [Meta-ID reference code](https://github.com/iscc/iscc-specs/blob/master/src/iscc/iscc.py#L19)
+See also: [Meta-Code reference code](https://github.com/iscc/iscc-specs/blob/master/src/iscc/iscc.py#L19)
 
 !!! warning "Text trimming"
     When trimming text be sure to trim the byte-length of the UTF-8 encoded version and not the number of characters. The trim point MUST be such that it does not cut into multi-byte characters. Characters might have different UTF-8 byte-length. For example `ü` is 2-bytes, `驩` is 3-bytes and `𠜎` is 4-bytes. So the trimmed version of a string with 128 `驩`-characters will result in a 42-character string with a 126-byte UTF-8 encoded length. This is necessary because the results of this operation will be stored as basic metadata with strict byte size limits on the blockchain.
@@ -176,17 +176,17 @@ See also: [Meta-ID reference code](https://github.com/iscc/iscc-specs/blob/maste
 !!! note "Automated Data-Ingestion"
     Applications that perform automated data-ingestion SHOULD apply a customized preliminary normalization to title data tailored to the dataset. Depending on catalog data removing pairs of brackets [], (), {}, and text in between them or cutting all text after the first occurence of a semicolon (;) or colon (:) can vastly improve deduplication.
 
-#### Dealing with Meta-ID collisions
+#### Dealing with Meta-Code collisions
 
-Ideally we want multiple ISCCs that identify different manifestations of the *same intangible creation* to be automatically grouped by an identical leading Meta-ID component. We call such a natural grouping an **intended component collision**. Metadata, captured and edited by humans, is notoriously unreliable. By using normalization and a similarity hash on the metadata, we account for some of this variation while keeping the Meta-ID component somewhat stable.
+Ideally we want multiple ISCCs that identify different manifestations of the *same intangible creation* to be automatically grouped by an identical leading Meta-Code component. We call such a natural grouping an **intended component collision**. Metadata, captured and edited by humans, is notoriously unreliable. By using normalization and a similarity hash on the metadata, we account for some of this variation while keeping the Meta-Code component somewhat stable.
 
-Auto-generated Meta-IDs components are **expected** to miss some intended collisions. An application SHOULD check for such **missed intended component collisions** before registering a new Meta-ID with the *canonical registry* of ISCCs by conducting a similarity search and asking for user feedback.
+Auto-generated Meta-Codes components are **expected** to miss some intended collisions. An application SHOULD check for such **missed intended component collisions** before registering a new Meta-Code with the *canonical registry* of ISCCs by conducting a similarity search and asking for user feedback.
 
-But what about **unintended component collisions**? Such collisions might happen because two *different intangible creations* have very similar or even identical metadata. But they might also happen by chance. With 2^56 possible Meta-ID components the probability of random collisions rises in an S-curved shape with the number of deployed ISCCs (see: [Hash Collision Probabilities](http://preshing.com/20110504/hash-collision-probabilities/)).  We should keep in mind that the Meta-ID component is only one part of a fully qualified ISCC Code. Unintended collisions of the Meta-ID component are generally deemed as **acceptable and expected**.
+But what about **unintended component collisions**? Such collisions might happen because two *different intangible creations* have very similar or even identical metadata. But they might also happen by chance. With 2^56 possible Meta-Code components the probability of random collisions rises in an S-curved shape with the number of deployed ISCCs (see: [Hash Collision Probabilities](http://preshing.com/20110504/hash-collision-probabilities/)).  We should keep in mind that the Meta-Code component is only one part of a fully qualified ISCC Code. Unintended collisions of the Meta-Code component are generally deemed as **acceptable and expected**.
 
-If for any reason an application wants to avoid unintended collisions with pre-existing Meta-ID components, it may use the `extra`-field. An application MUST first generate a Meta-ID without asking the user for input to the `extra`-field and then first check for collisions with the *canonical registry* of ISCCs. After it finds a collision with a pre-existing Meta-ID it may display the metadata of the colliding entry and interact with the user to determine if it is an unintended collision. Only if the user indicates an unintended collision, may the application ask for a disambiguation that is then added as an amendment to the metadata via the `extra`-field to create a different Meta-ID component. The application may repeat the pre-existence check until it finds no collision or a user intended collision. The application MUST NOT supply auto-generated input to the `extra`-field.
+If for any reason an application wants to avoid unintended collisions with pre-existing Meta-Code components, it may use the `extra`-field. An application MUST first generate a Meta-Code without asking the user for input to the `extra`-field and then first check for collisions with the *canonical registry* of ISCCs. After it finds a collision with a pre-existing Meta-Code it may display the metadata of the colliding entry and interact with the user to determine if it is an unintended collision. Only if the user indicates an unintended collision, may the application ask for a disambiguation that is then added as an amendment to the metadata via the `extra`-field to create a different Meta-Code component. The application may repeat the pre-existence check until it finds no collision or a user intended collision. The application MUST NOT supply auto-generated input to the `extra`-field.
 
-It is our opinion that the concept of **intended collisions** of Meta-ID components is a useful concept and a net positive. But one must know that this characteristic also has its pitfalls. It is not an attempt to provide an unambiguous - agreed upon - definition of *"identical intangible creations"*.
+It is our opinion that the concept of **intended collisions** of Meta-Code components is a useful concept and a net positive. But one must know that this characteristic also has its pitfalls. It is not an attempt to provide an unambiguous - agreed upon - definition of *"identical intangible creations"*.
 
 ### Content-Code Component
 
@@ -265,24 +265,24 @@ The last bit of the header byte of the Content-Code is the "Partial Content Flag
 
 !!! example "PCF Linking Example"
 
-    Let's assume we have a single newspaper issue "The Times - 03 Jan 2009". You would generate one Meta-ID component with the title "The Times" and extra "03 Jan 2009". The resulting Meta-ID component will be the grouping prefix in this scenario.
+    Let's assume we have a single newspaper issue "The Times - 03 Jan 2009". You would generate one Meta-Code component with the title "The Times" and extra "03 Jan 2009". The resulting Meta-Code component will be the grouping prefix in this scenario.
 
-    We use a Content-Code-Mixed with PCF `0` (not partial) for the ISCC of the newspaper issue. We generate Data-ID and Instance-ID from the print PDF of the newspaper issue.
+    We use a Content-Code-Mixed with PCF `0` (not partial) for the ISCC of the newspaper issue. We generate Data-Code and Instance-Code from the print PDF of the newspaper issue.
 
-    To create an ISCC for a single extracted image that should convey context with the newspaper issue, we reuse the Meta-ID of the newspaper issue and create a Content-Code-Image with PCF `1` (partial to the newspaper issue). For the Data-ID or Instance-ID of the image, we are free to choose if we reuse those of the newspaper issue or create separate ones. The former would express strong specialization of the image to the newspaper issue (not likely to be useful out of context). The latter would create a stronger link to an eventual standalone ISCC of the image. Note that the ISCC of the individual image keeps links in both ways:
+    To create an ISCC for a single extracted image that should convey context with the newspaper issue, we reuse the Meta-Code of the newspaper issue and create a Content-Code-Image with PCF `1` (partial to the newspaper issue). For the Data-Code or Instance-Code of the image, we are free to choose if we reuse those of the newspaper issue or create separate ones. The former would express strong specialization of the image to the newspaper issue (not likely to be useful out of context). The latter would create a stronger link to an eventual standalone ISCC of the image. Note that the ISCC of the individual image keeps links in both ways:
 
-    - Image is linked to the newspaper issue by identical Meta-ID component
+    - Image is linked to the newspaper issue by identical Meta-Code component
     - Image is linked to the standalone version of the image by identical Content-Code-Image body
 
-    This is just one example that illustrates the flexibility that the PCF-Flag provides in concert with a grouping Meta-ID. With great flexibility comes great danger of complexity. Applications SHOULD do careful planning before using the PCF-Flag with internally defined semantics.
+    This is just one example that illustrates the flexibility that the PCF-Flag provides in concert with a grouping Meta-Code. With great flexibility comes great danger of complexity. Applications SHOULD do careful planning before using the PCF-Flag with internally defined semantics.
 
-### Data-ID Component
+### Data-Code Component
 
-For the Data-ID that encodes data similarity we use a content defined chunking algorithm that provides some shift resistance and calculate the MinHash from those chunks. To accommodate for small files, the first 100 chunks have a ~140-byte size target while the remaining chunks target ~ 6kb in size.
+For the Data-Code that encodes data similarity we use a content defined chunking algorithm that provides some shift resistance and calculate the MinHash from those chunks. To accommodate for small files, the first 100 chunks have a ~140-byte size target while the remaining chunks target ~ 6kb in size.
 
-The Data-ID is built from the raw encoded data of the content to be identified. An ISCC generating application MUST provide a `data_id` function that accepts the raw encoded data as input.
+The Data-Code is built from the raw encoded data of the content to be identified. An ISCC generating application MUST provide a `data_id` function that accepts the raw encoded data as input.
 
-#### Generate Data-ID
+#### Generate Data-Code
 
 1. Apply [`data_chunks`](#data_chunks) to the raw encoded content data.
 2. For each chunk, calculate the xxHash32 integer hash.
@@ -292,19 +292,19 @@ The Data-ID is built from the raw encoded data of the content to be identified. 
 7. Prepend the 1-byte component header (eg. 0x20).
 8. Apply [`encode`](#encode) to the result of step 6 and return the result.
 
-See also: [Data-ID reference code](https://github.com/iscc/iscc-specs/blob/master/src/iscc/iscc.py#L123)
+See also: [Data-Code reference code](https://github.com/iscc/iscc-specs/blob/master/src/iscc/iscc.py#L123)
 
-### Instance-ID Component
+### Instance-Code Component
 
-The Instance-ID is built from the raw data of the media object to be identified and serves as checksum for the media object. The raw data of the media object is split into 64-kB data-chunks. Then we build a hash-tree from those chunks and use the truncated tophash (Merkle root) as component-body of the Instance-ID.
+The Instance-Code is built from the raw data of the media object to be identified and serves as checksum for the media object. The raw data of the media object is split into 64-kB data-chunks. Then we build a hash-tree from those chunks and use the truncated tophash (Merkle root) as component-body of the Instance-Code.
 
-To guard against length-extension attacks and second preimage attacks, we use double sha256 for hashing. We also prefix the hash input data with a `0x00`-byte for the leaf nodes hashes and with a `0x01`-byte for the internal node hashes. While the Instance-ID itself is a non-cryptographic checksum, the full tophash may be supplied in the extended metadata of an ISCC secure integrity verification is required.
+To guard against length-extension attacks and second preimage attacks, we use double sha256 for hashing. We also prefix the hash input data with a `0x00`-byte for the leaf nodes hashes and with a `0x01`-byte for the internal node hashes. While the Instance-Code itself is a non-cryptographic checksum, the full tophash may be supplied in the extended metadata of an ISCC secure integrity verification is required.
 
-![iscc-creation-instance-id](images/iscc-creation-instance-id.svg)
+![iscc-creation-Instance-Code](images/iscc-creation-Instance-Code.svg)
 
-An ISCC generating application MUST provide a `instance_id` function that accepts the raw data file as input and returns an encoded Instance-ID and a full hex-encoded 256-bit tophash.
+An ISCC generating application MUST provide a `instance_id` function that accepts the raw data file as input and returns an encoded Instance-Code and a full hex-encoded 256-bit tophash.
 
-#### Generate Instance-ID
+#### Generate Instance-Code
 
 1. Split the raw bytes of the encoded media object into 64-kB chunks.
 2. For each chunk, calculate the sha256d of the concatenation of a `0x00`-byte and the chunk bytes. We call the resulting values *leaf node hashes* (LNH).
@@ -312,11 +312,11 @@ An ISCC generating application MUST provide a `instance_id` function that accept
 4. Recursively apply `0x01`-prefixed pair-wise hashing to the results of the last step until the process yields only one hash value. We call this value the tophash.
 5. Trim the resulting tophash to the first 8 bytes.
 6. Prepend the 1-byte component header (e.g. `0x30`).
-7. Encode resulting 9-byte sequence with [`encode`](#encode) to an Instance-ID Code
+7. Encode resulting 9-byte sequence with [`encode`](#encode) to an Instance-Code Code
 8. Hex-Encode the tophash
-9. Return the Instance-ID and the hex-encoded tophash
+9. Return the Instance-Code and the hex-encoded tophash
 
-See also: [Instance-ID reference code](https://github.com/iscc/iscc-specs/blob/master/src/iscc/iscc.py#L144)
+See also: [Instance-Code reference code](https://github.com/iscc/iscc-specs/blob/master/src/iscc/iscc.py#L144)
 
 Applications may carry, store, and process the leaf node hashes for advanced streaming data identification or partial data integrity verification.
 
@@ -331,13 +331,13 @@ Basic metadata for an ISCC is metadata that is explicitly defined by this specif
 | Name    | Type       | Required | Bound | Description                                                  |
 | ------- | ---------- | -------- | ----- | ------------------------------------------------------------ |
 | version | integer    | No       | No    | Version of ISCC Specification. Assumed to be 1 if omitted.   |
-| title   | text       | Yes      | Yes   | The title of an intangible creation identified by the ISCC. The normalized and trimmed UTF-8 encoded text MUST not exceed 128 bytes. The result of processing `title` and `extra` data with the `meta_id` function MUST match the Meta-ID component of the ISCC. |
-| extra   | text       | No       | Yes   | An optional short statement that distinguishes this intangible creation from another one for Meta-ID uniqueness. |
+| title   | text       | Yes      | Yes   | The title of an intangible creation identified by the ISCC. The normalized and trimmed UTF-8 encoded text MUST not exceed 128 bytes. The result of processing `title` and `extra` data with the `meta_id` function MUST match the Meta-Code component of the ISCC. |
+| extra   | text       | No       | Yes   | An optional short statement that distinguishes this intangible creation from another one for Meta-Code uniqueness. |
 | tophash | text (hex) | No       | No    | The full hex-encoded tophash (Merkle root) returned by the `instance_id`  function. |
 | meta    | array      | No       | No    | A list of one or more **extended metadata** entries. Must include at least one entry if specified. |
 
 !!! attention
-    **Bound** metadata impacts the ISCC Code (Meta-ID) and cannot be changed afterwards. Depending on adoption and real world use, future versions of this specification may define new basic metadata fields. Applications MAY add custom fields at the top level of the JSON object, but MUST prefix those fields with an underscore to avoid collisions with future extensions of this specification.
+    **Bound** metadata impacts the ISCC Code (Meta-Code) and cannot be changed afterwards. Depending on adoption and real world use, future versions of this specification may define new basic metadata fields. Applications MAY add custom fields at the top level of the JSON object, but MUST prefix those fields with an underscore to avoid collisions with future extensions of this specification.
 
 ### Extended Metadata
 
@@ -374,7 +374,7 @@ See also: [ISCC-Stream specification](https://coblo.github.io/cips/cip-0003-iscc
 
 Embedding ISCC codes into content is only RECOMMENDED if it does not create a side effect. We call it a side effect if embedding an ISCC code changes the content to such an extent, that it yields a different ISCC code.
 
-Side effects will depend on the combination of ISCC components that are to be embedded. A Meta-ID can always be embedded without side effects because it does not depend on the content itself. Content-Code and Data-ID may not change if embedded in larger media objects. Instance-IDs cannot easily be embedded as they will inevitably have a side effect on the post-embedding Instance-ID without special processing.
+Side effects will depend on the combination of ISCC components that are to be embedded. A Meta-Code can always be embedded without side effects because it does not depend on the content itself. Content-Code and Data-Code may not change if embedded in larger media objects. Instance-Codes cannot easily be embedded as they will inevitably have a side effect on the post-embedding Instance-Code without special processing.
 
 Applications MAY embed ISCC codes that have side effects if they specify a procedure by which the embedded ISCC codes can be stripped in such a way that the stripped content will yield the original embedded ISCC codes.
 
@@ -590,7 +590,7 @@ Copyright © 2016 - 2020 The Authors, Content Blockchain Project
 
 *[sha256d]: Double SHA256
 
-*[tophash]: Root hash of an Instance-ID hash-tree
+*[tophash]: Root hash of an Instance-Code hash-tree
 
 [#Charikar2002]:  http://dx.doi.org/10.1145/509907.509965 "Charikar, M.S., 2002, May. Similarity estimation techniques from rounding algorithms. In Proceedings of the thirty-fourth annual ACM symposium on theory of computing (pp. 380-388). ACM."
 [#WenXia2016]: http://dx.doi.org/10.1109/TC.2016.2595565 "Wen Xia, Yukun Zhou, Hong Jiang, Yu Hua, Yuchong Hu, Yucheng Zhang, Qing Liu, 2016. FastCDC: a Fast and Efficient Content-Defined Chunking Approach for Data Deduplication."
