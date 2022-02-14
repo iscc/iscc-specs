@@ -79,7 +79,7 @@ A **Fully Qualified ISCC Digest** is a fixed size sequence of **36 bytes (288 bi
 The ISCC Digest is built from multiple self-describing 72-bit components:
 
 
-| Components:     | Meta-ID             | Content-ID         | Data-ID           | Instance-ID   |
+| Components:     | Meta-ID             | Content-Code         | Data-ID           | Instance-ID   |
 | :-------------- | :------------------ | :----------------- | :---------------- | :------------ |
 | **Context:**    | Intangible creation | Content similarity | Data similarity   | Data checksum |
 | **Input:**      | Metadata            | Extracted  content | Raw data          | Raw data      |
@@ -92,13 +92,13 @@ ISCC components MAY be used separately or in combination by applications for var
 
     **Meta-ID**: CCDFPFc87MhdT
 
-Combinations of components MUST include the Meta-ID component and MUST be ordered as **Meta-ID**, **Content-ID**, **Data-ID**, and **Instance-ID**. Individual components MAY be skipped and SHOULD be separated with hyphens. A combination of components SHOULD be prefixed with "ISCC".
+Combinations of components MUST include the Meta-ID component and MUST be ordered as **Meta-ID**, **Content-Code**, **Data-ID**, and **Instance-ID**. Individual components MAY be skipped and SHOULD be separated with hyphens. A combination of components SHOULD be prefixed with "ISCC".
 
 !!! example "Combination of ISCC-Code components"
 
     **ISCC**: CCPktvj3dVoVa-CTPCWTpGPMaLZ-CDL6QsUZdZzog
 
-A **Fully Qualified ISCC Code** is an ordered sequence of Meta-ID, Content-ID, Data-ID, and Instance-ID codes. It SHOULD be prefixed with ISCC and MAY be separated by hyphens.
+A **Fully Qualified ISCC Code** is an ordered sequence of Meta-ID, Content-Code, Data-ID, and Instance-ID codes. It SHOULD be prefixed with ISCC and MAY be separated by hyphens.
 
 !!! example "Fully Qualified ISCC-Code (52 characters)"
 
@@ -121,16 +121,16 @@ The header only needs to be carried in the encoded representation. As similarity
 | Component                | Nibble-1 | Nibble-2                        | Byte | Code |
 | :----------------------- | :------- | :------------------------------ | :--- | ---- |
 | **Meta-ID**              | 0000     | 0000 - Reserved                 | 0x00 | CC   |
-| **Content-ID-Text**      | 0001     | 0000 - Content Type Text        | 0x10 | CT   |
-| **Content-ID-Text PCF**  | 0001     | 0001 - Content Type Text  + PCF | 0x11 | Ct   |
-| **Content-ID-Image**     | 0001     | 0010 - Content Type Image       | 0x12 | CY   |
-| **Content-ID-Image PCF** | 0001     | 0011 - Content Type Image + PCF | 0x13 | Ci   |
-| *Content-ID-Audio*       | 0001     | 0100 - Content Type Audio       | 0x14 | CA   |
-| *Content-ID-Audio PCF*   | 0001     | 0101 - Content Type Audio + PCF | 0x15 | Ca   |
-| *Content-ID-Video*       | 0001     | 0110 - Content Type Video       | 0x16 | CV   |
-| *Content-ID-Video PCF*   | 0001     | 0111 - Content Type Video + PCF | 0x17 | Cv   |
-| **Content-ID-Mixed**     | 0001     | 1000 - Content Type Mixed       | 0x18 | CM   |
-| **Content-ID Mixed PCF** | 0001     | 1001 - Content Type Mixed + PCF | 0x19 | Cm   |
+| **Content-Code-Text**      | 0001     | 0000 - Content Type Text        | 0x10 | CT   |
+| **Content-Code-Text PCF**  | 0001     | 0001 - Content Type Text  + PCF | 0x11 | Ct   |
+| **Content-Code-Image**     | 0001     | 0010 - Content Type Image       | 0x12 | CY   |
+| **Content-Code-Image PCF** | 0001     | 0011 - Content Type Image + PCF | 0x13 | Ci   |
+| *Content-Code-Audio*       | 0001     | 0100 - Content Type Audio       | 0x14 | CA   |
+| *Content-Code-Audio PCF*   | 0001     | 0101 - Content Type Audio + PCF | 0x15 | Ca   |
+| *Content-Code-Video*       | 0001     | 0110 - Content Type Video       | 0x16 | CV   |
+| *Content-Code-Video PCF*   | 0001     | 0111 - Content Type Video + PCF | 0x17 | Cv   |
+| **Content-Code-Mixed**     | 0001     | 1000 - Content Type Mixed       | 0x18 | CM   |
+| **Content-Code Mixed PCF** | 0001     | 1001 - Content Type Mixed + PCF | 0x19 | Cm   |
 | **Data-ID**              | 0010     | 0000 - Reserved                 | 0x20 | CD   |
 | **Instance-ID**          | 0011     | 0000 - Reserved                 | 0x30 | CR   |
 
@@ -188,30 +188,30 @@ If for any reason an application wants to avoid unintended collisions with pre-e
 
 It is our opinion that the concept of **intended collisions** of Meta-ID components is a useful concept and a net positive. But one must know that this characteristic also has its pitfalls. It is not an attempt to provide an unambiguous - agreed upon - definition of *"identical intangible creations"*.
 
-### Content-ID Component
+### Content-Code Component
 
-The Content-ID component has multiple subtypes. The subtypes correspond with the **Generic Media Types (GMT)**. A fully qualified ISCC can only have one Content-ID component of one specific GMT, but there may be multiple ISCCs with different Content-ID types per digital media object.
+The Content-Code component has multiple subtypes. The subtypes correspond with the **Generic Media Types (GMT)**. A fully qualified ISCC can only have one Content-Code component of one specific GMT, but there may be multiple ISCCs with different Content-Code types per digital media object.
 
-A Content-ID is generated in two broad steps. In the first step, we extract and convert content from a rich media type to a normalized GMT. In the second step, we use a GMT-specific process to generate the Content-ID component of an ISCC.
+A Content-Code is generated in two broad steps. In the first step, we extract and convert content from a rich media type to a normalized GMT. In the second step, we use a GMT-specific process to generate the Content-Code component of an ISCC.
 
 #### Generic Media Types
 
-The  Content-ID type is signaled by the first 3 bits of the second nibble of the first byte of the Content-ID:
+The  Content-Code type is signaled by the first 3 bits of the second nibble of the first byte of the Content-Code:
 
-| Content-ID Type | Nibble 2 Bits 0-3 | Description                                           |
+| Content-Code Type | Nibble 2 Bits 0-3 | Description                                           |
 | :-------------- | :---------------- | ----------------------------------------------------- |
 | text            | 000               | Generated from extracted and normalized plain-text    |
 | image           | 001               | Generated from normalized grayscale pixel data        |
 | *audio*         | *010*             | To be defined in a later version of the specification |
 | *video*         | *011*             | To be defined in a later version of the specification |
-| mixed           | 100               | Generated from multiple Content-IDs                   |
+| mixed           | 100               | Generated from multiple Content-Codes                   |
 |                 | 101, 110, 111     | Reserved for future versions of specification         |
 
-#### Content-ID-Text
+#### Content-Code-Text
 
-The Content-ID-Text is built from the extracted plain-text content of an encoded media object. To build a stable Content-ID-Text the plain-text content must first be extracted from the digital media object. It should be extracted in a way that is reproducible. There are many text document formats out in the wild and extracting plain-text from all of them is anything but a trivial task. While text-extraction is out of scope for this specification it is RECOMMENDED, that plain-text content SHOULD be extracted with the open-source [Apache Tika v1.23](https://tika.apache.org/) toolkit, if a generic reproducibility of the Content-ID-Text component is desired.
+The Content-Code-Text is built from the extracted plain-text content of an encoded media object. To build a stable Content-Code-Text the plain-text content must first be extracted from the digital media object. It should be extracted in a way that is reproducible. There are many text document formats out in the wild and extracting plain-text from all of them is anything but a trivial task. While text-extraction is out of scope for this specification it is RECOMMENDED, that plain-text content SHOULD be extracted with the open-source [Apache Tika v1.23](https://tika.apache.org/) toolkit, if a generic reproducibility of the Content-Code-Text component is desired.
 
-An ISCC generating application MUST provide a `content_id(text, partial=False)` function that accepts UTF-8 encoded plain text and a boolean, indicating the [partial content flag](#partial-content-flag-pcf) as input and returns a Content-ID with GMT type `text`. The procedure to create a Content-ID-Text is:
+An ISCC generating application MUST provide a `content_id(text, partial=False)` function that accepts UTF-8 encoded plain text and a boolean, indicating the [partial content flag](#partial-content-flag-pcf) as input and returns a Content-Code with GMT type `text`. The procedure to create a Content-Code-Text is:
 
 1. Apply [`text_normalize`](#text_normalize) to the text input while removing white-space.
 2. Create character-wise n-grams of length 13 from the normalized text.
@@ -222,20 +222,20 @@ An ISCC generating application MUST provide a `content_id(text, partial=False)` 
 7. Prepend the 1-byte component header (`0x10` full content or `0x11` partial content).
 8. Encode and return the resulting 9-byte sequence with [`encode`](#encode).
 
-See also: [Content-ID-Text reference code](https://github.com/iscc/iscc-specs/blob/master/src/iscc/iscc.py#L54)
+See also: [Content-Code-Text reference code](https://github.com/iscc/iscc-specs/blob/master/src/iscc/iscc.py#L54)
 
-#### Content-ID-Image
+#### Content-Code-Image
 
-For the Content-ID-Image we are opting for a DCT-based perceptual image-hash instead of a more sophisticated key-point detection based method. In view of the generic deployability of the ISCC we chose an algorithm that has moderate computation requirements and is easy to implement while still being robust against common image manipulations.
+For the Content-Code-Image we are opting for a DCT-based perceptual image-hash instead of a more sophisticated key-point detection based method. In view of the generic deployability of the ISCC we chose an algorithm that has moderate computation requirements and is easy to implement while still being robust against common image manipulations.
 
-An ISCC generating application MUST provide a `content_id_image(image, partial=False)` function that accepts a local file path to an image and returns a Content-ID with GMT type `image`. The procedure to create a Content-ID-Image is as follows:
+An ISCC generating application MUST provide a `content_id_image(image, partial=False)` function that accepts a local file path to an image and returns a Content-Code with GMT type `image`. The procedure to create a Content-Code-Image is as follows:
 
 1. Apply [`image_normalize`](#image_normalize) to receive a two-dimensional array of gray-scale pixel data.
 2. Apply [`image_hash`](#image_hash) to the results of the previous step.
 3. Prepend the 1-byte component header (`0x12` full content or `0x13` partial content) to results of the previous step.
 4. Encode and return the resulting 9-byte sequence with [`encode`](#encode)
 
-See also: [Content-ID-Image reference code](https://github.com/iscc/iscc-specs/blob/master/src/iscc/iscc.py#L81)
+See also: [Content-Code-Image reference code](https://github.com/iscc/iscc-specs/blob/master/src/iscc/iscc.py#L81)
 
 !!! note "Image Data Input"
     The `content_id_image` function may optionally accept the raw byte data of an encoded image or an internal native image object as input for convenience.
@@ -243,23 +243,23 @@ See also: [Content-ID-Image reference code](https://github.com/iscc/iscc-specs/b
 !!! warning "JPEG Decoding"
     Decoding of JPEG images is non deterministic. Different image processing libraries may yield diverging pixel data and result in different Image-IDs. The reference implementation uses the built-in decoder of the [Python Pillow](https://github.com/python-pillow/Pillow) imaging library. Future versions of the ISCC specification may define a custom deterministic JPEG decoding procedure.
 
-#### Content-ID-Mixed
+#### Content-Code-Mixed
 
-The Content-ID-Mixed aggregates multiple Content-IDs of the same or different types. It may be used for digital media objects that embed multiples types of media or for collections of contents of the same type. First, we have to collect contents from the mixed media object or content collection and generate Content-IDs for each item. An ISCC conforming application must provide a `content_id_mixed` function that takes a list of Content-ID Codes as input and returns a Content-ID-Mixed. Follow these steps to create a Content-ID-Mixed:
+The Content-Code-Mixed aggregates multiple Content-Codes of the same or different types. It may be used for digital media objects that embed multiples types of media or for collections of contents of the same type. First, we have to collect contents from the mixed media object or content collection and generate Content-Codes for each item. An ISCC conforming application must provide a `content_id_mixed` function that takes a list of Content-Code Codes as input and returns a Content-Code-Mixed. Follow these steps to create a Content-Code-Mixed:
 
 Signature: `conent_id_mixed(cids: List[str], partial: bool=False) -> str`
 
-1. Decode the list of Content-IDs.
-2. Extract the **first 8-bytes** from each digest (**Note**: this includes the header part of the Content-IDs).
+1. Decode the list of Content-Codes.
+2. Extract the **first 8-bytes** from each digest (**Note**: this includes the header part of the Content-Codes).
 3. Apply [`similarity_hash`](#similarity_hash) to the list of digests from step 2.
 4. Prepend the 1-byte component header(`0x18` full content or `0x19` partial content)
 5. Apply [`encode`](#encode) to the result of step 5 and return the result.
 
-See also: [Content-ID-Mixed reference code](https://github.com/iscc/iscc-specs/blob/master/src/iscc/iscc.py#L102)
+See also: [Content-Code-Mixed reference code](https://github.com/iscc/iscc-specs/blob/master/src/iscc/iscc.py#L102)
 
 #### Partial Content Flag (PCF)
 
-The last bit of the header byte of the Content-ID is the "Partial Content Flag". It designates if the Content-ID applies to the full content, or just some part of it. The PCF MUST be set as a `0`-bit (**full GMT-specific content**) by default. Setting the PCF to `1` enables applications to create multiple linked ISCCs of partial extracts of a content collection. The exact semantics of *partial content* are outside of the scope of this specification. Applications that plan to support partial Content-IDs MUST define their semantics.
+The last bit of the header byte of the Content-Code is the "Partial Content Flag". It designates if the Content-Code applies to the full content, or just some part of it. The PCF MUST be set as a `0`-bit (**full GMT-specific content**) by default. Setting the PCF to `1` enables applications to create multiple linked ISCCs of partial extracts of a content collection. The exact semantics of *partial content* are outside of the scope of this specification. Applications that plan to support partial Content-Codes MUST define their semantics.
 
  ![Partial Contant Flag](images/iscc-pcf.svg)
 
@@ -267,12 +267,12 @@ The last bit of the header byte of the Content-ID is the "Partial Content Flag".
 
     Let's assume we have a single newspaper issue "The Times - 03 Jan 2009". You would generate one Meta-ID component with the title "The Times" and extra "03 Jan 2009". The resulting Meta-ID component will be the grouping prefix in this scenario.
 
-    We use a Content-ID-Mixed with PCF `0` (not partial) for the ISCC of the newspaper issue. We generate Data-ID and Instance-ID from the print PDF of the newspaper issue.
+    We use a Content-Code-Mixed with PCF `0` (not partial) for the ISCC of the newspaper issue. We generate Data-ID and Instance-ID from the print PDF of the newspaper issue.
 
-    To create an ISCC for a single extracted image that should convey context with the newspaper issue, we reuse the Meta-ID of the newspaper issue and create a Content-ID-Image with PCF `1` (partial to the newspaper issue). For the Data-ID or Instance-ID of the image, we are free to choose if we reuse those of the newspaper issue or create separate ones. The former would express strong specialization of the image to the newspaper issue (not likely to be useful out of context). The latter would create a stronger link to an eventual standalone ISCC of the image. Note that the ISCC of the individual image keeps links in both ways:
+    To create an ISCC for a single extracted image that should convey context with the newspaper issue, we reuse the Meta-ID of the newspaper issue and create a Content-Code-Image with PCF `1` (partial to the newspaper issue). For the Data-ID or Instance-ID of the image, we are free to choose if we reuse those of the newspaper issue or create separate ones. The former would express strong specialization of the image to the newspaper issue (not likely to be useful out of context). The latter would create a stronger link to an eventual standalone ISCC of the image. Note that the ISCC of the individual image keeps links in both ways:
 
     - Image is linked to the newspaper issue by identical Meta-ID component
-    - Image is linked to the standalone version of the image by identical Content-ID-Image body
+    - Image is linked to the standalone version of the image by identical Content-Code-Image body
 
     This is just one example that illustrates the flexibility that the PCF-Flag provides in concert with a grouping Meta-ID. With great flexibility comes great danger of complexity. Applications SHOULD do careful planning before using the PCF-Flag with internally defined semantics.
 
@@ -374,7 +374,7 @@ See also: [ISCC-Stream specification](https://coblo.github.io/cips/cip-0003-iscc
 
 Embedding ISCC codes into content is only RECOMMENDED if it does not create a side effect. We call it a side effect if embedding an ISCC code changes the content to such an extent, that it yields a different ISCC code.
 
-Side effects will depend on the combination of ISCC components that are to be embedded. A Meta-ID can always be embedded without side effects because it does not depend on the content itself. Content-ID and Data-ID may not change if embedded in larger media objects. Instance-IDs cannot easily be embedded as they will inevitably have a side effect on the post-embedding Instance-ID without special processing.
+Side effects will depend on the combination of ISCC components that are to be embedded. A Meta-ID can always be embedded without side effects because it does not depend on the content itself. Content-Code and Data-ID may not change if embedded in larger media objects. Instance-IDs cannot easily be embedded as they will inevitably have a side effect on the post-embedding Instance-ID without special processing.
 
 Applications MAY embed ISCC codes that have side effects if they specify a procedure by which the embedded ISCC codes can be stripped in such a way that the stripped content will yield the original embedded ISCC codes.
 
@@ -483,7 +483,7 @@ See also: [Image normalization reference code](https://github.com/iscc/iscc-spec
 
 ### Feature Hashing
 
-The ISCC standardizes various feature hashing algorithms that reduce content features to a binary vector used as the body of the various Content-ID components.
+The ISCC standardizes various feature hashing algorithms that reduce content features to a binary vector used as the body of the various Content-Code components.
 
 #### similarity_hash
 

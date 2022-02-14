@@ -156,11 +156,11 @@ The Partial Content Flag is a 1-bit flag that indicates whether the remaining el
 
 ### Media Type Flag
 
-The Media Type Flag is a 3 bit flag that allows us to distinguish between up to 8 generic media types **(GMTs)** to which our Content-ID component applies. We define a generic media type as *basic content types* such as plain text or raw pixel data that is specified exactly and extracted from more complex file formats or encodings. We start with generic text and image types and add audio, video and mixed types later.
+The Media Type Flag is a 3 bit flag that allows us to distinguish between up to 8 generic media types **(GMTs)** to which our Content-Code component applies. We define a generic media type as *basic content types* such as plain text or raw pixel data that is specified exactly and extracted from more complex file formats or encodings. We start with generic text and image types and add audio, video and mixed types later.
 
-### Content-ID
+### Content-Code
 
-The Content-ID operates on **Layer 3** and will be a GMT-specific similarity preserving hash generated from extracted content. It identifies the normalized content of a specific GMT, independent of file format or encoding. It relates to the structural essence of the content and groups similar GMT-specific manifestations of the abstract creation or parts of it (as indicated by the Partial Content Flag). For practical reasons we intentionally skip a **Layer 2** component at this time. It would add unnecessary complexity for a basic proof-of-concept implementation.
+The Content-Code operates on **Layer 3** and will be a GMT-specific similarity preserving hash generated from extracted content. It identifies the normalized content of a specific GMT, independent of file format or encoding. It relates to the structural essence of the content and groups similar GMT-specific manifestations of the abstract creation or parts of it (as indicated by the Partial Content Flag). For practical reasons we intentionally skip a **Layer 2** component at this time. It would add unnecessary complexity for a basic proof-of-concept implementation.
 
 ### Data-ID
 

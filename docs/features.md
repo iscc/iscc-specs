@@ -4,7 +4,7 @@ authors: Titusz Pan
 
 # ISCC - Features
 
-**The ISCC comes with a number of built-in features:** 
+**The ISCC comes with a number of built-in features:**
 
 ## Granular Content Management
 
@@ -39,13 +39,13 @@ During content creation, review processes or distribution, same or similar files
 
 ## Related Product Identification
 
-The Content-ID is one component of the ISCC. It is a similarity-preserving hash generated from extracted content. It identifies the normalized content of a specific file, independent of file format or encoding. As the Content-ID will remain the same for the same content in various formats, the ISCC automatically connects related formats, like PDF-, MS-word or EPUB-files or JPEG- and PNG-files, etc.
+The Content-Code is one component of the ISCC. It is a similarity-preserving hash generated from extracted content. It identifies the normalized content of a specific file, independent of file format or encoding. As the Content-Code will remain the same for the same content in various formats, the ISCC automatically connects related formats, like PDF-, MS-word or EPUB-files or JPEG- and PNG-files, etc.
 
 [![ISCC Image Clustering](images/iscc-image-clustering.svg)](images/iscc-image-clustering.svg)
 
 ## Content Variant Detection
 
-The similarity preserving hash of the Content-ID of the ISCC is able to cluster similar variants of content. It identifies the same or similar content and also shows on a scale from 1-64 (or 1-100%) how similar two content variants are. At the same time an application can distinguish between similar but not identical content through the Instance-ID component of the ISCC. This can help to identify e.g. watermarked files. 
+The similarity preserving hash of the Content-Code of the ISCC is able to cluster similar variants of content. It identifies the same or similar content and also shows on a scale from 1-64 (or 1-100%) how similar two content variants are. At the same time an application can distinguish between similar but not identical content through the Instance-ID component of the ISCC. This can help to identify e.g. watermarked files.
 
 
 ## Proof of Data Possession
