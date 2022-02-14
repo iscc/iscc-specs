@@ -293,7 +293,7 @@ The Instance-Code is built from the raw data of the media object to be identifie
 
 To guard against length-extension attacks and second pre-image attacks we use double sha256 for hashing. We also prefix the hash input data with a `0x00`-byte for the leaf nodes hashes and with a `0x01`-byte for the  internal node hashes. While the Instance-Code itself is a non-cryptographic checksum, the full tophash may be supplied in the extended metadata of an ISCC secure integrity verification is required.
 
-![iscc-creation-Instance-Code](images/iscc-creation-Instance-Code.svg)
+![ISCC Creation Instance-Code](images/iscc-creation-instance-code.svg)
 
 An ISCC generating application MUST provide a `instance_id` function that accepts the raw data file as input and returns an encoded Instance-Code and a full hex-encoded 256-bit tophash.
 
