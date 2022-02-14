@@ -48,7 +48,7 @@ optional = ["opencv-contrib-python-headless", "scenedetect"]
 
 [tool.poetry.dev-dependencies]
 pytest = "^6.2"
-mkdocs-material = "^8.0"
+mkdocs-material = "^8.1"
 mkdocs-redirects = "^1.0"
 mkdocs-minify-plugin = "^0.5"
 mkdocs-git-revision-date-localized-plugin = "^0.10"

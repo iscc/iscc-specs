@@ -18,7 +18,7 @@ copyright: 'Copyright © 2016-2022 The Authors
 
 theme:
     name: material
-    custom_dir: overrides
+    custom_dir: docs/overrides
     language: en
     logo: images/logo-white.svg
     favicon: images/favicon.png
@@ -70,6 +70,8 @@ extra:
           link: https://t.me/iscc_dev
         - icon: fontawesome/brands/twitter
           link: https://twitter.com/iscc_foundation
+    analytics:
+        provider: custom
 
 markdown_extensions:
     - abbr
