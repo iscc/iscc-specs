@@ -1,8 +1,8 @@
-title: ISCC - Content Identifiers
-description: The intelligent digital media identifier. 
+title: ISCC - Content Codes
+description: The intelligent digital media identifier.
 authors: Titusz Pan
 
-# ISCC - Content Identifiers
+# ISCC - Content Codes
 
 The ISCC (International Standard Content Code) is a modern, generic, and free content identifier:
 
@@ -22,7 +22,7 @@ With better identifiers for digital content, the entire ecosystem becomes more e
 | ------------------------------------ | ----------------------------------------- |
 | Centralized issuance                 | Decentralized issuance                    |
 | Industry specific overspecialization | Generic content identifier                |
-| None or human curated semantics      | Algorithmic similarity & deduplication    |  
+| None or human curated semantics      | Algorithmic similarity & deduplication    |
 | High management costs                | Low management costs                      |
 | High barrier of entry                | Low barrier of entry                      |
 | Not designed for blockchain storage  | Designed for and registered on blockchain |
