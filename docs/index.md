@@ -1,8 +1,8 @@
-title: ISCC - Content Identifiers
+title: ISCC - Content Codes
 description: The intelligent digital media identifier.
 authors: Titusz Pan
 
-# ISCC - Content Identifiers
+# ISCC - Content Codes
 
 ## A Proposal for a Modern and Open Content-Based Identifier
 

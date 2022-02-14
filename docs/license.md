@@ -1,6 +1,6 @@
 # License
 
-**TITLE**: ISCC - Content Identifiers
+**TITLE**: ISCC - Content Codes
 
 **ISCC**: CCDFPFc87MhdT-CTg5dAueXoTwU-CDFo1xv7eF4sD
 
