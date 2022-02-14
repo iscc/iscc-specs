@@ -1,5 +1,5 @@
 # Project information
-site_name: 'ISCC - Content Identifiers'
+site_name: 'ISCC - Content Codes'
 site_description: 'International Standard Content Code - Specification'
 site_author: 'Titusz Pan'
 site_url: 'http://iscc.codes'
@@ -10,7 +10,7 @@ repo_url: 'https://github.com/iscc/iscc-specs'
 edit_uri: 'edit/master/docs/'
 
 # Copyright
-copyright: 'Copyright © 2016-2020 The Authors
+copyright: 'Copyright © 2016-2022 The Authors
 | <a href="https://iscc.foundation/privacy">Privacy Policy</a>
 | <a href="https://iscc.foundation/cookies">Cookie Policy</a>
 | <a href="https://iscc.foundation/imprint">Imprint</a>
@@ -18,12 +18,27 @@ copyright: 'Copyright © 2016-2020 The Authors
 
 theme:
     name: material
+    custom_dir: overrides
     language: en
     logo: images/logo-white.svg
     favicon: images/favicon.png
     palette:
-        primary: blue
-        accent: pink
+    - scheme: default
+      toggle:
+        icon: material/toggle-switch-off-outline
+        name: Switch to dark mode
+    - scheme: slate
+      toggle:
+        icon: material/toggle-switch
+        name: Switch to light mode
+    features:
+    # - toc.integrate
+    - navigation.indexes
+    - navigation.tracking
+    # -  navigation.tabs
+    # - navigation.tabs.sticky
+    - navigation.expand
+
 #    features:
 #        - navigation.tabs
 #        - navigation.tabs.sticky
