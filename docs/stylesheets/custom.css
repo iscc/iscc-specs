@@ -20,6 +20,9 @@
   --md-default-fg-color--light:        #a6db50;
 }
 
+.md-grid {
+  max-width: 1550px;
+}
 
 .md-typeset {
     font-weight: 200;
