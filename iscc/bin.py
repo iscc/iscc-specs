@@ -157,6 +157,15 @@ def exiv2_install():
     os.chmod(exiv2_bin(), st.st_mode | stat.S_IEXEC)
     st = os.stat(exiv2json_bin())
     os.chmod(exiv2json_bin(), st.st_mode | stat.S_IEXEC)
+
+    # macOS workaround to avoid dynamic linking issues
+    # Correct way would be to set DYLD_LIBRARY_PATH when calling exiv2,
+    # but this makes it easier.
+    if system().lower() == "darwin":
+        lib_path = Path(exiv2_bin()).parent / ".." / "lib" / "libexiv2.27.dylib"
+        lib_bin_path = Path(exiv2_bin()).parent / "libexiv2.27.dylib"
+        os.symlink(lib_path, lib_bin_path)
+
     return exiv2_bin()
 
 
