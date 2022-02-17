@@ -115,8 +115,11 @@ def extract_text_metadata(data, text=None, **options):
     norm_text = normalize_text(text) if text else ""
 
     if not norm_title and opts.text_guess_title and text:
-        title = text.strip().splitlines()[0]
-        norm_title = normalize_text(title)
+        try:
+            title = text.strip().splitlines()[0]
+            norm_title = normalize_text(title)
+        except IndexError:
+            pass
 
     norm_title = iscc_core.code_meta.trim_text(norm_title, opts.meta_trim_title)
 
