@@ -308,7 +308,7 @@ def code_audio(data, **options):
 
 def code_video(uri, **options):
     # type: (Union[Uri, File], **Any) -> dict
-    """Compute Content-ID video."""
+    """Compute Content-Code video."""
     opts = SdkOptions(**options) if options else sdk_opts
     result = {}
     with Timer(text="{:0.4f}s for video metadata extraction", logger=log.debug):

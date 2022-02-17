@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Content-ID Image functions"""
+"""Content-Code Image functions"""
 import base64
 import json
 import os
