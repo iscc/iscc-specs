@@ -12,16 +12,16 @@ The **International Standard Content Code** is a proposal for an [open standard]
 
 ## Installing the reference code
 
-The reference code is published with the package name [iscc](https://pypi.python.org/pypi/iscc) on Python Package Index. Install it with:
+The reference code is published with the package name [iscc](https://pypi.org/project/iscc/#history) on Python Package Index. Install the latest beta release with:
 
 ``` bash
-pip install iscc==1.1.0b16
+pip install iscc==1.1.0b17
 ```
 
 If your system is setup to compile c-extensions install with:
 
 ``` bash
-pip install iscc[turbo]==1.1.0b16
+pip install iscc[turbo]==1.1.0b17
 ```
 
 This will install cython and build binary extansions for faster ISCC processing.
