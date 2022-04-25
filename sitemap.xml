@@ -2,32 +2,32 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
          <loc>http://iscc.codes/</loc>
-         <lastmod>2022-02-14</lastmod>
+         <lastmod>2022-04-25</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>http://iscc.codes/concept/</loc>
-         <lastmod>2022-02-14</lastmod>
+         <lastmod>2022-04-25</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>http://iscc.codes/features/</loc>
-         <lastmod>2022-02-14</lastmod>
+         <lastmod>2022-04-25</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>http://iscc.codes/license/</loc>
-         <lastmod>2022-02-14</lastmod>
+         <lastmod>2022-04-25</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>http://iscc.codes/resources/</loc>
-         <lastmod>2022-02-14</lastmod>
+         <lastmod>2022-04-25</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>http://iscc.codes/specification/</loc>
-         <lastmod>2022-02-14</lastmod>
+         <lastmod>2022-04-25</lastmod>
          <changefreq>daily</changefreq>
     </url>
 </urlset>
