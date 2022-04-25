@@ -41,6 +41,7 @@ iscc-core = "^0.1"
 Pillow = "^8.4"
 tinytag = "^1.6"
 install-jdk = "^0.3.0"
+bitarray-hardbyte = "<=1.6.2"
 
 [tool.poetry.extras]
 turbo = ["cython", "pybase64"]
