@@ -10,13 +10,20 @@ authors: Titusz Pan
 
 ## The ISCC is...
 
-- a universal identifier for multiple generic media-types (text, image, audio, video)
-- a lightweight and similarity-preserving fingerprint designed for digital content
+- a universal identifier for all kinds of digital content (text, image, audio, video)
+- a lightweight and similarity-preserving fingerprint
 - designed for cross-sector applicability (journalism, books, music, film, etc.)
 - designed to identify content in decentralized and networked environments
 - and most importantly it is free, open-source and transparent
 
-**You want to try it instantly?** Head over to our demo at https://iscc.coblo.net
+You want to try an early prototype instantly? Head over to an interactive [demo](https://iscc.coblo.net)
+
+!!! update
+    The ISCC has been accepted by ISO as full work item [ISO/AWI 24138 - International Standard Content Code](https://www.iso.org/standard/77899.html) and is being standardized at [TC 46/SC 9/WG 18](https://www.iso.org/committee/48836.html).
+
+    Current development is documented at [ISCC - Codec & Algorithms](https://core.iscc.codes)
+
+
 
 ## Motivation
 
