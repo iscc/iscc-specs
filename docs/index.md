@@ -6,7 +6,7 @@ authors: Titusz Pan
 
 ## A Proposal for a Modern and Open Content-Based Identifier
 
-![iscc-sample](images/iscc-algo-design2.svg)
+![iscc-sample](images/iscc-algo-design.svg)
 
 ## The ISCC is...
 
