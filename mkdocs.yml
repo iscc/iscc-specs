@@ -22,9 +22,7 @@ theme:
     language: en
     logo: images/logo-white.svg
     favicon: images/favicon.png
-    font:
-      text: Readex Pro
-      code: JetBrains Mono
+    font: false
     palette:
     - scheme: default
       toggle:

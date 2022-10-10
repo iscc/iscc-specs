@@ -1,3 +1,18 @@
+@font-face {
+  font-family: "Readex Pro";
+  src: url("/fonts/ReadexPro-VariableFont_wght.ttf");
+}
+
+@font-face {
+  font-family: "JetBrains Mono";
+  src: url("/fonts/JetBrainsMono-VariableFont_wght.ttf");
+}
+
+:root {
+  --md-text-font: "Readex Pro";
+  --md-code-font: "JetBrains Mono";
+}
+
 [data-md-color-scheme="default"] {
   --md-primary-fg-color:               #0054b2;
   --md-primary-fg-color--light:        #7ac2f7;
