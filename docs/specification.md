@@ -8,7 +8,7 @@ authors: Titusz Pan
 
 !!! warning
 
-    This document is **out of date** early draft and retained for historic reasons only. Please follow **current development** at https://ieps.iscc.codes
+    This document is an **out of date** early draft and retained for historic reasons only. Please follow **current development** at https://ieps.iscc.codes
 
 ## Abstract
 
